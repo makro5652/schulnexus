@@ -48,13 +48,49 @@ class PortalTest(TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertEqual(self.client.get(reverse("klassenliste", args=[Gruppe.objects.get(name="9b").pk])).status_code, 403)
 
+    def test_schuelerakte(self):
+        from stammdaten.models import Gruppe
+
+        s_9a = Gruppe.objects.get(name="9a").aktuelle_mitglieder().first()
+        s_9b = Gruppe.objects.get(name="9b").aktuelle_mitglieder().first()
+        self.client.login(username="lehrkraft", password="Test-Passwort-123")
+        r = self.client.get(reverse("schuelerakte", args=[s_9a.pk]))
+        self.assertEqual(r.status_code, 200)
+        self.assertContains(r, "Schullaufbahn")
+        self.assertContains(r, "Eltern und Kontaktpersonen")
+        self.assertNotContains(r, "Gesundheitsangaben")  # Lehrkräfte sehen Gesundheitsdaten standardmäßig nicht
+        self.assertEqual(self.client.get(reverse("schuelerakte", args=[s_9b.pk])).status_code, 403)
+
+    def test_verwaltung_sieht_gesundheitsangaben(self):
+        from stammdaten.models import Gesundheitsangaben
+
+        g = Gesundheitsangaben.objects.first()
+        self.client.login(username="verwaltung", password="Test-Passwort-123")
+        r = self.client.get(reverse("schuelerakte", args=[g.schueler_id]))
+        self.assertContains(r, "Gesundheitsangaben")
+        self.assertContains(r, g.allergien)
+
+    def test_lehrkraft_sieht_nur_eigene_personalakte(self):
+        self.client.login(username="lehrkraft", password="Test-Passwort-123")
+        r = self.client.get(reverse("admin:stammdaten_personalprofil_changelist"))
+        # Lehrkräfte haben kein Recht auf die Personalverwaltung
+        self.assertEqual(r.status_code, 403)
+
     def test_admin_seiten_laden(self):
         User.objects.create_superuser("chef", password="x-Passwort-123")
         self.client.login(username="chef", password="x-Passwort-123")
         for name in ["stammdaten_person", "stammdaten_schuelerprofil", "stammdaten_gruppe", "noten_unterricht",
-                     "noten_leistungsnachweis", "noten_note", "fehlzeiten_fehlzeit", "nachmittag_agangebot"]:
+                     "noten_leistungsnachweis", "noten_note", "fehlzeiten_fehlzeit", "nachmittag_agangebot",
+                     "stammdaten_personalprofil", "stammdaten_laufbahnabschnitt", "stammdaten_elternprofil",
+                     "stammdaten_abschluss", "stammdaten_gesundheitsangaben", "noten_bewertungsordner"]:
             self.assertEqual(self.client.get(reverse(f"admin:{name}_changelist")).status_code, 200, name)
             self.assertEqual(self.client.get(reverse(f"admin:{name}_add")).status_code, 200, name)
+        # Detailseiten mit allen Inlines
+        from stammdaten.models import Person, Personalprofil, Schuelerprofil
+
+        for obj, name in [(Schuelerprofil.objects.first(), "stammdaten_schuelerprofil"), (Personalprofil.objects.first(), "stammdaten_personalprofil"),
+                          (Person.objects.filter(elternprofil__isnull=False).first(), "stammdaten_person")]:
+            self.assertEqual(self.client.get(reverse(f"admin:{name}_change", args=[obj.pk])).status_code, 200, name)
 
     def test_lehrkraft_admin_nur_eigene_leistungsnachweise(self):
         self.client.login(username="lehrkraft", password="Test-Passwort-123")

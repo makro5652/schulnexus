@@ -139,3 +139,63 @@ def klassenliste(request, pk):
             "kontakte": s.beziehungen.select_related("person").all(),
         })
     return render(request, "portal/klassenliste.html", {"gruppe": gruppe, "zeilen": zeilen})
+
+
+@login_required
+def schuelerakte(request, pk):
+    schueler = get_object_or_404(Schuelerprofil.objects.select_related("person"), pk=pk)
+    klasse = schueler.stammklasse()
+    person = getattr(request.user, "person", None)
+    ist_klassenleitung = bool(person and klasse and klasse.leitung and klasse.leitung.person_id == person.pk)
+    if not (ist_verwaltung(request.user) or ist_klassenleitung):
+        raise PermissionDenied
+
+    darf_gesundheit = request.user.has_perm("stammdaten.view_gesundheitsangaben") or (
+        ist_klassenleitung and request.user.has_perm("stammdaten.view_gesundheit_klasse")
+    )
+    gesundheit = getattr(schueler, "gesundheit", None) if darf_gesundheit else None
+
+    sj = Schuljahr.aktuelles()
+    fehlzeiten = list(schueler.fehlzeiten.filter(datum_von__gte=sj.beginn, datum_von__lte=sj.ende)) if sj else []
+    stunden_pro_tag = sj.zeitraster.count() if sj else 0
+    fz = {
+        "stunden": sum(f.fehlstunden(stunden_pro_tag) for f in fehlzeiten),
+        "unentschuldigt": sum(f.fehlstunden(stunden_pro_tag) for f in fehlzeiten if f.status == "unentschuldigt"),
+        "verspaetungen": sum(1 for f in fehlzeiten if f.art == Fehlzeit.VERSPAETUNG),
+        "offen": sum(1 for f in fehlzeiten if f.status == "offen"),
+    }
+
+    noten = []
+    if sj:
+        for u in Unterricht.objects.filter(abschnitt__schuljahr=sj, gruppe__mitgliedschaften__schueler=schueler).select_related(
+            "fach", "abschnitt", "lehrkraft", "skala"
+        ).distinct().order_by("abschnitt__nummer", "fach__reihenfolge"):
+            noten.append({"unterricht": u, "vorschlag": vorschlagsnote(u, schueler)})
+
+    alter = None
+    if schueler.person.geburtsdatum:
+        heute = timezone.localdate()
+        g = schueler.person.geburtsdatum
+        alter = heute.year - g.year - ((heute.month, heute.day) < (g.month, g.day))
+
+    return render(request, "portal/schuelerakte.html", {
+        "s": schueler,
+        "p": schueler.person,
+        "klasse": klasse,
+        "alter": alter,
+        "laufbahn": schueler.laufbahn.select_related("schuljahr", "bildungsgang", "stammklasse").order_by("schuljahr__beginn", "von"),
+        "aktuell": schueler.aktueller_laufbahnabschnitt(),
+        "kontakte": schueler.beziehungen.select_related("person", "person__elternprofil").order_by("-sorgerecht", "art"),
+        "gruppen": Gruppe.objects.filter(
+            mitgliedschaften__in=Mitgliedschaft.objects.aktiv().filter(schueler=schueler)
+        ).exclude(typ=Gruppe.STAMMKLASSE).distinct(),
+        "abschluesse": schueler.abschluesse.select_related("art"),
+        "sprachen": schueler.sprachenfolge.select_related("fach"),
+        "vorherige": schueler.vorherige_schulen.all(),
+        "einwilligungen": schueler.einwilligungen.all(),
+        "gesundheit": gesundheit,
+        "darf_gesundheit": darf_gesundheit,
+        "fz": fz,
+        "noten": noten,
+        "ist_verwaltung": ist_verwaltung(request.user),
+    })

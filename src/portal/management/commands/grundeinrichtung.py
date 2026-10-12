@@ -9,6 +9,29 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 
 from noten.models import Notenskala, Notenstufe
+from stammdaten.models import Abschlussart, Bildungsgang
+
+# Voreinstellungen – in der Verwaltung frei änderbar (Stammdaten › Bildungsgänge / Abschlussarten).
+BILDUNGSGAENGE = [
+    ("KG", "Kindergarten / Vorschule", "", None, None),
+    ("GS", "Grundschule", "", 1, 4),
+    ("HS", "Hauptschulbildungsgang", "Erster allgemeinbildender Schulabschluss (Hauptschulabschluss)", 5, 10),
+    ("RS", "Realschulbildungsgang", "Mittlerer Schulabschluss (Realschulabschluss)", 5, 10),
+    ("GYM", "Gymnasialer Bildungsgang (Sek I)", "Berechtigung zum Besuch der gymnasialen Oberstufe", 5, 10),
+    ("GOS", "Gymnasiale Oberstufe", "Allgemeine Hochschulreife", 11, 12),
+]
+ABSCHLUSSARTEN = [
+    ("ESA", "Erster allgemeinbildender Schulabschluss (Hauptschulabschluss)"),
+    ("EESA", "Erweiterter erster allgemeinbildender Schulabschluss"),
+    ("MSA", "Mittlerer Schulabschluss (Realschulabschluss)"),
+    ("OS", "Berechtigung zum Besuch der gymnasialen Oberstufe"),
+    ("FHR", "Fachhochschulreife (schulischer Teil)"),
+    ("AHR", "Allgemeine Hochschulreife (Abitur)"),
+    ("DIA", "Deutsches Internationales Abitur (DIA)"),
+    ("DSD1", "Deutsches Sprachdiplom Stufe I (DSD I)"),
+    ("DSD2", "Deutsches Sprachdiplom Stufe II (DSD II)"),
+    ("SONST", "Sonstiges Zertifikat"),
+]
 
 SEK1 = [
     ("1+", "0.7"), ("1", "1.0"), ("1-", "1.3"), ("2+", "1.7"), ("2", "2.0"), ("2-", "2.3"),
@@ -23,6 +46,8 @@ ROLLEN = {
         "view_person", "view_schuelerprofil", "view_gruppe", "view_mitgliedschaft", "view_fach", "view_beziehung",
         "view_unterricht", "view_notenskala", "view_notenstufe", "view_notenschluessel", "view_gewichtungsvorlage",
         "view_leistungskategorie",
+        "view_laufbahnabschnitt", "view_abschluss", "view_sprachenfolge", "view_vorherigeschule",
+        "view_elternprofil", "view_bildungsgang", "view_abschlussart", "view_einwilligung",
         "add_bewertungsordner", "change_bewertungsordner", "view_bewertungsordner", "delete_bewertungsordner",
         "add_leistungsnachweis", "change_leistungsnachweis", "view_leistungsnachweis", "delete_leistungsnachweis",
         "add_note", "change_note", "view_note",
@@ -72,3 +97,12 @@ class Command(BaseCommand):
                 [Notenstufe(skala=sek2, bezeichnung=str(p), wert=Decimal(p), reihenfolge=15 - p) for p in range(15, -1, -1)]
             )
         self.stdout.write(self.style.SUCCESS("Notenskalen eingerichtet."))
+
+        for i, (k, name, abschluss, von, bis) in enumerate(BILDUNGSGAENGE):
+            Bildungsgang.objects.get_or_create(
+                kuerzel=k, defaults={"name": name, "angestrebter_abschluss": abschluss,
+                                     "jahrgang_von": von, "jahrgang_bis": bis, "reihenfolge": (i + 1) * 10},
+            )
+        for i, (k, name) in enumerate(ABSCHLUSSARTEN):
+            Abschlussart.objects.get_or_create(kuerzel=k, defaults={"name": name, "reihenfolge": (i + 1) * 10})
+        self.stdout.write(self.style.SUCCESS("Bildungsgänge und Abschlussarten eingerichtet."))

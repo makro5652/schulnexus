@@ -28,6 +28,14 @@ from noten.models import (
 )
 from stammdaten.models import (
     Abschnitt,
+    Bildungsgang,
+    Elternprofil,
+    Fortbildung,
+    Gesundheitsangaben,
+    Laufbahnabschnitt,
+    Notfallkontakt,
+    Sprachenfolge,
+    VorherigeSchule,
     Beziehung,
     Einwilligung,
     Fach,
@@ -44,6 +52,10 @@ VORNAMEN = [
     "Malia", "Noah", "Olivia", "Paul", "Rehema", "Samuel", "Tara", "Umar", "Valentina", "Wanjiru", "Yusuf", "Zoe",
     "Aiden", "Baraka", "Charlotte", "Daniel", "Emma", "Felix", "Jabari", "Lena", "Mia", "Nia", "Otieno", "Sophie",
 ]
+VORNAMEN_W = ["Amani", "Clara", "Elif", "Grace", "Hannah", "Imani", "Kiara", "Malia", "Olivia", "Rehema", "Tara",
+              "Valentina", "Wanjiru", "Zoe", "Charlotte", "Emma", "Lena", "Mia", "Nia", "Sophie"]
+VORNAMEN_M = ["Ben", "David", "Finn", "Jonas", "Leon", "Noah", "Paul", "Samuel", "Umar", "Yusuf", "Aiden", "Baraka",
+              "Daniel", "Felix", "Jabari", "Otieno"]
 NACHNAMEN = [
     "Achieng", "Bauer", "Chege", "Dietrich", "Engel", "Fischer", "Gitau", "Hoffmann", "Imbuga", "Jung",
     "Kamau", "Lehmann", "Mwangi", "Neumann", "Odhiambo", "Peters", "Ruto", "Schmidt", "Thiong'o", "Ullrich",
@@ -83,24 +95,49 @@ class Command(BaseCommand):
         faecher = {}
         for i, (k, n) in enumerate([("D", "Deutsch"), ("E", "Englisch"), ("M", "Mathematik"), ("CH", "Chemie"),
                                     ("BIO", "Biologie"), ("PH", "Physik"), ("ETH", "Ethik"), ("REL", "Religion"),
-                                    ("SW", "Kiswahili")]):
+                                    ("SW", "Kiswahili"), ("F", "Französisch")]):
             faecher[k], _ = Fach.objects.get_or_create(kuerzel=k, defaults={"name": n, "reihenfolge": (i + 1) * 10})
 
-        # Personal mit Benutzerkonten
-        def personal(kuerzel, vorname, nachname, funktion="lehrkraft", benutzername=None, rolle="Lehrkraft"):
+        # Frühere Schuljahre (für die Schullaufbahn)
+        sj_alt = {
+            2024: Schuljahr.objects.create(name="2024/25", beginn=date(2024, 8, 19), ende=date(2025, 6, 27)),
+            2025: Schuljahr.objects.create(name="2025/26", beginn=date(2025, 8, 18), ende=date(2026, 6, 26)),
+        }
+        bg = {b.kuerzel: b for b in Bildungsgang.objects.all()}
+
+        # Personal mit Benutzerkonten und Personalakte
+        def personal(kuerzel, vorname, nachname, funktion="lehrkraft", benutzername=None, rolle="Lehrkraft",
+                     anstellung="olk", faecher_k=(), stunden=None, beginn=2022, funktionen="", anrede="Frau"):
             user = None
             if benutzername:
                 user = User.objects.create_user(benutzername, password=pw, is_staff=True, first_name=vorname, last_name=nachname)
                 user.groups.add(Group.objects.get(name=rolle))
-            p = Person.objects.create(vorname=vorname, nachname=nachname, email=f"{kuerzel.lower()}@schule.example", benutzer=user)
-            return Personalprofil.objects.create(person=p, kuerzel=kuerzel, funktion=funktion)
+            p = Person.objects.create(anrede=anrede, vorname=vorname, nachname=nachname, email=f"{kuerzel.lower()}@privat.example",
+                                      mobil=f"+254 7{rng.randint(10, 99)} {rng.randint(100, 999)} {rng.randint(100, 999)}",
+                                      ort="Nairobi", benutzer=user)
+            pp = Personalprofil.objects.create(
+                person=p, kuerzel=kuerzel, funktion=funktion, personalnummer=f"P-{rng.randint(1000, 9999)}",
+                anstellungsart=anstellung, dienstbeginn=date(beginn, 8, 1),
+                vertragsende=date(beginn + 6, 7, 31) if anstellung in {"adlk", "bplk"} else None,
+                wochenstunden=stunden, weitere_funktionen=funktionen, dienst_email=f"{kuerzel.lower()}@schule.example",
+                arbeitserlaubnis_bis=date(beginn + 3, 7, 31) if anstellung in {"adlk", "bplk", "lplk"} else None,
+            )
+            pp.lehrbefaehigungen.set([faecher[k] for k in faecher_k])
+            Notfallkontakt.objects.create(personal=pp, name=f"{rng.choice(VORNAMEN)} {nachname}", beziehung="Partner:in",
+                                          telefon=f"+254 7{rng.randint(10, 99)} {rng.randint(100, 999)} {rng.randint(100, 999)}")
+            if funktion == "lehrkraft":
+                Fortbildung.objects.create(personal=pp, titel="Sprachsensibler Fachunterricht", anbieter="ZfA Region Afrika",
+                                           datum=date(2025, 11, rng.randint(3, 28)), umfang_stunden=Decimal(12), nachweis_liegt_vor=True)
+            return pp
 
-        kro = personal("KRA", "Martin", "Krause", benutzername="lehrkraft")
-        mue = personal("MUE", "Sabine", "Müller")
-        sch = personal("SCH", "Thomas", "Schwarz")
-        oko = personal("OKO", "Grace", "Okoth")
-        bra = personal("BRA", "Peter", "Brandt")
-        personal("SEK", "Mercy", "Wambui", funktion="verwaltung", benutzername="verwaltung", rolle="Verwaltung")
+        kro = personal("KRA", "Martin", "Krause", benutzername="lehrkraft", anstellung="adlk", faecher_k=("CH", "BIO"),
+                       stunden=Decimal(25), beginn=2024, funktionen="Fachleitung Naturwissenschaften", anrede="Herr")
+        mue = personal("MUE", "Sabine", "Müller", anstellung="bplk", faecher_k=("M", "PH"), stunden=Decimal(26), beginn=2023)
+        sch = personal("SCH", "Thomas", "Schwarz", anstellung="adlk", faecher_k=("D", "E"), stunden=Decimal(23), beginn=2021, anrede="Herr")
+        oko = personal("OKO", "Grace", "Okoth", anstellung="olk", faecher_k=("ETH", "E", "SW"), stunden=Decimal(20), beginn=2019)
+        bra = personal("BRA", "Peter", "Brandt", anstellung="lplk", faecher_k=("REL", "D"), stunden=Decimal(26), beginn=2025, anrede="Herr")
+        personal("SEK", "Mercy", "Wambui", funktion="verwaltung", benutzername="verwaltung", rolle="Verwaltung",
+                 anstellung="ortskraft", stunden=Decimal(40), beginn=2018, funktionen="Schulsekretariat")
 
         # Klassen und Schüler:innen
         klassen = {
@@ -116,17 +153,72 @@ class Command(BaseCommand):
                 vorname, nachname = namen_pool.pop()
                 nr += 1
                 geb = date(2026 - jg - 6, rng.randint(1, 12), rng.randint(1, 28))
-                p = Person.objects.create(vorname=vorname, nachname=nachname, geburtsdatum=geb, ort="Nairobi")
-                s = Schuelerprofil.objects.create(person=p, schuelernummer=str(nr), eintrittsdatum=date(2022, 8, 15))
+                geschlecht = rng.choice(["w", "m"])
+                p = Person.objects.create(
+                    vorname=vorname, nachname=nachname, geburtsdatum=geb, geschlecht=geschlecht, ort="Nairobi",
+                    strasse=f"{rng.choice(['Runda', 'Kitisuru', 'Gigiri', 'Lavington', 'Karen'])} Estate, House {rng.randint(1, 80)}",
+                    postfach=f"P.O. Box {rng.randint(10000, 99999)}-00100", geburtsort=rng.choice(["Nairobi", "Berlin", "München", "Mombasa", "Hamburg"]),
+                    staatsangehoerigkeiten=rng.choice(["deutsch", "kenianisch", "deutsch, kenianisch", "österreichisch", "deutsch, britisch"]),
+                )
+                eintritt_jg = rng.choice([1, 1, 1, 5, jg - 1])
+                s = Schuelerprofil.objects.create(
+                    person=p, schuelernummer=str(nr), eintrittsdatum=date(2026 - (jg - eintritt_jg), 8, 15), eintritt_jahrgang=eintritt_jg,
+                    muttersprache=rng.choice(["Deutsch", "Deutsch", "Englisch", "Kiswahili, Englisch", "Deutsch, Englisch"]),
+                    familiensprache=rng.choice(["Deutsch", "Deutsch, Englisch", "Englisch"]),
+                    daz=rng.random() < 0.15, nachteilsausgleich=rng.random() < 0.08,
+                    religionsunterricht=rng.choice(["ev", "kath", "ethik"]),
+                    lebt_bei="beiden Eltern", schulweg=rng.choice(["bus", "abgeholt", "abgeholt"]),
+                )
+                if s.schulweg == "bus":
+                    s.buslinie = f"Linie {rng.randint(1, 6)}"
+                    s.save(update_fields=["buslinie"])
                 Mitgliedschaft.objects.create(gruppe=g, schueler=s, von=sj.beginn)
+
+                # Schullaufbahn: zwei Vorjahre + aktuelles Jahr
+                bildungsgang = rng.choices(["GYM", "RS", "HS"], weights=[70, 20, 10])[0]
+                wechsel = bildungsgang == "GYM" and rng.random() < 0.12  # Aufstieg RS -> GYM
+                for jahr, schuljahr in sj_alt.items():
+                    jg_damals = jg - (2026 - jahr)
+                    if jg_damals < eintritt_jg:
+                        continue
+                    bg_damals = "RS" if wechsel and jahr == 2024 else bildungsgang
+                    ergebnis = "wechsel" if wechsel and jahr == 2024 else "versetzt"
+                    Laufbahnabschnitt.objects.create(
+                        schueler=s, schuljahr=schuljahr, jahrgang=jg_damals, bildungsgang=bg[bg_damals], ergebnis=ergebnis,
+                        bemerkung="Wechsel in den gymnasialen Bildungsgang (Konferenzbeschluss)" if ergebnis == "wechsel" else "",
+                    )
+                Laufbahnabschnitt.objects.create(schueler=s, schuljahr=sj, jahrgang=jg, bildungsgang=bg[bildungsgang], stammklasse=g)
+                Sprachenfolge.objects.create(schueler=s, position=1, fach=faecher["E"], ab_jahrgang=1 if eintritt_jg <= 3 else 5)
+                if bildungsgang == "GYM":
+                    Sprachenfolge.objects.create(schueler=s, position=2, fach=rng.choice([faecher["F"], faecher["SW"]]), ab_jahrgang=6)
+                if eintritt_jg > 1:
+                    VorherigeSchule.objects.create(
+                        schueler=s, name=rng.choice(["Hillcrest School", "Grundschule am See", "Brookhouse School", "Peponi School"]),
+                        ort=rng.choice(["Nairobi", "Hamburg", "Karen"]), land=rng.choice(["Kenia", "Deutschland"]),
+                        letzter_jahrgang=str(eintritt_jg - 1), schulform=rng.choice(["CBC (KE)", "Grundschule (DE)", "British Curriculum"]),
+                    )
+                if rng.random() < 0.25:
+                    Gesundheitsangaben.objects.create(
+                        schueler=s, allergien=rng.choice(["Erdnüsse", "Bienenstiche", "Laktose", "Pollen"]),
+                        medikamente=rng.choice(["", "Notfallset (Adrenalin-Pen) im Sekretariat", "Asthmaspray"]),
+                        arzt="Dr. Kamau, +254 20 123 4567", krankenversicherung=rng.choice(["AAR", "Jubilee", "Allianz Care"]),
+                    )
                 eltern = []
-                for art, vn in [("mutter", rng.choice(VORNAMEN)), ("vater", rng.choice(VORNAMEN))][: rng.choice([1, 2, 2])]:
+                for art, vn in [("mutter", rng.choice(VORNAMEN_W)), ("vater", rng.choice(VORNAMEN_M))][: rng.choice([1, 2, 2])]:
                     e = Person.objects.create(
-                        vorname=vn, nachname=nachname, email=f"{vn.lower()}.{nachname.lower().replace(chr(39), '')}@eltern.example",
-                        telefon=f"+254 7{rng.randint(10, 99)} {rng.randint(100, 999)} {rng.randint(100, 999)}", ort="Nairobi",
+                        anrede="Frau" if art == "mutter" else "Herr", vorname=vn, nachname=nachname,
+                        email=f"{vn.lower()}.{nachname.lower().replace(chr(39), '')}@eltern.example",
+                        mobil=f"+254 7{rng.randint(10, 99)} {rng.randint(100, 999)} {rng.randint(100, 999)}",
+                        strasse=p.strasse, postfach=p.postfach, ort="Nairobi",
                         sprache=rng.choice(["de", "de", "en"]),
                     )
-                    Beziehung.objects.create(schueler=s, person=e, art=art, notfallkontakt=not eltern)
+                    Elternprofil.objects.create(
+                        person=e, beruf=rng.choice(["Diplomatin", "Ingenieur", "Ärztin", "Lehrer", "Projektleiterin", "Unternehmer", "Journalistin"]),
+                        arbeitgeber=rng.choice(["Deutsche Botschaft", "GIZ", "UN-Habitat", "UNEP", "Safaricom", "selbstständig", ""]),
+                        korrespondenzweg=rng.choice(["email", "email", "app"]), schulverein_mitglied=rng.random() < 0.7,
+                        kontaktdaten_weitergabe=rng.random() < 0.6,
+                    )
+                    Beziehung.objects.create(schueler=s, person=e, art=art, notfallkontakt=not eltern, rechnungsempfaenger=not eltern)
                     eltern.append(e)
                 if rng.random() < 0.8:
                     Einwilligung.objects.create(schueler=s, zweck="foto_intern", erteilt_durch=eltern[0], erteilt_am=date(2026, 8, 20))

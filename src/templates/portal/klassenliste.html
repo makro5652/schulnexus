@@ -10,13 +10,13 @@
   <tbody>
   {% for z in zeilen %}
     <tr>
-      <td>{{ z.schueler.person }}</td>
+      <td><a href="{% url 'schuelerakte' z.schueler.pk %}">{{ z.schueler.person }}</a></td>
       <td>{{ z.schueler.schuelernummer }}</td>
       <td class="zahl">{{ z.fehlstunden }}</td>
       <td class="zahl {% if z.unentschuldigt %}auffaellig{% endif %}">{{ z.unentschuldigt }}</td>
       <td class="zahl">{{ z.verspaetungen }}</td>
       <td class="zahl {% if z.offene %}auffaellig{% endif %}">{{ z.offene }}</td>
-      <td>{% for b in z.kontakte %}{{ b.person.anzeigename }} ({{ b.get_art_display }}){% if b.person.telefon %}, {{ b.person.telefon }}{% endif %}{% if not forloop.last %}<br>{% endif %}{% empty %}—{% endfor %}</td>
+      <td>{% for b in z.kontakte %}{{ b.person.anzeigename }} ({{ b.get_art_display }}){% if b.person.mobil or b.person.telefon %}, {{ b.person.mobil|default:b.person.telefon }}{% endif %}{% if not forloop.last %}<br>{% endif %}{% empty %}—{% endfor %}</td>
     </tr>
   {% endfor %}
   </tbody>

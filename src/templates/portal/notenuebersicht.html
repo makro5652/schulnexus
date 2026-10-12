@@ -32,7 +32,7 @@
     <tr class="{% if z.vorschlag.gefaehrdet %}gefaehrdet{% endif %}">
       <th class="links">{{ z.schueler.person }}</th>
       {% for n in z.zellen %}
-        <td>{% if n %}{% if n.stufe %}{{ n.stufe }}{% if n.prozent is not None %}<small>{{ n.prozent }} %</small>{% endif %}{% elif n.sonderstatus %}<span class="sonder" title="{{ n.get_sonderstatus_display }}">{{ n.get_sonderstatus_display|slice:":4" }}.</span>{% else %}<span class="leer">–</span>{% endif %}{% else %}<span class="leer">–</span>{% endif %}</td>
+        <td>{% if n %}{% if n.stufe %}{{ n.stufe }}{% if n.gewicht_individuell is not None %}<span class="einzelgewicht" title="Individuelles Gewicht: {{ n.gewicht_begruendung }}">×{{ n.gewicht_individuell|floatformat:-2 }}</span>{% endif %}{% if n.prozent is not None %}<small>{{ n.prozent }} %</small>{% endif %}{% elif n.sonderstatus %}<span class="sonder" title="{{ n.get_sonderstatus_display }}">{{ n.get_sonderstatus_display|slice:":4" }}.</span>{% else %}<span class="leer">–</span>{% endif %}{% else %}<span class="leer">–</span>{% endif %}</td>
       {% endfor %}
       {% for k in z.vorschlag.alle_ordner %}<td class="kat">{{ k.schnitt|default_if_none:"–" }}</td>{% endfor %}
       <td class="vorschlag">

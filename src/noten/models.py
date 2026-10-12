@@ -334,6 +334,13 @@ class Note(models.Model):
     erreichte_be = models.DecimalField("Erreichte BE", max_digits=6, decimal_places=2, null=True, blank=True)
     stufe = models.ForeignKey(Notenstufe, null=True, blank=True, on_delete=models.PROTECT, verbose_name="Note")
     sonderstatus = models.CharField("Sonderstatus", max_length=16, choices=SONDERSTATUS, blank=True, default="")
+    gewicht_individuell = models.DecimalField(
+        "Individuelles Gewicht", max_digits=6, decimal_places=2, null=True, blank=True,
+        validators=[MinValueValidator(Decimal("0"))],
+        help_text="Nur ausfüllen, wenn diese eine Note anders zählen soll als der Leistungsnachweis "
+                  "(z. B. Nachschreibarbeit, Nachteilsausgleich). Leer = Gewicht des Leistungsnachweises.",
+    )
+    gewicht_begruendung = models.CharField("Begründung für abweichendes Gewicht", max_length=200, blank=True)
     kommentar = models.CharField("Kommentar", max_length=200, blank=True)
     history = HistoricalRecords(verbose_name="Änderungsprotokoll Note")
 
@@ -345,7 +352,18 @@ class Note(models.Model):
     def __str__(self):
         return f"{self.schueler}: {self.stufe or self.get_sonderstatus_display()}"
 
+    @property
+    def wirksames_gewicht(self):
+        return self.gewicht_individuell if self.gewicht_individuell is not None else self.leistungsnachweis.gewicht
+
+    @property
+    def gewicht_abweichend(self):
+        return self.gewicht_individuell is not None and self.gewicht_individuell != self.leistungsnachweis.gewicht
+
     def clean(self):
+        if self.gewicht_individuell is not None and self.leistungsnachweis_id \
+                and self.gewicht_individuell != self.leistungsnachweis.gewicht and not self.gewicht_begruendung.strip():
+            raise ValidationError({"gewicht_begruendung": "Bitte begründen, warum diese Note anders gewichtet wird."})
         ln = self.leistungsnachweis
         if self.erreichte_be is not None and ln.max_be and self.erreichte_be > ln.max_be:
             raise ValidationError("Die erreichten BE überschreiten die maximalen BE.")

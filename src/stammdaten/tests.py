@@ -42,3 +42,44 @@ class MitgliedschaftTest(TestCase):
 
         with self.assertRaises(IntegrityError), transaction.atomic():
             Schuljahr.objects.create(name="2027/28", beginn=date(2027, 8, 16), ende=date(2028, 6, 23), aktiv=True)
+
+
+class LaufbahnTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        from django.core.management import call_command
+
+        call_command("grundeinrichtung", stdout=open("/dev/null", "w"))
+        cls.sj = Schuljahr.objects.create(name="2026/27", beginn=date(2026, 8, 17), ende=date(2027, 6, 25), aktiv=True)
+        cls.alt = Schuljahr.objects.create(name="2025/26", beginn=date(2025, 8, 18), ende=date(2026, 6, 26))
+        cls.s = Schuelerprofil.objects.create(person=Person.objects.create(vorname="A", nachname="B"), schuelernummer="1")
+
+    def test_bildungsgaenge_eingerichtet(self):
+        from .models import Abschlussart, Bildungsgang
+
+        self.assertEqual(set(Bildungsgang.objects.values_list("kuerzel", flat=True)) >= {"HS", "RS", "GYM", "GOS"}, True)
+        self.assertTrue(Abschlussart.objects.filter(kuerzel="MSA").exists())
+
+    def test_laufbahn_und_aktueller_abschnitt(self):
+        from .models import Bildungsgang, Laufbahnabschnitt
+
+        rs, gym = Bildungsgang.objects.get(kuerzel="RS"), Bildungsgang.objects.get(kuerzel="GYM")
+        Laufbahnabschnitt.objects.create(schueler=self.s, schuljahr=self.alt, jahrgang=8, bildungsgang=rs, ergebnis="wechsel")
+        Laufbahnabschnitt.objects.create(schueler=self.s, schuljahr=self.sj, jahrgang=9, bildungsgang=gym)
+        self.assertEqual(self.s.aktueller_laufbahnabschnitt().bildungsgang, gym)
+        self.assertEqual(self.s.laufbahn.count(), 2)
+
+    def test_jahrgang_passt_nicht_zum_bildungsgang(self):
+        from .models import Bildungsgang, Laufbahnabschnitt
+
+        gos = Bildungsgang.objects.get(kuerzel="GOS")
+        with self.assertRaises(ValidationError):
+            Laufbahnabschnitt(schueler=self.s, schuljahr=self.sj, jahrgang=7, bildungsgang=gos).full_clean()
+
+    def test_stammklasse_aus_anderem_schuljahr(self):
+        from .models import Bildungsgang, Laufbahnabschnitt
+
+        klasse_alt = Gruppe.objects.create(schuljahr=self.alt, name="8a", jahrgang=8)
+        with self.assertRaises(ValidationError):
+            Laufbahnabschnitt(schueler=self.s, schuljahr=self.sj, jahrgang=9, bildungsgang=Bildungsgang.objects.get(kuerzel="GYM"),
+                              stammklasse=klasse_alt).full_clean()

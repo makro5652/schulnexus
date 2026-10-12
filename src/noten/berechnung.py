@@ -15,6 +15,9 @@ Beispiel:  Schriftlich (50)  ─ 1. Klassenarbeit (1), Test (0,5)
 Leere Ordner werden übersprungen, die übrigen Einträge ihrer Ebene tragen dann
 mehr Gewicht. Fehlt einem obersten Ordner jede Note, gibt es einen Warnhinweis.
 
+Jede einzelne Note kann ein individuelles Gewicht haben (z. B. Nachschreibarbeit);
+sonst gilt das Gewicht des Leistungsnachweises.
+
 Noten mit Sonderstatus (entschuldigt, befreit, nicht bewertbar) zählen nicht.
 "Unentschuldigt" zählt nur, wenn die Lehrkraft eine Note eingetragen hat.
 """
@@ -128,13 +131,18 @@ def vorschlagsnote(unterricht, schueler, noten=None, baum=None) -> Vorschlag:
     baum = baum or Baum(unterricht)
     if noten is None:
         noten = Note.objects.filter(leistungsnachweis__unterricht=unterricht, schueler=schueler).select_related("stufe")
-    wert_je_ln = {n.leistungsnachweis_id: n.stufe.wert for n in noten if n.stufe is not None}
+    # Wert und ggf. individuelles Gewicht je Leistungsnachweis
+    wert_je_ln = {n.leistungsnachweis_id: (n.stufe.wert, n.gewicht_individuell) for n in noten if n.stufe is not None}
 
     ergebnisse: dict[int, OrdnerErgebnis] = {}
 
     def wert(o, ebene, pfad):
         p = f"{pfad} › {o.name}" if pfad else o.name
-        paare = [(wert_je_ln[ln.pk], ln.gewicht) for ln in baum.nachweise_in[o.pk] if ln.pk in wert_je_ln]
+        paare = []
+        for ln in baum.nachweise_in[o.pk]:
+            if ln.pk in wert_je_ln:
+                wert_n, gewicht_individuell = wert_je_ln[ln.pk]
+                paare.append((wert_n, gewicht_individuell if gewicht_individuell is not None else ln.gewicht))
         anzahl = len(paare)
         for k in baum.kinder[o.pk]:
             w, n = wert(k, ebene + 1, p)

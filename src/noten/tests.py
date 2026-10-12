@@ -202,3 +202,28 @@ class ZeugnisnoteTest(NotenFixture):
 
     def test_passende_note_ohne_begruendung(self):
         Zeugnisnote(unterricht=self.u, schueler=self.s1, vorschlag=Decimal("2.10"), stufe=self.st["2"]).full_clean()
+
+
+class EinzelgewichtTest(NotenFixture):
+    """Gewichtung pro einzelner Note (z. B. Nachschreibarbeit)."""
+
+    def test_individuelles_gewicht_wirkt(self):
+        a = Leistungsnachweis.objects.create(ordner=self.schr, titel="KA 1", datum=date(2026, 9, 1), gewicht=1)
+        b = Leistungsnachweis.objects.create(ordner=self.schr, titel="KA 2", datum=date(2026, 10, 1), gewicht=1)
+        Note.objects.create(leistungsnachweis=a, schueler=self.s1, stufe=self.st["1"])
+        Note.objects.create(leistungsnachweis=b, schueler=self.s1, stufe=self.st["4"],
+                            gewicht_individuell=Decimal("0.5"), gewicht_begruendung="Verkürzte Nachschreibarbeit")
+        # (1*1 + 4*0,5) / 1,5 = 2,00 statt 2,50
+        self.assertEqual(vorschlagsnote(self.u, self.s1).schnitt, Decimal("2.00"))
+        # Andere Schüler:innen sind nicht betroffen
+        Note.objects.create(leistungsnachweis=a, schueler=self.s2, stufe=self.st["1"])
+        Note.objects.create(leistungsnachweis=b, schueler=self.s2, stufe=self.st["4"])
+        self.assertEqual(vorschlagsnote(self.u, self.s2).schnitt, Decimal("2.50"))
+
+    def test_abweichung_braucht_begruendung(self):
+        a = Leistungsnachweis.objects.create(ordner=self.schr, titel="KA", datum=date(2026, 9, 1), gewicht=1)
+        n = Note(leistungsnachweis=a, schueler=self.s1, stufe=self.st["2"], gewicht_individuell=Decimal(2))
+        with self.assertRaises(ValidationError):
+            n.full_clean()
+        n.gewicht_begruendung = "Ersatzleistung für zwei Tests"
+        n.full_clean()

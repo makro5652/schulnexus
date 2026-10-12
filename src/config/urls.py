@@ -10,6 +10,7 @@ urlpatterns = [
     path("abmelden/", auth_views.LogoutView.as_view(), name="logout"),
     path("noten/unterricht/<int:pk>/", views.notenuebersicht, name="notenuebersicht"),
     path("klassen/<int:pk>/", views.klassenliste, name="klassenliste"),
+    path("schueler/<int:pk>/", views.schuelerakte, name="schuelerakte"),
     path("gesundheit/", views.gesundheit, name="gesundheit"),
     path("verwaltung/", admin.site.urls),
 ]

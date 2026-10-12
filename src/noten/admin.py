@@ -196,7 +196,7 @@ class BewertungsordnerAdmin(SimpleHistoryAdmin):
 class NoteInline(admin.TabularInline):
     model = Note
     extra = 0
-    fields = ["schueler", "erreichte_be", "stufe", "sonderstatus", "kommentar"]
+    fields = ["schueler", "erreichte_be", "stufe", "sonderstatus", "gewicht_individuell", "gewicht_begruendung", "kommentar"]
     autocomplete_fields = ["schueler"]
 
     def get_readonly_fields(self, request, obj=None):
@@ -253,7 +253,7 @@ class LeistungsnachweisAdmin(EigeneDatenMixin, SimpleHistoryAdmin):
 @admin.register(Note)
 class NoteAdmin(EigeneDatenMixin, SimpleHistoryAdmin):
     unterricht_pfad = "leistungsnachweis__unterricht"
-    list_display = ["schueler", "leistungsnachweis", "erreichte_be", "stufe", "sonderstatus"]
+    list_display = ["schueler", "leistungsnachweis", "erreichte_be", "stufe", "sonderstatus", "gewicht_individuell"]
     list_filter = ["leistungsnachweis__unterricht__abschnitt", "leistungsnachweis__unterricht__fach"]
     search_fields = ["schueler__person__nachname", "leistungsnachweis__titel"]
     autocomplete_fields = ["schueler", "leistungsnachweis"]

@@ -1,4 +1,4 @@
-# Schulverwaltung (Version 0.2, Entwicklungsstand)
+# Schulverwaltung (Version 0.3, Entwicklungsstand)
 
 Open-Source-Schulverwaltung für die DSN: Stammdaten, Klassen und Lerngruppen,
 Noten mit Gewichtung, Fehlzeiten, Nachmittagsprogramm. Läuft im Browser,
@@ -54,6 +54,28 @@ Sonstige Mitarbeit (Gewicht 50)
 - Bedienung: Notenübersicht → „Bewertungsstruktur“ → „+ Unterordner“ bzw. „+ Leistungsnachweis“.
   Die Noten trägt man ein, indem man auf den Namen des Leistungsnachweises klickt.
 - Die Gewichtungsvorlage legt beim Anlegen eines Unterrichts nur die **Start-Ordner** an.
+
+**Gewichtung pro einzelner Note:** Zusätzlich zum Gewicht des Leistungsnachweises kann jede
+einzelne Note ein individuelles Gewicht bekommen (z. B. verkürzte Nachschreibarbeit). Eine
+Abweichung muss begründet werden und ist in der Notenübersicht mit „×Gewicht“ markiert.
+
+## Personenakten
+
+| Akte | Inhalt |
+| --- | --- |
+| Person (für alle) | Anrede, Titel, Namen, Geschlecht, Geburtsdatum/-ort/-land, Staatsangehörigkeiten, E-Mail, Telefon privat/mobil/dienstlich, Anschrift mit Postfach (P.O. Box), Sprache, Dokumente |
+| Schüler:in | Schülernummer, Status, Ein-/Austritt, Erst-/Familiensprachen, DaZ/DaF, Nachteilsausgleich, Förderbedarf, Religion/Ethik, Lebt bei, Schulweg/Bus, Abholhinweise; dazu Schullaufbahn, Klassen/Gruppen, Eltern, Abschlüsse, Sprachenfolge, vorherige Schulen, Einwilligungen |
+| Schullaufbahn | je Schuljahr: Jahrgang, **Bildungsgang** (Haupt-/Realschul-/gymnasialer Bildungsgang, Oberstufe …), Stammklasse, Ergebnis (versetzt, Wiederholung, Wechsel, Abschluss …), Bemerkung; Wechsel im Schuljahr über Von/Bis |
+| Gesundheitsangaben | Allergien, Erkrankungen, Medikamente, Notfallhinweise, Arzt, Versicherung, Schwimmen – **eigene Tabelle mit eigenem Zugriffsrecht**, Lehrkräfte sehen sie standardmäßig nicht |
+| Eltern | Beruf, Arbeitgeber, bevorzugter Kommunikationsweg, Schulverein (Mitgliedschaft, Nummer), Elternvertretung, Einverständnis zur Kontaktweitergabe; je Kind: Sorgerecht, Auskunftsrecht, Abholberechtigung, Notfallkontakt, Rechnungsempfang |
+| Personal | Kürzel, Funktion, Personalnummer, Anstellungsart (ADLK, BPLK, LPLK, OLK, Ortskraft …), Dienstbeginn, Vertragsende, Deputat, Ermäßigung, Arbeitserlaubnis bis, Lehrbefähigungen, weitere Funktionen, Fortbildungen, Notfallkontakte |
+
+Bildungsgänge und Abschlussarten sind unter „Stammdaten“ frei anpassbar. Die **Schülerakte**
+(Link in der Klassenliste und in der Schülerliste) zeigt alles auf einer Seite; sie ist für
+Verwaltung, Schulleitung und die Klassenleitung der aktuellen Stammklasse sichtbar.
+
+Klassenleitungen sollen Gesundheitsangaben der eigenen Klasse sehen? Dann in der Verwaltung
+unter „Gruppen“ der Rolle „Lehrkraft“ das Recht „Darf Gesundheitsangaben der eigenen Klasse sehen“ geben.
 
 ## Update von einer älteren Version
 

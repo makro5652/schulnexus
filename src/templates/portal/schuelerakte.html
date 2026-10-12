@@ -1,0 +1,153 @@
+{% extends "portal/base.html" %}
+{% block title %}Schülerakte {{ p.anzeigename }}{% endblock %}
+{% block inhalt %}
+<p class="brotkrumen"><a href="{% url 'start' %}">Start</a>{% if klasse %} › <a href="{% url 'klassenliste' klasse.pk %}">Klasse {{ klasse.name }}</a>{% endif %} › Schülerakte</p>
+<div class="akte-kopf">
+  <div>
+    <h1>{{ p.vorname }} {{ p.nachname }}{% if p.rufname %} <span class="leise">({{ p.rufname }})</span>{% endif %}</h1>
+    <p class="unterzeile">
+      Nr. {{ s.schuelernummer }} · {% if klasse %}Klasse {{ klasse.name }}{% else %}keine Stammklasse{% endif %}
+      {% if aktuell %} · {{ aktuell.bildungsgang }}{% endif %}
+      {% if alter is not None %} · {{ alter }} Jahre{% endif %}
+      · <span class="marke-status status-{{ s.status }}">{{ s.get_status_display }}</span>
+    </p>
+  </div>
+  {% if user.is_staff %}<a class="knopf zweitrangig" href="{% url 'admin:stammdaten_schuelerprofil_change' s.pk %}">Akte bearbeiten</a>{% endif %}
+</div>
+
+<div class="hinweisleiste">
+  {% if s.daz %}<span class="etikett">DaZ/DaF</span>{% endif %}
+  {% if s.nachteilsausgleich %}<span class="etikett">Nachteilsausgleich</span>{% endif %}
+  {% if gesundheit and gesundheit.hat_eintraege %}<span class="etikett warnend">Gesundheitshinweise</span>{% endif %}
+  {% if fz.offen %}<span class="etikett warnend">{{ fz.offen }} offene Entschuldigung{{ fz.offen|pluralize:"en" }}</span>{% endif %}
+</div>
+
+<div class="raster">
+  <section class="karte">
+    <h2>Persönliche Daten</h2>
+    <dl class="daten">
+      <dt>Geburtsdatum</dt><dd>{{ p.geburtsdatum|date:"d.m.Y"|default:"—" }}{% if p.geburtsort %} in {{ p.geburtsort }}{% endif %}{% if p.geburtsland %} ({{ p.geburtsland }}){% endif %}</dd>
+      <dt>Geschlecht</dt><dd>{{ p.get_geschlecht_display|default:"—" }}</dd>
+      <dt>Staatsangehörigkeit</dt><dd>{{ p.staatsangehoerigkeiten|default:"—" }}</dd>
+      <dt>Erstsprache(n)</dt><dd>{{ s.muttersprache|default:"—" }}</dd>
+      <dt>Familiensprache(n)</dt><dd>{{ s.familiensprache|default:"—" }}</dd>
+      <dt>Religion / Ethik</dt><dd>{{ s.get_religionsunterricht_display|default:"—" }}</dd>
+      <dt>Anschrift</dt><dd>{{ p.strasse|default:"" }}{% if p.postfach %}<br>{{ p.postfach }}{% endif %}{% if p.ort %}<br>{{ p.plz }} {{ p.ort }}, {{ p.land }}{% endif %}{% if not p.strasse and not p.ort %}—{% endif %}</dd>
+      <dt>Lebt bei</dt><dd>{{ s.lebt_bei|default:"—" }}</dd>
+      <dt>Schulweg</dt><dd>{{ s.get_schulweg_display|default:"—" }}{% if s.buslinie %}, {{ s.buslinie }}{% endif %}</dd>
+      {% if s.abholhinweise %}<dt>Abholhinweise</dt><dd>{{ s.abholhinweise }}</dd>{% endif %}
+      {% if s.foerderbedarf %}<dt>Förderbedarf</dt><dd>{{ s.foerderbedarf }}</dd>{% endif %}
+      <dt>Eintritt</dt><dd>{{ s.eintrittsdatum|date:"d.m.Y"|default:"—" }}{% if s.eintritt_jahrgang %} in Jahrgang {{ s.eintritt_jahrgang }}{% endif %}</dd>
+      {% if s.austrittsdatum %}<dt>Austritt</dt><dd>{{ s.austrittsdatum|date:"d.m.Y" }}{% if s.austrittsgrund %} – {{ s.austrittsgrund }}{% endif %}</dd>{% endif %}
+    </dl>
+  </section>
+
+  <section class="karte">
+    <h2>Eltern und Kontaktpersonen</h2>
+    {% for b in kontakte %}
+      <div class="kontakt">
+        <strong>{{ b.person.anrede }} {{ b.person.titel }} {{ b.person.anzeigename }}</strong> <span class="leise">· {{ b.get_art_display }}</span>
+        <div class="etiketten">
+          {% if b.sorgerecht %}<span class="etikett">Sorgerecht</span>{% endif %}
+          {% if b.notfallkontakt %}<span class="etikett warnend">Notfallkontakt</span>{% endif %}
+          {% if b.abholberechtigt %}<span class="etikett">abholberechtigt</span>{% endif %}
+          {% if not b.auskunftsrecht %}<span class="etikett warnend">kein Auskunftsrecht</span>{% endif %}
+        </div>
+        <div class="leise">
+          {% if b.person.mobil %}Mobil {{ b.person.mobil }}<br>{% endif %}
+          {% if b.person.telefon %}Tel. {{ b.person.telefon }}<br>{% endif %}
+          {% if b.person.email %}<a href="mailto:{{ b.person.email }}">{{ b.person.email }}</a><br>{% endif %}
+          {% if b.person.elternprofil %}{% with e=b.person.elternprofil %}
+            {% if e.beruf %}{{ e.beruf }}{% if e.arbeitgeber %}, {{ e.arbeitgeber }}{% endif %}<br>{% endif %}
+            Bevorzugt: {{ e.get_korrespondenzweg_display }} · Sprache: {{ b.person.get_sprache_display }}
+            {% if e.elternvertretung %}<br>{{ e.elternvertretung }}{% endif %}
+          {% endwith %}{% endif %}
+        </div>
+      </div>
+    {% empty %}<p class="leer">Keine Kontaktpersonen hinterlegt.</p>{% endfor %}
+  </section>
+
+  <section class="karte breit-2">
+    <h2>Schullaufbahn</h2>
+    {% if laufbahn %}
+    <table class="liste">
+      <thead><tr><th>Schuljahr</th><th class="zahl">Jg.</th><th>Bildungsgang</th><th>Klasse</th><th>Zeitraum</th><th>Ergebnis</th><th>Bemerkung</th></tr></thead>
+      <tbody>
+      {% for l in laufbahn %}
+        <tr>
+          <td>{{ l.schuljahr }}</td><td class="zahl">{{ l.jahrgang }}</td><td>{{ l.bildungsgang }}</td>
+          <td>{{ l.stammklasse.name|default:"—" }}</td>
+          <td>{% if l.von or l.bis %}{{ l.von|date:"d.m.Y"|default:"…" }} – {{ l.bis|date:"d.m.Y"|default:"…" }}{% else %}ganzes Schuljahr{% endif %}</td>
+          <td>{{ l.get_ergebnis_display }}</td><td>{{ l.bemerkung }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% else %}<p class="leer">Noch keine Laufbahn erfasst.</p>{% endif %}
+    {% if vorherige %}
+      <h3>Vorherige Schulen</h3>
+      <ul class="schlicht">{% for v in vorherige %}<li>{{ v.name }}{% if v.ort %}, {{ v.ort }}{% endif %}{% if v.land %} ({{ v.land }}){% endif %}{% if v.schulform %} · {{ v.schulform }}{% endif %}{% if v.letzter_jahrgang %} · zuletzt Klasse {{ v.letzter_jahrgang }}{% endif %}{% if v.von or v.bis %} · {{ v.von|date:"Y" }}–{{ v.bis|date:"Y" }}{% endif %}</li>{% endfor %}</ul>
+    {% endif %}
+  </section>
+
+  <section class="karte">
+    <h2>Abschlüsse und Sprachen</h2>
+    {% for a in abschluesse %}<p><strong>{{ a.art }}</strong> · {{ a.datum|date:"m/Y" }}{% if a.durchschnitt %} · Ø {{ a.durchschnitt }}{% endif %}{% if a.niveau %} · {{ a.niveau }}{% endif %}</p>{% empty %}<p class="leer">Noch keine Abschlüsse.</p>{% endfor %}
+    <h3>Sprachenfolge</h3>
+    {% for sp in sprachen %}<p>{{ sp.position }}. Fremdsprache: {{ sp.fach.name }} ab Jg. {{ sp.ab_jahrgang }}{% if sp.bis_jahrgang %} bis {{ sp.bis_jahrgang }}{% endif %}</p>{% empty %}<p class="leer">Nicht erfasst.</p>{% endfor %}
+    {% if gruppen %}<h3>Kurse und AGs</h3><p>{% for g in gruppen %}{{ g.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>{% endif %}
+  </section>
+
+  <section class="karte">
+    <h2>Fehlzeiten {{ AKTUELLES_SCHULJAHR }}</h2>
+    <dl class="daten zahlen">
+      <dt>Fehlstunden</dt><dd>{{ fz.stunden }}</dd>
+      <dt>davon unentschuldigt</dt><dd class="{% if fz.unentschuldigt %}auffaellig{% endif %}">{{ fz.unentschuldigt }}</dd>
+      <dt>Verspätungen</dt><dd>{{ fz.verspaetungen }}</dd>
+      <dt>offene Entschuldigungen</dt><dd class="{% if fz.offen %}auffaellig{% endif %}">{{ fz.offen }}</dd>
+    </dl>
+    {% if ist_verwaltung %}<p><a href="{% url 'admin:fehlzeiten_fehlzeit_changelist' %}?q={{ p.nachname|urlencode }}">Einzelne Fehlzeiten anzeigen</a></p>{% endif %}
+  </section>
+
+  <section class="karte">
+    <h2>Notenstand {{ AKTUELLES_SCHULJAHR }}</h2>
+    {% if noten %}
+    <table class="liste">
+      <thead><tr><th>Fach</th><th>Halbjahr</th><th class="zahl">Ø</th><th class="zahl">Vorschlag</th></tr></thead>
+      <tbody>
+      {% for n in noten %}
+        <tr class="{% if n.vorschlag.gefaehrdet %}auffaellig{% endif %}">
+          <td><a href="{% url 'notenuebersicht' n.unterricht.pk %}">{{ n.unterricht.fach.name }}</a></td>
+          <td>{{ n.unterricht.abschnitt.name }}</td>
+          <td class="zahl">{{ n.vorschlag.schnitt|default_if_none:"–" }}</td>
+          <td class="zahl"><strong>{{ n.vorschlag.stufe|default_if_none:"–" }}</strong></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% else %}<p class="leer">Keine Unterrichte im aktuellen Schuljahr.</p>{% endif %}
+  </section>
+
+  <section class="karte">
+    <h2>Einwilligungen</h2>
+    {% for e in einwilligungen %}<p>{% if e.gueltig %}✓{% else %}✗{% endif %} {{ e.get_zweck_display }} <span class="leise">· {{ e.erteilt_am|date:"d.m.Y" }}{% if e.widerrufen_am %}, widerrufen {{ e.widerrufen_am|date:"d.m.Y" }}{% endif %}</span></p>{% empty %}<p class="leer">Keine Einwilligungen erfasst – im Zweifel gilt: nicht erteilt.</p>{% endfor %}
+  </section>
+
+  {% if darf_gesundheit %}
+  <section class="karte vertraulich">
+    <h2>Gesundheitsangaben <span class="etikett warnend">vertraulich</span></h2>
+    {% if gesundheit %}
+    <dl class="daten">
+      <dt>Allergien</dt><dd>{{ gesundheit.allergien|default:"—" }}</dd>
+      <dt>Erkrankungen</dt><dd>{{ gesundheit.erkrankungen|default:"—" }}</dd>
+      <dt>Medikamente</dt><dd>{{ gesundheit.medikamente|default:"—" }}</dd>
+      <dt>Notfallhinweise</dt><dd>{{ gesundheit.notfallhinweise|default:"—"|linebreaksbr }}</dd>
+      <dt>Ärztin / Arzt</dt><dd>{{ gesundheit.arzt|default:"—" }}</dd>
+      <dt>Versicherung</dt><dd>{{ gesundheit.krankenversicherung|default:"—" }}</dd>
+      <dt>Schwimmen</dt><dd>{% if gesundheit.schwimmen_erlaubt %}ja{% else %}nein{% endif %}</dd>
+    </dl>
+    {% else %}<p class="leer">Keine Angaben hinterlegt.</p>{% endif %}
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

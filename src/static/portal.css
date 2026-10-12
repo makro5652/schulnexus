@@ -99,3 +99,31 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 .noten th, .noten td { padding: 0.45rem 0.55rem; }
 .noten thead th { white-space: normal; min-width: 5rem; max-width: 9.5rem; vertical-align: bottom; }
 .noten thead th.links { min-width: 10rem; }
+.einzelgewicht { display: inline-block; margin-left: 0.25rem; padding: 0 0.3rem; border-radius: 4px; background: var(--akzent-hell); color: var(--akzent); font-size: 0.72rem; font-weight: 600; cursor: help; }
+
+/* Schülerakte */
+.akte-kopf { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; }
+.leise { color: var(--leise); font-weight: 400; }
+.raster { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.2rem; margin-top: 1rem; }
+.raster .breit-2 { grid-column: 1 / -1; }
+.karte h3 { font-size: 0.95rem; margin: 1.1rem 0 0.4rem; }
+.daten { display: grid; grid-template-columns: max-content 1fr; gap: 0.35rem 1rem; margin: 0; }
+.daten dt { color: var(--leise); font-size: 0.9rem; }
+.daten dd { margin: 0; }
+.kontakt { padding: 0.7rem 0; border-bottom: 1px solid var(--linie); }
+.kontakt:last-child { border-bottom: 0; }
+.etiketten { margin: 0.3rem 0; }
+.hinweisleiste { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.etikett { display: inline-block; font-size: 0.75rem; padding: 0.1rem 0.5rem; border-radius: 999px; background: var(--akzent-hell); color: var(--akzent); font-weight: 600; margin-right: 0.25rem; }
+.etikett.warnend { background: var(--gefahr-flaeche); color: var(--warnung); }
+.marke-status { font-weight: 600; }
+.status-abgang { color: var(--warnung); }
+.schlicht { margin: 0; padding-left: 1.1rem; }
+.kennzahlen.klein { margin: 0 0 0.6rem; grid-template-columns: repeat(auto-fit, minmax(88px, 1fr)); gap: 0.5rem; }
+.kennzahlen.klein div { padding: 0.6rem 0.7rem; min-width: 0; }
+.kennzahlen.klein span { font-size: 0.78rem; overflow-wrap: anywhere; }
+.kennzahlen.klein strong { font-size: 1.3rem; }
+.vertraulich { border-color: var(--warnung); }
+tr.auffaellig td { color: var(--warnung); }
+
+.daten.zahlen dd { font-variant-numeric: tabular-nums; font-weight: 600; font-size: 1.05rem; }

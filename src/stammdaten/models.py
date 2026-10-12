@@ -66,13 +66,27 @@ class Abschnitt(models.Model):
 class Person(models.Model):
     """Gemeinsamer Kern aller Menschen im System (Schüler:innen, Eltern, Personal)."""
 
-    vorname = models.CharField("Vorname", max_length=80)
+    GESCHLECHT = [("w", "weiblich"), ("m", "männlich"), ("d", "divers"), ("", "keine Angabe")]
+
+    anrede = models.CharField("Anrede", max_length=20, blank=True, help_text="z. B. Frau, Herr")
+    titel = models.CharField("Titel", max_length=30, blank=True, help_text="z. B. Dr.")
+    vorname = models.CharField("Vorname(n)", max_length=80)
     nachname = models.CharField("Nachname", max_length=80)
     rufname = models.CharField("Rufname", max_length=80, blank=True)
+    geschlecht = models.CharField("Geschlecht", max_length=1, choices=GESCHLECHT, blank=True)
     geburtsdatum = models.DateField("Geburtsdatum", null=True, blank=True)
+    geburtsort = models.CharField("Geburtsort", max_length=80, blank=True)
+    geburtsland = models.CharField("Geburtsland", max_length=60, blank=True)
+    staatsangehoerigkeiten = models.CharField(
+        "Staatsangehörigkeit(en)", max_length=120, blank=True, help_text="mehrere durch Komma trennen"
+    )
     email = models.EmailField("E-Mail", blank=True)
-    telefon = models.CharField("Telefon", max_length=40, blank=True)
-    strasse = models.CharField("Straße / Hausnummer", max_length=120, blank=True)
+    telefon = models.CharField("Telefon (privat)", max_length=40, blank=True)
+    mobil = models.CharField("Mobil", max_length=40, blank=True)
+    telefon_dienstlich = models.CharField("Telefon (dienstlich)", max_length=40, blank=True)
+    strasse = models.CharField("Straße / Hausnummer / Estate", max_length=120, blank=True)
+    postfach = models.CharField("Postfach (P.O. Box)", max_length=40, blank=True)
+    plz = models.CharField("PLZ / Postal Code", max_length=12, blank=True)
     ort = models.CharField("Ort", max_length=80, blank=True)
     land = models.CharField("Land", max_length=60, blank=True, default="Kenia")
     sprache = models.CharField(
@@ -103,11 +117,34 @@ class Person(models.Model):
 class Schuelerprofil(models.Model):
     STATUS = [("aktiv", "Aktiv"), ("abgang", "Abgegangen"), ("bewerber", "Bewerber:in")]
 
+    RELIGIONSUNTERRICHT = [
+        ("", "—"), ("ev", "Evangelische Religion"), ("kath", "Katholische Religion"),
+        ("ethik", "Ethik"), ("sonstige", "Sonstiges / befreit"),
+    ]
+    SCHULWEG = [("", "—"), ("bus", "Schulbus"), ("abgeholt", "Wird gebracht / abgeholt"), ("selbst", "Selbstständig")]
+
     person = models.OneToOneField(Person, on_delete=models.CASCADE, related_name="schueler", verbose_name="Person")
     schuelernummer = models.CharField("Schülernummer", max_length=20, unique=True)
     eintrittsdatum = models.DateField("Eintritt", null=True, blank=True)
+    eintritt_jahrgang = models.PositiveSmallIntegerField("Eingeschult / eingetreten in Jahrgang", null=True, blank=True)
     austrittsdatum = models.DateField("Austritt", null=True, blank=True)
+    austrittsgrund = models.CharField("Austrittsgrund / Zielschule", max_length=200, blank=True)
     status = models.CharField("Status", max_length=10, choices=STATUS, default="aktiv")
+
+    # Sprache und Förderung
+    muttersprache = models.CharField("Erstsprache(n)", max_length=80, blank=True)
+    familiensprache = models.CharField("Familiensprache(n)", max_length=80, blank=True)
+    daz = models.BooleanField("DaZ-/DaF-Förderung", default=False)
+    nachteilsausgleich = models.BooleanField("Nachteilsausgleich", default=False)
+    foerderbedarf = models.CharField("Förderbedarf / Förderschwerpunkt", max_length=200, blank=True)
+    religionsunterricht = models.CharField("Religion / Ethik", max_length=10, choices=RELIGIONSUNTERRICHT, blank=True)
+
+    # Organisatorisches
+    lebt_bei = models.CharField("Lebt bei", max_length=120, blank=True, help_text="z. B. beiden Eltern, Mutter, Gastfamilie")
+    schulweg = models.CharField("Schulweg", max_length=10, choices=SCHULWEG, blank=True)
+    buslinie = models.CharField("Buslinie / Haltestelle", max_length=80, blank=True)
+    abholhinweise = models.CharField("Abholhinweise", max_length=200, blank=True)
+    bemerkungen = models.TextField("Bemerkungen (Verwaltung)", blank=True)
     history = HistoricalRecords(verbose_name="Änderungsprotokoll Schüler:in")
 
     class Meta:
@@ -126,20 +163,56 @@ class Schuelerprofil(models.Model):
         m = qs.select_related("gruppe").first()
         return m.gruppe if m else None
 
+    def aktueller_laufbahnabschnitt(self):
+        return self.laufbahn.select_related("bildungsgang", "schuljahr").order_by("-schuljahr__beginn", "-von").first()
+
 
 class Personalprofil(models.Model):
     FUNKTIONEN = [
         ("lehrkraft", "Lehrkraft"),
         ("verwaltung", "Verwaltung / Sekretariat"),
         ("leitung", "Schulleitung"),
+        ("paedagogik", "Pädagogische Fachkraft / Betreuung"),
+        ("technik", "Technik / Haustechnik / IT"),
         ("sonstige", "Sonstiges Personal"),
+    ]
+    ANSTELLUNG = [
+        ("adlk", "Auslandsdienstlehrkraft (ADLK)"),
+        ("bplk", "Bundesprogrammlehrkraft (BPLK)"),
+        ("lplk", "Landesprogrammlehrkraft (LPLK)"),
+        ("olk", "Ortslehrkraft (OLK)"),
+        ("ortskraft", "Ortskraft (Verwaltung / Service)"),
+        ("honorar", "Honorarkraft"),
+        ("praktikum", "Praktikum / Referendariat / Freiwilligendienst"),
+        ("sonstige", "Sonstige"),
     ]
 
     person = models.OneToOneField(Person, on_delete=models.CASCADE, related_name="personal", verbose_name="Person")
     kuerzel = models.CharField("Kürzel", max_length=8, unique=True, help_text="wie im Stundenplan, z. B. KRO")
     funktion = models.CharField("Funktion", max_length=12, choices=FUNKTIONEN, default="lehrkraft")
     aktiv = models.BooleanField("Aktiv", default=True)
-    history = HistoricalRecords(verbose_name="Änderungsprotokoll Personal")
+
+    # Dienstverhältnis
+    personalnummer = models.CharField("Personalnummer", max_length=20, blank=True)
+    anstellungsart = models.CharField("Anstellungsart", max_length=10, choices=ANSTELLUNG, blank=True)
+    dienstbeginn = models.DateField("Dienstbeginn an der Schule", null=True, blank=True)
+    vertragsende = models.DateField("Vertragsende / Rückkehr", null=True, blank=True)
+    wochenstunden = models.DecimalField(
+        "Deputat / Wochenstunden", max_digits=4, decimal_places=1, null=True, blank=True,
+        help_text="bei Lehrkräften Unterrichtsstunden, sonst Arbeitsstunden",
+    )
+    ermaessigung = models.DecimalField("Ermäßigung / Anrechnung (Std.)", max_digits=4, decimal_places=1, null=True, blank=True)
+    arbeitserlaubnis_bis = models.DateField("Arbeitserlaubnis gültig bis", null=True, blank=True)
+
+    # Tätigkeit
+    lehrbefaehigungen = models.ManyToManyField("Fach", blank=True, related_name="lehrkraefte", verbose_name="Lehrbefähigungen")
+    weitere_funktionen = models.CharField(
+        "Weitere Funktionen", max_length=200, blank=True, help_text="z. B. Mittelstufenkoordination, Fachleitung Chemie"
+    )
+    dienst_email = models.EmailField("Dienstliche E-Mail", blank=True)
+    raum = models.CharField("Büro / Fachraum", max_length=40, blank=True)
+    bemerkungen = models.TextField("Bemerkungen (Personalverwaltung)", blank=True)
+    history = HistoricalRecords(verbose_name="Änderungsprotokoll Personal", m2m_fields=[lehrbefaehigungen])
 
     class Meta:
         verbose_name = "Personal"
@@ -148,6 +221,72 @@ class Personalprofil(models.Model):
 
     def __str__(self):
         return f"{self.kuerzel} – {self.person.anzeigename}"
+
+    def clean(self):
+        if self.dienstbeginn and self.vertragsende and self.vertragsende < self.dienstbeginn:
+            raise ValidationError("Das Vertragsende liegt vor dem Dienstbeginn.")
+
+
+class Fortbildung(models.Model):
+    personal = models.ForeignKey(Personalprofil, on_delete=models.CASCADE, related_name="fortbildungen", verbose_name="Personal")
+    titel = models.CharField("Titel", max_length=150)
+    anbieter = models.CharField("Anbieter", max_length=100, blank=True, help_text="z. B. ZfA, Regionale Fortbildung, schulintern")
+    datum = models.DateField("Datum")
+    umfang_stunden = models.DecimalField("Umfang (Std.)", max_digits=5, decimal_places=1, null=True, blank=True)
+    nachweis_liegt_vor = models.BooleanField("Nachweis liegt vor", default=False)
+
+    class Meta:
+        verbose_name = "Fortbildung"
+        verbose_name_plural = "Fortbildungen"
+        ordering = ["-datum"]
+
+    def __str__(self):
+        return f"{self.titel} ({self.datum:%d.%m.%Y})"
+
+
+class Notfallkontakt(models.Model):
+    """Notfallkontakte für Personal (bei Schüler:innen über die Beziehungen zu Eltern / Kontaktpersonen)."""
+
+    personal = models.ForeignKey(Personalprofil, on_delete=models.CASCADE, related_name="notfallkontakte", verbose_name="Personal")
+    name = models.CharField("Name", max_length=120)
+    beziehung = models.CharField("Beziehung", max_length=60, blank=True, help_text="z. B. Ehepartner:in")
+    telefon = models.CharField("Telefon", max_length=40)
+    reihenfolge = models.PositiveSmallIntegerField("Reihenfolge", default=1)
+
+    class Meta:
+        verbose_name = "Notfallkontakt"
+        verbose_name_plural = "Notfallkontakte"
+        ordering = ["personal", "reihenfolge"]
+
+    def __str__(self):
+        return f"{self.name} ({self.telefon})"
+
+
+class Elternprofil(models.Model):
+    """Zusatzdaten für Erziehungsberechtigte und Kontaktpersonen."""
+
+    KORRESPONDENZ = [("email", "E-Mail"), ("app", "App / Portal"), ("post", "Post"), ("telefon", "Telefon")]
+
+    person = models.OneToOneField(Person, on_delete=models.CASCADE, related_name="elternprofil", verbose_name="Person")
+    beruf = models.CharField("Beruf", max_length=100, blank=True)
+    arbeitgeber = models.CharField("Arbeitgeber / Organisation", max_length=120, blank=True)
+    korrespondenzweg = models.CharField("Bevorzugter Kommunikationsweg", max_length=10, choices=KORRESPONDENZ, default="email")
+    schulverein_mitglied = models.BooleanField("Mitglied im Schulverein", default=False)
+    mitgliedsnummer = models.CharField("Mitgliedsnummer Schulverein", max_length=30, blank=True)
+    elternvertretung = models.CharField(
+        "Funktion in der Elternvertretung", max_length=100, blank=True, help_text="z. B. Klassenelternsprecher:in 9a"
+    )
+    kontaktdaten_weitergabe = models.BooleanField(
+        "Einverstanden mit Weitergabe der Kontaktdaten an die Klassenelternschaft", default=False
+    )
+    history = HistoricalRecords(verbose_name="Änderungsprotokoll Elternprofil")
+
+    class Meta:
+        verbose_name = "Elternprofil"
+        verbose_name_plural = "Elternprofile"
+
+    def __str__(self):
+        return f"Elternprofil {self.person}"
 
 
 class Beziehung(models.Model):
@@ -349,3 +488,169 @@ class Dokument(models.Model):
 
     def __str__(self):
         return f"{self.titel} ({self.person})"
+
+
+class Bildungsgang(models.Model):
+    """Konfigurierbar, z. B. Grundschule, Hauptschul-, Realschul-, Gymnasialer Bildungsgang, Oberstufe."""
+
+    kuerzel = models.CharField("Kürzel", max_length=10, unique=True)
+    name = models.CharField("Bezeichnung", max_length=80)
+    angestrebter_abschluss = models.CharField("Angestrebter Abschluss", max_length=120, blank=True)
+    jahrgang_von = models.PositiveSmallIntegerField("ab Jahrgang", null=True, blank=True)
+    jahrgang_bis = models.PositiveSmallIntegerField("bis Jahrgang", null=True, blank=True)
+    reihenfolge = models.PositiveSmallIntegerField("Reihenfolge", default=10)
+
+    class Meta:
+        verbose_name = "Bildungsgang"
+        verbose_name_plural = "Bildungsgänge"
+        ordering = ["reihenfolge", "name"]
+
+    def __str__(self):
+        return self.name
+
+
+class Laufbahnabschnitt(models.Model):
+    """
+    Ein Abschnitt der Schullaufbahn, in der Regel ein Schuljahr.
+    Wechselt jemand im laufenden Schuljahr den Bildungsgang, entstehen zwei Abschnitte mit Von-/Bis-Datum.
+    """
+
+    ERGEBNISSE = [
+        ("laufend", "laufend"),
+        ("versetzt", "versetzt"),
+        ("versetzt_auflage", "versetzt mit Auflage / auf Probe"),
+        ("nicht_versetzt", "nicht versetzt (Wiederholung)"),
+        ("freiwillig_wiederholt", "freiwillige Wiederholung"),
+        ("wechsel", "Wechsel des Bildungsgangs"),
+        ("abschluss", "Abschluss erreicht"),
+        ("abgang", "Abgang ohne Abschluss / Schulwechsel"),
+    ]
+
+    schueler = models.ForeignKey(Schuelerprofil, on_delete=models.CASCADE, related_name="laufbahn", verbose_name="Schüler:in")
+    schuljahr = models.ForeignKey(Schuljahr, on_delete=models.PROTECT, related_name="laufbahnabschnitte", verbose_name="Schuljahr")
+    jahrgang = models.PositiveSmallIntegerField("Jahrgang")
+    bildungsgang = models.ForeignKey(Bildungsgang, on_delete=models.PROTECT, verbose_name="Bildungsgang")
+    stammklasse = models.ForeignKey(
+        Gruppe, null=True, blank=True, on_delete=models.SET_NULL, limit_choices_to={"typ": "stammklasse"},
+        verbose_name="Stammklasse",
+    )
+    von = models.DateField("Von", null=True, blank=True, help_text="leer = Beginn des Schuljahres")
+    bis = models.DateField("Bis", null=True, blank=True, help_text="leer = Ende des Schuljahres")
+    ergebnis = models.CharField("Ergebnis", max_length=24, choices=ERGEBNISSE, default="laufend")
+    bemerkung = models.CharField("Bemerkung", max_length=200, blank=True, help_text="z. B. Konferenzbeschluss vom ...")
+    history = HistoricalRecords(verbose_name="Änderungsprotokoll Schullaufbahn")
+
+    class Meta:
+        verbose_name = "Laufbahnabschnitt"
+        verbose_name_plural = "Schullaufbahn"
+        ordering = ["schueler", "schuljahr__beginn", "von"]
+
+    def __str__(self):
+        return f"{self.schuljahr} · Jg. {self.jahrgang} · {self.bildungsgang}"
+
+    def clean(self):
+        if self.von and self.bis and self.bis < self.von:
+            raise ValidationError("'Bis' darf nicht vor 'Von' liegen.")
+        if self.stammklasse_id and self.schuljahr_id and self.stammklasse.schuljahr_id != self.schuljahr_id:
+            raise ValidationError({"stammklasse": "Die Stammklasse gehört zu einem anderen Schuljahr."})
+        bg = self.bildungsgang if self.bildungsgang_id else None
+        if bg and self.jahrgang and ((bg.jahrgang_von and self.jahrgang < bg.jahrgang_von) or (bg.jahrgang_bis and self.jahrgang > bg.jahrgang_bis)):
+            raise ValidationError({"jahrgang": f"Jahrgang {self.jahrgang} liegt außerhalb des Bildungsgangs {bg}."})
+
+
+class Abschlussart(models.Model):
+    kuerzel = models.CharField("Kürzel", max_length=12, unique=True)
+    name = models.CharField("Bezeichnung", max_length=120)
+    reihenfolge = models.PositiveSmallIntegerField("Reihenfolge", default=10)
+
+    class Meta:
+        verbose_name = "Abschlussart"
+        verbose_name_plural = "Abschlussarten"
+        ordering = ["reihenfolge", "name"]
+
+    def __str__(self):
+        return self.name
+
+
+class Abschluss(models.Model):
+    schueler = models.ForeignKey(Schuelerprofil, on_delete=models.CASCADE, related_name="abschluesse", verbose_name="Schüler:in")
+    art = models.ForeignKey(Abschlussart, on_delete=models.PROTECT, verbose_name="Abschluss / Zertifikat")
+    datum = models.DateField("Datum")
+    durchschnitt = models.DecimalField("Durchschnitt / Gesamtnote", max_digits=4, decimal_places=2, null=True, blank=True)
+    niveau = models.CharField("Niveau / Stufe", max_length=30, blank=True, help_text="z. B. B1 / C1 beim DSD")
+    an_dieser_schule = models.BooleanField("An dieser Schule erworben", default=True)
+    bemerkung = models.CharField("Bemerkung", max_length=200, blank=True)
+    history = HistoricalRecords(verbose_name="Änderungsprotokoll Abschluss")
+
+    class Meta:
+        verbose_name = "Abschluss / Zertifikat"
+        verbose_name_plural = "Abschlüsse / Zertifikate"
+        ordering = ["schueler", "datum"]
+
+    def __str__(self):
+        return f"{self.art} ({self.datum:%m/%Y})"
+
+
+class VorherigeSchule(models.Model):
+    schueler = models.ForeignKey(Schuelerprofil, on_delete=models.CASCADE, related_name="vorherige_schulen", verbose_name="Schüler:in")
+    name = models.CharField("Schule", max_length=150)
+    ort = models.CharField("Ort", max_length=80, blank=True)
+    land = models.CharField("Land", max_length=60, blank=True)
+    schulform = models.CharField("Schulform / System", max_length=80, blank=True, help_text="z. B. Gymnasium (DE), CBC (KE), IGCSE")
+    von = models.DateField("Von", null=True, blank=True)
+    bis = models.DateField("Bis", null=True, blank=True)
+    letzter_jahrgang = models.CharField("Zuletzt besuchte Klasse", max_length=20, blank=True)
+
+    class Meta:
+        verbose_name = "Vorherige Schule"
+        verbose_name_plural = "Vorherige Schulen"
+        ordering = ["schueler", "von"]
+
+    def __str__(self):
+        return self.name
+
+
+class Sprachenfolge(models.Model):
+    schueler = models.ForeignKey(Schuelerprofil, on_delete=models.CASCADE, related_name="sprachenfolge", verbose_name="Schüler:in")
+    position = models.PositiveSmallIntegerField("Fremdsprache Nr.", help_text="1 = erste Fremdsprache usw.")
+    fach = models.ForeignKey(Fach, on_delete=models.PROTECT, verbose_name="Sprache")
+    ab_jahrgang = models.PositiveSmallIntegerField("ab Jahrgang")
+    bis_jahrgang = models.PositiveSmallIntegerField("bis Jahrgang", null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Sprachenfolge"
+        verbose_name_plural = "Sprachenfolge"
+        ordering = ["schueler", "position"]
+        unique_together = [("schueler", "position")]
+
+    def __str__(self):
+        return f"{self.position}. Fremdsprache: {self.fach.name} ab Jg. {self.ab_jahrgang}"
+
+
+class Gesundheitsangaben(models.Model):
+    """
+    Besonders schützenswerte Daten. Eigene Tabelle mit eigenem Zugriffsrecht:
+    Lehrkräfte sehen sie standardmäßig NICHT, nur Verwaltung und Schulleitung.
+    """
+
+    schueler = models.OneToOneField(Schuelerprofil, on_delete=models.CASCADE, related_name="gesundheit", verbose_name="Schüler:in")
+    allergien = models.CharField("Allergien / Unverträglichkeiten", max_length=200, blank=True)
+    erkrankungen = models.CharField("Chronische Erkrankungen", max_length=200, blank=True)
+    medikamente = models.CharField("Medikamente in der Schule", max_length=200, blank=True)
+    notfallhinweise = models.TextField("Hinweise für Notfälle", blank=True)
+    arzt = models.CharField("Ärztin / Arzt (Name, Telefon)", max_length=150, blank=True)
+    krankenversicherung = models.CharField("Krankenversicherung", max_length=120, blank=True)
+    schwimmen_erlaubt = models.BooleanField("Teilnahme am Schwimmunterricht", default=True)
+    history = HistoricalRecords(verbose_name="Änderungsprotokoll Gesundheitsangaben")
+
+    class Meta:
+        verbose_name = "Gesundheitsangaben"
+        verbose_name_plural = "Gesundheitsangaben"
+        permissions = [("view_gesundheit_klasse", "Darf Gesundheitsangaben der eigenen Klasse sehen")]
+
+    def __str__(self):
+        return f"Gesundheitsangaben {self.schueler}"
+
+    @property
+    def hat_eintraege(self):
+        return any([self.allergien, self.erkrankungen, self.medikamente, self.notfallhinweise])
