@@ -18,6 +18,8 @@ betrieben mit Docker.
    ./start.sh
    ```
 
+Falls „Permission denied“ erscheint: `sh start.sh` verwenden.
+
 Beim ersten Start dauert es einige Minuten. Danach öffnet sich der Browser mit
 http://localhost:8000. Die Zugangsdaten stehen in der Datei `.env`
 (sie wird beim ersten Start mit zufälligen Passwörtern erzeugt).
