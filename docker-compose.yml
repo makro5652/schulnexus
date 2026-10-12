@@ -1,0 +1,40 @@
+# Schulverwaltung – lokaler Start und Testserver
+#   Start:   docker compose up --build
+#   Aufruf:  http://localhost:8000
+#   Stopp:   docker compose down        (Daten bleiben erhalten)
+#   Reset:   docker compose down -v     (löscht ALLE Daten!)
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-schulverwaltung}
+      POSTGRES_USER: ${DB_BENUTZER:-schule}
+      POSTGRES_PASSWORD: ${DB_PASSWORT:?Bitte DB_PASSWORT in .env setzen}
+    volumes:
+      - datenbank:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  web:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://${DB_BENUTZER:-schule}:${DB_PASSWORT}@db:5432/${DB_NAME:-schulverwaltung}
+      MEDIA_ROOT: /daten/dokumente
+    ports:
+      - "${PORT:-8000}:8000"
+    volumes:
+      - dokumente:/daten/dokumente
+
+volumes:
+  datenbank:
+  dokumente:

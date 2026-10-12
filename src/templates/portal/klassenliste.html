@@ -1,0 +1,25 @@
+{% extends "portal/base.html" %}
+{% block title %}Klasse {{ gruppe.name }}{% endblock %}
+{% block inhalt %}
+<p class="brotkrumen"><a href="{% url 'start' %}">Start</a> › Klasse {{ gruppe.name }}</p>
+<h1>Klasse {{ gruppe.name }}</h1>
+<p class="unterzeile">{{ gruppe.schuljahr }} · Klassenleitung {{ gruppe.leitung.person.anzeigename|default:"—" }} · {{ zeilen|length }} Schüler:innen</p>
+<div class="tabellenrahmen">
+<table class="liste">
+  <thead><tr><th>Schüler:in</th><th>Nr.</th><th class="zahl">Fehlstunden</th><th class="zahl">davon unentsch.</th><th class="zahl">Verspätungen</th><th class="zahl">offen</th><th>Kontakte</th></tr></thead>
+  <tbody>
+  {% for z in zeilen %}
+    <tr>
+      <td>{{ z.schueler.person }}</td>
+      <td>{{ z.schueler.schuelernummer }}</td>
+      <td class="zahl">{{ z.fehlstunden }}</td>
+      <td class="zahl {% if z.unentschuldigt %}auffaellig{% endif %}">{{ z.unentschuldigt }}</td>
+      <td class="zahl">{{ z.verspaetungen }}</td>
+      <td class="zahl {% if z.offene %}auffaellig{% endif %}">{{ z.offene }}</td>
+      <td>{% for b in z.kontakte %}{{ b.person.anzeigename }} ({{ b.get_art_display }}){% if b.person.telefon %}, {{ b.person.telefon }}{% endif %}{% if not forloop.last %}<br>{% endif %}{% empty %}—{% endfor %}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

@@ -1,0 +1,9 @@
+.env
+.git
+**/__pycache__
+**/*.pyc
+src/staticfiles
+src/media
+venv
+.venv
+.DS_Store

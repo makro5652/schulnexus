@@ -1,0 +1,40 @@
+{% extends "portal/base.html" %}
+{% block title %}Noten {{ unterricht.fach.kuerzel }} {{ unterricht.gruppe.name }}{% endblock %}
+{% block inhalt %}
+<p class="brotkrumen"><a href="{% url 'start' %}">Start</a> › Notenübersicht</p>
+<h1>{{ unterricht.fach.name }} · {{ unterricht.gruppe.name }}</h1>
+<p class="unterzeile">{{ unterricht.abschnitt }} · Lehrkraft {{ unterricht.lehrkraft.person.anzeigename }} · Skala „{{ unterricht.skala }}“ · Gewichtung:
+  {% for k in kategorien %}{{ k.name }} {{ k.anteil|floatformat:0 }} %{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+
+<div class="tabellenrahmen">
+<table class="noten">
+  <thead>
+    <tr>
+      <th class="links">Schüler:in</th>
+      {% for ln in nachweise %}<th><span class="ln-titel">{{ ln.titel }}</span><small>{{ ln.kategorie.name }} · ×{{ ln.gewicht|floatformat:-2 }}<br>{{ ln.datum|date:"d.m." }}</small></th>{% endfor %}
+      {% for k in kategorien %}<th class="kat">Ø {{ k.name }}</th>{% endfor %}
+      <th class="vorschlag">Vorschlag</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for z in zeilen %}
+    <tr class="{% if z.vorschlag.gefaehrdet %}gefaehrdet{% endif %}">
+      <th class="links">{{ z.schueler.person }}</th>
+      {% for n in z.zellen %}
+        <td>{% if n %}{% if n.stufe %}{{ n.stufe }}{% if n.prozent is not None %}<small>{{ n.prozent }} %</small>{% endif %}{% elif n.sonderstatus %}<span class="sonder" title="{{ n.get_sonderstatus_display }}">{{ n.get_sonderstatus_display|slice:":4" }}.</span>{% else %}<span class="leer">–</span>{% endif %}{% else %}<span class="leer">–</span>{% endif %}</td>
+      {% endfor %}
+      {% for k in z.vorschlag.kategorien %}<td class="kat">{{ k.schnitt|default_if_none:"–" }}</td>{% endfor %}
+      <td class="vorschlag">
+        {% if z.vorschlag.schnitt is not None %}<strong>{{ z.vorschlag.stufe }}</strong><small>Ø {{ z.vorschlag.schnitt }}</small>{% else %}–{% endif %}
+        {% if z.vorschlag.warnungen %}<span class="warnung" title="{{ z.vorschlag.warnungen|join:' ' }}">!</span>{% endif %}
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="99" class="leer">Keine Schüler:innen in dieser Gruppe.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+<p class="hinweistext">Der Vorschlag ist rechnerisch ermittelt. Die Zeugnisnote setzt die Lehrkraft in pädagogischer Gesamtwürdigung fest; Abweichungen werden begründet. Rot markierte Zeilen liegen im Gefährdungsbereich. Ein Ausrufezeichen zeigt eine fehlende Leistungskategorie an.</p>
+{% if user.is_staff %}<p><a class="knopf zweitrangig" href="{% url 'admin:noten_leistungsnachweis_add' %}?unterricht={{ unterricht.pk }}">Leistungsnachweis anlegen</a></p>{% endif %}
+{% endblock %}

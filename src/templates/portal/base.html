@@ -1,0 +1,29 @@
+{% load static %}<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Schulverwaltung{% endblock %} · {{ SCHULNAME }}</title>
+  <link rel="stylesheet" href="{% static 'portal.css' %}">
+</head>
+<body>
+  <header class="kopf">
+    <a class="marke" href="{% url 'start' %}">
+      <span class="marke-zeichen" aria-hidden="true">S</span>
+      <span><strong>Schulverwaltung</strong><small>{{ SCHULNAME }}{% if AKTUELLES_SCHULJAHR %} · {{ AKTUELLES_SCHULJAHR }}{% endif %}</small></span>
+    </a>
+    {% if user.is_authenticated %}
+    <nav class="navi">
+      <a href="{% url 'start' %}">Start</a>
+      {% if user.is_staff %}<a href="{% url 'admin:index' %}">Verwaltung</a>{% endif %}
+      <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit" class="link">Abmelden</button></form>
+    </nav>
+    {% endif %}
+  </header>
+  <main class="inhalt">
+    {% if messages %}<ul class="meldungen">{% for m in messages %}<li class="{{ m.tags }}">{{ m }}</li>{% endfor %}</ul>{% endif %}
+    {% block inhalt %}{% endblock %}
+  </main>
+  <footer class="fuss">Open-Source-Schulverwaltung · Version 0.1 (Entwicklungsstand)</footer>
+</body>
+</html>

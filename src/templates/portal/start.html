@@ -1,0 +1,46 @@
+{% extends "portal/base.html" %}
+{% block title %}Start{% endblock %}
+{% block inhalt %}
+<h1>Guten Tag, {{ user.person.anzeigename|default:user.username }}</h1>
+
+{% if kennzahlen %}
+<section class="kennzahlen" aria-label="Kennzahlen">
+  <div><strong>{{ kennzahlen.schueler }}</strong><span>Schüler:innen aktiv</span></div>
+  <div><strong>{{ kennzahlen.klassen }}</strong><span>Stammklassen</span></div>
+  <div><strong>{{ kennzahlen.lerngruppen }}</strong><span>Lerngruppen</span></div>
+  <div><strong>{{ kennzahlen.ags }}</strong><span>AG-Angebote</span></div>
+  <div><strong>{{ kennzahlen.fehlzeiten_heute }}</strong><span>Fehlzeiten heute</span></div>
+  <div class="{% if kennzahlen.offene_entschuldigungen %}hinweis{% endif %}"><strong>{{ kennzahlen.offene_entschuldigungen }}</strong><span>offene Entschuldigungen</span></div>
+</section>
+{% endif %}
+
+<div class="spalten">
+  <section class="karte">
+    <h2>{% if ist_verwaltung %}Unterrichte im Schuljahr{% else %}Meine Unterrichte{% endif %}</h2>
+    {% if unterrichte %}
+    <table class="liste">
+      <thead><tr><th>Fach</th><th>Gruppe</th><th>Halbjahr</th>{% if ist_verwaltung %}<th>Lehrkraft</th>{% endif %}<th></th></tr></thead>
+      <tbody>
+      {% for u in unterrichte %}
+        <tr>
+          <td>{{ u.fach.name }}</td><td>{{ u.gruppe.name }}</td><td>{{ u.abschnitt.name }}</td>
+          {% if ist_verwaltung %}<td>{{ u.lehrkraft.kuerzel }}</td>{% endif %}
+          <td><a href="{% url 'notenuebersicht' u.pk %}">Noten</a></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% else %}<p class="leer">Keine Unterrichte zugeordnet.</p>{% endif %}
+  </section>
+
+  <section class="karte">
+    <h2>Meine Klassen und Gruppen</h2>
+    {% if klassen %}
+    <ul class="kacheln">
+      {% for k in klassen %}<li><a href="{% url 'klassenliste' k.gruppe.pk %}"><strong>{{ k.gruppe.name }}</strong><span>{{ k.anzahl }} Schüler:innen</span></a></li>{% endfor %}
+    </ul>
+    {% else %}<p class="leer">Keine Klassenleitung.</p>{% endif %}
+    {% if user.is_staff %}<p><a class="knopf zweitrangig" href="{% url 'admin:index' %}">Zur Verwaltungsoberfläche</a></p>{% endif %}
+  </section>
+</div>
+{% endblock %}
