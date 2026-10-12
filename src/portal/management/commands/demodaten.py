@@ -16,6 +16,7 @@ from fehlzeiten.models import Fehlzeit, Stunde
 from nachmittag.models import AGAngebot, AGWahl
 from nachmittag.zuteilung import lose_zuteilen
 from noten.models import (
+    Bewertungsordner,
     Gewichtungsvorlage,
     Leistungskategorie,
     Leistungsnachweis,
@@ -150,8 +151,8 @@ class Command(BaseCommand):
             Schluesselschwelle.objects.create(schluessel=schluessel, min_prozent=Decimal(ab), stufe=stufen[b])
 
         nawi = Gewichtungsvorlage.objects.create(name="Naturwissenschaften Sek I", beschreibung="Beispiel: 50 % schriftlich, 50 % sonstige Leistungen")
-        schriftlich = Leistungskategorie.objects.create(vorlage=nawi, name="Schriftlich", anteil=Decimal(50))
-        sonstige = Leistungskategorie.objects.create(vorlage=nawi, name="Sonstige Leistungen", anteil=Decimal(50))
+        Leistungskategorie.objects.create(vorlage=nawi, name="Schriftlich", anteil=Decimal(50))
+        Leistungskategorie.objects.create(vorlage=nawi, name="Sonstige Mitarbeit", anteil=Decimal(50))
         haupt = Gewichtungsvorlage.objects.create(name="Hauptfächer Sek I", beschreibung="Beispiel: 60 % schriftlich, 40 % sonstige")
         Leistungskategorie.objects.create(vorlage=haupt, name="Schriftlich", anteil=Decimal(60))
         Leistungskategorie.objects.create(vorlage=haupt, name="Sonstige Leistungen", anteil=Decimal(40))
@@ -168,11 +169,16 @@ class Command(BaseCommand):
         unterricht(reli, "REL", bra)
 
         # Beispielnoten in Chemie 9a und 9b
+        # Ordnerstruktur: Schriftlich (50) | Sonstige Mitarbeit (50) › Quartal 1 (1), Quartal 2 (1)
         for u in (ch9a, ch9b):
-            ka = Leistungsnachweis.objects.create(unterricht=u, kategorie=schriftlich, titel="1. Klassenarbeit", datum=date(2026, 9, 24), schluessel=schluessel, max_be=Decimal(40))
-            test = Leistungsnachweis.objects.create(unterricht=u, kategorie=schriftlich, titel="Test Atombau", datum=date(2026, 10, 8), gewicht=Decimal("0.5"), schluessel=schluessel, max_be=Decimal(20))
-            muendl = Leistungsnachweis.objects.create(unterricht=u, kategorie=sonstige, titel="Mitarbeit Sept.", datum=date(2026, 9, 30))
-            prot = Leistungsnachweis.objects.create(unterricht=u, kategorie=sonstige, titel="Protokoll Flammenfärbung", datum=date(2026, 10, 2), gewicht=Decimal("0.5"))
+            schriftlich = u.bewertungsordner.get(name="Schriftlich", eltern=None)
+            mitarbeit = u.bewertungsordner.get(name="Sonstige Mitarbeit", eltern=None)
+            q1 = Bewertungsordner.objects.create(unterricht=u, eltern=mitarbeit, name="Quartal 1", gewicht=1, reihenfolge=10)
+            Bewertungsordner.objects.create(unterricht=u, eltern=mitarbeit, name="Quartal 2", gewicht=1, reihenfolge=20)
+            ka = Leistungsnachweis.objects.create(ordner=schriftlich, titel="1. Klassenarbeit", datum=date(2026, 9, 24), schluessel=schluessel, max_be=Decimal(40))
+            test = Leistungsnachweis.objects.create(ordner=schriftlich, titel="Test Atombau", datum=date(2026, 10, 8), gewicht=Decimal("0.5"), schluessel=schluessel, max_be=Decimal(20))
+            muendl = Leistungsnachweis.objects.create(ordner=q1, titel="Mitarbeit September", datum=date(2026, 9, 30))
+            prot = Leistungsnachweis.objects.create(ordner=q1, titel="Protokoll Flammenfärbung", datum=date(2026, 10, 2), gewicht=Decimal("0.5"))
             muendlich_stufen = [s for s in sek1.stufen.all() if s.bezeichnung in {"1", "1-", "2+", "2", "2-", "3+", "3", "3-", "4", "4-", "5"}]
             for i, s in enumerate(u.schueler()):
                 staerke = rng.gauss(0.68, 0.15) if i else 0.30  # erste Person: Gefährdungsbeispiel

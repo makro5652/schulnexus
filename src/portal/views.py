@@ -10,7 +10,7 @@ from django.utils import timezone
 
 from fehlzeiten.models import Fehlzeit
 from nachmittag.models import AGAngebot
-from noten.berechnung import vorschlagsnote
+from noten.berechnung import Baum, nominale_anteile, vorschlagsnote
 from noten.models import Note, Unterricht
 from stammdaten.models import Gruppe, Mitgliedschaft, Schuelerprofil, Schuljahr
 
@@ -69,32 +69,49 @@ def start(request):
 @login_required
 def notenuebersicht(request, pk):
     unterricht = get_object_or_404(
-        Unterricht.objects.select_related("gruppe", "fach", "lehrkraft__person", "skala", "gewichtung", "abschnitt"), pk=pk
+        Unterricht.objects.select_related("gruppe", "fach", "lehrkraft__person", "skala", "abschnitt"), pk=pk
     )
     if not darf_unterricht_sehen(request.user, unterricht):
         raise PermissionDenied
 
-    nachweise = list(unterricht.leistungsnachweise.select_related("kategorie").order_by("-kategorie__anteil", "kategorie__name", "datum"))
-    schueler = list(unterricht.schueler())
-    alle_noten = Note.objects.filter(leistungsnachweis__unterricht=unterricht).select_related("stufe", "leistungsnachweis__kategorie")
+    baum = Baum(unterricht)
+    anteil_ordner, anteil_ln = nominale_anteile(baum.ordner, baum.nachweise)
+    spalten = [
+        {"ln": ln, "pfad": pfad, "anteil": anteil_ln.get(ln.pk)} for ln, pfad in baum.nachweise_in_reihenfolge()
+    ]
+    # Kopfzeile: aufeinanderfolgende Leistungsnachweise desselben Ordners zusammenfassen
+    gruppen = []
+    for sp in spalten:
+        if gruppen and gruppen[-1]["pfad"] == sp["pfad"]:
+            gruppen[-1]["breite"] += 1
+        else:
+            gruppen.append({"pfad": sp["pfad"], "breite": 1})
+
+    struktur = [
+        {"ordner": o, "ebene": ebene, "pfad": pfad, "anteil": anteil_ordner.get(o.pk),
+         "anzahl": len(baum.nachweise_in[o.pk]), "einzug": ebene * 1.4}
+        for o, ebene, pfad in baum.in_reihenfolge()
+    ]
+
+    alle_noten = Note.objects.filter(leistungsnachweis__unterricht=unterricht).select_related("stufe")
     noten_je_schueler = defaultdict(list)
     for n in alle_noten:
         noten_je_schueler[n.schueler_id].append(n)
 
     zeilen = []
-    for s in schueler:
+    for s in unterricht.schueler():
         noten = noten_je_schueler[s.pk]
         nach_ln = {n.leistungsnachweis_id: n for n in noten}
         zeilen.append({
             "schueler": s,
-            "zellen": [nach_ln.get(ln.pk) for ln in nachweise],
-            "vorschlag": vorschlagsnote(unterricht, s, noten),
+            "zellen": [nach_ln.get(sp["ln"].pk) for sp in spalten],
+            "vorschlag": vorschlagsnote(unterricht, s, noten, baum),
         })
 
     return render(
         request,
         "portal/notenuebersicht.html",
-        {"unterricht": unterricht, "nachweise": nachweise, "zeilen": zeilen, "kategorien": unterricht.gewichtung.kategorien.all()},
+        {"unterricht": unterricht, "spalten": spalten, "gruppen": gruppen, "zeilen": zeilen, "struktur": struktur},
     )
 
 

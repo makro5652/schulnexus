@@ -23,6 +23,7 @@ ROLLEN = {
         "view_person", "view_schuelerprofil", "view_gruppe", "view_mitgliedschaft", "view_fach", "view_beziehung",
         "view_unterricht", "view_notenskala", "view_notenstufe", "view_notenschluessel", "view_gewichtungsvorlage",
         "view_leistungskategorie",
+        "add_bewertungsordner", "change_bewertungsordner", "view_bewertungsordner", "delete_bewertungsordner",
         "add_leistungsnachweis", "change_leistungsnachweis", "view_leistungsnachweis", "delete_leistungsnachweis",
         "add_note", "change_note", "view_note",
         "add_zeugnisnote", "change_zeugnisnote", "view_zeugnisnote",

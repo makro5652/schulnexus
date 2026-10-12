@@ -87,3 +87,15 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 .noten tr.gefaehrdet td, .noten tr.gefaehrdet th { background: var(--gefahr-flaeche); }
 .sonder { color: var(--leise); font-size: 0.8rem; }
 .warnung { display: inline-grid; place-items: center; width: 1.1rem; height: 1.1rem; margin-left: 0.3rem; border-radius: 50%; background: var(--warnung); color: var(--flaeche); font-size: 0.75rem; font-weight: 700; cursor: help; }
+
+.noten .ordnerkopf { color: var(--text); font-size: 0.8rem; border-bottom: 2px solid var(--akzent); }
+.noten a.ln-titel { color: var(--text); text-decoration: none; border-bottom: 1px dotted var(--leise); }
+.noten a.ln-titel:hover { color: var(--akzent); }
+.struktur { margin-top: 1.5rem; }
+.karte-kopf { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.karte-kopf h2 { margin: 0; }
+.aktionen a { margin-right: 0.9rem; white-space: nowrap; font-size: 0.9rem; }
+.inhalt.breit { max-width: none; }
+.noten th, .noten td { padding: 0.45rem 0.55rem; }
+.noten thead th { white-space: normal; min-width: 5rem; max-width: 9.5rem; vertical-align: bottom; }
+.noten thead th.links { min-width: 10rem; }

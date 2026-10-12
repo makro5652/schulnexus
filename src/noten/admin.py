@@ -5,7 +5,9 @@ from simple_history.admin import SimpleHistoryAdmin
 
 from portal.rechte import ist_verwaltung
 
+from .berechnung import nominale_anteile
 from .models import (
+    Bewertungsordner,
     Gewichtungsvorlage,
     Leistungskategorie,
     Leistungsnachweis,
@@ -68,12 +70,48 @@ class EigeneDatenMixin:
         return qs.filter(**{f"{self.unterricht_pfad}__lehrkraft__person__benutzer": request.user})
 
 
+def eigene_unterrichte(request):
+    qs = Unterricht.objects.select_related("fach", "gruppe", "abschnitt", "lehrkraft")
+    return qs if ist_verwaltung(request.user) else qs.filter(lehrkraft__person__benutzer=request.user)
+
+
+def eigene_ordner(request):
+    return Bewertungsordner.objects.filter(unterricht__in=eigene_unterrichte(request)).select_related(
+        "unterricht__fach", "unterricht__gruppe", "eltern__eltern__eltern__eltern"
+    )
+
+
+class EigenerUnterrichtFilter(admin.SimpleListFilter):
+    title = "Unterricht"
+    parameter_name = "unterricht"
+
+    def lookups(self, request, model_admin):
+        return [(u.pk, str(u)) for u in eigene_unterrichte(request)]
+
+    def queryset(self, request, queryset):
+        return queryset.filter(unterricht_id=self.value()) if self.value() else queryset
+
+
+class OberordnerInline(admin.TabularInline):
+    model = Bewertungsordner
+    extra = 0
+    fields = ["name", "eltern", "gewicht", "reihenfolge"]
+    verbose_name_plural = "Bewertungsordner"
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "eltern":
+            uid = request.resolver_match.kwargs.get("object_id")
+            kwargs["queryset"] = Bewertungsordner.objects.filter(unterricht_id=uid) if uid else Bewertungsordner.objects.none()
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+
 @admin.register(Unterricht)
 class UnterrichtAdmin(admin.ModelAdmin):
-    list_display = ["__str__", "gruppe", "fach", "lehrkraft", "gewichtung", "uebersicht"]
+    list_display = ["__str__", "gruppe", "fach", "lehrkraft", "links"]
     list_filter = ["abschnitt", "fach", "gruppe__jahrgang"]
     search_fields = ["gruppe__name", "fach__name", "lehrkraft__kuerzel"]
     autocomplete_fields = ["gruppe", "lehrkraft"]
+    inlines = [OberordnerInline]
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -82,8 +120,77 @@ class UnterrichtAdmin(admin.ModelAdmin):
         return qs.filter(lehrkraft__person__benutzer=request.user)
 
     @admin.display(description="Noten")
-    def uebersicht(self, obj):
-        return format_html('<a href="{}">Notenübersicht</a>', reverse("notenuebersicht", args=[obj.pk]))
+    def links(self, obj):
+        return format_html(
+            '<a href="{}">Notenübersicht</a> · <a href="{}?unterricht={}">Bewertungsordner</a>',
+            reverse("notenuebersicht", args=[obj.pk]), reverse("admin:noten_bewertungsordner_changelist"), obj.pk,
+        )
+
+
+class LeistungsnachweisInline(admin.TabularInline):
+    model = Leistungsnachweis
+    extra = 1
+    fields = ["titel", "datum", "gewicht", "schluessel", "max_be"]
+    show_change_link = True
+    verbose_name = "Leistungsnachweis in diesem Ordner"
+    verbose_name_plural = "Leistungsnachweise in diesem Ordner (Noten über „Ändern“ eintragen)"
+
+
+@admin.register(Bewertungsordner)
+class BewertungsordnerAdmin(SimpleHistoryAdmin):
+    list_display = ["pfad_anzeige", "unterricht", "gewicht", "anteil", "anzahl_nachweise"]
+    list_filter = [EigenerUnterrichtFilter]
+    search_fields = ["name", "unterricht__gruppe__name", "unterricht__fach__name"]
+    fields = ["unterricht", "eltern", "name", "gewicht", "reihenfolge", "beschreibung"]
+    inlines = [LeistungsnachweisInline]
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).filter(pk__in=eigene_ordner(request).values("pk")).select_related(
+            "unterricht__fach", "unterricht__gruppe", "unterricht__lehrkraft", "unterricht__abschnitt", "eltern__eltern__eltern"
+        )
+
+    def get_changeform_initial_data(self, request):
+        daten = super().get_changeform_initial_data(request)
+        for feld in ("unterricht", "eltern"):
+            if request.GET.get(feld):
+                daten[feld] = request.GET[feld]
+        return daten
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "unterricht":
+            kwargs["queryset"] = eigene_unterrichte(request)
+        if db_field.name == "eltern":
+            qs = eigene_ordner(request)
+            oid = request.resolver_match.kwargs.get("object_id")
+            if oid:
+                eigener = Bewertungsordner.objects.filter(pk=oid).first()
+                qs = qs.filter(unterricht_id=eigener.unterricht_id).exclude(pk=oid) if eigener else qs
+            elif request.GET.get("unterricht"):
+                qs = qs.filter(unterricht_id=request.GET["unterricht"])
+            kwargs["queryset"] = qs
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+    @admin.display(description="Ordner", ordering="name")
+    def pfad_anzeige(self, obj):
+        return obj.pfad
+
+    @admin.display(description="Anteil an der Gesamtnote")
+    def anteil(self, obj):
+        ordner = list(Bewertungsordner.objects.filter(unterricht_id=obj.unterricht_id))
+        nachweise = list(Leistungsnachweis.objects.filter(unterricht_id=obj.unterricht_id))
+        wert = nominale_anteile(ordner, nachweise)[0].get(obj.pk)
+        return f"{wert:.1f} %".replace(".", ",") if wert is not None else "—"
+
+    @admin.display(description="Leistungsnachweise")
+    def anzahl_nachweise(self, obj):
+        return obj.leistungsnachweise.count()
+
+    def save_formset(self, request, form, formset, change):
+        super().save_formset(request, form, formset, change)
+        if formset.model is Leistungsnachweis:
+            neu = sum(ln.notenzeilen_anlegen() for ln in form.instance.leistungsnachweise.all())
+            if neu:
+                self.message_user(request, f"{neu} Notenzeilen angelegt – Noten über „Ändern“ beim Leistungsnachweis eintragen.")
 
 
 class NoteInline(admin.TabularInline):
@@ -110,32 +217,37 @@ class NoteInline(admin.TabularInline):
 
 
 @admin.register(Leistungsnachweis)
-class LeistungsnachweisAdmin(EigeneDatenMixin, admin.ModelAdmin):
-    list_display = ["titel", "unterricht", "kategorie", "datum", "gewicht", "anzahl_noten"]
-    list_filter = ["unterricht__abschnitt", "unterricht__fach", "kategorie__name"]
-    search_fields = ["titel", "unterricht__gruppe__name"]
-    autocomplete_fields = ["unterricht"]
+class LeistungsnachweisAdmin(EigeneDatenMixin, SimpleHistoryAdmin):
+    list_display = ["titel", "ordner_pfad", "unterricht", "datum", "gewicht", "anzahl_noten"]
+    list_filter = [EigenerUnterrichtFilter, "unterricht__abschnitt"]
+    search_fields = ["titel", "ordner__name", "unterricht__gruppe__name"]
+    fields = ["ordner", "titel", "datum", "gewicht", "schluessel", "max_be"]
     inlines = [NoteInline]
+
+    @admin.display(description="Ordner", ordering="ordner__name")
+    def ordner_pfad(self, obj):
+        return obj.ordner.pfad
 
     @admin.display(description="Noten erfasst")
     def anzahl_noten(self, obj):
         return obj.noten.exclude(stufe__isnull=True, sonderstatus="").count()
 
+    def get_changeform_initial_data(self, request):
+        daten = super().get_changeform_initial_data(request)
+        if request.GET.get("ordner"):
+            daten["ordner"] = request.GET["ordner"]
+        return daten
+
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "unterricht" and not ist_verwaltung(request.user):
-            kwargs["queryset"] = Unterricht.objects.filter(lehrkraft__person__benutzer=request.user)
+        if db_field.name == "ordner":
+            kwargs["queryset"] = eigene_ordner(request)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def save_related(self, request, form, formsets, change):
         super().save_related(request, form, formsets, change)
-        # Für jede Schülerin / jeden Schüler der Gruppe eine (leere) Notenzeile anlegen,
-        # damit die Lehrkraft die Noten direkt in der Liste eintragen kann.
-        ln = form.instance
-        vorhanden = set(ln.noten.values_list("schueler_id", flat=True))
-        neue = [Note(leistungsnachweis=ln, schueler=s) for s in ln.unterricht.schueler() if s.pk not in vorhanden]
-        Note.objects.bulk_create(neue)
-        if neue:
-            self.message_user(request, f"{len(neue)} Notenzeilen angelegt – bitte jetzt die Noten eintragen.")
+        neu = form.instance.notenzeilen_anlegen()
+        if neu:
+            self.message_user(request, f"{neu} Notenzeilen angelegt – bitte jetzt die Noten eintragen.")
 
 
 @admin.register(Note)

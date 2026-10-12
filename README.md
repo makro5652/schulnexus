@@ -1,4 +1,4 @@
-# Schulverwaltung (Version 0.1, Entwicklungsstand)
+# Schulverwaltung (Version 0.2, Entwicklungsstand)
 
 Open-Source-Schulverwaltung für die DSN: Stammdaten, Klassen und Lerngruppen,
 Noten mit Gewichtung, Fehlzeiten, Nachmittagsprogramm. Läuft im Browser,
@@ -29,6 +29,36 @@ http://localhost:8000. Die Zugangsdaten stehen in der Datei `.env`
 | `admin` | Vollzugriff | `ADMIN_PASSWORT` in `.env` |
 | `lehrkraft` | Demo-Lehrkraft, Klassenleitung 9a, Chemie 9a/9b, Biologie 9a | `DEMO_PASSWORT` in `.env` |
 | `verwaltung` | Demo-Sekretariat | `DEMO_PASSWORT` in `.env` |
+
+## Noten mit Bewertungsordnern
+
+Jeder Unterricht hat eine frei gestaltbare Ordnerstruktur, z. B.:
+
+```
+Schriftlich (Gewicht 50)
+├─ 1. Klassenarbeit (Gewicht 1)
+└─ Test Atombau (Gewicht 0,5)
+Sonstige Mitarbeit (Gewicht 50)
+├─ Quartal 1 (Gewicht 1)
+│  ├─ Mitarbeit September (Gewicht 1)
+│  └─ Protokoll Flammenfärbung (Gewicht 0,5)
+├─ Quartal 2 (Gewicht 1)
+└─ Referate (Gewicht 2)
+```
+
+- Ordner und Leistungsnachweise sind **frei benennbar**, Leistungsnachweise haben ein **Datum**.
+- Jedes Gewicht gilt **relativ zu den anderen Einträgen derselben Ebene** (50/50 = 1/1).
+- Ein Ordner kann Unterordner und Leistungsnachweise gleichzeitig enthalten (bis zu 5 Ebenen).
+- **Leere Ordner** (z. B. ein noch nicht begonnenes Quartal) werden bei der Berechnung übersprungen.
+- Die Notenübersicht zeigt für jeden Eintrag seinen planmäßigen Anteil an der Gesamtnote.
+- Bedienung: Notenübersicht → „Bewertungsstruktur“ → „+ Unterordner“ bzw. „+ Leistungsnachweis“.
+  Die Noten trägt man ein, indem man auf den Namen des Leistungsnachweises klickt.
+- Die Gewichtungsvorlage legt beim Anlegen eines Unterrichts nur die **Start-Ordner** an.
+
+## Update von einer älteren Version
+
+Neuen Ordnerinhalt über den alten kopieren (die `.env` behalten) und erneut `./start.sh`
+ausführen. Die Datenbank wird automatisch umgestellt; vorhandene Kategorien werden zu Ordnern.
 
 ## Wichtige Befehle
 

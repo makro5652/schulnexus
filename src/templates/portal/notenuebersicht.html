@@ -1,19 +1,30 @@
 {% extends "portal/base.html" %}
 {% block title %}Noten {{ unterricht.fach.kuerzel }} {{ unterricht.gruppe.name }}{% endblock %}
+{% block inhaltsklasse %}breit{% endblock %}
 {% block inhalt %}
 <p class="brotkrumen"><a href="{% url 'start' %}">Start</a> › Notenübersicht</p>
 <h1>{{ unterricht.fach.name }} · {{ unterricht.gruppe.name }}</h1>
-<p class="unterzeile">{{ unterricht.abschnitt }} · Lehrkraft {{ unterricht.lehrkraft.person.anzeigename }} · Skala „{{ unterricht.skala }}“ · Gewichtung:
-  {% for k in kategorien %}{{ k.name }} {{ k.anteil|floatformat:0 }} %{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+<p class="unterzeile">{{ unterricht.abschnitt }} · Lehrkraft {{ unterricht.lehrkraft.person.anzeigename }} · Skala „{{ unterricht.skala }}“</p>
 
+{% if spalten %}
 <div class="tabellenrahmen">
 <table class="noten">
   <thead>
+    <tr class="ordnerzeile">
+      <th rowspan="2" class="links">Schüler:in</th>
+      {% for g in gruppen %}<th colspan="{{ g.breite }}" class="ordnerkopf">{{ g.pfad }}</th>{% endfor %}
+      <th colspan="{{ struktur|length }}" class="ordnerkopf kat">Ordnerschnitte</th>
+      <th rowspan="2" class="vorschlag">Vorschlag</th>
+    </tr>
     <tr>
-      <th class="links">Schüler:in</th>
-      {% for ln in nachweise %}<th><span class="ln-titel">{{ ln.titel }}</span><small>{{ ln.kategorie.name }} · ×{{ ln.gewicht|floatformat:-2 }}<br>{{ ln.datum|date:"d.m." }}</small></th>{% endfor %}
-      {% for k in kategorien %}<th class="kat">Ø {{ k.name }}</th>{% endfor %}
-      <th class="vorschlag">Vorschlag</th>
+      {% for sp in spalten %}
+      <th>
+        {% if user.is_staff %}<a class="ln-titel" href="{% url 'admin:noten_leistungsnachweis_change' sp.ln.pk %}" title="Noten eintragen">{{ sp.ln.titel }}</a>{% else %}<span class="ln-titel">{{ sp.ln.titel }}</span>{% endif %}
+        <small>{{ sp.ln.datum|date:"d.m." }} · ×{{ sp.ln.gewicht|floatformat:-2 }}</small>
+        <small>≈ {{ sp.anteil|floatformat:1 }} % der Note</small>
+      </th>
+      {% endfor %}
+      {% for e in struktur %}<th class="kat" title="{{ e.pfad }}">Ø {% if e.ebene %}└ {% endif %}{{ e.ordner.name }}</th>{% endfor %}
     </tr>
   </thead>
   <tbody>
@@ -23,7 +34,7 @@
       {% for n in z.zellen %}
         <td>{% if n %}{% if n.stufe %}{{ n.stufe }}{% if n.prozent is not None %}<small>{{ n.prozent }} %</small>{% endif %}{% elif n.sonderstatus %}<span class="sonder" title="{{ n.get_sonderstatus_display }}">{{ n.get_sonderstatus_display|slice:":4" }}.</span>{% else %}<span class="leer">–</span>{% endif %}{% else %}<span class="leer">–</span>{% endif %}</td>
       {% endfor %}
-      {% for k in z.vorschlag.kategorien %}<td class="kat">{{ k.schnitt|default_if_none:"–" }}</td>{% endfor %}
+      {% for k in z.vorschlag.alle_ordner %}<td class="kat">{{ k.schnitt|default_if_none:"–" }}</td>{% endfor %}
       <td class="vorschlag">
         {% if z.vorschlag.schnitt is not None %}<strong>{{ z.vorschlag.stufe }}</strong><small>Ø {{ z.vorschlag.schnitt }}</small>{% else %}–{% endif %}
         {% if z.vorschlag.warnungen %}<span class="warnung" title="{{ z.vorschlag.warnungen|join:' ' }}">!</span>{% endif %}
@@ -35,6 +46,38 @@
   </tbody>
 </table>
 </div>
-<p class="hinweistext">Der Vorschlag ist rechnerisch ermittelt. Die Zeugnisnote setzt die Lehrkraft in pädagogischer Gesamtwürdigung fest; Abweichungen werden begründet. Rot markierte Zeilen liegen im Gefährdungsbereich. Ein Ausrufezeichen zeigt eine fehlende Leistungskategorie an.</p>
-{% if user.is_staff %}<p><a class="knopf zweitrangig" href="{% url 'admin:noten_leistungsnachweis_add' %}?unterricht={{ unterricht.pk }}">Leistungsnachweis anlegen</a></p>{% endif %}
+<p class="hinweistext">Der Vorschlag ist rechnerisch ermittelt; die Zeugnisnote setzt die Lehrkraft in pädagogischer Gesamtwürdigung fest. Rot markierte Zeilen liegen im Gefährdungsbereich. Ein Ausrufezeichen zeigt einen Ordner ohne Note an. Die Prozentangaben gelten, wenn alle Einträge bewertet sind; leere Ordner werden übersprungen.</p>
+{% else %}
+<p class="leer">Noch keine Leistungsnachweise angelegt.</p>
+{% endif %}
+
+<section class="karte struktur">
+  <div class="karte-kopf">
+    <h2>Bewertungsstruktur</h2>
+    {% if user.is_staff %}<a class="knopf zweitrangig" href="{% url 'admin:noten_bewertungsordner_add' %}?unterricht={{ unterricht.pk }}">Neuer Ordner</a>{% endif %}
+  </div>
+  <p class="hinweistext">Ordner und Unterordner sind frei benennbar. Das Gewicht gilt jeweils relativ zu den anderen Einträgen derselben Ebene.</p>
+  {% if struktur %}
+  <table class="liste">
+    <thead><tr><th>Ordner</th><th class="zahl">Gewicht</th><th class="zahl">Anteil an der Note</th><th class="zahl">Nachweise</th>{% if user.is_staff %}<th></th>{% endif %}</tr></thead>
+    <tbody>
+    {% for e in struktur %}
+      <tr>
+        <td><span style="padding-left: {{ e.einzug }}rem">{% if e.ebene %}└ {% endif %}{{ e.ordner.name }}</span></td>
+        <td class="zahl">{{ e.ordner.gewicht|floatformat:-2 }}</td>
+        <td class="zahl">{{ e.anteil|floatformat:1 }} %</td>
+        <td class="zahl">{{ e.anzahl }}</td>
+        {% if user.is_staff %}
+        <td class="aktionen">
+          <a href="{% url 'admin:noten_bewertungsordner_change' e.ordner.pk %}">Bearbeiten</a>
+          <a href="{% url 'admin:noten_leistungsnachweis_add' %}?ordner={{ e.ordner.pk }}">+ Leistungsnachweis</a>
+          <a href="{% url 'admin:noten_bewertungsordner_add' %}?unterricht={{ unterricht.pk }}&amp;eltern={{ e.ordner.pk }}">+ Unterordner</a>
+        </td>
+        {% endif %}
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}<p class="leer">Noch keine Ordner. Lege zuerst einen Ordner an, z. B. „Schriftlich“ oder „Sonstige Mitarbeit“.</p>{% endif %}
+</section>
 {% endblock %}

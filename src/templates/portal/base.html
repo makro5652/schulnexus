@@ -20,10 +20,10 @@
     </nav>
     {% endif %}
   </header>
-  <main class="inhalt">
+  <main class="inhalt {% block inhaltsklasse %}{% endblock %}">
     {% if messages %}<ul class="meldungen">{% for m in messages %}<li class="{{ m.tags }}">{{ m }}</li>{% endfor %}</ul>{% endif %}
     {% block inhalt %}{% endblock %}
   </main>
-  <footer class="fuss">Open-Source-Schulverwaltung · Version 0.1 (Entwicklungsstand)</footer>
+  <footer class="fuss">Open-Source-Schulverwaltung · Version 0.2 (Entwicklungsstand)</footer>
 </body>
 </html>

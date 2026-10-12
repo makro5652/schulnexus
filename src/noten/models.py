@@ -3,9 +3,11 @@ Notenmodul.
 
 - Notenskala + Notenstufen: frei konfigurierbar (Sek I mit Tendenzen, 0–15 Punkte ...).
 - Notenschlüssel: eigene Tabellen Prozent -> Notenstufe (z. B. für Klassenarbeiten mit BE).
-- Gewichtungsvorlage + Kategorien: z. B. schriftlich 50 %, sonstige Leistungen 50 %.
+- Gewichtungsvorlage + Kategorien: Startvorlage, z. B. schriftlich 50 %, sonstige Mitarbeit 50 %.
 - Unterricht: Gruppe x Fach x Lehrkraft x Halbjahr.
-- Leistungsnachweis + Note: einzelne Bewertungen.
+- Bewertungsordner: frei benennbar und verschachtelbar (z. B. „Sonstige Mitarbeit › Quartal 1“),
+  jeder mit eigenem Gewicht relativ zu seiner Ebene.
+- Leistungsnachweis + Note: einzelne Bewertungen mit freier Bezeichnung, Datum und Gewicht im Ordner.
 - Zeugnisnote: von der Lehrkraft festgesetzt; Abweichung vom Vorschlag braucht Begründung.
 """
 from decimal import ROUND_HALF_UP, Decimal
@@ -13,6 +15,7 @@ from decimal import ROUND_HALF_UP, Decimal
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models import Q
 from simple_history.models import HistoricalRecords
 
 from stammdaten.models import Abschnitt, Fach, Gruppe, Personalprofil, Schuelerprofil
@@ -150,7 +153,10 @@ class Unterricht(models.Model):
     fach = models.ForeignKey(Fach, on_delete=models.PROTECT, related_name="unterrichte", verbose_name="Fach")
     lehrkraft = models.ForeignKey(Personalprofil, on_delete=models.PROTECT, related_name="unterrichte", verbose_name="Lehrkraft")
     skala = models.ForeignKey(Notenskala, on_delete=models.PROTECT, verbose_name="Notenskala")
-    gewichtung = models.ForeignKey(Gewichtungsvorlage, on_delete=models.PROTECT, verbose_name="Gewichtungsvorlage")
+    gewichtung = models.ForeignKey(
+        Gewichtungsvorlage, null=True, blank=True, on_delete=models.PROTECT, verbose_name="Startvorlage für Bewertungsordner",
+        help_text="Beim Anlegen werden daraus die obersten Ordner erzeugt. Danach sind die Ordner frei änderbar.",
+    )
 
     class Meta:
         verbose_name = "Unterricht"
@@ -176,21 +182,114 @@ class Unterricht(models.Model):
             .order_by("person__nachname", "person__vorname")
         )
 
+    def save(self, *args, **kwargs):
+        neu = self._state.adding
+        super().save(*args, **kwargs)
+        if neu:
+            self.ordner_aus_vorlage()
+
+    def ordner_aus_vorlage(self):
+        """Legt die obersten Bewertungsordner aus der Startvorlage an, falls noch keine existieren."""
+        if not self.gewichtung_id or self.bewertungsordner.exists():
+            return
+        for i, kat in enumerate(self.gewichtung.kategorien.all()):
+            Bewertungsordner.objects.create(unterricht=self, name=kat.name, gewicht=kat.anteil, reihenfolge=(i + 1) * 10)
+
+
+class Bewertungsordner(models.Model):
+    """
+    Frei benennbarer, verschachtelbarer Ordner für Leistungsnachweise eines Unterrichts,
+    z. B. „Schriftlich“ oder „Sonstige Mitarbeit › Quartal 1“.
+
+    Das Gewicht gilt relativ zu den anderen Einträgen derselben Ebene (Ordner und
+    Leistungsnachweise). 50 und 50 ergeben also dasselbe wie 1 und 1.
+    """
+
+    MAX_TIEFE = 5
+
+    unterricht = models.ForeignKey(Unterricht, on_delete=models.CASCADE, related_name="bewertungsordner", verbose_name="Unterricht")
+    eltern = models.ForeignKey(
+        "self", null=True, blank=True, on_delete=models.CASCADE, related_name="unterordner",
+        verbose_name="Übergeordneter Ordner", help_text="leer = oberste Ebene",
+    )
+    name = models.CharField("Name", max_length=80, help_text="z. B. Sonstige Mitarbeit oder Quartal 1")
+    gewicht = models.DecimalField(
+        "Gewicht", max_digits=6, decimal_places=2, default=Decimal("1"),
+        validators=[MinValueValidator(Decimal("0"))],
+        help_text="Relativ zu den anderen Einträgen derselben Ebene, z. B. 50 / 50 oder 2 / 1.",
+    )
+    reihenfolge = models.PositiveSmallIntegerField("Reihenfolge", default=10)
+    beschreibung = models.CharField("Beschreibung", max_length=200, blank=True)
+    history = HistoricalRecords(verbose_name="Änderungsprotokoll Bewertungsordner")
+
+    class Meta:
+        verbose_name = "Bewertungsordner"
+        verbose_name_plural = "Bewertungsordner"
+        ordering = ["unterricht", "reihenfolge", "name"]
+        constraints = [
+            models.UniqueConstraint(fields=["unterricht", "eltern", "name"], name="ordnername_je_ebene_eindeutig"),
+            models.UniqueConstraint(
+                fields=["unterricht", "name"], condition=Q(eltern__isnull=True), name="ordnername_oberste_ebene_eindeutig"
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.unterricht.fach.kuerzel} {self.unterricht.gruppe.name}: {self.pfad}"
+
+    @property
+    def pfad(self):
+        return " › ".join([v.name for v in reversed(self.vorfahren())] + [self.name])
+
+    def vorfahren(self):
+        """Übergeordnete Ordner von innen nach außen. Bricht bei einem Zyklus ab, statt endlos zu laufen."""
+        liste, gesehen = [], {self.pk} if self.pk else set()
+        o = self.eltern
+        while o is not None and o.pk not in gesehen:
+            liste.append(o)
+            gesehen.add(o.pk)
+            o = o.eltern
+        return liste
+
+    def _erzeugt_zyklus(self):
+        if not (self.pk and self.eltern_id):
+            return False
+        o, schritte = Bewertungsordner.objects.filter(pk=self.eltern_id).first(), 0
+        while o is not None and schritte <= self.MAX_TIEFE + 1:
+            if o.pk == self.pk:
+                return True
+            o = Bewertungsordner.objects.filter(pk=o.eltern_id).first() if o.eltern_id else None
+            schritte += 1
+        return False
+
+    def clean(self):
+        if self.eltern_id:
+            if self.eltern.unterricht_id != self.unterricht_id:
+                raise ValidationError({"eltern": "Der übergeordnete Ordner gehört zu einem anderen Unterricht."})
+            if self.eltern_id == self.pk or self._erzeugt_zyklus():
+                raise ValidationError({"eltern": "Ein Ordner kann nicht in sich selbst oder einem seiner Unterordner liegen."})
+            if len(self.eltern.vorfahren()) + 2 > self.MAX_TIEFE:
+                raise ValidationError({"eltern": f"Höchstens {self.MAX_TIEFE} Ordnerebenen sind möglich."})
+
 
 class Leistungsnachweis(models.Model):
-    unterricht = models.ForeignKey(Unterricht, on_delete=models.CASCADE, related_name="leistungsnachweise", verbose_name="Unterricht")
-    kategorie = models.ForeignKey(Leistungskategorie, on_delete=models.PROTECT, verbose_name="Kategorie")
-    titel = models.CharField("Titel", max_length=100, help_text="z. B. 1. Klassenarbeit")
+    unterricht = models.ForeignKey(
+        Unterricht, on_delete=models.CASCADE, related_name="leistungsnachweise", verbose_name="Unterricht", editable=False
+    )
+    ordner = models.ForeignKey(Bewertungsordner, on_delete=models.PROTECT, related_name="leistungsnachweise", verbose_name="Ordner")
+    titel = models.CharField("Bezeichnung", max_length=100, help_text="frei wählbar, z. B. 1. Klassenarbeit oder Referat Säuren")
     datum = models.DateField("Datum")
     gewicht = models.DecimalField(
-        "Gewicht innerhalb der Kategorie", max_digits=4, decimal_places=2, default=Decimal("1"),
+        "Gewicht im Ordner", max_digits=6, decimal_places=2, default=Decimal("1"),
         validators=[MinValueValidator(Decimal("0.01"))],
+        help_text="Relativ zu den anderen Einträgen im selben Ordner.",
     )
     schluessel = models.ForeignKey(
         Notenschluessel, null=True, blank=True, on_delete=models.PROTECT, verbose_name="Notenschlüssel",
         help_text="Optional: Note wird aus erreichten Bewertungseinheiten (BE) berechnet.",
     )
     max_be = models.DecimalField("Maximale BE", max_digits=6, decimal_places=2, null=True, blank=True)
+
+    history = HistoricalRecords(verbose_name="Änderungsprotokoll Leistungsnachweis")
 
     class Meta:
         verbose_name = "Leistungsnachweis"
@@ -201,12 +300,24 @@ class Leistungsnachweis(models.Model):
         return f"{self.titel} ({self.unterricht})"
 
     def clean(self):
-        if self.kategorie_id and self.unterricht_id and self.kategorie.vorlage_id != self.unterricht.gewichtung_id:
-            raise ValidationError("Die Kategorie gehört nicht zur Gewichtungsvorlage dieses Unterrichts.")
+        if self.ordner_id:
+            self.unterricht_id = self.ordner.unterricht_id
         if self.schluessel_id and not self.max_be:
             raise ValidationError("Bei Verwendung eines Notenschlüssels bitte die maximalen BE angeben.")
         if self.schluessel_id and self.unterricht_id and self.schluessel.skala_id != self.unterricht.skala_id:
             raise ValidationError("Der Notenschlüssel passt nicht zur Notenskala des Unterrichts.")
+
+    def save(self, *args, **kwargs):
+        # Der Unterricht ergibt sich immer aus dem Ordner.
+        self.unterricht_id = self.ordner.unterricht_id
+        super().save(*args, **kwargs)
+
+    def notenzeilen_anlegen(self):
+        """Legt für jede Schülerin / jeden Schüler der Gruppe eine leere Notenzeile an."""
+        vorhanden = set(self.noten.values_list("schueler_id", flat=True))
+        neue = [Note(leistungsnachweis=self, schueler=s) for s in self.unterricht.schueler() if s.pk not in vorhanden]
+        Note.objects.bulk_create(neue)
+        return len(neue)
 
 
 class Note(models.Model):
