@@ -137,6 +137,12 @@ class Command(BaseCommand):
             if not Notiz.objects.exists():
                 self.startseite_anlegen()
                 self.stdout.write("Beispiele für Notizen und Geburtstage ergänzt.")
+            from aufnahme.models import Anmeldung
+
+            if not Anmeldung.objects.exists():
+                call_command("grundeinrichtung", stdout=self.stdout)
+                self.aufnahme_anlegen()
+                self.stdout.write("Beispiele für Neuanmeldungen ergänzt.")
             return
 
         call_command("grundeinrichtung", stdout=self.stdout)
@@ -491,6 +497,7 @@ class Command(BaseCommand):
         self.foerderung_anlegen(pw)
         self.startseite_anlegen()
         self.rollen_anlegen(pw)
+        self.aufnahme_anlegen()
 
         self.stdout.write(self.style.SUCCESS(
             f"Demo-Daten angelegt: {len(alle)} Schüler:innen, {Person.objects.count()} Personen, "
@@ -733,6 +740,129 @@ class Command(BaseCommand):
             if eltern:
                 konto("eltern", eltern.person, R.ELTERN, personal=False)
         Personalprofil.objects.filter(person__in=[sl.person, vl.person]).update(arbeitserlaubnis_bis=heute.replace(year=heute.year + 2))
+
+
+    # ------------------------------------------------------------ Neuanmeldungen (ab 0.4.2.5)
+    def aufnahme_anlegen(self):
+        from django.core.files.base import ContentFile
+
+        from aufnahme.models import AnmeldeDatei, AnmeldeKontakt, Anmeldung, ChecklistenVorlage
+
+        heute = timezone.localdate()
+        sj = Schuljahr.objects.get(name="2026/27")
+        kl = {g.name: g for g in Gruppe.objects.filter(schuljahr=sj, typ=Gruppe.STAMMKLASSE)}
+        bg = {b.kuerzel: b for b in Bildungsgang.objects.all()}
+        vorlage = {v.name: v for v in ChecklistenVorlage.objects.all()}
+        sekretariat = User.objects.get(username="verwaltung")
+        finanzen = User.objects.filter(username="finanzen").first() or sekretariat
+        mittelstufe = User.objects.filter(username="mittelstufe").first() or sekretariat
+        leitung = User.objects.filter(username="schulleitung").first() or sekretariat
+        wer = {"sekretariat": sekretariat, "finanzen": finanzen, "koordination": mittelstufe, "schulleitung": leitung, "": sekretariat}
+        jetzt = timezone.now()
+
+        def anmeldung(tage, vorlagen, kontakte, dateien, erledigt=0, **felder):
+            a = Anmeldung.objects.create(schuljahr=sj, eingang=heute - timedelta(days=tage), erstellt_von=sekretariat,
+                                         status_seit=heute - timedelta(days=max(tage - 5, 0)), **felder)
+            for v in vorlagen:
+                a.punkte_aus_vorlage(vorlage[v])
+            for i, k in enumerate(kontakte, start=1):
+                AnmeldeKontakt.objects.create(anmeldung=a, reihenfolge=i, **k)
+            for j, (kategorie, titel, alter) in enumerate(dateien):
+                d = AnmeldeDatei(anmeldung=a, kategorie=kategorie, titel=titel, hochgeladen_von=sekretariat,
+                                 zugriffsstufe=AnmeldeDatei.STUFE_NACH_KATEGORIE.get(kategorie, "akte"))
+                d.datei = ContentFile(beispiel_pdf(titel, a.anzeigename), name=f"{titel}.pdf")
+                d.save()
+                AnmeldeDatei.objects.filter(pk=d.pk).update(hochgeladen_am=jetzt - timedelta(days=alter, hours=j))
+            punkte = list(a.punkte.all())
+            for n, pkt in enumerate(punkte[:erledigt] if erledigt >= 0 else [p for p in punkte if p.pflicht]):
+                pkt.abhaken(wer[pkt.zustaendig])
+                type(pkt).objects.filter(pk=pkt.pk).update(erledigt_am=jetzt - timedelta(days=max(tage - 2 - n, 0)))
+            return a
+
+        def eltern(art, vorname, nachname, **mehr):
+            d = {"art": art, "anrede": "Frau" if art == "mutter" else "Herr", "vorname": vorname, "nachname": nachname,
+                 "email": f"{vorname.lower()}.{nachname.lower()}@familie.example", "mobil": "+254 700 000 000"}
+            d.update(mehr)
+            return d
+
+        # 1) Quereinstieg aus Deutschland, in Prüfung, vorläufig 9a
+        anmeldung(
+            18, ["Standard", "Mittelstufe"],
+            [eltern("mutter", "Julia", "Hoffmann", rechnungsempfaenger=True, beruf="Projektleiterin", arbeitgeber="GIZ"),
+             eltern("vater", "Markus", "Hoffmann", beruf="Ingenieur")],
+            [("zeugnis", "Jahreszeugnis Klasse 8", 17), ("zeugnis", "Halbjahreszeugnis Klasse 8", 17),
+             ("ausweis", "Reisepass (Kopie)", 16)],
+            erledigt=5, status=Anmeldung.PRUEFUNG, vorname="Lena", nachname="Hoffmann", geschlecht="w",
+            geburtsdatum=date(2012, 4, 3), geburtsort="Saarbrücken", geburtsland="Deutschland", staatsangehoerigkeiten="deutsch",
+            muttersprache="Deutsch", familiensprache="Deutsch", deutschkenntnisse="muttersprachlich", religionsunterricht="ev",
+            jahrgang=9, bildungsgang=bg.get("GYM"), eintrittsdatum=date(2027, 1, 11), vorlaeufige_klasse=kl.get("9a"),
+            strasse="Lavington Green, House 12", postfach="P.O. Box 12345-00100", plz="00100", ort="Nairobi", land="Kenia",
+            vorherige_schule="Gymnasium am Rotenbühl", vorherige_schule_ort="Saarbrücken", vorherige_schule_land="Deutschland",
+            vorherige_schulform="Gymnasium (DE)", letzter_jahrgang="9",
+            bemerkungen="Umzug im Dezember wegen Versetzung der Mutter (GIZ). Familie wünscht Französisch weiter als 2. Fremdsprache.",
+        )
+
+        # 2) Grundschulübergang mit geringen Deutschkenntnissen, gerade eingegangen
+        anmeldung(
+            3, ["Standard", "Mittelstufe", "Geringe Deutschkenntnisse"],
+            [eltern("mutter", "Grace", "Otieno", sprache="en", korrespondenzweg="email", rechnungsempfaenger=True)],
+            [("ausweis", "Geburtsurkunde", 3)],
+            status=Anmeldung.EINGEGANGEN, vorname="Amani", nachname="Otieno", geschlecht="m",
+            geburtsdatum=date(2015, 9, 21), geburtsort="Nairobi", geburtsland="Kenia", staatsangehoerigkeiten="kenianisch",
+            muttersprache="Kiswahili, Englisch", familiensprache="Englisch", deutschkenntnisse="keine", daz=True,
+            jahrgang=5, eintrittsdatum=date(2027, 1, 11), strasse="Kileleshwa, Othaya Road 5", ort="Nairobi", land="Kenia",
+            vorherige_schule="Hillcrest Primary", vorherige_schule_ort="Nairobi", vorherige_schule_land="Kenia",
+            vorherige_schulform="CBC (KE)", letzter_jahrgang="Grade 5",
+        )
+
+        # 3) Zusage, alle Pflichtpunkte erledigt – bereit zur Übernahme; Geschwisterkind an der Schule
+        g = kl.get("9b")
+        geschwister = g.aktuelle_mitglieder().select_related("person").order_by("person__nachname").first() if g else None
+        b = geschwister.beziehungen.select_related("person").filter(sorgerecht=True).first() if geschwister else None
+        if b:
+            kontakt = eltern(b.art, b.person.vorname, b.person.nachname, email=b.person.email, anrede=b.person.anrede,
+                             rechnungsempfaenger=b.rechnungsempfaenger)
+            nachname, hinweis = b.person.nachname, f"{geschwister.person.anzeigename} (9b)"
+        else:
+            kontakt, nachname, hinweis = eltern("mutter", "Anna", "Weber"), "Weber", ""
+        anmeldung(
+            32, ["Standard", "Mittelstufe"], [kontakt],
+            [("zeugnis", "Zeugnis Klasse 8 (Deutsche Schule Kapstadt)", 30), ("ausweis", "Reisepass (Kopie)", 30),
+             ("sonstiges", "Impfpass", 25), ("vertrag", "Schulvertrag (unterschrieben)", 8)],
+            erledigt=-1, status=Anmeldung.ZUGESAGT, vorname="Jonas", nachname=nachname, geschlecht="m",
+            geburtsdatum=date(2012, 2, 14), geburtsort="Kapstadt", geburtsland="Südafrika", staatsangehoerigkeiten="deutsch",
+            muttersprache="Deutsch", familiensprache="Deutsch, Englisch", deutschkenntnisse="muttersprachlich",
+            religionsunterricht="ethik", jahrgang=9, bildungsgang=bg.get("GYM"), eintrittsdatum=date(2026, 11, 2),
+            vorlaeufige_klasse=g, strasse="Runda Estate, House 41", ort="Nairobi", land="Kenia",
+            vorherige_schule="Deutsche Schule Kapstadt", vorherige_schule_ort="Kapstadt", vorherige_schule_land="Südafrika",
+            vorherige_schulform="Gymnasium (DSA)", letzter_jahrgang="9", geschwister=hinweis,
+        )
+
+        # 4) Oberstufe, Warteliste
+        anmeldung(
+            41, ["Standard", "Oberstufe"],
+            [eltern("vater", "Daniel", "Schneider", rechnungsempfaenger=True, sprache="de")],
+            [("zeugnis", "Zeugnis Klasse 10 mit Versetzungsvermerk", 40)],
+            erledigt=3, status=Anmeldung.WARTELISTE, vorname="Mia", nachname="Schneider", geschlecht="w",
+            geburtsdatum=date(2010, 6, 30), geburtsort="Wien", geburtsland="Österreich", staatsangehoerigkeiten="österreichisch",
+            muttersprache="Deutsch", jahrgang=11, bildungsgang=bg.get("GOS"), ort="Nairobi", land="Kenia",
+            vorherige_schule="BRG Wien 19", vorherige_schule_land="Österreich", vorherige_schulform="Gymnasium (AT)", letzter_jahrgang="10",
+            bemerkungen="Warteliste wegen Kursgröße Chemie/Biologie; Rückmeldung bis Ende November zugesagt.",
+        )
+
+        # 5) Zurückgezogen
+        anmeldung(
+            60, ["Standard"], [eltern("mutter", "Wanjiru", "Kamau", sprache="en")], [],
+            erledigt=1, status=Anmeldung.ZURUECKGEZOGEN, vorname="Noah", nachname="Kamau", geschlecht="m",
+            geburtsdatum=date(2013, 1, 9), jahrgang=8, ort="Nairobi", land="Kenia",
+            bemerkungen="Familie hat sich für eine andere Schule entschieden (E-Mail vom Vormonat).",
+        )
+        # Anmeldenummern in der Reihenfolge des Eingangs
+        alle = list(Anmeldung.objects.order_by("eingang", "pk"))
+        for a in alle:
+            Anmeldung.objects.filter(pk=a.pk).update(nummer=f"tmp-{a.pk}")
+        for i, a in enumerate(alle, start=1):
+            Anmeldung.objects.filter(pk=a.pk).update(nummer=f"A{a.eingang.year}-{i:03d}")
 
 
 def beispiel_pdf(titel, name):

@@ -71,7 +71,7 @@ html[data-theme="dark"] .mb {
 .mb-konto-menue form { margin: 0; }
 
 /* Registerkarten */
-.mb-reiter { display: flex; align-items: flex-end; gap: 0.1rem; padding: 0.1rem 0.8rem 0; overflow-x: auto; scrollbar-width: none; }
+.mb-reiter { position: relative; display: flex; align-items: flex-end; gap: 0.1rem; padding: 0.1rem 0.8rem 0; overflow-x: auto; scrollbar-width: none; }
 .mb-reiter::-webkit-scrollbar { display: none; }
 .mb-reiter [role="tab"] { padding: 0.55rem 0.85rem 0.45rem; color: var(--mb-leise); border-bottom: 3px solid transparent; white-space: nowrap; font-size: 0.9rem; }
 .mb-reiter [role="tab"]:hover { color: var(--mb-text); }
@@ -82,7 +82,7 @@ html[data-theme="dark"] .mb {
 .mb.eingeklappt .mb-einklappen svg { transform: rotate(180deg); }
 
 /* Band mit Befehlsgruppen */
-.mb-band { display: flex; align-items: stretch; padding: 0.4rem 0.5rem 0.25rem; border-top: 1px solid var(--mb-linie); overflow-x: auto; scrollbar-width: thin; }
+.mb-band { position: relative; display: flex; align-items: stretch; padding: 0.4rem 0.5rem 0.25rem; border-top: 1px solid var(--mb-linie); overflow-x: auto; scrollbar-width: thin; }
 .mb-band[hidden] { display: none; }
 .mb-gruppe { display: flex; flex-direction: column; justify-content: space-between; padding: 0 0.55rem; border-right: 1px solid var(--mb-linie); flex: none; }
 .mb-gruppe:last-child { border-right: 0; }

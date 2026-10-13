@@ -46,6 +46,7 @@
 
 <div class="startraster">
   <div class="hauptspalte">
+    {% if aufnahme %}{% include "aufnahme/_start.html" %}{% endif %}
     {% if foerderung %}{% include "foerderung/_start.html" %}{% endif %}
     {% if hr %}{% include "portal/_start_hr.html" %}{% endif %}
 

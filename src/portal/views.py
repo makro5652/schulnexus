@@ -9,6 +9,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 
+from aufnahme.ansichten import start_hinweise as aufnahme_hinweise
 from fehlzeiten.models import Fehlzeit
 from foerderung.ansichten import aktive_nta_je_schueler, foerder_hinweise, foerder_kontext, nta_kurztext
 from foerderung.models import Foerderplan
@@ -96,6 +97,7 @@ def start(request):
         {"unterrichte": meine_unterrichte if ist_verwaltung(request.user) else None,
          "klassen": klassen_info, "kennzahlen": kennzahlen, "hr": hr,
          "foerderung": foerder_hinweise(request.user), "ist_verwaltung": ist_verwaltung(request.user),
+         "aufnahme": aufnahme_hinweise(request.user),
          "begruessung": begruessung(jetzt), "heute": jetzt.date(), "kalenderwoche": jetzt.isocalendar()[1],
          "schnellzugriff": schnellzugriff(request.user, sj), "geburtstage": geburtstage(request.user, jetzt.date()),
          "notizen": notizen_fuer(request.user, jetzt.date())},
@@ -235,8 +237,16 @@ def schuelerakte(request, pk):
         g = schueler.person.geburtsdatum
         alter = heute.year - g.year - ((heute.month, heute.day) < (g.month, g.day))
 
+    from aufnahme.models import Anmeldung
+    from aufnahme.rechte import darf_sehen as anmeldung_sichtbar
+
+    anmeldung = Anmeldung.objects.filter(schueler=schueler).first()
+    if anmeldung and not anmeldung_sichtbar(request.user, anmeldung):
+        anmeldung = None
+
     return render(request, "portal/schuelerakte.html", {
         "s": schueler,
+        "anmeldung": anmeldung,
         "p": schueler.person,
         "klasse": klasse,
         "alter": alter,

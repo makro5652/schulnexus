@@ -1,0 +1,77 @@
+{% extends "portal/base.html" %}
+{% load i18n formate %}
+{% block title %}{% translate "Übernahme in die Schülerdaten" %} · {{ a.anzeigename }}{% endblock %}
+{% block inhalt %}
+<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › <a href="{% url 'anmeldungen' %}">{% translate "Neuanmeldungen" %}</a> ›
+  <a href="{% url 'anmeldung' a.pk %}">{{ a.nummer }}</a> › {% translate "Übernahme" %}</p>
+<h1>{% translate "Übernahme in die Schülerdaten" %}</h1>
+<p class="unterzeile">{{ a.anzeigename }} · {{ a.nummer }}</p>
+
+{% if hindernisse %}
+<div class="an-banner warnend">
+  <strong>{% translate "Die Übernahme ist noch nicht möglich:" %}</strong>
+  <ul class="schlicht">{% for h in hindernisse %}<li>{{ h }}</li>{% endfor %}</ul>
+  <a href="{% url 'anmeldung' a.pk %}">{% translate "Zurück zur Bewerbungsakte" %}</a>
+</div>
+{% else %}
+{% for f in fehler %}<div class="an-banner warnend">{{ f }}</div>{% endfor %}
+
+<form method="post" class="an-uebernahme">
+  {% csrf_token %}
+  <section class="karte">
+    <h2>{% translate "Das wird angelegt" %}</h2>
+    <dl class="daten">
+      <dt>{% translate "Schüler:in" %}</dt>
+      <dd><strong>{{ a.vorname }} {{ a.nachname }}</strong>{% if a.geburtsdatum %}, * {{ a.geburtsdatum|kurzdatum }}{% endif %}
+        <span class="leise blockzeile">{% translate "mit neuer Schülernummer, Status aktiv" %}{% if a.jahrgang %} · {% blocktranslate with jg=a.jahrgang %}Eintritt in Jahrgang {{ jg }}{% endblocktranslate %}{% endif %}</span></dd>
+      <dt>{% translate "Klasse" %}</dt>
+      <dd>{% if a.vorlaeufige_klasse %}{% blocktranslate with klasse=a.vorlaeufige_klasse.name datum=a.eintritt|kurzdatum %}{{ klasse }} ab {{ datum }}{% endblocktranslate %}{% else %}<span class="leise">{% translate "keine" %}</span>{% endif %}</dd>
+      {% if a.bildungsgang %}<dt>{% translate "Schullaufbahn" %}</dt><dd>{{ a.schuljahr }} · {% translate "Jg." %} {{ a.jahrgang|default:"–" }} · {{ a.bildungsgang.lokal_name }}</dd>{% endif %}
+      {% if a.vorherige_schule %}<dt>{% translate "Bisherige Schule" %}</dt><dd>{{ a.vorherige_schule }}</dd>{% endif %}
+      <dt>{% translate "Checkliste" %}</dt><dd>{% blocktranslate with e=fortschritt.erledigt g=fortschritt.gesamt %}{{ e }} von {{ g }} Punkten erledigt – das Protokoll wird als Anhang (nur Verwaltung) gespeichert.{% endblocktranslate %}</dd>
+    </dl>
+    {% if hinweise %}<ul class="an-hinweise">{% for h in hinweise %}<li>{{ h }}</li>{% endfor %}</ul>{% endif %}
+  </section>
+
+  {% if dubletten %}
+  <section class="karte vertraulich">
+    <h2>{% translate "Mögliche Dubletten" %}</h2>
+    <p class="hinweistext">{% translate "Diese Personen sind bereits erfasst und haben einen ähnlichen Namen bzw. dasselbe Geburtsdatum. Bitte prüfen, ob das Kind schon in der Datenbank ist (z. B. Wiederaufnahme)." %}</p>
+    <ul class="schlicht">{% for p in dubletten %}<li>{% if p.schueler %}<a href="{% url 'schuelerakte' p.schueler.pk %}" target="_blank" rel="noopener">{{ p.vorname }} {{ p.nachname }}</a>{% else %}{{ p.vorname }} {{ p.nachname }}{% endif %}
+      <span class="leise">{% if p.geburtsdatum %}· * {{ p.geburtsdatum|kurzdatum }}{% endif %}{% if p.schueler %} · {% translate "Schüler:in" %} {{ p.schueler.schuelernummer }} ({{ p.schueler.get_status_display }}){% endif %}</span></li>{% endfor %}</ul>
+    <label class="haken an-bestaetigen"><input type="checkbox" name="dubletten_geprueft" value="1"> {% translate "Geprüft: Es handelt sich um eine andere Person – trotzdem neu anlegen." %}</label>
+  </section>
+  {% endif %}
+
+  <section class="karte">
+    <h2>{% translate "Erziehungsberechtigte" %}</h2>
+    {% for k in kontakte %}
+    <fieldset class="an-kontaktwahl">
+      <legend><strong>{{ k.vorname }} {{ k.nachname }}</strong> <span class="leise">· {{ k.get_art_display }}{% if k.email %} · {{ k.email }}{% endif %}</span></legend>
+      <label class="haken"><input type="radio" name="kontakt-{{ k.pk }}" value="neu"{% if not k.kandidaten %} checked{% endif %}> {% translate "Als neue Person anlegen" %}</label>
+      {% for p in k.kandidaten %}
+      <label class="haken"><input type="radio" name="kontakt-{{ k.pk }}" value="{{ p.pk }}"{% if forloop.first %} checked{% endif %}>
+        {% blocktranslate with name=p.anzeigename %}Vorhandene Person verwenden: {{ name }}{% endblocktranslate %}
+        <span class="leise">{% if p.email %}· {{ p.email }}{% endif %}{% with kinder=p.kinder_beziehungen.all %}{% if kinder %} · {% translate "Kinder" %}: {% for b in kinder %}{{ b.schueler.person.anzeigename }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% endwith %}</span></label>
+      {% endfor %}
+    </fieldset>
+    {% empty %}<p class="leer">{% translate "Keine Kontakte erfasst." %}</p>
+    {% endfor %}
+  </section>
+
+  <section class="karte">
+    <h2>{% translate "Unterlagen" %}</h2>
+    {% if dateien %}
+    <ul class="schlicht">{% for d in dateien %}<li>{{ d.titel }} <span class="leise">· {{ d.get_kategorie_display }} · {% translate "sichtbar für" %}: {{ d.get_zugriffsstufe_display }}</span></li>{% endfor %}</ul>
+    <label class="haken an-bestaetigen"><input type="hidden" name="dateien" value="0"><input type="checkbox" name="dateien" value="1" checked> {% translate "Diese Unterlagen als Anhänge in die Schülerakte kopieren" %}</label>
+    {% else %}<p class="leer">{% translate "Keine Unterlagen zur Übernahme ausgewählt." %}</p>{% endif %}
+    {% if nicht_uebernommen %}<p class="hinweistext">{% blocktranslate count n=nicht_uebernommen %}{{ n }} Datei bleibt nur in der Bewerbungsakte.{% plural %}{{ n }} Dateien bleiben nur in der Bewerbungsakte.{% endblocktranslate %}</p>{% endif %}
+  </section>
+
+  <div class="knopfreihe an-absenden">
+    <button type="submit" class="knopf">{% translate "Jetzt übernehmen" %}</button>
+    <a class="knopf zweitrangig" href="{% url 'anmeldung' a.pk %}">{% translate "Abbrechen" %}</a>
+  </div>
+</form>
+{% endif %}
+{% endblock %}

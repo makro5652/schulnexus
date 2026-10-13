@@ -17,6 +17,7 @@
 </div>
 
 <div class="hinweisleiste">
+  {% if anmeldung %}<a class="etikett" href="{% url 'anmeldung' anmeldung.pk %}">{% blocktranslate with nr=anmeldung.nummer %}Anmeldung {{ nr }}{% endblocktranslate %}</a>{% endif %}
   {% if s.daz %}<span class="etikett">{% translate "DaZ/DaF" %}</span>{% endif %}
   {% if foerderung.nta_aktiv %}<a class="etikett" href="#foerderung">{% translate "Nachteilsausgleich" %}</a>{% elif s.nachteilsausgleich %}<span class="etikett">{% translate "Nachteilsausgleich" %}</span>{% endif %}
   {% if anhaenge %}<a class="etikett" href="#anhaenge">{% blocktranslate count n=anhaenge|length %}{{ n }} Anhang{% plural %}{{ n }} Anhänge{% endblocktranslate %}</a>{% endif %}

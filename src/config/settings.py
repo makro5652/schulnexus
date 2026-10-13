@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "fehlzeiten",
     "nachmittag",
     "foerderung",
+    "aufnahme",
     "portal",
 ]
 

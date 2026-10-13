@@ -1,8 +1,8 @@
-# Schulverwaltung (Version 0.4.2.4, Entwicklungsstand)
+# Schulverwaltung (Version 0.4.2.5, Entwicklungsstand)
 
 Open-Source-Schulverwaltung für die DSN: Stammdaten, Klassen und Lerngruppen,
 Noten mit Gewichtung, Fehlzeiten, Nachmittagsprogramm, Anhänge zur Schülerakte,
-Förderpläne und Nachteilsausgleiche. Läuft im Browser,
+Förderpläne und Nachteilsausgleiche, Neuanmeldungen. Läuft im Browser,
 betrieben mit Docker.
 
 > Nur mit **erfundenen Testdaten** verwenden. Für echte Schülerdaten fehlen noch
@@ -64,6 +64,41 @@ Arbeitsseite mit drei Spalten:
 - **Rechte:** Sekretariat, Verwaltungsleitung, Schulleitung alle Gruppen; Stufenkoordination die
   Gruppen ihrer Stufe (AGs ohne Jahrgang bleiben bei der Verwaltung).
 
+## Neuanmeldungen
+
+**Menüband › Schüler:innen › Neuanmeldungen** verwaltet Bewerbungen bis zur Aufnahme – getrennt von
+den regulären Stammdaten.
+
+1. **Neue Anmeldung:** Kind, gewünschter Jahrgang und Eintritt, Bildungsgang, bisherige Schule,
+   Erziehungsberechtigte (Adresse wie Kind oder abweichend), Checklisten-Vorlagen und gleich
+   mehrere Zeugnisse auf einmal (auch per Ziehen und Ablegen).
+2. **Bewerbungsakte:** Status (Eingegangen › In Prüfung › Warteliste › Zugesagt, außerdem Abgelehnt
+   und Zurückgezogen) mit einem Klick; **vorläufige Klasse** mit aktueller Klassengröße und weiteren
+   vorläufigen Zuordnungen; **Unterlagen** sortiert nach Upload-Datum, je Datei einstellbar, ob und für
+   wen sie später in der Schülerakte sichtbar ist; **Verlauf** der Änderungen.
+3. **Checkliste:** Punkte abhaken (mit Datum und Person), Bemerkung ergänzen, als Pflicht oder optional
+   markieren, einzelne Punkte ergänzen oder entfernen, weitere Vorlagen hinzufügen. Jeder Punkt hat
+   eine Zuständigkeit (Sekretariat, Finanzen, Stufenkoordination, Schulleitung); „für mich“ zeigt die
+   eigenen offenen Punkte – auch auf der Startseite.
+   Vorlagen pflegen: **Menüband › Schüler:innen › Checklisten-Vorlagen** (zweisprachig, mit
+   Jahrgangsbereich; „Immer vorschlagen“ für die Grundausstattung).
+4. **Übernahme** (Status „Zugesagt“, alle Pflichtpunkte erledigt): legt Schüler:in mit neuer
+   Schülernummer, Erziehungsberechtigte mit Elternprofil und Beziehung, bisherige Schule, Schullaufbahn
+   und die Mitgliedschaft in der vorläufigen Klasse ab dem Eintrittsdatum an und kopiert die
+   ausgewählten Unterlagen samt ursprünglichem Upload-Datum in die Schülerakte; das Checklisten-
+   Protokoll wird als Anhang (nur Verwaltung) gespeichert. Vorher werden **Dubletten** gesucht (gleicher
+   Name bzw. Geburtsdatum); bei Eltern von Geschwisterkindern kann die vorhandene Person verknüpft
+   werden. Die Bewerbungsakte ist danach abgeschlossen und mit der Schülerakte verlinkt.
+
+| Rolle | Neuanmeldungen |
+| --- | --- |
+| Sekretariat, Verwaltungsleitung, Schulleitung | alles, einschließlich Übernahme und Löschen |
+| Mittel-/Oberstufenkoordination | Anmeldungen der eigenen Jahrgänge (und ohne Jahrgang): anlegen, bearbeiten, Status, Klasse, Checkliste, Unterlagen; keine Übernahme |
+| Finanzen | alle Anmeldungen lesen, Checkliste abhaken, Kontakte (z. B. Rechnungsempfänger:in) ändern, Unterlagen hochladen |
+
+Abgelehnte und zurückgezogene Anmeldungen bleiben bis zur Löschung erhalten; „Anmeldung löschen“
+entfernt auch alle Dateien.
+
 ## Rollen und Rechte
 
 Rollen sind Benutzergruppen; eine Person kann mehrere haben (z. B. Lehrer:in + Mittelstufenkoordination).
@@ -73,13 +108,13 @@ unter **Verwaltung › Rollen und Rechte** (für Verwaltungsleitung und Schullei
 | Rolle | Rechte |
 | --- | --- |
 | Lehrer:in | eigener Unterricht (Leistungsnachweise, Noten, Zeugnisnoten); als Klassenleitung Akte, Fehlzeiten, Anhänge, Förderung der eigenen Klasse |
-| Mittelstufenkoordination | wie Lehrer:in, zusätzlich alle Klassen der Mittelstufe: Akten, Notenübersichten, Fehlzeiten, Gesundheitshinweise, Förderpläne/Nachteilsausgleiche bearbeiten, Schullaufbahn; Stufenübersicht |
+| Mittelstufenkoordination | wie Lehrer:in, zusätzlich alle Klassen der Mittelstufe: Akten, Notenübersichten, Fehlzeiten, Gesundheitshinweise, Förderpläne/Nachteilsausgleiche bearbeiten, Schullaufbahn, Neuanmeldungen der Stufe; Stufenübersicht |
 | Oberstufenkoordination | dasselbe für die Oberstufe |
 | Schulleitung | alles |
-| Sekretariat | Schüler- und Elternstammdaten, Klassen, Fehlzeiten, AGs, Anhänge, Gesundheitsangaben; Noten und Einstellungen lesend; keine Förderpläne, keine HR-Daten |
+| Sekretariat | Schüler- und Elternstammdaten, Klassen, Fehlzeiten, AGs, Anhänge, Gesundheitsangaben, Neuanmeldungen mit Übernahme; Noten und Einstellungen lesend; keine Förderpläne, keine HR-Daten |
 | Verwaltungsleitung | wie Sekretariat, dazu Schuljahre, Fächer, Notenskalen, Unterrichtsverteilung, eigene Felder, Benutzerkonten und Rollen, Personal inkl. HR, Finanzen |
 | HR-Management | Personal aller Bereiche inkl. Dienstverhältnis, Nachweise, Abwesenheiten |
-| Finanzen | Rechnungsempfänger, Eltern- und Schülerstammdaten (lesend), Dienstleister, Vertragsunterlagen |
+| Finanzen | Rechnungsempfänger, Eltern- und Schülerstammdaten (lesend), Dienstleister, Vertragsunterlagen; Neuanmeldungen lesen und Checkliste abhaken |
 | Förderkoordination | alle Förderpläne und Nachteilsausgleiche, Genehmigung, Kataloge |
 | Schüler:in, Eltern | vorbereitet für Stundenplan bzw. Elternkommunikation; derzeit kein Zugang |
 
@@ -282,7 +317,8 @@ liegen in `src/locale/en/LC_MESSAGES/django.po`; Pflege mit `tools/sprachdateien
 
 Neuen Ordnerinhalt über den alten kopieren (die `.env` behalten) und erneut `./start.sh`
 ausführen. Die Datenbank wird automatisch umgestellt; vorhandene Kategorien werden zu Ordnern.
-Bei eingeschalteten Demo-Daten werden die englischen Bezeichnungen der Beispieldaten nachgetragen.
+Bei eingeschalteten Demo-Daten werden die englischen Bezeichnungen der Beispieldaten nachgetragen
+und fehlende Beispiele (z. B. Neuanmeldungen) ergänzt. Checklisten-Vorlagen werden beim Start angelegt.
 
 ## Wichtige Befehle
 
@@ -304,6 +340,7 @@ Bei eingeschalteten Demo-Daten werden die englischen Bezeichnungen der Beispield
 | `src/nachmittag` | AG-Angebote, Wünsche, Losverfahren in `zuteilung.py` |
 | `src/portal` | Startseite, Menüband, Notenübersicht, Klassenliste, Schülerakte, Stufenübersicht, Rollen (`rollen.py`) und Rechteprüfung (`rechte.py`), Sprachwahl, Demo-Daten |
 | `src/foerderung` | Förderpläne, Nachteilsausgleiche, Elternbestätigung |
+| `src/aufnahme` | Neuanmeldungen: Bewerbungsakte, Checklisten, Unterlagen, Übernahme (`uebernahme.py`), Rechte (`rechte.py`) |
 | `src/locale` | Übersetzungen (Englisch) |
 | `src/config/version.py` | Versionsnummer (kleine Änderungen erhöhen die letzte Stelle) |
 

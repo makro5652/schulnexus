@@ -1,0 +1,21 @@
+{% load i18n formate %}
+<section class="karte hr" id="neuanmeldungen">
+  <div class="karte-kopf">
+    <h2>{% translate "Neuanmeldungen" %}
+      <span class="leise">· {% blocktranslate count n=aufnahme.offen %}{{ n }} offen{% plural %}{{ n }} offen{% endblocktranslate %}</span></h2>
+    <div class="knopfreihe">
+      <a class="knopf zweitrangig klein" href="{% url 'anmeldungen' %}">{% translate "Alle anzeigen" %}</a>
+      {% if aufnahme.darf_anlegen %}<a class="knopf klein" href="{% url 'anmeldung_neu' %}">{% translate "Neue Anmeldung" %}</a>{% endif %}
+    </div>
+  </div>
+  <section class="kennzahlen klein" aria-label="{% translate 'Neuanmeldungen nach Status' %}">
+    <div><strong>{{ aufnahme.eingegangen }}</strong><span>{% translate "eingegangen / in Prüfung" %}</span></div>
+    <div><strong>{{ aufnahme.warteliste }}</strong><span>{% translate "Warteliste" %}</span></div>
+    <div class="{% if aufnahme.zugesagt %}hinweis{% endif %}"><a href="{% url 'anmeldungen' %}?status=zugesagt"><strong>{{ aufnahme.zugesagt }}</strong></a><span>{% translate "zugesagt, Übernahme offen" %}</span></div>
+  </section>
+  {% if aufnahme.meine %}
+  <h3>{% translate "Meine offenen Checklistenpunkte" %}</h3>
+  {% for a in aufnahme.meine %}<p><a href="{% url 'anmeldung' a.pk %}#checkliste">{{ a.anzeigename }}</a>
+    <span class="leise">· {{ a.nummer }}{% if a.jahrgang %} · {% translate "Jg." %} {{ a.jahrgang }}{% endif %}{% if a.vorlaeufige_klasse %} · {{ a.vorlaeufige_klasse.name }}{% endif %} · {% blocktranslate count n=a.n %}{{ n }} Punkt{% plural %}{{ n }} Punkte{% endblocktranslate %}</span></p>{% endfor %}
+  {% endif %}
+</section>

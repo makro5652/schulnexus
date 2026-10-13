@@ -74,15 +74,20 @@ def anhang_hochladen(request, pk):
 def _ausliefern(request, dok):
     if not darf_dokument_sehen(request.user, dok):
         raise PermissionDenied
-    if not dok.datei:
+    return datei_ausliefern(request, dok.datei, dok.inhaltstyp, dok.originalname)
+
+
+def datei_ausliefern(request, feld, inhaltstyp, originalname):
+    """Gemeinsame, sichere Auslieferung hochgeladener Dateien (Anhänge, Bewerbungsunterlagen) – Rechte prüft der Aufrufer."""
+    if not feld:
         raise Http404
     try:
-        datei = dok.datei.open("rb")
+        datei = feld.open("rb")
     except FileNotFoundError:
         raise Http404
-    ansehen = request.GET.get("ansehen") == "1" and dok.inhaltstyp in INLINE_TYPEN
-    name = dok.originalname or dok.datei.name.rsplit("/", 1)[-1]
-    antwort = FileResponse(datei, content_type=dok.inhaltstyp or "application/octet-stream")
+    ansehen = request.GET.get("ansehen") == "1" and inhaltstyp in INLINE_TYPEN
+    name = originalname or feld.name.rsplit("/", 1)[-1]
+    antwort = FileResponse(datei, content_type=inhaltstyp or "application/octet-stream")
     art = "inline" if ansehen else "attachment"
     antwort["Content-Disposition"] = f"{art}; filename*=UTF-8''{quote(name)}"
     # Hochgeladene Inhalte dürfen keine Skripte im Kontext der Schulverwaltung ausführen.

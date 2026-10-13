@@ -1,0 +1,145 @@
+{% extends "portal/base.html" %}
+{% load i18n static %}
+{% block title %}{% if neu %}{% translate "Neue Anmeldung" %}{% else %}{% blocktranslate with nr=a.nummer %}Anmeldung {{ nr }} bearbeiten{% endblocktranslate %}{% endif %}{% endblock %}
+{% block inhalt %}
+<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › <a href="{% url 'anmeldungen' %}">{% translate "Neuanmeldungen" %}</a> ›
+  {% if neu %}{% translate "Neue Anmeldung" %}{% else %}<a href="{% url 'anmeldung' a.pk %}">{{ a.nummer }}</a> › {% translate "Bearbeiten" %}{% endif %}</p>
+<h1>{% if neu %}{% translate "Neue Anmeldung" %}{% else %}{{ a.anzeigename }} <span class="leise">· {{ a.nummer }}</span>{% endif %}</h1>
+{% if not darf_kind %}<p class="hinweistext">{% translate "Sie können hier die Angaben der Erziehungsberechtigten ändern; die übrigen Angaben sind schreibgeschützt." %}</p>{% endif %}
+
+<form method="post" enctype="multipart/form-data" class="an-formular" novalidate>
+  {% csrf_token %}
+  {% if form.non_field_errors %}<p class="fehler">{{ form.non_field_errors|join:" " }}</p>{% endif %}
+
+  <section class="karte">
+    <h2>{% translate "Gewünschte Aufnahme" %}</h2>
+    <div class="an-felder">
+      {% include "aufnahme/_feld.html" with f=form.schuljahr %}
+      {% include "aufnahme/_feld.html" with f=form.jahrgang %}
+      {% include "aufnahme/_feld.html" with f=form.bildungsgang %}
+      {% include "aufnahme/_feld.html" with f=form.eintrittsdatum %}
+      {% include "aufnahme/_feld.html" with f=form.eingang %}
+    </div>
+  </section>
+
+  <section class="karte">
+    <h2>{% translate "Kind" %}</h2>
+    <div class="an-felder">
+      {% include "aufnahme/_feld.html" with f=form.vorname %}
+      {% include "aufnahme/_feld.html" with f=form.nachname %}
+      {% include "aufnahme/_feld.html" with f=form.rufname %}
+      {% include "aufnahme/_feld.html" with f=form.geschlecht %}
+      {% include "aufnahme/_feld.html" with f=form.geburtsdatum %}
+      {% include "aufnahme/_feld.html" with f=form.geburtsort %}
+      {% include "aufnahme/_feld.html" with f=form.geburtsland %}
+      {% include "aufnahme/_feld.html" with f=form.staatsangehoerigkeiten %}
+    </div>
+    <h3>{% translate "Sprachen und Religion" %}</h3>
+    <div class="an-felder">
+      {% include "aufnahme/_feld.html" with f=form.muttersprache %}
+      {% include "aufnahme/_feld.html" with f=form.familiensprache %}
+      {% include "aufnahme/_feld.html" with f=form.deutschkenntnisse %}
+      {% include "aufnahme/_feld.html" with f=form.religionsunterricht %}
+      {% include "aufnahme/_feld.html" with f=form.daz breit=1 %}
+    </div>
+    <h3>{% translate "Adresse" %}</h3>
+    <div class="an-felder">
+      {% include "aufnahme/_feld.html" with f=form.strasse %}
+      {% include "aufnahme/_feld.html" with f=form.postfach %}
+      {% include "aufnahme/_feld.html" with f=form.plz %}
+      {% include "aufnahme/_feld.html" with f=form.ort %}
+      {% include "aufnahme/_feld.html" with f=form.land %}
+    </div>
+    <h3>{% translate "Bisherige Schule" %}</h3>
+    <div class="an-felder">
+      {% include "aufnahme/_feld.html" with f=form.vorherige_schule %}
+      {% include "aufnahme/_feld.html" with f=form.vorherige_schule_ort %}
+      {% include "aufnahme/_feld.html" with f=form.vorherige_schule_land %}
+      {% include "aufnahme/_feld.html" with f=form.vorherige_schulform %}
+      {% include "aufnahme/_feld.html" with f=form.letzter_jahrgang %}
+    </div>
+  </section>
+
+  <section class="karte" id="kontakte">
+    <h2>{% translate "Erziehungsberechtigte und Kontakte" %}</h2>
+    {{ kontakte.management_form }}
+    {% if kontakte.non_form_errors %}<p class="fehler">{{ kontakte.non_form_errors|join:" " }}</p>{% endif %}
+    {% for k in kontakte %}
+    <fieldset class="an-kontakt"{% if not darf_kontakte %} disabled{% endif %}>
+      <legend>{% if k.instance.pk %}{{ k.instance.anzeigename }}{% else %}{% blocktranslate with n=forloop.counter %}Kontakt {{ n }}{% endblocktranslate %}{% if not neu or forloop.counter > 1 %} <span class="leise">({% translate "optional" %})</span>{% endif %}{% endif %}</legend>
+      {% for h in k.hidden_fields %}{{ h }}{% endfor %}
+      <div class="an-felder">
+        {% include "aufnahme/_feld.html" with f=k.art %}
+        {% include "aufnahme/_feld.html" with f=k.anrede %}
+        {% include "aufnahme/_feld.html" with f=k.vorname %}
+        {% include "aufnahme/_feld.html" with f=k.nachname %}
+        {% include "aufnahme/_feld.html" with f=k.email %}
+        {% include "aufnahme/_feld.html" with f=k.mobil %}
+        {% include "aufnahme/_feld.html" with f=k.telefon %}
+        {% include "aufnahme/_feld.html" with f=k.sprache %}
+        {% include "aufnahme/_feld.html" with f=k.korrespondenzweg %}
+        {% include "aufnahme/_feld.html" with f=k.beruf %}
+        {% include "aufnahme/_feld.html" with f=k.arbeitgeber %}
+      </div>
+      <div class="an-haken-reihe">
+        {% include "aufnahme/_feld.html" with f=k.sorgerecht %}
+        {% include "aufnahme/_feld.html" with f=k.abholberechtigt %}
+        {% include "aufnahme/_feld.html" with f=k.notfallkontakt %}
+        {% include "aufnahme/_feld.html" with f=k.rechnungsempfaenger %}
+        {% include "aufnahme/_feld.html" with f=k.adresse_wie_kind %}
+        {% if kontakte.can_delete and k.instance.pk %}<label class="an-feld an-haken an-loeschen">{{ k.DELETE }} <span>{% translate "Kontakt entfernen" %}</span></label>{% endif %}
+      </div>
+      <div class="an-felder an-adresse" data-adresse>
+        {% include "aufnahme/_feld.html" with f=k.strasse %}
+        {% include "aufnahme/_feld.html" with f=k.postfach %}
+        {% include "aufnahme/_feld.html" with f=k.plz %}
+        {% include "aufnahme/_feld.html" with f=k.ort %}
+        {% include "aufnahme/_feld.html" with f=k.land %}
+      </div>
+    </fieldset>
+    {% empty %}<p class="leer">{% translate "Keine Kontakte erfasst." %}</p>
+    {% endfor %}
+  </section>
+
+  {% if neu %}
+  <section class="karte" id="checkliste">
+    <h2>{% translate "Checkliste zusammenstellen" %}</h2>
+    <p class="hinweistext">{% translate "Die Punkte der gewählten Vorlagen werden übernommen. In der Bewerbungsakte lassen sich danach einzelne Punkte ergänzen, entfernen oder als optional markieren." %}</p>
+    <div class="an-vorlagen">
+      {% for v in vorlagen %}
+      <label class="an-vorlage"><input type="checkbox" name="vorlagen" value="{{ v.pk }}"{% if v.vorgewaehlt %} checked{% endif %}
+        data-standard="{{ v.standard|yesno:'1,0' }}" data-von="{{ v.jahrgang_von|default_if_none:'' }}" data-bis="{{ v.jahrgang_bis|default_if_none:'' }}">
+        <span><strong>{{ v.lokal_name }}</strong>
+        <small class="leise">{% blocktranslate count n=v.anzahl %}{{ n }} Punkt{% plural %}{{ n }} Punkte{% endblocktranslate %}{% if v.beschreibung %} · {{ v.beschreibung }}{% endif %}</small></span></label>
+      {% empty %}<p class="leer">{% translate "Noch keine Vorlagen angelegt." %}</p>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="karte" id="unterlagen">
+    <h2>{% translate "Zeugnisse und Unterlagen" %}</h2>
+    <label class="an-ablage" data-ablage>
+      {{ dateien_form.zeugnisse }}
+      <strong>{% translate "Dateien auswählen oder hierher ziehen" %}</strong>
+      <small class="leise">{% blocktranslate with mb=DOKUMENT_MAX_MB %}Mehrere Dateien möglich, je höchstens {{ mb }} MB. Sie werden als „Zeugnis“ abgelegt; Kategorie und Sichtbarkeit lassen sich in der Bewerbungsakte ändern.{% endblocktranslate %}</small>
+      <span class="an-dateinamen" data-dateinamen></span>
+    </label>
+    {% for e in dateien_form.zeugnisse.errors %}<p class="fehler">{{ e }}</p>{% endfor %}
+  </section>
+  {% endif %}
+
+  <section class="karte">
+    <h2>{% translate "Weitere Angaben" %}</h2>
+    <div class="an-felder">
+      {% include "aufnahme/_feld.html" with f=form.geschwister breit=1 %}
+      {% include "aufnahme/_feld.html" with f=form.bemerkungen breit=1 %}
+    </div>
+  </section>
+
+  <div class="knopfreihe an-absenden">
+    <button type="submit" class="knopf">{% if neu %}{% translate "Anmeldung anlegen" %}{% else %}{% translate "Speichern" %}{% endif %}</button>
+    <a class="knopf zweitrangig" href="{% if neu %}{% url 'anmeldungen' %}{% else %}{% url 'anmeldung' a.pk %}{% endif %}">{% translate "Abbrechen" %}</a>
+  </div>
+</form>
+<script src="{% static 'aufnahme.js' %}" defer></script>
+{% endblock %}

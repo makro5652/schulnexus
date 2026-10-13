@@ -37,18 +37,18 @@ BESCHREIBUNG = {
               "Fehlzeiten, Anhänge und Förderung der eigenen Klasse. Nachteilsausgleiche der eigenen Schüler:innen lesen."),
     MITTELSTUFE: _("Wie Lehrer:in, zusätzlich für alle Klassen der Mittelstufe: Schülerakten, Notenübersichten, Fehlzeiten, "
                    "Gesundheitshinweise, Förderpläne und Nachteilsausgleiche (bearbeiten), Schullaufbahn und Versetzungsvermerke, "
-                   "Klassen und Lerngruppen der Stufe bilden und Schüler:innen zuordnen."),
+                   "Klassen und Lerngruppen der Stufe bilden und Schüler:innen zuordnen, Neuanmeldungen der Stufe bearbeiten."),
     OBERSTUFE: _("Wie Mittelstufenkoordination, bezogen auf die Jahrgänge der Oberstufe."),
     SCHULLEITUNG: _("Alle Rechte, einschließlich Genehmigung von Nachteilsausgleichen, HR-Daten und Benutzerverwaltung."),
     SEKRETARIAT: _("Schüler- und Elternstammdaten, Klassen und Gruppen, Fehlzeiten, AGs, Einwilligungen, Anhänge, "
-                   "Gesundheitsangaben. Noten, Unterrichtsverteilung, Kataloge und Personal nur lesend; keine Förderpläne, keine HR-Daten."),
+                   "Gesundheitsangaben, Neuanmeldungen einschließlich Übernahme. Noten, Unterrichtsverteilung, Kataloge und Personal nur lesend; keine Förderpläne, keine HR-Daten."),
     VERWALTUNGSLEITUNG: _("Wie Sekretariat, zusätzlich Schuljahre, Zeitraster, Fächer, Notenskalen, Unterrichtsverteilung, "
                           "eigene Datenfelder, Benutzerkonten und Rollen, Personal einschließlich HR-Daten, Dienstleister und Finanzen. "
                           "Keine Noteneingabe, keine Förderpläne."),
     HR: _("Personal aller Bereiche mit Dienstverhältnis, Nachweisen, Abwesenheiten, Fortbildungen und Notfallkontakten. "
           "Keine Noten, keine Gesundheits- oder Förderdaten von Schüler:innen."),
     FINANZEN: _("Rechnungsempfänger:innen und Elternstammdaten, Schülerstammdaten lesend, Dienstleister und Verträge, "
-                "Anhänge der Kategorie Verwaltung. Keine Noten, keine Förder- und Gesundheitsdaten. Ein Finanzmodul folgt später."),
+                "Anhänge der Kategorie Verwaltung, Neuanmeldungen lesen mit Checkliste, Kontakten und Unterlagen. Keine Noten, keine Förder- und Gesundheitsdaten. Ein Finanzmodul folgt später."),
     FOERDERKOORDINATION: _("Alle Förderpläne und Nachteilsausgleiche der Schule, Genehmigung, Kataloge, Schülerakten lesend."),
     SCHUELER: _("Vorbereitet für den späteren Stundenplan. Derzeit kein Zugang zum Portal."),
     ELTERN: _("Vorbereitet für die spätere Elternkommunikation. Derzeit kein Zugang zum Portal."),
@@ -91,19 +91,27 @@ _NOTEN_LESEN = r("view", "leistungsnachweis", "note", "zeugnisnote", "bewertungs
 _HR = r(ALLE, "personalprofil", "personalbereich", "dienstleister", "nachweisart", "nachweis", "personalabwesenheit",
         "fortbildung", "notfallkontakt", "dokument") | r(("add", "change", "view"), "person", "zusatzfeld") | {"view_hr_daten", "view_fach"}
 
-_SEKRETARIAT = (_SCHUELERDATEN | r("view", *_KATALOGE) | _NOTEN_LESEN | r("view", "personalprofil", "dienstleister")
+# Neuanmeldungen (App aufnahme). Zeilenweise: Stufenkoordination nur Anmeldungen ihrer Jahrgänge (aufnahme/rechte.py).
+_AUFNAHME_MODELLE = ("anmeldung", "anmeldekontakt", "anmeldedatei", "anmeldepunkt")
+_AUFNAHME_VOLL = r(ALLE, *_AUFNAHME_MODELLE, "checklistenvorlage", "vorlagenpunkt") | {"uebernehmen_anmeldung"}
+_AUFNAHME_STUFE = (r(("add", "change", "view"), "anmeldung", "anmeldekontakt") | r(ALLE, "anmeldedatei", "anmeldepunkt")
+                   | r("view", "checklistenvorlage", "vorlagenpunkt"))
+_AUFNAHME_FINANZEN = (r("view", *_AUFNAHME_MODELLE, "checklistenvorlage", "vorlagenpunkt")
+                      | r("change", "anmeldekontakt", "anmeldepunkt") | r("add", "anmeldedatei"))
+
+_SEKRETARIAT = (_SCHUELERDATEN | _AUFNAHME_VOLL | r("view", *_KATALOGE) | _NOTEN_LESEN | r("view", "personalprofil", "dienstleister")
                 | r("view", "nachteilsausgleich", "foerderschwerpunkt", "ausgleichsmassnahme"))
 
 ROLLEN_RECHTE = {
     LEHRER: _LEHRER,
-    MITTELSTUFE: _STUFE,
-    OBERSTUFE: _STUFE,
+    MITTELSTUFE: _STUFE | _AUFNAHME_STUFE,
+    OBERSTUFE: _STUFE | _AUFNAHME_STUFE,
     SCHULLEITUNG: "__alle__",
     SEKRETARIAT: _SEKRETARIAT,
     VERWALTUNGSLEITUNG: _SEKRETARIAT | r(ALLE, *_KATALOGE) | _HR | r(ALLE, "user", "group") | {"view_permission"},
     HR: _HR,
     FINANZEN: (r("view", "person", "schuelerprofil", "gruppe", "mitgliedschaft", "personalprofil", "personalbereich", "zusatzfeld")
-               | r(("view", "change"), "beziehung", "elternprofil") | r(ALLE, "dienstleister") | r(("add", "view"), "dokument")),
+               | r(("view", "change"), "beziehung", "elternprofil") | r(ALLE, "dienstleister") | r(("add", "view"), "dokument") | _AUFNAHME_FINANZEN),
     FOERDERKOORDINATION: "__foerderung__",
     SCHUELER: set(),
     ELTERN: set(),
@@ -114,7 +122,7 @@ FOERDERKOORDINATION_EXTRA = (r("view", "person", "schuelerprofil", "gruppe", "mi
                              | r(ALLE, "dokument"))
 
 # Apps, deren Rechte über Rollen vergeben werden
-APPS = ["stammdaten", "noten", "fehlzeiten", "nachmittag", "foerderung", "auth"]
+APPS = ["stammdaten", "noten", "fehlzeiten", "nachmittag", "foerderung", "aufnahme", "auth"]
 
 # Rollen, die im Portal arbeiten (Beschäftigte). Schüler:innen und Eltern erhalten später eigene Oberflächen.
 PORTAL_ROLLEN = {LEHRER, MITTELSTUFE, OBERSTUFE, SCHULLEITUNG, SEKRETARIAT, VERWALTUNGSLEITUNG, HR, FINANZEN, FOERDERKOORDINATION}
@@ -131,6 +139,7 @@ BEREICHE = [
     ("nta", _("Nachteilsausgleiche")),
     ("stammdaten", _("Schüler- und Elternstammdaten")),
     ("zuordnung", _("Klassen und Gruppen zuordnen")),
+    ("aufnahme", _("Neuanmeldungen")),
     ("personal", _("Personal")),
     ("hr", _("HR-Daten")),
     ("finanzen", _("Finanzen / Rechnungsempfänger")),
@@ -139,24 +148,24 @@ BEREICHE = [
 ]
 
 MATRIX = {
-    LEHRER: {"zuordnung": "", "noten": "eigene", "akten": "eigene", "gesundheit": "", "fehlzeiten": "eigene", "foerderung": "eigene",
+    LEHRER: {"aufnahme": "", "zuordnung": "", "noten": "eigene", "akten": "eigene", "gesundheit": "", "fehlzeiten": "eigene", "foerderung": "eigene",
              "nta": "eigene", "stammdaten": "lesen", "personal": "", "hr": "", "finanzen": "", "einstellungen": "lesen", "benutzer": ""},
-    MITTELSTUFE: {"zuordnung": "stufe", "noten": "stufe", "akten": "stufe", "gesundheit": "stufe", "fehlzeiten": "stufe", "foerderung": "stufe",
+    MITTELSTUFE: {"aufnahme": "stufe", "zuordnung": "stufe", "noten": "stufe", "akten": "stufe", "gesundheit": "stufe", "fehlzeiten": "stufe", "foerderung": "stufe",
                   "nta": "stufe", "stammdaten": "lesen", "personal": "", "hr": "", "finanzen": "", "einstellungen": "lesen", "benutzer": ""},
     SCHULLEITUNG: {k: "ja" for k, _n in BEREICHE},
-    SEKRETARIAT: {"zuordnung": "ja", "noten": "lesen", "akten": "ja", "gesundheit": "ja", "fehlzeiten": "ja", "foerderung": "", "nta": "lesen",
+    SEKRETARIAT: {"aufnahme": "ja", "zuordnung": "ja", "noten": "lesen", "akten": "ja", "gesundheit": "ja", "fehlzeiten": "ja", "foerderung": "", "nta": "lesen",
                   "stammdaten": "ja", "personal": "lesen", "hr": "", "finanzen": "", "einstellungen": "lesen", "benutzer": ""},
-    VERWALTUNGSLEITUNG: {"zuordnung": "ja", "noten": "lesen", "akten": "ja", "gesundheit": "ja", "fehlzeiten": "ja", "foerderung": "", "nta": "lesen",
+    VERWALTUNGSLEITUNG: {"aufnahme": "ja", "zuordnung": "ja", "noten": "lesen", "akten": "ja", "gesundheit": "ja", "fehlzeiten": "ja", "foerderung": "", "nta": "lesen",
                          "stammdaten": "ja", "personal": "ja", "hr": "ja", "finanzen": "ja", "einstellungen": "ja", "benutzer": "ja"},
-    HR: {"zuordnung": "", "noten": "", "akten": "", "gesundheit": "", "fehlzeiten": "", "foerderung": "", "nta": "", "stammdaten": "",
+    HR: {"aufnahme": "", "zuordnung": "", "noten": "", "akten": "", "gesundheit": "", "fehlzeiten": "", "foerderung": "", "nta": "", "stammdaten": "",
          "personal": "ja", "hr": "ja", "finanzen": "", "einstellungen": "", "benutzer": ""},
-    FINANZEN: {"zuordnung": "", "noten": "", "akten": "", "gesundheit": "", "fehlzeiten": "", "foerderung": "", "nta": "", "stammdaten": "lesen",
+    FINANZEN: {"aufnahme": "teils", "zuordnung": "", "noten": "", "akten": "", "gesundheit": "", "fehlzeiten": "", "foerderung": "", "nta": "", "stammdaten": "lesen",
                "personal": "lesen", "hr": "", "finanzen": "ja", "einstellungen": "", "benutzer": ""},
-    FOERDERKOORDINATION: {"zuordnung": "", "noten": "", "akten": "lesen", "gesundheit": "", "fehlzeiten": "", "foerderung": "ja", "nta": "ja",
+    FOERDERKOORDINATION: {"aufnahme": "", "zuordnung": "", "noten": "", "akten": "lesen", "gesundheit": "", "fehlzeiten": "", "foerderung": "ja", "nta": "ja",
                           "stammdaten": "lesen", "personal": "", "hr": "", "finanzen": "", "einstellungen": "", "benutzer": ""},
     SCHUELER: {k: "" for k, _n in BEREICHE},
     ELTERN: {k: "" for k, _n in BEREICHE},
 }
 MATRIX[OBERSTUFE] = dict(MATRIX[MITTELSTUFE])
 
-WERTE = {"ja": _("ja"), "lesen": _("lesen"), "eigene": _("eigene"), "stufe": _("Stufe"), "": "–"}
+WERTE = {"ja": _("ja"), "teils": _("Checkliste"), "lesen": _("lesen"), "eigene": _("eigene"), "stufe": _("Stufe"), "": "–"}

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-13 14:06+0300\n"
+"POT-Creation-Date: 2026-10-13 14:48+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,9 +18,765 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#: aufnahme/admin.py:25
+msgid "Jahrgänge"
+msgstr "Year groups"
+
+#: aufnahme/admin.py:31
+msgid "Punkte"
+msgstr "Items"
+
+#: aufnahme/admin.py:76 portal/apps.py:8
+msgid "Portal"
+msgstr "Portal"
+
+#: aufnahme/admin.py:78
+msgid "öffnen"
+msgstr "open"
+
+#: aufnahme/ansichten.py:64 stammdaten/models.py:86
+msgid "mehrere durch Komma trennen"
+msgstr "separate several with commas"
+
+#: aufnahme/ansichten.py:69
+msgid "Bitte einen Jahrgang Ihrer Stufe wählen."
+msgstr "Please choose a year group within your section."
+
+#: aufnahme/ansichten.py:112
+msgid "Dateien"
+msgstr "Files"
+
+#: aufnahme/ansichten.py:113 aufnahme/models.py:305 noten/models.py:135
+#: stammdaten/models.py:697 templates/portal/_anhaenge.html:6
+#: templates/portal/_anhaenge.html:25
+msgid "Kategorie"
+msgstr "Category"
+
+#: aufnahme/ansichten.py:114 aufnahme/models.py:259 aufnahme/models.py:306
+#: foerderung/models.py:86 nachmittag/models.py:20 stammdaten/models.py:77
+#: stammdaten/models.py:443 stammdaten/models.py:698
+#: templates/aufnahme/anmeldung.html:130 templates/portal/_anhaenge.html:25
+msgid "Titel"
+msgstr "Title"
+
+#: aufnahme/ansichten.py:115
+msgid "leer = Dateiname"
+msgstr "empty = file name"
+
+#: aufnahme/ansichten.py:116 aufnahme/models.py:312 portal/models.py:31
+#: portal/models.py:44 stammdaten/admin.py:501 stammdaten/models.py:699
+msgid "Notiz"
+msgstr "Note"
+
+#: aufnahme/ansichten.py:120
+msgid "Zeugnisse und weitere Unterlagen"
+msgstr "School reports and other documents"
+
+#: aufnahme/ansichten.py:127
+msgid "Neuer Punkt"
+msgstr "New item"
+
+#: aufnahme/ansichten.py:161 fehlzeiten/models.py:44
+msgid "Offen"
+msgstr "Open"
+
+#: aufnahme/ansichten.py:161
+msgid "Alle"
+msgstr "All"
+
+#: aufnahme/ansichten.py:253
+#, python-format
+msgid "Anmeldung %(nr)s für %(name)s angelegt."
+msgstr "Application %(nr)s for %(name)s created."
+
+#: aufnahme/ansichten.py:254 aufnahme/ansichten.py:503
+#, python-format
+msgid "%(n)s Datei gespeichert."
+msgid_plural "%(n)s Dateien gespeichert."
+msgstr[0] "%(n)s file saved."
+msgstr[1] "%(n)s files saved."
+
+#: aufnahme/ansichten.py:297
+#, python-format
+msgid "Änderungen an der Anmeldung %(nr)s gespeichert."
+msgstr "Changes to application %(nr)s saved."
+
+#: aufnahme/ansichten.py:375
+msgid "angelegt"
+msgstr "created"
+
+#: aufnahme/ansichten.py:385
+#, python-format
+msgid "Status: %(status)s"
+msgstr "Status: %(status)s"
+
+#: aufnahme/ansichten.py:391
+#, python-format
+msgid "geändert: %(felder)s"
+msgstr "changed: %(felder)s"
+
+#: aufnahme/ansichten.py:416
+#, python-format
+msgid "Status: %(status)s."
+msgstr "Status: %(status)s."
+
+#: aufnahme/ansichten.py:426
+msgid "Vorläufige Klasse entfernt."
+msgstr "Provisional class removed."
+
+#: aufnahme/ansichten.py:437
+#, python-format
+msgid "Vorläufige Klasse: %(klasse)s."
+msgstr "Provisional class: %(klasse)s."
+
+#: aufnahme/ansichten.py:461
+#, python-format
+msgid "Punkt „%(text)s“ ergänzt."
+msgstr "Item “%(text)s” added."
+
+#: aufnahme/ansichten.py:467
+#, python-format
+msgid "Punkt „%(text)s“ entfernt."
+msgstr "Item “%(text)s” removed."
+
+#: aufnahme/ansichten.py:475
+#, python-format
+msgid "%(n)s Punkt aus „%(vorlage)s“ ergänzt."
+msgid_plural "%(n)s Punkte aus „%(vorlage)s“ ergänzt."
+msgstr[0] "%(n)s item added from “%(vorlage)s”."
+msgstr[1] "%(n)s items added from “%(vorlage)s”."
+
+#: aufnahme/ansichten.py:505
+#, python-format
+msgid "Nicht gespeichert – %(fehler)s"
+msgstr "Not saved – %(fehler)s"
+
+#: aufnahme/ansichten.py:536
+#, python-format
+msgid "Datei „%(titel)s“ gelöscht."
+msgstr "File “%(titel)s” deleted."
+
+#: aufnahme/ansichten.py:548
+#, python-format
+msgid "Anmeldung %(text)s mit allen Unterlagen gelöscht."
+msgstr "Application %(text)s deleted together with all documents."
+
+#: aufnahme/ansichten.py:578
+msgid ""
+"Bitte bestätigen, dass die gefundenen Personen nicht identisch mit dem Kind "
+"sind."
+msgstr ""
+"Please confirm that the people found are not the same person as the child."
+
+#: aufnahme/ansichten.py:586
+#, python-format
+msgid "%(name)s wurde als Schüler:in übernommen (Schülernummer %(nr)s)."
+msgstr "%(name)s has been enrolled as a student (student number %(nr)s)."
+
+#: aufnahme/apps.py:8 portal/navigation.py:93 portal/rollen.py:142
+#: templates/aufnahme/_start.html:4 templates/aufnahme/anmeldung.html:6
+#: templates/aufnahme/formular.html:5 templates/aufnahme/liste.html:3
+#: templates/aufnahme/liste.html:8 templates/aufnahme/liste.html:9
+#: templates/aufnahme/uebernahme.html:5
+msgid "Neuanmeldungen"
+msgstr "Admissions"
+
+#: aufnahme/models.py:29 fehlzeiten/models.py:47 portal/rollen.py:30
+msgid "Sekretariat"
+msgstr "School office"
+
+#: aufnahme/models.py:30 portal/navigation.py:214 portal/rollen.py:31
+msgid "Finanzen"
+msgstr "Finance"
+
+#: aufnahme/models.py:31 portal/navigation.py:84
+msgid "Stufenkoordination"
+msgstr "Stage coordination"
+
+#: aufnahme/models.py:32 portal/rollen.py:30
+msgid "Schulleitung"
+msgstr "School management"
+
+#: aufnahme/models.py:69 foerderung/models.py:23 foerderung/models.py:37
+#: noten/models.py:27 noten/models.py:78 noten/models.py:118
+#: noten/models.py:279 stammdaten/models.py:22 stammdaten/models.py:51
+#: stammdaten/models.py:189 stammdaten/models.py:346 stammdaten/models.py:548
+#: stammdaten/models.py:632 stammdaten/models.py:758 stammdaten/models.py:826
+#: stammdaten/models.py:947
+msgid "Bezeichnung"
+msgstr "Name"
+
+#: aufnahme/models.py:70 foerderung/models.py:24 foerderung/models.py:38
+#: noten/models.py:28 stammdaten/models.py:52 stammdaten/models.py:190
+#: stammdaten/models.py:347 stammdaten/models.py:633 stammdaten/models.py:759
+#: stammdaten/models.py:827 stammdaten/models.py:948
+msgid "Bezeichnung (Englisch)"
+msgstr "Name (English)"
+
+#: aufnahme/models.py:71 nachmittag/models.py:21 noten/models.py:29
+#: noten/models.py:80 noten/models.py:222 stammdaten/models.py:355
+#: stammdaten/models.py:656
+msgid "Beschreibung"
+msgstr "Description"
+
+#: aufnahme/models.py:72 nachmittag/models.py:29 stammdaten/models.py:762
+#: stammdaten/models.py:879
+msgid "ab Jahrgang"
+msgstr "from year"
+
+#: aufnahme/models.py:73
+msgid "Wird bei passendem Jahrgang vorgeschlagen."
+msgstr "Suggested when the year group matches."
+
+#: aufnahme/models.py:74 nachmittag/models.py:30 stammdaten/models.py:763
+#: stammdaten/models.py:880
+msgid "bis Jahrgang"
+msgstr "to year"
+
+#: aufnahme/models.py:75
+msgid "Immer vorschlagen"
+msgstr "Always suggest"
+
+#: aufnahme/models.py:76
+msgid "Wird bei jeder neuen Anmeldung vorausgewählt."
+msgstr "Preselected for every new application."
+
+#: aufnahme/models.py:77 foerderung/models.py:26 foerderung/models.py:45
+#: foerderung/models.py:82 stammdaten/models.py:127 stammdaten/models.py:250
+#: stammdaten/models.py:971
+msgid "Aktiv"
+msgstr "Active"
+
+#: aufnahme/models.py:78 aufnahme/models.py:99 aufnahme/models.py:279
+#: aufnahme/models.py:350 foerderung/models.py:25 foerderung/models.py:44
+#: foerderung/models.py:155 noten/models.py:65 noten/models.py:221
+#: stammdaten/models.py:195 stammdaten/models.py:354 stammdaten/models.py:465
+#: stammdaten/models.py:764 stammdaten/models.py:828 stammdaten/models.py:970
+msgid "Reihenfolge"
+msgstr "Order"
+
+#: aufnahme/models.py:81
+msgid "Checklisten-Vorlage"
+msgstr "Checklist template"
+
+#: aufnahme/models.py:82 portal/navigation.py:98
+msgid "Checklisten-Vorlagen"
+msgstr "Checklist templates"
+
+#: aufnahme/models.py:94 noten/models.py:134
+msgid "Vorlage"
+msgstr "Template"
+
+#: aufnahme/models.py:95 aufnahme/models.py:346
+msgid "Punkt"
+msgstr "Item"
+
+#: aufnahme/models.py:96 aufnahme/models.py:347
+msgid "Punkt (Englisch)"
+msgstr "Item (English)"
+
+#: aufnahme/models.py:97 aufnahme/models.py:348 foerderung/models.py:151
+#: templates/foerderung/plan.html:52
+msgid "Zuständig"
+msgstr "Responsible"
+
+#: aufnahme/models.py:98 aufnahme/models.py:349
+msgid "Pflicht vor Übernahme"
+msgstr "Required before enrolment"
+
+#: aufnahme/models.py:102
+msgid "Checklistenpunkt (Vorlage)"
+msgstr "Checklist item (template)"
+
+#: aufnahme/models.py:103
+msgid "Checklistenpunkte (Vorlage)"
+msgstr "Checklist items (template)"
+
+#: aufnahme/models.py:116
+msgid "Eingegangen"
+msgstr "Received"
+
+#: aufnahme/models.py:117
+msgid "In Prüfung"
+msgstr "Under review"
+
+#: aufnahme/models.py:118 templates/aufnahme/_start.html:13
+msgid "Warteliste"
+msgstr "Waiting list"
+
+#: aufnahme/models.py:119 portal/navigation.py:96
+msgid "Zugesagt"
+msgstr "Offer made"
+
+#: aufnahme/models.py:120
+msgid "Abgelehnt"
+msgstr "Declined"
+
+#: aufnahme/models.py:121
+msgid "Zurückgezogen"
+msgstr "Withdrawn"
+
+#: aufnahme/models.py:122 templates/aufnahme/anmeldung.html:23
+msgid "Übernommen"
+msgstr "Enrolled"
+
+#: aufnahme/models.py:127
+msgid "Anmeldenummer"
+msgstr "Application number"
+
+#: aufnahme/models.py:128 fehlzeiten/models.py:59 foerderung/models.py:88
+#: foerderung/models.py:229 stammdaten/admin.py:316 stammdaten/models.py:141
+#: stammdaten/models.py:412 templates/aufnahme/liste.html:15
+#: templates/aufnahme/liste.html:38 templates/foerderung/_akte.html:16
+#: templates/foerderung/_akte.html:36 templates/foerderung/plan.html:25
+msgid "Status"
+msgstr "Status"
+
+#: aufnahme/models.py:129 templates/aufnahme/liste.html:39
+msgid "Eingang"
+msgstr "Received on"
+
+#: aufnahme/models.py:132
+msgid "Aufnahme zum Schuljahr"
+msgstr "Admission for school year"
+
+#: aufnahme/models.py:133 stammdaten/models.py:550 stammdaten/models.py:792
+#: templates/aufnahme/liste.html:24 templates/portal/zuordnung.html:120
+msgid "Jahrgang"
+msgstr "Year"
+
+#: aufnahme/models.py:134 stammdaten/admin.py:288 stammdaten/models.py:767
+#: stammdaten/models.py:793 templates/aufnahme/anmeldung.html:215
+#: templates/portal/schuelerakte.html:77
+msgid "Bildungsgang"
+msgstr "School track"
+
+#: aufnahme/models.py:135
+msgid "Gewünschter Eintritt"
+msgstr "Requested start date"
+
+#: aufnahme/models.py:136 stammdaten/models.py:798
+msgid "leer = Beginn des Schuljahres"
+msgstr "empty = start of the school year"
+
+#: aufnahme/models.py:139 templates/aufnahme/anmeldung.html:185
+#: templates/aufnahme/liste.html:38
+msgid "Vorläufige Klasse"
+msgstr "Provisional class"
+
+#: aufnahme/models.py:143 stammdaten/models.py:78
+msgid "Vorname(n)"
+msgstr "First name(s)"
+
+#: aufnahme/models.py:144 aufnahme/models.py:261 stammdaten/models.py:79
+msgid "Nachname"
+msgstr "Surname"
+
+#: aufnahme/models.py:145 stammdaten/models.py:80
+msgid "Rufname"
+msgstr "Preferred name"
+
+#: aufnahme/models.py:146 stammdaten/models.py:81
+#: templates/aufnahme/anmeldung.html:213 templates/portal/schuelerakte.html:33
+msgid "Geschlecht"
+msgstr "Gender"
+
+#: aufnahme/models.py:147 stammdaten/models.py:82
+#: templates/aufnahme/anmeldung.html:212 templates/portal/schuelerakte.html:32
+msgid "Geburtsdatum"
+msgstr "Date of birth"
+
+#: aufnahme/models.py:148 stammdaten/models.py:83
+msgid "Geburtsort"
+msgstr "Place of birth"
+
+#: aufnahme/models.py:149 stammdaten/models.py:84
+msgid "Geburtsland"
+msgstr "Country of birth"
+
+#: aufnahme/models.py:150 stammdaten/models.py:86
+msgid "Staatsangehörigkeit(en)"
+msgstr "Nationality / nationalities"
+
+#: aufnahme/models.py:151 stammdaten/models.py:144
+#: templates/portal/schuelerakte.html:35
+msgid "Erstsprache(n)"
+msgstr "First language(s)"
+
+#: aufnahme/models.py:152 stammdaten/models.py:145
+#: templates/portal/schuelerakte.html:36
+msgid "Familiensprache(n)"
+msgstr "Language(s) spoken at home"
+
+#: aufnahme/models.py:153
+msgid "Deutschkenntnisse"
+msgstr "German proficiency"
+
+#: aufnahme/models.py:154
+msgid "z. B. keine, A2, B1, muttersprachlich"
+msgstr "e.g. none, A2, B1, native speaker"
+
+#: aufnahme/models.py:155
+msgid "DaZ-/DaF-Förderung voraussichtlich nötig"
+msgstr "German language support (DaZ/DaF) likely needed"
+
+#: aufnahme/models.py:156 stammdaten/models.py:151
+#: templates/aufnahme/anmeldung.html:218 templates/portal/schuelerakte.html:37
+#: templates/portal/zuordnung.html:121
+msgid "Religion / Ethik"
+msgstr "Religious education / Ethics"
+
+#: aufnahme/models.py:157 aufnahme/models.py:266 stammdaten/models.py:92
+msgid "Straße / Hausnummer / Estate"
+msgstr "Street / House number / Estate"
+
+#: aufnahme/models.py:158 aufnahme/models.py:267 stammdaten/models.py:93
+msgid "Postfach (P.O. Box)"
+msgstr "P.O. Box"
+
+#: aufnahme/models.py:159 aufnahme/models.py:268 stammdaten/models.py:94
+msgid "PLZ / Postal Code"
+msgstr "Postal code"
+
+#: aufnahme/models.py:160 aufnahme/models.py:269 stammdaten/models.py:95
+#: stammdaten/models.py:859
+msgid "Ort"
+msgstr "Town"
+
+#: aufnahme/models.py:161 aufnahme/models.py:270 stammdaten/models.py:96
+#: stammdaten/models.py:860
+msgid "Land"
+msgstr "Country"
+
+#: aufnahme/models.py:164 templates/aufnahme/anmeldung.html:220
+#: templates/aufnahme/formular.html:53 templates/aufnahme/uebernahme.html:30
+msgid "Bisherige Schule"
+msgstr "Previous school"
+
+#: aufnahme/models.py:165
+msgid "Ort der bisherigen Schule"
+msgstr "Location of previous school"
+
+#: aufnahme/models.py:166
+msgid "Land der bisherigen Schule"
+msgstr "Country of previous school"
+
+#: aufnahme/models.py:167 stammdaten/models.py:861
+msgid "Schulform / System"
+msgstr "Type of school / System"
+
+#: aufnahme/models.py:168 stammdaten/models.py:861
+msgid "z. B. Gymnasium (DE), CBC (KE), IGCSE"
+msgstr "e.g. Gymnasium (DE), CBC (KE), IGCSE"
+
+#: aufnahme/models.py:169 stammdaten/models.py:864
+msgid "Zuletzt besuchte Klasse"
+msgstr "Last class attended"
+
+#: aufnahme/models.py:171
+msgid "Geschwister an der Schule"
+msgstr "Siblings at the school"
+
+#: aufnahme/models.py:172 stammdaten/models.py:213
+#: templates/aufnahme/anmeldung.html:223
+msgid "Bemerkungen"
+msgstr "Remarks"
+
+#: aufnahme/models.py:176
+msgid "Übernommen als"
+msgstr "Enrolled as"
+
+#: aufnahme/models.py:177
+msgid "Übernommen am"
+msgstr "Enrolled on"
+
+#: aufnahme/models.py:179
+msgid "Übernommen von"
+msgstr "Enrolled by"
+
+#: aufnahme/models.py:181
+msgid "Status seit"
+msgstr "Status since"
+
+#: aufnahme/models.py:184 fehlzeiten/models.py:63 foerderung/models.py:321
+msgid "Erfasst von"
+msgstr "Recorded by"
+
+#: aufnahme/models.py:186
+msgid "Änderungsprotokoll Anmeldung"
+msgstr "Change log application"
+
+#: aufnahme/models.py:189 aufnahme/models.py:256 aufnahme/models.py:304
+#: aufnahme/models.py:345
+msgid "Anmeldung"
+msgstr "Application"
+
+#: aufnahme/models.py:190
+msgid "Anmeldungen"
+msgstr "Applications"
+
+#: aufnahme/models.py:192
+msgid "Kann Anmeldungen in die Schülerdaten übernehmen"
+msgstr "Can enrol applications into student records"
+
+#: aufnahme/models.py:216
+msgid "Die Klasse gehört zu einem anderen Schuljahr."
+msgstr "The class belongs to a different school year."
+
+#: aufnahme/models.py:218
+msgid "Der Eintritt muss im gewählten Schuljahr liegen."
+msgstr "The start date must fall within the selected school year."
+
+#: aufnahme/models.py:257
+msgid "Beziehung zum Kind"
+msgstr "Relationship to child"
+
+#: aufnahme/models.py:258 stammdaten/models.py:76
+msgid "Anrede"
+msgstr "Salutation"
+
+#: aufnahme/models.py:260
+msgid "Vorname"
+msgstr "First name"
+
+#: aufnahme/models.py:262 stammdaten/models.py:88 stammdaten/models.py:211
+#: stammdaten/models.py:479
+msgid "E-Mail"
+msgstr "Email"
+
+#: aufnahme/models.py:263 stammdaten/models.py:89
+msgid "Telefon (privat)"
+msgstr "Phone (private)"
+
+#: aufnahme/models.py:264 stammdaten/models.py:90
+#: templates/portal/schuelerakte.html:60
+msgid "Mobil"
+msgstr "Mobile"
+
+#: aufnahme/models.py:265
+msgid "Adresse wie Kind"
+msgstr "Same address as child"
+
+#: aufnahme/models.py:271 stammdaten/models.py:98
+msgid "Bevorzugte Sprache"
+msgstr "Preferred language"
+
+#: aufnahme/models.py:271 stammdaten/models.py:98
+#: templates/aufnahme/anmeldung.html:217
+msgid "Deutsch"
+msgstr "German"
+
+#: aufnahme/models.py:271 stammdaten/models.py:98
+msgid "Englisch"
+msgstr "English"
+
+#: aufnahme/models.py:272 stammdaten/models.py:484
+msgid "Bevorzugter Kommunikationsweg"
+msgstr "Preferred communication channel"
+
+#: aufnahme/models.py:273 stammdaten/models.py:482
+msgid "Beruf"
+msgstr "Occupation"
+
+#: aufnahme/models.py:274 stammdaten/models.py:483
+msgid "Arbeitgeber / Organisation"
+msgstr "Employer / Organisation"
+
+#: aufnahme/models.py:275 stammdaten/models.py:520
+#: templates/aufnahme/anmeldung.html:233 templates/portal/schuelerakte.html:54
+msgid "Sorgerecht"
+msgstr "Custody"
+
+#: aufnahme/models.py:276 stammdaten/models.py:522
+msgid "Abholberechtigt"
+msgstr "Authorised to collect"
+
+#: aufnahme/models.py:277 stammdaten/models.py:468 stammdaten/models.py:523
+#: templates/aufnahme/anmeldung.html:233 templates/portal/schuelerakte.html:55
+msgid "Notfallkontakt"
+msgstr "Emergency contact"
+
+#: aufnahme/models.py:278 stammdaten/models.py:524
+#: templates/aufnahme/anmeldung.html:233
+msgid "Rechnungsempfänger:in"
+msgstr "Invoice recipient"
+
+#: aufnahme/models.py:281
+msgid "Übernommen als Person"
+msgstr "Enrolled as person"
+
+#: aufnahme/models.py:282
+msgid "Änderungsprotokoll Kontakt (Anmeldung)"
+msgstr "Change log contact (application)"
+
+#: aufnahme/models.py:285
+msgid "Kontakt (Anmeldung)"
+msgstr "Contact (application)"
+
+#: aufnahme/models.py:286
+msgid "Kontakte (Anmeldung)"
+msgstr "Contacts (application)"
+
+#: aufnahme/models.py:307 stammdaten/admin.py:498 stammdaten/models.py:369
+#: stammdaten/models.py:701 templates/aufnahme/anmeldung.html:130
+#: templates/portal/_anhaenge.html:26
+msgid "Datei"
+msgstr "File"
+
+#: aufnahme/models.py:309 stammdaten/models.py:704
+msgid "Dateiname"
+msgstr "File name"
+
+#: aufnahme/models.py:310 stammdaten/models.py:705
+msgid "Größe (Byte)"
+msgstr "Size (bytes)"
+
+#: aufnahme/models.py:311 stammdaten/models.py:706
+msgid "Dateityp"
+msgstr "File type"
+
+#: aufnahme/models.py:313
+msgid "Sichtbar nach Übernahme für"
+msgstr "Visible after enrolment to"
+
+#: aufnahme/models.py:314
+msgid "In die Schülerakte übernehmen"
+msgstr "Copy to student file"
+
+#: aufnahme/models.py:315 stammdaten/models.py:712
+msgid "Hochgeladen am"
+msgstr "Uploaded on"
+
+#: aufnahme/models.py:317 stammdaten/models.py:714
+msgid "Hochgeladen von"
+msgstr "Uploaded by"
+
+#: aufnahme/models.py:318
+msgid "Änderungsprotokoll Datei (Anmeldung)"
+msgstr "Change log file (application)"
+
+#: aufnahme/models.py:321
+msgid "Datei (Anmeldung)"
+msgstr "File (application)"
+
+#: aufnahme/models.py:322
+msgid "Dateien (Anmeldung)"
+msgstr "Files (application)"
+
+#: aufnahme/models.py:351 portal/models.py:39
+#: templates/portal/_notizen.html:36
+msgid "Erledigt"
+msgstr "Done"
+
+#: aufnahme/models.py:352
+msgid "Erledigt am"
+msgstr "Completed on"
+
+#: aufnahme/models.py:354
+msgid "Erledigt von"
+msgstr "Completed by"
+
+#: aufnahme/models.py:355 foerderung/models.py:319 stammdaten/models.py:370
+#: stammdaten/models.py:414 stammdaten/models.py:801 stammdaten/models.py:844
+#: templates/aufnahme/anmeldung.html:81 templates/portal/schuelerakte.html:77
+msgid "Bemerkung"
+msgstr "Remark"
+
+#: aufnahme/models.py:356
+msgid "Änderungsprotokoll Checklistenpunkt"
+msgstr "Change log checklist item"
+
+#: aufnahme/models.py:359
+msgid "Checklistenpunkt"
+msgstr "Checklist item"
+
+#: aufnahme/models.py:360
+msgid "Checklistenpunkte"
+msgstr "Checklist items"
+
+#: aufnahme/uebernahme.py:63
+msgid "Die Übernahme ist erst nach einer Zusage möglich (Status „Zugesagt“)."
+msgstr ""
+"Enrolment is only possible once an offer has been made (status “Offer "
+"made”)."
+
+#: aufnahme/uebernahme.py:66
+#, python-format
+msgid "Offene Pflichtpunkte der Checkliste: %(punkte)s"
+msgstr "Open required checklist items: %(punkte)s"
+
+#: aufnahme/uebernahme.py:69
+msgid "Das Geburtsdatum fehlt."
+msgstr "The date of birth is missing."
+
+#: aufnahme/uebernahme.py:77
+msgid ""
+"Keine vorläufige Klasse – die Klassenzuordnung kann später unter „Zuordnen“ "
+"erfolgen."
+msgstr ""
+"No provisional class – the class can be assigned later under “Assign”."
+
+#: aufnahme/uebernahme.py:79
+msgid "Es sind keine Erziehungsberechtigten erfasst."
+msgstr "No parents or guardians have been recorded."
+
+#: aufnahme/uebernahme.py:83
+#, python-format
+msgid ""
+"Jahrgang %(jg)s passt nicht zum Bildungsgang %(bg)s – die Schullaufbahn wird"
+" nicht angelegt."
+msgstr ""
+"Year %(jg)s does not match the track %(bg)s – no school career entry will be"
+" created."
+
+#: aufnahme/uebernahme.py:86
+msgid "Kein Bildungsgang angegeben – die Schullaufbahn wird nicht angelegt."
+msgstr "No track specified – no school career entry will be created."
+
+#: aufnahme/uebernahme.py:105
+#, python-format
+msgid "Aufnahmecheckliste der Anmeldung %(nr)s (Eingang %(datum)s)"
+msgstr "Admission checklist for application %(nr)s (received %(datum)s)"
+
+#: aufnahme/uebernahme.py:110
+#, python-format
+msgid "erledigt am %(datum)s von %(wer)s"
+msgstr "completed on %(datum)s by %(wer)s"
+
+#: aufnahme/uebernahme.py:114
+msgid "nicht erledigt"
+msgstr "not completed"
+
+#: aufnahme/uebernahme.py:134
+msgid "Diese Anmeldung wurde bereits übernommen."
+msgstr "This application has already been enrolled."
+
+#: aufnahme/uebernahme.py:142
+#, python-format
+msgid "Aufgenommen über Anmeldung %(nr)s."
+msgstr "Admitted via application %(nr)s."
+
+#: aufnahme/uebernahme.py:144
+#, python-format
+msgid "Deutschkenntnisse bei Anmeldung: %(dk)s."
+msgstr "German proficiency at application: %(dk)s."
+
+#: aufnahme/uebernahme.py:195
+#, python-format
+msgid "Aufnahmecheckliste %(nr)s"
+msgstr "Admission checklist %(nr)s"
+
+#: aufnahme/uebernahme.py:215
+msgid ""
+"Schüler:in, Erziehungsberechtigte, Klassenzuordnung und Unterlagen werden in"
+" die Stammdaten übernommen."
+msgstr ""
+"Student, parents/guardians, class assignment and documents are transferred "
+"to the student records."
+
 #: fehlzeiten/admin.py:26 fehlzeiten/admin.py:30
 #: templates/foerderung/_akte.html:36 templates/foerderung/plan.html:26
-#: templates/portal/schuelerakte.html:76
+#: templates/portal/schuelerakte.html:77
 msgid "Zeitraum"
 msgstr "Period"
 
@@ -39,7 +795,7 @@ msgid "%(n)s Min."
 msgstr "%(n)s min"
 
 #: fehlzeiten/admin.py:41 templates/portal/klassenliste.html:11
-#: templates/portal/schuelerakte.html:106
+#: templates/portal/schuelerakte.html:107
 msgid "Fehlstunden"
 msgstr "Missed lessons"
 
@@ -61,15 +817,15 @@ msgstr "Mark as unexcused"
 msgid "%(n)s Fehlzeiten als unentschuldigt markiert."
 msgstr "%(n)s absences marked as unexcused."
 
-#: fehlzeiten/apps.py:8 fehlzeiten/models.py:70 portal/navigation.py:109
-#: portal/navigation.py:110 portal/rollen.py:129
+#: fehlzeiten/apps.py:8 fehlzeiten/models.py:70 portal/navigation.py:124
+#: portal/navigation.py:125 portal/rollen.py:137
 msgid "Fehlzeiten"
 msgstr "Absences"
 
-#: fehlzeiten/models.py:23 foerderung/models.py:85 portal/navigation.py:219
+#: fehlzeiten/models.py:23 foerderung/models.py:85 portal/navigation.py:234
 #: stammdaten/models.py:28 stammdaten/models.py:50 stammdaten/models.py:546
-#: stammdaten/models.py:791 templates/portal/schuelerakte.html:76
-#: templates/portal/zuordnung.html:12
+#: stammdaten/models.py:791 templates/aufnahme/liste.html:21
+#: templates/portal/schuelerakte.html:77 templates/portal/zuordnung.html:12
 msgid "Schuljahr"
 msgstr "School year"
 
@@ -91,7 +847,7 @@ msgstr "End"
 msgid "Unterrichtsstunde (Zeitraster)"
 msgstr "Lesson period (timetable grid)"
 
-#: fehlzeiten/models.py:30 portal/navigation.py:222
+#: fehlzeiten/models.py:30 portal/navigation.py:237
 msgid "Zeitraster"
 msgstr "Timetable grid"
 
@@ -113,10 +869,6 @@ msgid "Verspätung"
 msgstr "Late arrival"
 
 #: fehlzeiten/models.py:44
-msgid "Offen"
-msgstr "Open"
-
-#: fehlzeiten/models.py:44
 msgid "Entschuldigt"
 msgstr "Excused"
 
@@ -124,13 +876,9 @@ msgstr "Excused"
 msgid "Unentschuldigt"
 msgstr "Unexcused"
 
-#: fehlzeiten/models.py:46 noten/models.py:154 templates/portal/start.html:59
+#: fehlzeiten/models.py:46 noten/models.py:154 templates/portal/start.html:60
 msgid "Lehrkraft"
 msgstr "Teacher"
-
-#: fehlzeiten/models.py:47 portal/rollen.py:30
-msgid "Sekretariat"
-msgstr "School office"
 
 #: fehlzeiten/models.py:48
 msgid "Eltern (Krankmeldung)"
@@ -147,6 +895,7 @@ msgstr "School event"
 #: stammdaten/models.py:163 stammdaten/models.py:517 stammdaten/models.py:589
 #: stammdaten/models.py:654 stammdaten/models.py:790 stammdaten/models.py:838
 #: stammdaten/models.py:857 stammdaten/models.py:876 stammdaten/models.py:899
+#: templates/aufnahme/uebernahme.html:24 templates/aufnahme/uebernahme.html:41
 #: templates/portal/klassenliste.html:11
 #: templates/portal/notenuebersicht.html:15
 msgid "Schüler:in"
@@ -181,13 +930,6 @@ msgstr "To period"
 msgid "Verspätung (Minuten)"
 msgstr "Late by (minutes)"
 
-#: fehlzeiten/models.py:59 foerderung/models.py:88 foerderung/models.py:229
-#: stammdaten/admin.py:316 stammdaten/models.py:141 stammdaten/models.py:412
-#: templates/foerderung/_akte.html:16 templates/foerderung/_akte.html:36
-#: templates/foerderung/plan.html:25
-msgid "Status"
-msgstr "Status"
-
 #: fehlzeiten/models.py:60
 msgid "Grund"
 msgstr "Reason"
@@ -195,10 +937,6 @@ msgstr "Reason"
 #: fehlzeiten/models.py:61
 msgid "Gemeldet durch"
 msgstr "Reported by"
-
-#: fehlzeiten/models.py:63 foerderung/models.py:321
-msgid "Erfasst von"
-msgstr "Recorded by"
 
 #: fehlzeiten/models.py:66
 msgid "Änderungsprotokoll Fehlzeit"
@@ -282,11 +1020,12 @@ msgid "System"
 msgstr "System"
 
 #: foerderung/admin.py:210 foerderung/admin.py:306
-#: templates/portal/schuelerakte.html:76 templates/portal/stufe.html:22
+#: templates/aufnahme/anmeldung.html:193 templates/aufnahme/uebernahme.html:27
+#: templates/portal/schuelerakte.html:77 templates/portal/stufe.html:22
 msgid "Klasse"
 msgstr "Class"
 
-#: foerderung/admin.py:215 foerderung/admin.py:319 portal/navigation.py:165
+#: foerderung/admin.py:215 foerderung/admin.py:319 portal/navigation.py:180
 #: portal/rollen.py:32 templates/foerderung/_akte.html:16
 #: templates/foerderung/_akte.html:36
 msgid "Eltern"
@@ -322,7 +1061,7 @@ msgstr "Measures"
 msgid "Geltung und Beschluss"
 msgstr "Validity and decision"
 
-#: foerderung/admin.py:315 foerderung/models.py:226 portal/navigation.py:143
+#: foerderung/admin.py:315 foerderung/models.py:226 portal/navigation.py:158
 #: stammdaten/models.py:638 templates/foerderung/_akte.html:16
 #: templates/foerderung/nachteilsausgleich.html:32
 msgid "Fächer"
@@ -379,44 +1118,17 @@ msgstr "Receipt confirmed by %(person)s."
 msgid "Bitte ein gültiges Datum angeben (nicht vor der Aushändigung)."
 msgstr "Please enter a valid date (not before the hand-out date)."
 
-#: foerderung/apps.py:8 portal/navigation.py:151
+#: foerderung/apps.py:8 portal/navigation.py:166
 #: templates/foerderung/_akte.html:4
 msgid "Förderung"
 msgstr "Learning support"
-
-#: foerderung/models.py:23 foerderung/models.py:37 noten/models.py:27
-#: noten/models.py:78 noten/models.py:118 noten/models.py:279
-#: stammdaten/models.py:22 stammdaten/models.py:51 stammdaten/models.py:189
-#: stammdaten/models.py:346 stammdaten/models.py:548 stammdaten/models.py:632
-#: stammdaten/models.py:758 stammdaten/models.py:826 stammdaten/models.py:947
-msgid "Bezeichnung"
-msgstr "Name"
-
-#: foerderung/models.py:24 foerderung/models.py:38 noten/models.py:28
-#: stammdaten/models.py:52 stammdaten/models.py:190 stammdaten/models.py:347
-#: stammdaten/models.py:633 stammdaten/models.py:759 stammdaten/models.py:827
-#: stammdaten/models.py:948
-msgid "Bezeichnung (Englisch)"
-msgstr "Name (English)"
-
-#: foerderung/models.py:25 foerderung/models.py:44 foerderung/models.py:155
-#: noten/models.py:65 noten/models.py:221 stammdaten/models.py:195
-#: stammdaten/models.py:354 stammdaten/models.py:465 stammdaten/models.py:764
-#: stammdaten/models.py:828 stammdaten/models.py:970
-msgid "Reihenfolge"
-msgstr "Order"
-
-#: foerderung/models.py:26 foerderung/models.py:45 foerderung/models.py:82
-#: stammdaten/models.py:127 stammdaten/models.py:250 stammdaten/models.py:971
-msgid "Aktiv"
-msgstr "Active"
 
 #: foerderung/models.py:29
 msgid "Förderschwerpunkt"
 msgstr "Area of need"
 
 #: foerderung/models.py:30 foerderung/models.py:87 foerderung/models.py:219
-#: portal/navigation.py:169 templates/foerderung/_akte.html:36
+#: portal/navigation.py:184 templates/foerderung/_akte.html:36
 #: templates/foerderung/plan.html:27
 msgid "Förderschwerpunkte"
 msgstr "Areas of need"
@@ -439,7 +1151,7 @@ msgstr ""
 msgid "Ausgleichsmaßnahme"
 msgstr "Access arrangement measure"
 
-#: foerderung/models.py:49 portal/navigation.py:171
+#: foerderung/models.py:49 portal/navigation.py:186
 msgid "Ausgleichsmaßnahmen"
 msgstr "Access arrangement measures"
 
@@ -462,12 +1174,6 @@ msgstr "Draft"
 #: foerderung/models.py:82
 msgid "Abgeschlossen / evaluiert"
 msgstr "Completed / evaluated"
-
-#: foerderung/models.py:86 nachmittag/models.py:20 stammdaten/models.py:77
-#: stammdaten/models.py:443 stammdaten/models.py:698
-#: templates/portal/_anhaenge.html:25
-msgid "Titel"
-msgstr "Title"
 
 #: foerderung/models.py:86
 msgid "optional, z. B. „Lesen und Rechtschreiben“"
@@ -550,8 +1256,8 @@ msgstr "Change history: support plan"
 msgid "Förderplan"
 msgstr "Support plan"
 
-#: foerderung/models.py:116 portal/navigation.py:152 portal/navigation.py:153
-#: portal/rollen.py:130 templates/foerderung/_akte.html:33
+#: foerderung/models.py:116 portal/navigation.py:167 portal/navigation.py:168
+#: portal/rollen.py:138 templates/foerderung/_akte.html:33
 #: templates/foerderung/_start.html:7 templates/portal/stufe.html:23
 msgid "Förderpläne"
 msgstr "Support plans"
@@ -585,7 +1291,7 @@ msgid "nicht erreicht"
 msgstr "not achieved"
 
 #: foerderung/models.py:147 noten/models.py:153 stammdaten/models.py:637
-#: templates/portal/schuelerakte.html:118 templates/portal/start.html:59
+#: templates/portal/schuelerakte.html:119 templates/portal/start.html:60
 msgid "Fach"
 msgstr "Subject"
 
@@ -605,10 +1311,6 @@ msgstr "Target"
 msgid "möglichst konkret und überprüfbar formulieren"
 msgstr "phrase as concretely and measurably as possible"
 
-#: foerderung/models.py:151 templates/foerderung/plan.html:52
-msgid "Zuständig"
-msgstr "Responsible"
-
 #: foerderung/models.py:151
 msgid "z. B. Deutschlehrkraft, Eltern, Schüler:in"
 msgstr "e.g. German teacher, parents, student"
@@ -619,7 +1321,7 @@ msgid "Bis"
 msgstr "To"
 
 #: foerderung/models.py:153 stammdaten/models.py:800
-#: templates/portal/schuelerakte.html:76
+#: templates/portal/schuelerakte.html:77
 msgid "Ergebnis"
 msgstr "Result"
 
@@ -690,7 +1392,7 @@ msgstr "Change history: progress entry"
 msgid "Verlaufseintrag"
 msgstr "Progress entry"
 
-#: foerderung/models.py:198 portal/navigation.py:156
+#: foerderung/models.py:198 portal/navigation.py:171
 #: templates/foerderung/plan.html:82
 msgid "Verlaufsdokumentation"
 msgstr "Progress log"
@@ -769,11 +1471,11 @@ msgstr "Change history: access arrangements"
 #: templates/foerderung/nachteilsausgleich.html:11
 #: templates/portal/klassenliste.html:15
 #: templates/portal/notenuebersicht.html:34
-#: templates/portal/schuelerakte.html:21
+#: templates/portal/schuelerakte.html:22
 msgid "Nachteilsausgleich"
 msgstr "Access arrangements"
 
-#: foerderung/models.py:243 portal/navigation.py:158 portal/rollen.py:131
+#: foerderung/models.py:243 portal/navigation.py:173 portal/rollen.py:139
 #: templates/foerderung/_akte.html:13 templates/foerderung/_start.html:8
 msgid "Nachteilsausgleiche"
 msgstr "Access arrangements"
@@ -857,12 +1559,6 @@ msgstr "Last change of the document when it was handed out"
 msgid "Bestätigung erfasst von"
 msgstr "Confirmation recorded by"
 
-#: foerderung/models.py:319 stammdaten/models.py:370 stammdaten/models.py:414
-#: stammdaten/models.py:801 stammdaten/models.py:844
-#: templates/portal/schuelerakte.html:76
-msgid "Bemerkung"
-msgstr "Remark"
-
 #: foerderung/models.py:322
 msgid "Änderungsprotokoll Aushändigung"
 msgstr "Change history: hand-out"
@@ -943,14 +1639,9 @@ msgid "Samstag"
 msgstr "Saturday"
 
 #: nachmittag/models.py:19 noten/models.py:151
-#: templates/portal/schuelerakte.html:118 templates/portal/start.html:59
+#: templates/portal/schuelerakte.html:119 templates/portal/start.html:60
 msgid "Halbjahr"
 msgstr "Semester"
-
-#: nachmittag/models.py:21 noten/models.py:29 noten/models.py:80
-#: noten/models.py:222 stammdaten/models.py:355 stammdaten/models.py:656
-msgid "Beschreibung"
-msgstr "Description"
 
 #: nachmittag/models.py:22
 msgid "Leitung"
@@ -972,14 +1663,6 @@ msgstr "Room / Location"
 msgid "Plätze"
 msgstr "Places"
 
-#: nachmittag/models.py:29 stammdaten/models.py:762 stammdaten/models.py:879
-msgid "ab Jahrgang"
-msgstr "from year"
-
-#: nachmittag/models.py:30 stammdaten/models.py:763 stammdaten/models.py:880
-msgid "bis Jahrgang"
-msgstr "to year"
-
 #: nachmittag/models.py:31
 msgid "Wahl geöffnet"
 msgstr "Choices open"
@@ -992,7 +1675,7 @@ msgstr "Change history: club"
 msgid "AG-Angebot"
 msgstr "Club"
 
-#: nachmittag/models.py:39 portal/navigation.py:137
+#: nachmittag/models.py:39 portal/navigation.py:152
 #: templates/portal/start.html:41
 msgid "AG-Angebote"
 msgstr "Clubs"
@@ -1025,7 +1708,7 @@ msgstr "Priority"
 msgid "AG-Wunsch"
 msgstr "Club choice"
 
-#: nachmittag/models.py:75 portal/navigation.py:138
+#: nachmittag/models.py:75 portal/navigation.py:153
 msgid "AG-Wünsche"
 msgstr "Club choices"
 
@@ -1055,12 +1738,12 @@ msgid "Unterricht"
 msgstr "Course"
 
 #: noten/admin.py:102 noten/admin.py:130 noten/models.py:226
-#: noten/models.py:227 portal/navigation.py:132
+#: noten/models.py:227 portal/navigation.py:147
 msgid "Bewertungsordner"
 msgstr "Assessment folder"
 
 #: noten/admin.py:125 noten/apps.py:8 noten/models.py:349
-#: templates/portal/notenuebersicht.html:3 templates/portal/start.html:63
+#: templates/portal/notenuebersicht.html:3 templates/portal/start.html:64
 msgid "Noten"
 msgstr "Grades"
 
@@ -1086,7 +1769,7 @@ msgstr "Folder"
 msgid "Anteil an der Gesamtnote"
 msgstr "Share of the overall grade"
 
-#: noten/admin.py:188 noten/models.py:296 portal/navigation.py:129
+#: noten/admin.py:188 noten/models.py:296 portal/navigation.py:144
 #: templates/portal/notenuebersicht.html:63
 msgid "Leistungsnachweise"
 msgstr "Assessments"
@@ -1149,7 +1832,7 @@ msgstr ""
 msgid "Notenskala"
 msgstr "Grading scale"
 
-#: noten/models.py:42 portal/navigation.py:144
+#: noten/models.py:42 portal/navigation.py:159
 msgid "Notenskalen"
 msgstr "Grading scales"
 
@@ -1222,18 +1905,9 @@ msgstr "Description / department decision"
 msgid "Gewichtungsvorlage"
 msgstr "Weighting template"
 
-#: noten/models.py:123 portal/navigation.py:145
+#: noten/models.py:123 portal/navigation.py:160
 msgid "Gewichtungsvorlagen"
 msgstr "Weighting templates"
-
-#: noten/models.py:134
-msgid "Vorlage"
-msgstr "Template"
-
-#: noten/models.py:135 stammdaten/models.py:697
-#: templates/portal/_anhaenge.html:6 templates/portal/_anhaenge.html:25
-msgid "Kategorie"
-msgstr "Category"
 
 #: noten/models.py:135
 msgid "z. B. Schriftlich, Sonstige Leistungen"
@@ -1281,6 +1955,7 @@ msgid "leer = oberste Ebene"
 msgstr "empty = top level"
 
 #: noten/models.py:215 stammdaten/admin.py:114 stammdaten/models.py:462
+#: templates/aufnahme/anmeldung.html:211
 msgid "Name"
 msgstr "Name"
 
@@ -1458,7 +2133,7 @@ msgstr "Change history: report grade"
 msgid "Zeugnisnote"
 msgstr "Report grade"
 
-#: noten/models.py:409 portal/navigation.py:135
+#: noten/models.py:409 portal/navigation.py:150
 msgid "Zeugnisnoten"
 msgstr "Report grades"
 
@@ -1481,18 +2156,14 @@ msgstr "Attachment “%(titel)s” saved."
 msgid "Anhang nicht gespeichert – %(fehler)s"
 msgstr "Attachment not saved – %(fehler)s"
 
-#: portal/anhaenge.py:118
+#: portal/anhaenge.py:123
 #, python-format
 msgid "Anhang „%(titel)s“ gelöscht."
 msgstr "Attachment “%(titel)s” deleted."
 
-#: portal/anhaenge.py:124
+#: portal/anhaenge.py:129
 msgid "Alle Kategorien"
 msgstr "All categories"
-
-#: portal/apps.py:8
-msgid "Portal"
-msgstr "Portal"
 
 #: portal/formulare.py:14 portal/middleware.py:46
 msgid "Dieses Portal ist nur für Beschäftigte der Schule zugänglich."
@@ -1542,11 +2213,6 @@ msgstr "Pink"
 msgid "Grau"
 msgstr "Grey"
 
-#: portal/models.py:31 portal/models.py:44 stammdaten/admin.py:501
-#: stammdaten/models.py:699
-msgid "Notiz"
-msgstr "Note"
-
 #: portal/models.py:32
 msgid "Farbe"
 msgstr "Colour"
@@ -1560,17 +2226,13 @@ msgstr ""
 "including this date."
 
 #: portal/models.py:37 stammdaten/models.py:708 stammdaten/models.py:965
-#: templates/portal/_anhaenge.html:26
+#: templates/aufnahme/anmeldung.html:144 templates/portal/_anhaenge.html:26
 msgid "Sichtbar für"
 msgstr "Visible to"
 
 #: portal/models.py:38
 msgid "Angeheftet"
 msgstr "Pinned"
-
-#: portal/models.py:39 templates/portal/_notizen.html:36
-msgid "Erledigt"
-msgstr "Done"
 
 #: portal/models.py:41
 msgid "Geändert am"
@@ -1581,7 +2243,10 @@ msgstr "Changed on"
 msgid "Notizen"
 msgstr "Notes"
 
-#: portal/navigation.py:61 templates/foerderung/nachteilsausgleich.html:7
+#: portal/navigation.py:61 templates/aufnahme/anmeldung.html:6
+#: templates/aufnahme/formular.html:5 templates/aufnahme/liste.html:8
+#: templates/aufnahme/uebernahme.html:5
+#: templates/foerderung/nachteilsausgleich.html:7
 #: templates/foerderung/plan.html:7 templates/portal/klassenliste.html:5
 #: templates/portal/notenuebersicht.html:6 templates/portal/rollen.html:6
 #: templates/portal/schuelerakte.html:5 templates/portal/start.html:3
@@ -1590,7 +2255,7 @@ msgstr "Notes"
 msgid "Start"
 msgstr "Home"
 
-#: portal/navigation.py:62 portal/navigation.py:217
+#: portal/navigation.py:62 portal/navigation.py:232
 msgid "Übersicht"
 msgstr "Overview"
 
@@ -1633,278 +2298,292 @@ msgstr "My classes"
 msgid "Klassenliste %(name)s"
 msgstr "Class list %(name)s"
 
-#: portal/navigation.py:84
-msgid "Stufenkoordination"
-msgstr "Stage coordination"
-
 #: portal/navigation.py:87
 #, python-format
 msgid "%(name)s, Jahrgänge %(von)s bis %(bis)s"
 msgstr "%(name)s, years %(von)s to %(bis)s"
 
-#: portal/navigation.py:89 portal/navigation.py:205 stammdaten/admin.py:127
+#: portal/navigation.py:92
+msgid "Neuanmeldung"
+msgstr "Admissions"
+
+#: portal/navigation.py:94
+msgid "Bewerbungen mit Unterlagen, Checkliste und vorläufiger Klasse"
+msgstr "Applications with documents, checklist and provisional class"
+
+#: portal/navigation.py:95 templates/aufnahme/_start.html:8
+#: templates/aufnahme/formular.html:3 templates/aufnahme/formular.html:6
+#: templates/aufnahme/formular.html:7 templates/aufnahme/liste.html:12
+msgid "Neue Anmeldung"
+msgstr "New application"
+
+#: portal/navigation.py:97
+msgid "Zugesagte Anmeldungen, Übernahme offen"
+msgstr "Offers made, enrolment pending"
+
+#: portal/navigation.py:102 portal/navigation.py:220 stammdaten/admin.py:127
 #: stammdaten/models.py:164 stammdaten/models.py:930
 #: templates/portal/stufe.html:11 templates/portal/stufe.html:22
 #: templates/portal/suche.html:17
 msgid "Schüler:innen"
 msgstr "Students"
 
-#: portal/navigation.py:92 portal/rollen.py:127
+#: portal/navigation.py:106 portal/rollen.py:135
 msgid "Schülerakten"
 msgstr "Student records"
 
-#: portal/navigation.py:93
+#: portal/navigation.py:107
 msgid "Alle Schüler:innen"
 msgstr "All students"
 
-#: portal/navigation.py:95
-msgid "Aufnehmen"
-msgstr "Admit"
+#: portal/navigation.py:109
+msgid "Direkt anlegen"
+msgstr "Create directly"
 
-#: portal/navigation.py:97
+#: portal/navigation.py:111
+msgid "Schüler:in ohne Anmeldeverfahren direkt anlegen"
+msgstr "Create a student directly without the admissions process"
+
+#: portal/navigation.py:112
 msgid "Eltern und Kontakte"
 msgstr "Parents and contacts"
 
-#: portal/navigation.py:99 templates/portal/_anhaenge.html:4
+#: portal/navigation.py:114 templates/portal/_anhaenge.html:4
 msgid "Anhänge"
 msgstr "Attachments"
 
-#: portal/navigation.py:100 portal/navigation.py:103 stammdaten/admin.py:187
+#: portal/navigation.py:115 portal/navigation.py:118 stammdaten/admin.py:187
 msgid "Klassen und Gruppen"
 msgstr "Classes and groups"
 
-#: portal/navigation.py:101
+#: portal/navigation.py:116 templates/aufnahme/anmeldung.html:201
 msgid "Zuordnen"
 msgstr "Assign"
 
-#: portal/navigation.py:102
+#: portal/navigation.py:117
 msgid "Schüler:innen Klassen, Lerngruppen und AGs zuordnen"
 msgstr "Assign students to classes, teaching groups and clubs"
 
-#: portal/navigation.py:105 stammdaten/models.py:599
+#: portal/navigation.py:120 stammdaten/models.py:599
 msgid "Mitgliedschaften"
 msgstr "Memberships"
 
-#: portal/navigation.py:107 stammdaten/admin.py:200 stammdaten/models.py:806
-#: templates/portal/schuelerakte.html:73
+#: portal/navigation.py:122 stammdaten/admin.py:200 stammdaten/models.py:806
+#: templates/aufnahme/uebernahme.html:29 templates/portal/schuelerakte.html:74
 msgid "Schullaufbahn"
 msgstr "School career"
 
-#: portal/navigation.py:111
+#: portal/navigation.py:126
 msgid "Offene Entschuldigungen"
 msgstr "Open excuse notes"
 
-#: portal/navigation.py:113
+#: portal/navigation.py:128
 msgid "Fehlzeit erfassen"
 msgstr "Record absence"
 
-#: portal/navigation.py:117 templates/portal/start.html:28
+#: portal/navigation.py:132 templates/portal/start.html:28
 msgid "Mein Unterricht"
 msgstr "My teaching"
 
-#: portal/navigation.py:123
+#: portal/navigation.py:138
 #, python-format
 msgid "Notenübersicht %(fach)s %(gruppe)s, %(abschnitt)s"
 msgstr "Grade overview %(fach)s %(gruppe)s, %(abschnitt)s"
 
-#: portal/navigation.py:126
+#: portal/navigation.py:141
 msgctxt "Menüband"
 msgid "Unterricht"
 msgstr "Teaching"
 
-#: portal/navigation.py:128 templates/foerderung/plan.html:53
+#: portal/navigation.py:143 templates/foerderung/plan.html:53
 msgid "Bewertung"
 msgstr "Assessment"
 
-#: portal/navigation.py:131
+#: portal/navigation.py:146
 msgid "Neuer Leistungsnachweis"
 msgstr "New assessment"
 
-#: portal/navigation.py:133
+#: portal/navigation.py:148
 msgid "Einzelnoten"
 msgstr "Individual grades"
 
-#: portal/navigation.py:134 stammdaten/models.py:680
+#: portal/navigation.py:149 stammdaten/models.py:680
 msgid "Zeugnis"
 msgstr "Report"
 
-#: portal/navigation.py:136
+#: portal/navigation.py:151
 msgid "Nachmittag"
 msgstr "Afternoon"
 
-#: portal/navigation.py:139
+#: portal/navigation.py:154
 msgid "Zuteilungen"
 msgstr "Allocations"
 
-#: portal/navigation.py:140 portal/navigation.py:190
+#: portal/navigation.py:155 portal/navigation.py:205
 msgid "Einstellungen"
 msgstr "Settings"
 
-#: portal/navigation.py:141
+#: portal/navigation.py:156
 msgid "Unterrichtsverteilung"
 msgstr "Teaching assignments"
 
-#: portal/navigation.py:155 templates/foerderung/_akte.html:7
+#: portal/navigation.py:170 templates/foerderung/_akte.html:7
 msgid "Neuer Förderplan"
 msgstr "New support plan"
 
-#: portal/navigation.py:159
+#: portal/navigation.py:174
 msgid "Gültige"
 msgstr "Valid"
 
-#: portal/navigation.py:160
+#: portal/navigation.py:175
 msgid "Gültige Nachteilsausgleiche"
 msgstr "Valid access arrangements"
 
-#: portal/navigation.py:161
+#: portal/navigation.py:176
 msgid "Beantragt"
 msgstr "Requested"
 
-#: portal/navigation.py:163
+#: portal/navigation.py:178
 msgid "Erfassen"
 msgstr "Record"
 
-#: portal/navigation.py:164 templates/foerderung/_akte.html:8
+#: portal/navigation.py:179 templates/foerderung/_akte.html:8
 msgid "Nachteilsausgleich erfassen"
 msgstr "Record access arrangements"
 
-#: portal/navigation.py:166
+#: portal/navigation.py:181
 msgid "Erhalt offen"
 msgstr "Receipt pending"
 
-#: portal/navigation.py:167
+#: portal/navigation.py:182
 msgid "Elternbestätigung offen"
 msgstr "Parent confirmation pending"
 
-#: portal/navigation.py:168
+#: portal/navigation.py:183
 msgid "Kataloge"
 msgstr "Catalogues"
 
-#: portal/navigation.py:177 portal/rollen.py:134 stammdaten/admin.py:127
+#: portal/navigation.py:192 portal/rollen.py:143 stammdaten/admin.py:127
 #: stammdaten/admin.py:153 stammdaten/models.py:285 stammdaten/models.py:286
 #: stammdaten/models.py:365 stammdaten/models.py:407 stammdaten/models.py:442
 #: stammdaten/models.py:461 stammdaten/models.py:930
 msgid "Personal"
 msgstr "Staff"
 
-#: portal/navigation.py:178
+#: portal/navigation.py:193
 msgid "Beschäftigte"
 msgstr "Employees"
 
-#: portal/navigation.py:179 templates/portal/_start_hr.html:5
+#: portal/navigation.py:194 templates/portal/_start_hr.html:5
 msgid "Personalliste"
 msgstr "Staff list"
 
-#: portal/navigation.py:181
+#: portal/navigation.py:196
 msgid "Einstellen"
 msgstr "Hire"
 
-#: portal/navigation.py:182
+#: portal/navigation.py:197
 msgid "Neue Mitarbeiterin / neuen Mitarbeiter anlegen"
 msgstr "Add a new member of staff"
 
-#: portal/navigation.py:183
+#: portal/navigation.py:198
 msgid "Nachweise offen"
 msgstr "Certificates outstanding"
 
-#: portal/navigation.py:185 portal/navigation.py:186
+#: portal/navigation.py:200 portal/navigation.py:201
 msgid "Abwesenheiten"
 msgstr "Absences"
 
-#: portal/navigation.py:188
+#: portal/navigation.py:203
 msgid "Offene Anträge"
 msgstr "Open requests"
 
-#: portal/navigation.py:191 stammdaten/models.py:199
+#: portal/navigation.py:206 stammdaten/models.py:199
 msgid "Personalbereiche"
 msgstr "Staff areas"
 
-#: portal/navigation.py:192 stammdaten/models.py:359
+#: portal/navigation.py:207 stammdaten/models.py:359
 msgid "Nachweisarten"
 msgstr "Certificate types"
 
-#: portal/navigation.py:193 portal/navigation.py:208
+#: portal/navigation.py:208 portal/navigation.py:223
 msgid "Dienstleister"
 msgstr "Contractors"
 
-#: portal/navigation.py:199 portal/rollen.py:31
-msgid "Finanzen"
-msgstr "Finance"
-
-#: portal/navigation.py:200
+#: portal/navigation.py:215
 msgid "Schulgeld"
 msgstr "School fees"
 
-#: portal/navigation.py:201
+#: portal/navigation.py:216
 msgid "Rechnungsempfänger"
 msgstr "Invoice recipients"
 
-#: portal/navigation.py:203 stammdaten/models.py:498
+#: portal/navigation.py:218 stammdaten/models.py:498
 msgid "Elternprofile"
 msgstr "Parent profiles"
 
-#: portal/navigation.py:207
+#: portal/navigation.py:222
 msgid "Verträge"
 msgstr "Contracts"
 
-#: portal/navigation.py:210
+#: portal/navigation.py:225
 msgid "Vertragsunterlagen"
 msgstr "Contract documents"
 
-#: portal/navigation.py:216 stammdaten/admin.py:45
+#: portal/navigation.py:231 stammdaten/admin.py:45
 msgid "Verwaltung"
 msgstr "Administration"
 
-#: portal/navigation.py:218
+#: portal/navigation.py:233
 msgid "Alle Bereiche"
 msgstr "All areas"
 
-#: portal/navigation.py:220 stammdaten/models.py:29
+#: portal/navigation.py:235 stammdaten/models.py:29
 msgid "Schuljahre"
 msgstr "School years"
 
-#: portal/navigation.py:223 stammdaten/models.py:768
+#: portal/navigation.py:238 stammdaten/models.py:768
 msgid "Bildungsgänge"
 msgstr "School tracks"
 
-#: portal/navigation.py:224 stammdaten/models.py:832
+#: portal/navigation.py:239 stammdaten/models.py:832
 msgid "Abschlussarten"
 msgstr "Qualification types"
 
-#: portal/navigation.py:225
+#: portal/navigation.py:240
 msgid "Datenfelder"
 msgstr "Data fields"
 
-#: portal/navigation.py:226
+#: portal/navigation.py:241
 msgid "Eigene Felder"
 msgstr "Custom fields"
 
-#: portal/navigation.py:227
+#: portal/navigation.py:242
 msgid "Zusatzfelder für Schüler:innen, Personal und Eltern"
 msgstr "Custom fields for students, staff and parents"
 
-#: portal/navigation.py:228
+#: portal/navigation.py:243
 msgid "Benutzer und Rechte"
 msgstr "Users and permissions"
 
-#: portal/navigation.py:229
+#: portal/navigation.py:244
 msgid "Benutzerkonten"
 msgstr "User accounts"
 
-#: portal/navigation.py:230
+#: portal/navigation.py:245
 msgid "Rollen"
 msgstr "Roles"
 
-#: portal/navigation.py:231 templates/portal/rollen.html:3
+#: portal/navigation.py:246 templates/portal/rollen.html:3
 #: templates/portal/rollen.html:6 templates/portal/rollen.html:7
 msgid "Rollen und Rechte"
 msgstr "Roles and permissions"
 
-#: portal/navigation.py:232
+#: portal/navigation.py:247
 msgid "Übersicht: welche Rolle was darf"
 msgstr "Overview: what each role may do"
 
-#: portal/navigation.py:243
+#: portal/navigation.py:258
 msgid "Vollzugriff"
 msgstr "Full access"
 
@@ -1919,10 +2598,6 @@ msgstr "Middle school coordination"
 #: portal/rollen.py:29
 msgid "Oberstufenkoordination"
 msgstr "Upper school coordination"
-
-#: portal/rollen.py:30
-msgid "Schulleitung"
-msgstr "School management"
 
 #: portal/rollen.py:30
 msgid "Verwaltungsleitung"
@@ -1951,12 +2626,14 @@ msgid ""
 "Wie Lehrer:in, zusätzlich für alle Klassen der Mittelstufe: Schülerakten, "
 "Notenübersichten, Fehlzeiten, Gesundheitshinweise, Förderpläne und "
 "Nachteilsausgleiche (bearbeiten), Schullaufbahn und Versetzungsvermerke, "
-"Klassen und Lerngruppen der Stufe bilden und Schüler:innen zuordnen."
+"Klassen und Lerngruppen der Stufe bilden und Schüler:innen zuordnen, "
+"Neuanmeldungen der Stufe bearbeiten."
 msgstr ""
-"As teacher, plus for all middle school classes: student records, grade "
+"Like teacher, plus for all lower-secondary classes: student files, grade "
 "overviews, absences, health notes, support plans and access arrangements "
-"(edit), school career and promotion notes, forming classes and teaching "
-"groups of the stage and assigning students."
+"(edit), school career and promotion notes, forming classes and learning "
+"groups of the section and assigning students, handling admissions for the "
+"section."
 
 #: portal/rollen.py:41
 msgid "Wie Mittelstufenkoordination, bezogen auf die Jahrgänge der Oberstufe."
@@ -1973,12 +2650,14 @@ msgstr ""
 #: portal/rollen.py:43
 msgid ""
 "Schüler- und Elternstammdaten, Klassen und Gruppen, Fehlzeiten, AGs, "
-"Einwilligungen, Anhänge, Gesundheitsangaben. Noten, Unterrichtsverteilung, "
-"Kataloge und Personal nur lesend; keine Förderpläne, keine HR-Daten."
+"Einwilligungen, Anhänge, Gesundheitsangaben, Neuanmeldungen einschließlich "
+"Übernahme. Noten, Unterrichtsverteilung, Kataloge und Personal nur lesend; "
+"keine Förderpläne, keine HR-Daten."
 msgstr ""
-"Student and parent master data, classes and groups, absences, clubs, "
-"consents, attachments, health information. Grades, teaching assignments, "
-"catalogues and staff read-only; no support plans, no HR data."
+"Student and parent records, classes and groups, absences, clubs, consents, "
+"attachments, health information, admissions including enrolment. Grades, "
+"teaching allocation, catalogues and staff read-only; no support plans, no HR"
+" data."
 
 #: portal/rollen.py:45
 msgid ""
@@ -2005,12 +2684,14 @@ msgstr ""
 #: portal/rollen.py:50
 msgid ""
 "Rechnungsempfänger:innen und Elternstammdaten, Schülerstammdaten lesend, "
-"Dienstleister und Verträge, Anhänge der Kategorie Verwaltung. Keine Noten, "
-"keine Förder- und Gesundheitsdaten. Ein Finanzmodul folgt später."
+"Dienstleister und Verträge, Anhänge der Kategorie Verwaltung, Neuanmeldungen"
+" lesen mit Checkliste, Kontakten und Unterlagen. Keine Noten, keine Förder- "
+"und Gesundheitsdaten. Ein Finanzmodul folgt später."
 msgstr ""
-"Invoice recipients and parent master data, student master data read-only, "
-"contractors and contracts, administrative attachments. No grades, no "
-"learning support or health data. A finance module will follow."
+"Invoice recipients and parent records, student records read-only, service "
+"providers and contracts, attachments of the administration category, "
+"admissions read-only with checklist, contacts and documents. No grades, no "
+"support or health data. A finance module will follow later."
 
 #: portal/rollen.py:52
 msgid ""
@@ -2031,54 +2712,60 @@ msgid ""
 "Portal."
 msgstr "Prepared for future parent communication. No portal access yet."
 
-#: portal/rollen.py:126
+#: portal/rollen.py:134
 msgid "Noten und Zeugnisnoten"
 msgstr "Grades and report grades"
 
-#: portal/rollen.py:128 stammdaten/models.py:910 stammdaten/models.py:911
-#: templates/portal/schuelerakte.html:152
+#: portal/rollen.py:136 stammdaten/models.py:910 stammdaten/models.py:911
+#: templates/portal/schuelerakte.html:153
 msgid "Gesundheitsangaben"
 msgstr "Health information"
 
-#: portal/rollen.py:132
+#: portal/rollen.py:140
 msgid "Schüler- und Elternstammdaten"
 msgstr "Student and parent master data"
 
-#: portal/rollen.py:133 templates/portal/zuordnung.html:3
+#: portal/rollen.py:141 templates/portal/zuordnung.html:3
 #: templates/portal/zuordnung.html:8 templates/portal/zuordnung.html:9
 msgid "Klassen und Gruppen zuordnen"
 msgstr "Assign classes and groups"
 
-#: portal/rollen.py:135
+#: portal/rollen.py:144
 msgid "HR-Daten"
 msgstr "HR data"
 
-#: portal/rollen.py:136
+#: portal/rollen.py:145
 msgid "Finanzen / Rechnungsempfänger"
 msgstr "Finance / invoice recipients"
 
-#: portal/rollen.py:137
+#: portal/rollen.py:146
 msgid "Schuljahre, Fächer, Notenskalen"
 msgstr "School years, subjects, grading scales"
 
-#: portal/rollen.py:138
+#: portal/rollen.py:147
 msgid "Benutzerkonten und Rollen"
 msgstr "User accounts and roles"
 
-#: portal/rollen.py:162 stammdaten/models.py:1067
-#: templates/portal/schuelerakte.html:161
+#: portal/rollen.py:171 stammdaten/models.py:1067
+#: templates/portal/schuelerakte.html:162
 msgid "ja"
 msgstr "yes"
 
-#: portal/rollen.py:162
+#: portal/rollen.py:171 templates/aufnahme/anmeldung.html:54
+#: templates/aufnahme/liste.html:39 templates/aufnahme/liste.html:53
+#: templates/aufnahme/uebernahme.html:31
+msgid "Checkliste"
+msgstr "Checklist"
+
+#: portal/rollen.py:171
 msgid "lesen"
 msgstr "read"
 
-#: portal/rollen.py:162
+#: portal/rollen.py:171
 msgid "eigene"
 msgstr "own"
 
-#: portal/rollen.py:162
+#: portal/rollen.py:171
 msgid "Stufe"
 msgstr "stage"
 
@@ -2208,7 +2895,7 @@ msgstr "Birth and origin"
 msgid "Kontakt"
 msgstr "Contact"
 
-#: stammdaten/admin.py:117 templates/portal/schuelerakte.html:37
+#: stammdaten/admin.py:117 templates/portal/schuelerakte.html:38
 msgid "Anschrift"
 msgstr "Address"
 
@@ -2261,11 +2948,6 @@ msgstr "Organisation"
 #: stammdaten/admin.py:283 stammdaten/models.py:544 stammdaten/models.py:796
 msgid "Stammklasse"
 msgstr "Home class"
-
-#: stammdaten/admin.py:288 stammdaten/models.py:767 stammdaten/models.py:793
-#: templates/portal/schuelerakte.html:76
-msgid "Bildungsgang"
-msgstr "School track"
 
 #: stammdaten/admin.py:293
 msgid "Akte"
@@ -2334,11 +3016,6 @@ msgstr "%(n)s memberships created. Please then remove students who opted out."
 #: templates/foerderung/nachteilsausgleich.html:33
 msgid "Gültig"
 msgstr "Valid"
-
-#: stammdaten/admin.py:498 stammdaten/models.py:369 stammdaten/models.py:701
-#: templates/portal/_anhaenge.html:26
-msgid "Datei"
-msgstr "File"
 
 #: stammdaten/admin.py:505
 msgid "Größe"
@@ -2422,10 +3099,6 @@ msgid "keine Angabe"
 msgstr "not specified"
 
 #: stammdaten/models.py:76
-msgid "Anrede"
-msgstr "Salutation"
-
-#: stammdaten/models.py:76
 msgid "z. B. Frau, Herr"
 msgstr "e.g. Ms, Mr"
 
@@ -2433,89 +3106,9 @@ msgstr "e.g. Ms, Mr"
 msgid "z. B. Dr."
 msgstr "e.g. Dr"
 
-#: stammdaten/models.py:78
-msgid "Vorname(n)"
-msgstr "First name(s)"
-
-#: stammdaten/models.py:79
-msgid "Nachname"
-msgstr "Surname"
-
-#: stammdaten/models.py:80
-msgid "Rufname"
-msgstr "Preferred name"
-
-#: stammdaten/models.py:81 templates/portal/schuelerakte.html:32
-msgid "Geschlecht"
-msgstr "Gender"
-
-#: stammdaten/models.py:82 templates/portal/schuelerakte.html:31
-msgid "Geburtsdatum"
-msgstr "Date of birth"
-
-#: stammdaten/models.py:83
-msgid "Geburtsort"
-msgstr "Place of birth"
-
-#: stammdaten/models.py:84
-msgid "Geburtsland"
-msgstr "Country of birth"
-
-#: stammdaten/models.py:86
-msgid "Staatsangehörigkeit(en)"
-msgstr "Nationality / nationalities"
-
-#: stammdaten/models.py:86
-msgid "mehrere durch Komma trennen"
-msgstr "separate several with commas"
-
-#: stammdaten/models.py:88 stammdaten/models.py:211 stammdaten/models.py:479
-msgid "E-Mail"
-msgstr "Email"
-
-#: stammdaten/models.py:89
-msgid "Telefon (privat)"
-msgstr "Phone (private)"
-
-#: stammdaten/models.py:90 templates/portal/schuelerakte.html:59
-msgid "Mobil"
-msgstr "Mobile"
-
 #: stammdaten/models.py:91
 msgid "Telefon (dienstlich)"
 msgstr "Phone (work)"
-
-#: stammdaten/models.py:92
-msgid "Straße / Hausnummer / Estate"
-msgstr "Street / House number / Estate"
-
-#: stammdaten/models.py:93
-msgid "Postfach (P.O. Box)"
-msgstr "P.O. Box"
-
-#: stammdaten/models.py:94
-msgid "PLZ / Postal Code"
-msgstr "Postal code"
-
-#: stammdaten/models.py:95 stammdaten/models.py:859
-msgid "Ort"
-msgstr "Town"
-
-#: stammdaten/models.py:96 stammdaten/models.py:860
-msgid "Land"
-msgstr "Country"
-
-#: stammdaten/models.py:98
-msgid "Bevorzugte Sprache"
-msgstr "Preferred language"
-
-#: stammdaten/models.py:98
-msgid "Deutsch"
-msgstr "German"
-
-#: stammdaten/models.py:98
-msgid "Englisch"
-msgstr "English"
 
 #: stammdaten/models.py:104
 msgid "Interne Notizen"
@@ -2586,7 +3179,8 @@ msgstr "Independently"
 msgid "Schülernummer"
 msgstr "Student number"
 
-#: stammdaten/models.py:137 templates/portal/schuelerakte.html:42
+#: stammdaten/models.py:137 templates/aufnahme/liste.html:38
+#: templates/portal/schuelerakte.html:43
 msgid "Eintritt"
 msgstr "Admission"
 
@@ -2594,21 +3188,13 @@ msgstr "Admission"
 msgid "Eingeschult / eingetreten in Jahrgang"
 msgstr "Admitted to year"
 
-#: stammdaten/models.py:139 templates/portal/schuelerakte.html:43
+#: stammdaten/models.py:139 templates/portal/schuelerakte.html:44
 msgid "Austritt"
 msgstr "Leaving date"
 
 #: stammdaten/models.py:140
 msgid "Austrittsgrund / Zielschule"
 msgstr "Reason for leaving / next school"
-
-#: stammdaten/models.py:144 templates/portal/schuelerakte.html:34
-msgid "Erstsprache(n)"
-msgstr "First language(s)"
-
-#: stammdaten/models.py:145 templates/portal/schuelerakte.html:35
-msgid "Familiensprache(n)"
-msgstr "Language(s) spoken at home"
 
 #: stammdaten/models.py:146
 msgid "DaZ-/DaF-Förderung"
@@ -2622,12 +3208,7 @@ msgstr "Details under Learning support › Access arrangements"
 msgid "Förderbedarf / Förderschwerpunkt"
 msgstr "Special educational needs / focus"
 
-#: stammdaten/models.py:151 templates/portal/schuelerakte.html:36
-#: templates/portal/zuordnung.html:121
-msgid "Religion / Ethik"
-msgstr "Religious education / Ethics"
-
-#: stammdaten/models.py:154 templates/portal/schuelerakte.html:38
+#: stammdaten/models.py:154 templates/portal/schuelerakte.html:39
 msgid "Lebt bei"
 msgstr "Lives with"
 
@@ -2635,7 +3216,7 @@ msgstr "Lives with"
 msgid "z. B. beiden Eltern, Mutter, Gastfamilie"
 msgstr "e.g. both parents, mother, host family"
 
-#: stammdaten/models.py:155 templates/portal/schuelerakte.html:39
+#: stammdaten/models.py:155 templates/portal/schuelerakte.html:40
 msgid "Schulweg"
 msgstr "Way to school"
 
@@ -2643,7 +3224,7 @@ msgstr "Way to school"
 msgid "Buslinie / Haltestelle"
 msgstr "Bus route / stop"
 
-#: stammdaten/models.py:157 templates/portal/schuelerakte.html:40
+#: stammdaten/models.py:157 templates/portal/schuelerakte.html:41
 msgid "Abholhinweise"
 msgstr "Pick-up notes"
 
@@ -2699,10 +3280,6 @@ msgstr "Contact person"
 #: stammdaten/models.py:212
 msgid "Vertrag bis"
 msgstr "Contract until"
-
-#: stammdaten/models.py:213
-msgid "Bemerkungen"
-msgstr "Remarks"
 
 #: stammdaten/models.py:216 stammdaten/models.py:260
 msgid "Dienstleister (Firma)"
@@ -2978,11 +3555,6 @@ msgstr "Relationship"
 msgid "z. B. Ehepartner:in"
 msgstr "e.g. spouse"
 
-#: stammdaten/models.py:468 stammdaten/models.py:523
-#: templates/portal/schuelerakte.html:54
-msgid "Notfallkontakt"
-msgstr "Emergency contact"
-
 #: stammdaten/models.py:469
 msgid "Notfallkontakte"
 msgstr "Emergency contacts"
@@ -2994,18 +3566,6 @@ msgstr "App / Portal"
 #: stammdaten/models.py:479
 msgid "Post"
 msgstr "Post"
-
-#: stammdaten/models.py:482
-msgid "Beruf"
-msgstr "Occupation"
-
-#: stammdaten/models.py:483
-msgid "Arbeitgeber / Organisation"
-msgstr "Employer / Organisation"
-
-#: stammdaten/models.py:484
-msgid "Bevorzugter Kommunikationsweg"
-msgstr "Preferred communication channel"
 
 #: stammdaten/models.py:485
 msgid "Mitglied im Schulverein"
@@ -3073,21 +3633,9 @@ msgstr "Other contact"
 msgid "Kontaktperson"
 msgstr "Contact"
 
-#: stammdaten/models.py:520 templates/portal/schuelerakte.html:53
-msgid "Sorgerecht"
-msgstr "Custody"
-
 #: stammdaten/models.py:521
 msgid "Auskunftsrecht"
 msgstr "Right to information"
-
-#: stammdaten/models.py:522
-msgid "Abholberechtigt"
-msgstr "Authorised to collect"
-
-#: stammdaten/models.py:524
-msgid "Rechnungsempfänger:in"
-msgstr "Invoice recipient"
 
 #: stammdaten/models.py:525
 msgid "Änderungsprotokoll Beziehung"
@@ -3121,11 +3669,6 @@ msgstr "e.g. 9a, Ethics 9, Robotics club"
 msgid "wie im Stundenplan"
 msgstr "as in the timetable"
 
-#: stammdaten/models.py:550 stammdaten/models.py:792
-#: templates/portal/zuordnung.html:120
-msgid "Jahrgang"
-msgstr "Year"
-
 #: stammdaten/models.py:553
 msgid "Leitung (Klassenleitung / AG-Leitung)"
 msgstr "Leader (class teacher / club leader)"
@@ -3150,7 +3693,7 @@ msgstr "Change history: group"
 msgid "Gruppen / Klassen"
 msgstr "Groups / Classes"
 
-#: stammdaten/models.py:588 templates/portal/start.html:59
+#: stammdaten/models.py:588 templates/portal/start.html:60
 msgid "Gruppe"
 msgstr "Group"
 
@@ -3236,7 +3779,7 @@ msgstr "Change history: consent"
 msgid "Einwilligung"
 msgstr "Consent"
 
-#: stammdaten/models.py:664 templates/portal/schuelerakte.html:136
+#: stammdaten/models.py:664 templates/portal/schuelerakte.html:137
 msgid "Einwilligungen"
 msgstr "Consents"
 
@@ -3288,18 +3831,6 @@ msgstr "School management only"
 msgid "Beschreibung oder Inhalt, falls keine Datei angehängt wird"
 msgstr "Description, or the content if no file is attached"
 
-#: stammdaten/models.py:704
-msgid "Dateiname"
-msgstr "File name"
-
-#: stammdaten/models.py:705
-msgid "Größe (Byte)"
-msgstr "Size (bytes)"
-
-#: stammdaten/models.py:706
-msgid "Dateityp"
-msgstr "File type"
-
 #: stammdaten/models.py:709
 msgid "Bei Personalunterlagen gilt immer: nur Personalverwaltung und Leitung."
 msgstr "Staff documents are always restricted to HR and school management."
@@ -3307,14 +3838,6 @@ msgstr "Staff documents are always restricted to HR and school management."
 #: stammdaten/models.py:711
 msgid "Aufbewahren bis"
 msgstr "Keep until"
-
-#: stammdaten/models.py:712
-msgid "Hochgeladen am"
-msgstr "Uploaded on"
-
-#: stammdaten/models.py:714
-msgid "Hochgeladen von"
-msgstr "Uploaded by"
 
 #: stammdaten/models.py:716
 msgid "Änderungsprotokoll Dokument"
@@ -3371,10 +3894,6 @@ msgstr "Qualification achieved"
 #: stammdaten/models.py:787
 msgid "Abgang ohne Abschluss / Schulwechsel"
 msgstr "Left without qualification / changed school"
-
-#: stammdaten/models.py:798
-msgid "leer = Beginn des Schuljahres"
-msgstr "empty = start of the school year"
 
 #: stammdaten/models.py:799
 msgid "leer = Ende des Schuljahres"
@@ -3443,23 +3962,11 @@ msgstr "Qualifications / Certificates"
 msgid "Schule"
 msgstr "School"
 
-#: stammdaten/models.py:861
-msgid "Schulform / System"
-msgstr "Type of school / System"
-
-#: stammdaten/models.py:861
-msgid "z. B. Gymnasium (DE), CBC (KE), IGCSE"
-msgstr "e.g. Gymnasium (DE), CBC (KE), IGCSE"
-
-#: stammdaten/models.py:864
-msgid "Zuletzt besuchte Klasse"
-msgstr "Last class attended"
-
 #: stammdaten/models.py:867
 msgid "Vorherige Schule"
 msgstr "Previous school"
 
-#: stammdaten/models.py:868 templates/portal/schuelerakte.html:90
+#: stammdaten/models.py:868 templates/portal/schuelerakte.html:91
 msgid "Vorherige Schulen"
 msgstr "Previous schools"
 
@@ -3476,7 +3983,7 @@ msgid "Sprache"
 msgstr "Language"
 
 #: stammdaten/models.py:883 stammdaten/models.py:884
-#: templates/portal/schuelerakte.html:98
+#: templates/portal/schuelerakte.html:99
 msgid "Sprachenfolge"
 msgstr "Language sequence"
 
@@ -3654,7 +4161,7 @@ msgstr "Custom fields"
 msgid "Bitte mindestens eine Option angeben (eine pro Zeile)."
 msgstr "Please enter at least one option (one per line)."
 
-#: stammdaten/models.py:1067 templates/portal/schuelerakte.html:161
+#: stammdaten/models.py:1067 templates/portal/schuelerakte.html:162
 msgid "nein"
 msgstr "no"
 
@@ -3663,7 +4170,8 @@ msgid "Bitte Ja oder Nein wählen."
 msgstr "Please choose Yes or No."
 
 #: stammdaten/zusatzfelder.py:90 stammdaten/zusatzfelder.py:139
-#: templates/portal/schuelerakte.html:142 templates/portal/zuordnung.html:43
+#: templates/aufnahme/formular.html:132 templates/portal/schuelerakte.html:143
+#: templates/portal/zuordnung.html:43
 msgid "Weitere Angaben"
 msgstr "Further information"
 
@@ -3685,9 +4193,591 @@ msgstr "Django administration"
 msgid "Version %(VERSION)s"
 msgstr "Version %(VERSION)s"
 
+#: templates/aufnahme/_start.html:5
+#, python-format
+msgid "%(n)s offen"
+msgid_plural "%(n)s offen"
+msgstr[0] "%(n)s open"
+msgstr[1] "%(n)s open"
+
+#: templates/aufnahme/_start.html:7
+msgid "Alle anzeigen"
+msgstr "Show all"
+
+#: templates/aufnahme/_start.html:11
+msgid "Neuanmeldungen nach Status"
+msgstr "Admissions by status"
+
+#: templates/aufnahme/_start.html:12
+msgid "eingegangen / in Prüfung"
+msgstr "received / under review"
+
+#: templates/aufnahme/_start.html:14
+msgid "zugesagt, Übernahme offen"
+msgstr "offer made, enrolment pending"
+
+#: templates/aufnahme/_start.html:17
+msgid "Meine offenen Checklistenpunkte"
+msgstr "My open checklist items"
+
+#: templates/aufnahme/_start.html:19 templates/aufnahme/liste.html:37
+#: templates/aufnahme/uebernahme.html:29 templates/portal/schuelerakte.html:77
+msgid "Jg."
+msgstr "Year"
+
+#: templates/aufnahme/_start.html:19 templates/aufnahme/formular.html:113
+#, python-format
+msgid "%(n)s Punkt"
+msgid_plural "%(n)s Punkte"
+msgstr[0] "%(n)s item"
+msgstr[1] "%(n)s items"
+
+#: templates/aufnahme/anmeldung.html:11 templates/portal/zuordnung.html:59
+#, python-format
+msgid "Jahrgang %(jg)s"
+msgstr "Year %(jg)s"
+
+#: templates/aufnahme/anmeldung.html:11
+#, python-format
+msgid "Schuljahr %(sj)s"
+msgstr "School year %(sj)s"
+
+#: templates/aufnahme/anmeldung.html:12
+#, python-format
+msgid "Eintritt %(datum)s"
+msgstr "Start %(datum)s"
+
+#: templates/aufnahme/anmeldung.html:13
+#, python-format
+msgid "Eingang %(datum)s"
+msgstr "Received %(datum)s"
+
+#: templates/aufnahme/anmeldung.html:16
+msgid "Angaben bearbeiten"
+msgstr "Edit details"
+
+#: templates/aufnahme/anmeldung.html:17
+msgid "In Schülerdaten übernehmen"
+msgstr "Enrol into student records"
+
+#: templates/aufnahme/anmeldung.html:24
+#, python-format
+msgid "am %(datum)s von %(wer)s"
+msgstr "on %(datum)s by %(wer)s"
+
+#: templates/aufnahme/anmeldung.html:25
+#, python-format
+msgid "Zur Schülerakte von %(name)s (Nr. %(nr)s)"
+msgstr "Go to the student file of %(name)s (no. %(nr)s)"
+
+#: templates/aufnahme/anmeldung.html:26
+msgid ""
+"Die Bewerbungsakte ist abgeschlossen und kann nicht mehr geändert werden."
+msgstr "The application file is closed and can no longer be changed."
+
+#: templates/aufnahme/anmeldung.html:29
+msgid "Status ändern"
+msgstr "Change status"
+
+#: templates/aufnahme/anmeldung.html:34 templates/portal/zuordnung.html:93
+#, python-format
+msgid "seit %(datum)s"
+msgstr "since %(datum)s"
+
+#: templates/aufnahme/anmeldung.html:39
+msgid "Vor der Übernahme noch offen:"
+msgstr "Still open before enrolment:"
+
+#: templates/aufnahme/anmeldung.html:43
+msgid "Bereit zur Übernahme."
+msgstr "Ready for enrolment."
+
+#: templates/aufnahme/anmeldung.html:43
+msgid "Alle Pflichtpunkte sind erledigt."
+msgstr "All required items are completed."
+
+#: templates/aufnahme/anmeldung.html:44
+msgid "Übernahme prüfen und ausführen"
+msgstr "Review and enrol"
+
+#: templates/aufnahme/anmeldung.html:55
+#, python-format
+msgid "%(n)s Pflichtpunkt offen"
+msgid_plural "%(n)s Pflichtpunkte offen"
+msgstr[0] "%(n)s required item open"
+msgstr[1] "%(n)s required items open"
+
+#: templates/aufnahme/anmeldung.html:56
+msgid "Pflichtpunkte erledigt"
+msgstr "Required items completed"
+
+#: templates/aufnahme/anmeldung.html:66
+msgid "Als offen markieren"
+msgstr "Mark as open"
+
+#: templates/aufnahme/anmeldung.html:66
+msgid "Als erledigt abhaken"
+msgstr "Tick off as completed"
+
+#: templates/aufnahme/anmeldung.html:70
+msgid "Muss vor der Übernahme erledigt sein"
+msgstr "Must be completed before enrolment"
+
+#: templates/aufnahme/anmeldung.html:70
+msgid "Pflicht"
+msgstr "Required"
+
+#: templates/aufnahme/anmeldung.html:71
+msgid "Ihre Zuständigkeit"
+msgstr "Your responsibility"
+
+#: templates/aufnahme/anmeldung.html:73
+#, python-format
+msgid "erledigt am %(datum)s · %(wer)s"
+msgstr "completed on %(datum)s · %(wer)s"
+
+#: templates/aufnahme/anmeldung.html:77
+msgid "Weitere Aktionen"
+msgstr "More actions"
+
+#: templates/aufnahme/anmeldung.html:82 templates/aufnahme/anmeldung.html:145
+#: templates/aufnahme/formular.html:140
+msgid "Speichern"
+msgstr "Save"
+
+#: templates/aufnahme/anmeldung.html:87
+msgid "Als optional markieren"
+msgstr "Mark as optional"
+
+#: templates/aufnahme/anmeldung.html:87
+msgid "Als Pflicht markieren"
+msgstr "Mark as required"
+
+#: templates/aufnahme/anmeldung.html:88
+msgid "Punkt entfernen"
+msgstr "Remove item"
+
+#: templates/aufnahme/anmeldung.html:96
+msgid "Noch keine Punkte. Ergänzen Sie eine Vorlage oder einzelne Punkte."
+msgstr "No items yet. Add a template or individual items."
+
+#: templates/aufnahme/anmeldung.html:107
+msgid "Ergänzen"
+msgstr "Add"
+
+#: templates/aufnahme/anmeldung.html:112
+msgid "Punkte aus Vorlage"
+msgstr "Items from template"
+
+#: templates/aufnahme/anmeldung.html:114 templates/portal/zuordnung.html:131
+msgid "Hinzufügen"
+msgstr "Add"
+
+#: templates/aufnahme/anmeldung.html:124 templates/aufnahme/formular.html:120
+msgid "Zeugnisse und Unterlagen"
+msgstr "School reports and documents"
+
+#: templates/aufnahme/anmeldung.html:125 templates/portal/_anhaenge.html:13
+msgid "Neueste zuerst"
+msgstr "Newest first"
+
+#: templates/aufnahme/anmeldung.html:125 templates/portal/_anhaenge.html:14
+msgid "Älteste zuerst"
+msgstr "Oldest first"
+
+#: templates/aufnahme/anmeldung.html:130 templates/portal/_anhaenge.html:25
+msgid "Hochgeladen"
+msgstr "Uploaded"
+
+#: templates/aufnahme/anmeldung.html:131
+msgid "Nach der Übernahme"
+msgstr "After enrolment"
+
+#: templates/aufnahme/anmeldung.html:137 templates/portal/_anhaenge.html:36
+msgid "Öffnen"
+msgstr "Open"
+
+#: templates/aufnahme/anmeldung.html:137 templates/portal/_anhaenge.html:36
+msgid "Herunterladen"
+msgstr "Download"
+
+#: templates/aufnahme/anmeldung.html:143
+msgid "übernehmen"
+msgstr "transfer"
+
+#: templates/aufnahme/anmeldung.html:147
+msgid "wird nicht übernommen"
+msgstr "will not be transferred"
+
+#: templates/aufnahme/anmeldung.html:150
+msgid "Diese Datei endgültig löschen?"
+msgstr "Delete this file permanently?"
+
+#: templates/aufnahme/anmeldung.html:151 templates/portal/_anhaenge.html:43
+#: templates/portal/_notizen.html:40 templates/portal/_notizen.html:56
+msgid "Löschen"
+msgstr "Delete"
+
+#: templates/aufnahme/anmeldung.html:157
+msgid "Noch keine Unterlagen."
+msgstr "No documents yet."
+
+#: templates/aufnahme/anmeldung.html:161
+msgid "Dateien hinzufügen"
+msgstr "Add files"
+
+#: templates/aufnahme/anmeldung.html:166 templates/aufnahme/formular.html:123
+msgid "Dateien auswählen oder hierher ziehen"
+msgstr "Choose files or drag them here"
+
+#: templates/aufnahme/anmeldung.html:167
+#, python-format
+msgid "Mehrere Dateien möglich, je höchstens %(mb)s MB."
+msgstr "Several files possible, each up to %(mb)s MB."
+
+#: templates/aufnahme/anmeldung.html:175 templates/portal/_anhaenge.html:67
+msgid "Hochladen"
+msgstr "Upload"
+
+#: templates/aufnahme/anmeldung.html:188
+#, python-format
+msgid "Klassenleitung: %(kl)s"
+msgstr "Form tutor: %(kl)s"
+
+#: templates/aufnahme/anmeldung.html:189
+msgid "Noch keine Klasse zugeordnet."
+msgstr "No class assigned yet."
+
+#: templates/aufnahme/anmeldung.html:195
+msgid "— keine —"
+msgstr "— none —"
+
+#: templates/aufnahme/anmeldung.html:196 templates/aufnahme/anmeldung.html:198
+#: templates/portal/klassenliste.html:8 templates/portal/start.html:23
+#, python-format
+msgid "%(n)s Schüler:in"
+msgid_plural "%(n)s Schüler:innen"
+msgstr[0] "%(n)s student"
+msgstr[1] "%(n)s students"
+
+#: templates/aufnahme/anmeldung.html:196 templates/aufnahme/anmeldung.html:198
+msgid "vorläufig"
+msgstr "provisional"
+
+#: templates/aufnahme/anmeldung.html:197
+msgid "Andere Jahrgänge"
+msgstr "Other year groups"
+
+#: templates/aufnahme/anmeldung.html:203
+msgid ""
+"Die Zuordnung ist vorläufig. Erst mit der Übernahme wird die Schülerin oder "
+"der Schüler zum Eintrittsdatum Mitglied der Klasse."
+msgstr ""
+"This assignment is provisional. The student only becomes a member of the "
+"class, as of the start date, upon enrolment."
+
+#: templates/aufnahme/anmeldung.html:209 templates/aufnahme/formular.html:26
+#: templates/aufnahme/liste.html:37
+msgid "Kind"
+msgstr "Child"
+
+#: templates/aufnahme/anmeldung.html:214 templates/portal/schuelerakte.html:34
+msgid "Staatsangehörigkeit"
+msgstr "Nationality"
+
+#: templates/aufnahme/anmeldung.html:216
+msgid "Sprachen"
+msgstr "Languages"
+
+#: templates/aufnahme/anmeldung.html:216
+msgid "Familie"
+msgstr "Family"
+
+#: templates/aufnahme/anmeldung.html:217 templates/portal/schuelerakte.html:21
+msgid "DaZ/DaF"
+msgstr "German support"
+
+#: templates/aufnahme/anmeldung.html:219 templates/aufnahme/formular.html:45
+msgid "Adresse"
+msgstr "Address"
+
+#: templates/aufnahme/anmeldung.html:220
+msgid "zuletzt"
+msgstr "last"
+
+#: templates/aufnahme/anmeldung.html:221
+msgid "Geschwister"
+msgstr "Siblings"
+
+#: templates/aufnahme/anmeldung.html:228 templates/aufnahme/uebernahme.html:47
+msgid "Erziehungsberechtigte"
+msgstr "Parents and guardians"
+
+#: templates/aufnahme/anmeldung.html:229
+msgid "bearbeiten"
+msgstr "edit"
+
+#: templates/aufnahme/anmeldung.html:235
+msgid "übernommen"
+msgstr "transferred"
+
+#: templates/aufnahme/anmeldung.html:237 templates/aufnahme/formular.html:100
+#: templates/aufnahme/uebernahme.html:58
+msgid "Keine Kontakte erfasst."
+msgstr "No contacts recorded."
+
+#: templates/aufnahme/anmeldung.html:242
+msgid "Verlauf"
+msgstr "History"
+
+#: templates/aufnahme/anmeldung.html:250
+#, python-format
+msgid "Erfasst am %(datum)s."
+msgstr "Recorded on %(datum)s."
+
+#: templates/aufnahme/anmeldung.html:252
+msgid "Anmeldung mit allen Unterlagen endgültig löschen?"
+msgstr "Permanently delete the application with all documents?"
+
+#: templates/aufnahme/anmeldung.html:253
+msgid "Anmeldung löschen"
+msgstr "Delete application"
+
+#: templates/aufnahme/formular.html:3
+#, python-format
+msgid "Anmeldung %(nr)s bearbeiten"
+msgstr "Edit application %(nr)s"
+
+#: templates/aufnahme/formular.html:6
+#: templates/foerderung/nachteilsausgleich.html:20
+#: templates/foerderung/plan.html:19 templates/portal/_notizen.html:12
+#: templates/portal/_notizen.html:39 templates/portal/notenuebersicht.html:73
+msgid "Bearbeiten"
+msgstr "Edit"
+
+#: templates/aufnahme/formular.html:8
+msgid ""
+"Sie können hier die Angaben der Erziehungsberechtigten ändern; die übrigen "
+"Angaben sind schreibgeschützt."
+msgstr ""
+"You can change the details of the parents and guardians here; all other "
+"details are read-only."
+
+#: templates/aufnahme/formular.html:15
+msgid "Gewünschte Aufnahme"
+msgstr "Requested admission"
+
+#: templates/aufnahme/formular.html:37
+msgid "Sprachen und Religion"
+msgstr "Languages and religion"
+
+#: templates/aufnahme/formular.html:64
+msgid "Erziehungsberechtigte und Kontakte"
+msgstr "Parents, guardians and contacts"
+
+#: templates/aufnahme/formular.html:69
+#, python-format
+msgid "Kontakt %(n)s"
+msgstr "Contact %(n)s"
+
+#: templates/aufnahme/formular.html:69
+msgid "optional"
+msgstr "optional"
+
+#: templates/aufnahme/formular.html:90
+msgid "Kontakt entfernen"
+msgstr "Remove contact"
+
+#: templates/aufnahme/formular.html:106
+msgid "Checkliste zusammenstellen"
+msgstr "Compose checklist"
+
+#: templates/aufnahme/formular.html:107
+msgid ""
+"Die Punkte der gewählten Vorlagen werden übernommen. In der Bewerbungsakte "
+"lassen sich danach einzelne Punkte ergänzen, entfernen oder als optional "
+"markieren."
+msgstr ""
+"The items of the selected templates are added. In the application file you "
+"can then add or remove individual items or mark them as optional."
+
+#: templates/aufnahme/formular.html:114
+msgid "Noch keine Vorlagen angelegt."
+msgstr "No templates created yet."
+
+#: templates/aufnahme/formular.html:124
+#, python-format
+msgid ""
+"Mehrere Dateien möglich, je höchstens %(mb)s MB. Sie werden als „Zeugnis“ "
+"abgelegt; Kategorie und Sichtbarkeit lassen sich in der Bewerbungsakte "
+"ändern."
+msgstr ""
+"Several files possible, each up to %(mb)s MB. They are filed as “School "
+"report”; category and visibility can be changed in the application file."
+
+#: templates/aufnahme/formular.html:140
+msgid "Anmeldung anlegen"
+msgstr "Create application"
+
+#: templates/aufnahme/formular.html:141 templates/aufnahme/uebernahme.html:73
+msgid "Abbrechen"
+msgstr "Cancel"
+
+#: templates/aufnahme/liste.html:10
+msgid ""
+"Bewerbungen bis zur Aufnahme: Unterlagen, Checkliste, vorläufige Klasse und "
+"Übernahme in die Schülerdaten."
+msgstr ""
+"Applications up to admission: documents, checklist, provisional class and "
+"enrolment into the student records."
+
+#: templates/aufnahme/liste.html:22 templates/aufnahme/liste.html:25
+msgid "alle"
+msgstr "all"
+
+#: templates/aufnahme/liste.html:27 templates/portal/suche.html:3
+#: templates/portal/suche.html:5
+msgid "Suche"
+msgstr "Search"
+
+#: templates/aufnahme/liste.html:28
+msgid "Name, Nummer, Elternteil"
+msgstr "Name, number, parent"
+
+#: templates/aufnahme/liste.html:29
+msgid "nur mit meinen offenen Punkten"
+msgstr "only with my open items"
+
+#: templates/aufnahme/liste.html:30 templates/portal/_anhaenge.html:17
+#: templates/portal/zuordnung.html:15
+msgid "Anzeigen"
+msgstr "Show"
+
+#: templates/aufnahme/liste.html:37 templates/portal/klassenliste.html:11
+msgid "Nr."
+msgstr "No."
+
+#: templates/aufnahme/liste.html:39 templates/aufnahme/uebernahme.html:63
+msgid "Unterlagen"
+msgstr "Documents"
+
+#: templates/aufnahme/liste.html:54
+#, python-format
+msgid "%(n)s für mich"
+msgstr "%(n)s for me"
+
+#: templates/aufnahme/liste.html:65
+msgid "Keine Anmeldungen für diese Filter."
+msgstr "No applications match these filters."
+
+#: templates/aufnahme/liste.html:65
+msgid "Keine Anmeldungen in dieser Ansicht."
+msgstr "No applications in this view."
+
+#: templates/aufnahme/uebernahme.html:3 templates/aufnahme/uebernahme.html:7
+msgid "Übernahme in die Schülerdaten"
+msgstr "Enrolment into student records"
+
+#: templates/aufnahme/uebernahme.html:6
+msgid "Übernahme"
+msgstr "Enrolment"
+
+#: templates/aufnahme/uebernahme.html:12
+msgid "Die Übernahme ist noch nicht möglich:"
+msgstr "Enrolment is not yet possible:"
+
+#: templates/aufnahme/uebernahme.html:14
+msgid "Zurück zur Bewerbungsakte"
+msgstr "Back to the application file"
+
+#: templates/aufnahme/uebernahme.html:22
+msgid "Das wird angelegt"
+msgstr "What will be created"
+
+#: templates/aufnahme/uebernahme.html:26
+msgid "mit neuer Schülernummer, Status aktiv"
+msgstr "with a new student number, status active"
+
+#: templates/aufnahme/uebernahme.html:26
+#, python-format
+msgid "Eintritt in Jahrgang %(jg)s"
+msgstr "joining year %(jg)s"
+
+#: templates/aufnahme/uebernahme.html:28
+#, python-format
+msgid "%(klasse)s ab %(datum)s"
+msgstr "%(klasse)s from %(datum)s"
+
+#: templates/aufnahme/uebernahme.html:28
+msgid "keine"
+msgstr "none"
+
+#: templates/aufnahme/uebernahme.html:31
+#, python-format
+msgid ""
+"%(e)s von %(g)s Punkten erledigt – das Protokoll wird als Anhang (nur "
+"Verwaltung) gespeichert."
+msgstr ""
+"%(e)s of %(g)s items completed – the record is saved as an attachment "
+"(administration only)."
+
+#: templates/aufnahme/uebernahme.html:38
+msgid "Mögliche Dubletten"
+msgstr "Possible duplicates"
+
+#: templates/aufnahme/uebernahme.html:39
+msgid ""
+"Diese Personen sind bereits erfasst und haben einen ähnlichen Namen bzw. "
+"dasselbe Geburtsdatum. Bitte prüfen, ob das Kind schon in der Datenbank ist "
+"(z. B. Wiederaufnahme)."
+msgstr ""
+"These people are already recorded and have a similar name or the same date "
+"of birth. Please check whether the child is already in the database (e.g. "
+"re-admission)."
+
+#: templates/aufnahme/uebernahme.html:42
+msgid "Geprüft: Es handelt sich um eine andere Person – trotzdem neu anlegen."
+msgstr "Checked: this is a different person – create anyway."
+
+#: templates/aufnahme/uebernahme.html:51
+msgid "Als neue Person anlegen"
+msgstr "Create as new person"
+
+#: templates/aufnahme/uebernahme.html:54
+#, python-format
+msgid "Vorhandene Person verwenden: %(name)s"
+msgstr "Use existing person: %(name)s"
+
+#: templates/aufnahme/uebernahme.html:55
+msgid "Kinder"
+msgstr "Children"
+
+#: templates/aufnahme/uebernahme.html:65
+msgid "sichtbar für"
+msgstr "visible to"
+
+#: templates/aufnahme/uebernahme.html:66
+msgid "Diese Unterlagen als Anhänge in die Schülerakte kopieren"
+msgstr "Copy these documents to the student file as attachments"
+
+#: templates/aufnahme/uebernahme.html:67
+msgid "Keine Unterlagen zur Übernahme ausgewählt."
+msgstr "No documents selected for transfer."
+
+#: templates/aufnahme/uebernahme.html:68
+#, python-format
+msgid "%(n)s Datei bleibt nur in der Bewerbungsakte."
+msgid_plural "%(n)s Dateien bleiben nur in der Bewerbungsakte."
+msgstr[0] "%(n)s file remains in the application file only."
+msgstr[1] "%(n)s files remain in the application file only."
+
+#: templates/aufnahme/uebernahme.html:72
+msgid "Jetzt übernehmen"
+msgstr "Enrol now"
+
 #: templates/foerderung/_akte.html:4
 #: templates/foerderung/nachteilsausgleich.html:6
-#: templates/foerderung/plan.html:6 templates/portal/schuelerakte.html:152
+#: templates/foerderung/plan.html:6 templates/portal/schuelerakte.html:153
 msgid "vertraulich"
 msgstr "confidential"
 
@@ -3834,12 +4924,6 @@ msgstr "born %(datum)s"
 msgid "Drucken / PDF"
 msgstr "Print / PDF"
 
-#: templates/foerderung/nachteilsausgleich.html:20
-#: templates/foerderung/plan.html:19 templates/portal/_notizen.html:12
-#: templates/portal/_notizen.html:39 templates/portal/notenuebersicht.html:73
-msgid "Bearbeiten"
-msgstr "Edit"
-
 #: templates/foerderung/nachteilsausgleich.html:25
 msgid "Gewährte Maßnahmen"
 msgstr "Arrangements granted"
@@ -3927,30 +5011,6 @@ msgstr "No entries yet."
 msgid "Sortierung"
 msgstr "Sort order"
 
-#: templates/portal/_anhaenge.html:13
-msgid "Neueste zuerst"
-msgstr "Newest first"
-
-#: templates/portal/_anhaenge.html:14
-msgid "Älteste zuerst"
-msgstr "Oldest first"
-
-#: templates/portal/_anhaenge.html:17 templates/portal/zuordnung.html:15
-msgid "Anzeigen"
-msgstr "Show"
-
-#: templates/portal/_anhaenge.html:25
-msgid "Hochgeladen"
-msgstr "Uploaded"
-
-#: templates/portal/_anhaenge.html:36
-msgid "Öffnen"
-msgstr "Open"
-
-#: templates/portal/_anhaenge.html:36
-msgid "Herunterladen"
-msgstr "Download"
-
 #: templates/portal/_anhaenge.html:38
 msgid "nur Notiz"
 msgstr "note only"
@@ -3958,11 +5018,6 @@ msgstr "note only"
 #: templates/portal/_anhaenge.html:42
 msgid "Diesen Anhang endgültig löschen?"
 msgstr "Delete this attachment permanently?"
-
-#: templates/portal/_anhaenge.html:43 templates/portal/_notizen.html:40
-#: templates/portal/_notizen.html:56
-msgid "Löschen"
-msgstr "Delete"
 
 #: templates/portal/_anhaenge.html:51
 msgid "Keine Anhänge in dieser Kategorie."
@@ -3983,10 +5038,6 @@ msgid ""
 "gespeichert."
 msgstr ""
 "Any file type, maximum %(mb)s MB. Without a file, only the note is saved."
-
-#: templates/portal/_anhaenge.html:67
-msgid "Hochladen"
-msgstr "Upload"
 
 #: templates/portal/_geburtstage.html:5
 msgid "heute und die nächsten 7 Tage"
@@ -4175,23 +5226,12 @@ msgstr "Assign members"
 msgid "Klassenleitung %(leitung)s"
 msgstr "Class teacher %(leitung)s"
 
-#: templates/portal/klassenliste.html:8 templates/portal/start.html:23
-#, python-format
-msgid "%(n)s Schüler:in"
-msgid_plural "%(n)s Schüler:innen"
-msgstr[0] "%(n)s student"
-msgstr[1] "%(n)s students"
-
-#: templates/portal/klassenliste.html:11
-msgid "Nr."
-msgstr "No."
-
 #: templates/portal/klassenliste.html:11
 msgid "davon unentsch."
 msgstr "of which unexc."
 
 #: templates/portal/klassenliste.html:11
-#: templates/portal/schuelerakte.html:108
+#: templates/portal/schuelerakte.html:109
 msgid "Verspätungen"
 msgstr "Late arrivals"
 
@@ -4244,7 +5284,7 @@ msgid "Ordnerschnitte"
 msgstr "Folder averages"
 
 #: templates/portal/notenuebersicht.html:18
-#: templates/portal/schuelerakte.html:118
+#: templates/portal/schuelerakte.html:119
 msgid "Vorschlag"
 msgstr "Suggestion"
 
@@ -4363,177 +5403,170 @@ msgid "Akte bearbeiten"
 msgstr "Edit record"
 
 #: templates/portal/schuelerakte.html:20
-msgid "DaZ/DaF"
-msgstr "German support"
+#, python-format
+msgid "Anmeldung %(nr)s"
+msgstr "Application %(nr)s"
 
-#: templates/portal/schuelerakte.html:22
+#: templates/portal/schuelerakte.html:23
 #, python-format
 msgid "%(n)s Anhang"
 msgid_plural "%(n)s Anhänge"
 msgstr[0] "%(n)s attachment"
 msgstr[1] "%(n)s attachments"
 
-#: templates/portal/schuelerakte.html:23
+#: templates/portal/schuelerakte.html:24
 msgid "Gesundheitshinweise"
 msgstr "Health notes"
 
-#: templates/portal/schuelerakte.html:24
+#: templates/portal/schuelerakte.html:25
 #, python-format
 msgid "%(n)s offene Entschuldigung"
 msgid_plural "%(n)s offene Entschuldigungen"
 msgstr[0] "%(n)s open excuse note"
 msgstr[1] "%(n)s open excuse notes"
 
-#: templates/portal/schuelerakte.html:29
+#: templates/portal/schuelerakte.html:30
 msgid "Persönliche Daten"
 msgstr "Personal details"
 
-#: templates/portal/schuelerakte.html:31
+#: templates/portal/schuelerakte.html:32
 #, python-format
 msgid "in %(ort)s"
 msgstr "in %(ort)s"
 
-#: templates/portal/schuelerakte.html:33
-msgid "Staatsangehörigkeit"
-msgstr "Nationality"
-
-#: templates/portal/schuelerakte.html:41
+#: templates/portal/schuelerakte.html:42
 msgid "Förderbedarf"
 msgstr "Special educational needs"
 
-#: templates/portal/schuelerakte.html:42
+#: templates/portal/schuelerakte.html:43
 #, python-format
 msgid "in Jahrgang %(jg)s"
 msgstr "in year %(jg)s"
 
-#: templates/portal/schuelerakte.html:48 templates/portal/suche.html:34
+#: templates/portal/schuelerakte.html:49 templates/portal/suche.html:34
 msgid "Eltern und Kontaktpersonen"
 msgstr "Parents and contacts"
 
-#: templates/portal/schuelerakte.html:55
+#: templates/portal/schuelerakte.html:56
 msgid "abholberechtigt"
 msgstr "authorised to collect"
 
-#: templates/portal/schuelerakte.html:56
+#: templates/portal/schuelerakte.html:57
 msgid "kein Auskunftsrecht"
 msgstr "no right to information"
 
-#: templates/portal/schuelerakte.html:60
+#: templates/portal/schuelerakte.html:61
 msgid "Tel."
 msgstr "Tel."
 
-#: templates/portal/schuelerakte.html:64
+#: templates/portal/schuelerakte.html:65
 #, python-format
 msgid "Bevorzugt: %(weg)s · Sprache: %(sprache)s"
 msgstr "Preferred: %(weg)s · Language: %(sprache)s"
 
-#: templates/portal/schuelerakte.html:69
+#: templates/portal/schuelerakte.html:70
 msgid "Keine Kontaktpersonen hinterlegt."
 msgstr "No contacts on file."
 
-#: templates/portal/schuelerakte.html:76
-msgid "Jg."
-msgstr "Year"
-
-#: templates/portal/schuelerakte.html:82
+#: templates/portal/schuelerakte.html:83
 msgid "ganzes Schuljahr"
 msgstr "whole school year"
 
-#: templates/portal/schuelerakte.html:88
+#: templates/portal/schuelerakte.html:89
 msgid "Noch keine Laufbahn erfasst."
 msgstr "No school career recorded yet."
 
-#: templates/portal/schuelerakte.html:91
+#: templates/portal/schuelerakte.html:92
 #, python-format
 msgid "zuletzt Klasse %(k)s"
 msgstr "last class %(k)s"
 
-#: templates/portal/schuelerakte.html:96
+#: templates/portal/schuelerakte.html:97
 msgid "Abschlüsse und Sprachen"
 msgstr "Qualifications and languages"
 
-#: templates/portal/schuelerakte.html:97
+#: templates/portal/schuelerakte.html:98
 msgid "Noch keine Abschlüsse."
 msgstr "No qualifications yet."
 
-#: templates/portal/schuelerakte.html:99
+#: templates/portal/schuelerakte.html:100
 #, python-format
 msgid "bis %(jg)s"
 msgstr "to %(jg)s"
 
-#: templates/portal/schuelerakte.html:99
+#: templates/portal/schuelerakte.html:100
 msgid "Nicht erfasst."
 msgstr "Not recorded."
 
-#: templates/portal/schuelerakte.html:100
+#: templates/portal/schuelerakte.html:101
 msgid "Kurse und AGs"
 msgstr "Courses and clubs"
 
-#: templates/portal/schuelerakte.html:104
+#: templates/portal/schuelerakte.html:105
 #, python-format
 msgid "Fehlzeiten %(sj)s"
 msgstr "Absences %(sj)s"
 
-#: templates/portal/schuelerakte.html:107
+#: templates/portal/schuelerakte.html:108
 msgid "davon unentschuldigt"
 msgstr "of which unexcused"
 
-#: templates/portal/schuelerakte.html:109 templates/portal/start.html:43
+#: templates/portal/schuelerakte.html:110 templates/portal/start.html:43
 #: templates/portal/stufe.html:14
 msgid "offene Entschuldigungen"
 msgstr "open excuse notes"
 
-#: templates/portal/schuelerakte.html:111
+#: templates/portal/schuelerakte.html:112
 msgid "Einzelne Fehlzeiten anzeigen"
 msgstr "Show individual absences"
 
-#: templates/portal/schuelerakte.html:115
+#: templates/portal/schuelerakte.html:116
 #, python-format
 msgid "Notenstand %(sj)s"
 msgstr "Current grades %(sj)s"
 
-#: templates/portal/schuelerakte.html:130
+#: templates/portal/schuelerakte.html:131
 msgid "Kein Unterricht im aktuellen Schuljahr."
 msgstr "No courses in the current school year."
 
-#: templates/portal/schuelerakte.html:137
+#: templates/portal/schuelerakte.html:138
 #, python-format
 msgid "widerrufen %(datum)s"
 msgstr "withdrawn %(datum)s"
 
-#: templates/portal/schuelerakte.html:137
+#: templates/portal/schuelerakte.html:138
 msgid "Keine Einwilligungen erfasst – im Zweifel gilt: nicht erteilt."
 msgstr "No consents recorded – if in doubt, consent has not been given."
 
-#: templates/portal/schuelerakte.html:155
+#: templates/portal/schuelerakte.html:156
 msgid "Allergien"
 msgstr "Allergies"
 
-#: templates/portal/schuelerakte.html:156
+#: templates/portal/schuelerakte.html:157
 msgid "Erkrankungen"
 msgstr "Conditions"
 
-#: templates/portal/schuelerakte.html:157
+#: templates/portal/schuelerakte.html:158
 msgid "Medikamente"
 msgstr "Medication"
 
-#: templates/portal/schuelerakte.html:158
+#: templates/portal/schuelerakte.html:159
 msgid "Notfallhinweise"
 msgstr "Emergency information"
 
-#: templates/portal/schuelerakte.html:159
+#: templates/portal/schuelerakte.html:160
 msgid "Ärztin / Arzt"
 msgstr "Doctor"
 
-#: templates/portal/schuelerakte.html:160
+#: templates/portal/schuelerakte.html:161
 msgid "Versicherung"
 msgstr "Insurance"
 
-#: templates/portal/schuelerakte.html:161
+#: templates/portal/schuelerakte.html:162
 msgid "Schwimmen"
 msgstr "Swimming"
 
-#: templates/portal/schuelerakte.html:163
+#: templates/portal/schuelerakte.html:164
 msgid "Keine Angaben hinterlegt."
 msgstr "No information on file."
 
@@ -4570,20 +5603,20 @@ msgstr "Teaching groups"
 msgid "Fehlzeiten heute"
 msgstr "Absences today"
 
-#: templates/portal/start.html:56
+#: templates/portal/start.html:57
 #, python-format
 msgid "Unterricht im Schuljahr %(sj)s"
 msgstr "Courses in %(sj)s"
 
-#: templates/portal/start.html:67
+#: templates/portal/start.html:68
 msgid "Kein Unterricht zugeordnet."
 msgstr "No courses assigned."
 
-#: templates/portal/start.html:73
+#: templates/portal/start.html:74
 msgid "Willkommen"
 msgstr "Welcome"
 
-#: templates/portal/start.html:74
+#: templates/portal/start.html:75
 msgid ""
 "Ihrem Konto sind noch keine Klassen und kein Unterricht zugeordnet. Die "
 "Verwaltung trägt das unter Unterricht › Unterrichtsverteilung ein."
@@ -4624,10 +5657,6 @@ msgstr "There are no classes in these years in the current school year."
 #: templates/portal/stufe.html:45
 msgid "Lerngruppen und Kurse"
 msgstr "Teaching groups and courses"
-
-#: templates/portal/suche.html:3 templates/portal/suche.html:5
-msgid "Suche"
-msgstr "Search"
 
 #: templates/portal/suche.html:9
 msgid "Person suchen …"
@@ -4689,11 +5718,6 @@ msgstr "Create group"
 msgid "Mitglieder"
 msgstr "Members"
 
-#: templates/portal/zuordnung.html:59
-#, python-format
-msgid "Jahrgang %(jg)s"
-msgstr "Year %(jg)s"
-
 #: templates/portal/zuordnung.html:62
 msgid "Klassenliste"
 msgstr "Class list"
@@ -4721,11 +5745,6 @@ msgid "%(n)s Mitglied"
 msgid_plural "%(n)s Mitglieder"
 msgstr[0] "%(n)s member"
 msgstr[1] "%(n)s members"
-
-#: templates/portal/zuordnung.html:93
-#, python-format
-msgid "seit %(datum)s"
-msgstr "since %(datum)s"
 
 #: templates/portal/zuordnung.html:98
 msgid "Rolle speichern"
@@ -4777,10 +5796,6 @@ msgstr "Hide members"
 #: templates/portal/zuordnung.html:130
 msgid "sichtbar"
 msgstr "visible"
-
-#: templates/portal/zuordnung.html:131
-msgid "Hinzufügen"
-msgstr "Add"
 
 #: templates/portal/zuordnung.html:140
 msgid "bereits Mitglied"

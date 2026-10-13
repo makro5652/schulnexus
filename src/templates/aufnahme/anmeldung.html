@@ -1,0 +1,259 @@
+{% extends "portal/base.html" %}
+{% load i18n static formate %}
+{% block title %}{{ a.anzeigename }} · {{ a.nummer }}{% endblock %}
+{% block inhaltsklasse %}breit{% endblock %}
+{% block inhalt %}
+<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › <a href="{% url 'anmeldungen' %}">{% translate "Neuanmeldungen" %}</a> › {{ a.nummer }}</p>
+<div class="akte-kopf">
+  <div>
+    <h1>{{ a.anzeigename }} <span class="an-status an-status-{{ a.status }} gross">{{ a.get_status_display }}</span></h1>
+    <p class="unterzeile">{{ a.nummer }} ·
+      {% if a.jahrgang %}{% blocktranslate with jg=a.jahrgang %}Jahrgang {{ jg }}{% endblocktranslate %} · {% endif %}{% blocktranslate with sj=a.schuljahr %}Schuljahr {{ sj }}{% endblocktranslate %}
+      · {% blocktranslate with datum=a.eintritt|kurzdatum %}Eintritt {{ datum }}{% endblocktranslate %}
+      · {% blocktranslate with datum=a.eingang|kurzdatum %}Eingang {{ datum }}{% endblocktranslate %}</p>
+  </div>
+  <div class="knopfreihe">
+    {% if darf.bearbeiten or darf.kontakte %}<a class="knopf zweitrangig" href="{% url 'anmeldung_bearbeiten' a.pk %}">{% translate "Angaben bearbeiten" %}</a>{% endif %}
+    {% if darf.uebernehmen and a.status == "zugesagt" %}<a class="knopf" href="{% url 'anmeldung_uebernahme' a.pk %}">{% translate "In Schülerdaten übernehmen" %}</a>{% endif %}
+  </div>
+</div>
+
+{% if a.abgeschlossen %}
+<div class="an-banner ok">
+  <strong>{% translate "Übernommen" %}</strong>
+  {% blocktranslate with datum=a.uebernommen_am|date:"SHORT_DATE_FORMAT" wer=a.uebernommen_von.get_full_name|default:a.uebernommen_von.get_username %}am {{ datum }} von {{ wer }}{% endblocktranslate %}.
+  {% if a.schueler %}<a href="{% url 'schuelerakte' a.schueler.pk %}">{% blocktranslate with name=a.schueler.person.anzeigename nr=a.schueler.schuelernummer %}Zur Schülerakte von {{ name }} (Nr. {{ nr }}){% endblocktranslate %}</a>{% endif %}
+  <span class="leise blockzeile">{% translate "Die Bewerbungsakte ist abgeschlossen und kann nicht mehr geändert werden." %}</span>
+</div>
+{% else %}
+<form method="post" action="{% url 'anmeldung_aktion' a.pk %}" class="an-statusleiste" aria-label="{% translate 'Status ändern' %}">
+  {% csrf_token %}<input type="hidden" name="aktion" value="status">
+  {% for wert, name in status_auswahl %}
+    <button type="submit" name="status" value="{{ wert }}" class="an-schritt an-schritt-{{ wert }}{% if wert == a.status %} aktiv{% endif %}"{% if wert == a.status %} aria-current="step"{% endif %}{% if not darf.bearbeiten %} disabled{% endif %}>{{ name }}</button>
+  {% endfor %}
+  <span class="leise an-seit">{% blocktranslate with datum=a.status_seit|kurzdatum %}seit {{ datum }}{% endblocktranslate %}</span>
+</form>
+{% if a.status == "zugesagt" %}
+  {% if hindernisse %}
+  <div class="an-banner warnend">
+    <strong>{% translate "Vor der Übernahme noch offen:" %}</strong>
+    <ul class="schlicht">{% for h in hindernisse %}<li>{{ h }}</li>{% endfor %}</ul>
+  </div>
+  {% elif darf.uebernehmen %}
+  <div class="an-banner ok"><strong>{% translate "Bereit zur Übernahme." %}</strong> {% translate "Alle Pflichtpunkte sind erledigt." %}
+    <a href="{% url 'anmeldung_uebernahme' a.pk %}">{% translate "Übernahme prüfen und ausführen" %}</a></div>
+  {% endif %}
+{% endif %}
+{% endif %}
+
+<div class="an-raster">
+  <div class="an-hauptspalte">
+    {# ------------------------------------------------ Checkliste #}
+    <section class="karte" id="checkliste">
+      <div class="karte-kopf">
+        <h2>{% translate "Checkliste" %} <span class="leise">· {{ fortschritt.erledigt }}/{{ fortschritt.gesamt }}</span></h2>
+        {% if fortschritt.offen_pflicht %}<span class="etikett warnend">{% blocktranslate count n=fortschritt.offen_pflicht|length %}{{ n }} Pflichtpunkt offen{% plural %}{{ n }} Pflichtpunkte offen{% endblocktranslate %}</span>
+        {% elif fortschritt.gesamt %}<span class="etikett">{% translate "Pflichtpunkte erledigt" %}</span>{% endif %}
+      </div>
+      {% if fortschritt.gesamt %}<div class="an-balken gross" aria-hidden="true"><span style="width:{{ fortschritt.prozent }}%"></span></div>{% endif %}
+      <ul class="an-punkte">
+      {% for p in punkte %}
+        <li class="an-punkt{% if p.erledigt %} erledigt{% endif %}{% if p.meins %} meins{% endif %}" id="punkt-{{ p.pk }}">
+          <form method="post" action="{% url 'anmeldung_aktion' a.pk %}">
+            {% csrf_token %}<input type="hidden" name="punkt" value="{{ p.pk }}">
+            <button type="submit" name="aktion" value="{% if p.erledigt %}zuruecknehmen{% else %}abhaken{% endif %}" class="an-kaestchen"
+              role="checkbox" aria-checked="{{ p.erledigt|yesno:'true,false' }}" aria-label="{{ p.lokal_text }}"
+              title="{% if p.erledigt %}{% translate 'Als offen markieren' %}{% else %}{% translate 'Als erledigt abhaken' %}{% endif %}"{% if not darf.abhaken %} disabled{% endif %}></button>
+          </form>
+          <div class="an-punkt-text">
+            <span class="an-punkt-titel">{{ p.lokal_text }}</span>
+            {% if p.pflicht %}<span class="an-pflicht" title="{% translate 'Muss vor der Übernahme erledigt sein' %}">{% translate "Pflicht" %}</span>{% endif %}
+            {% if p.zustaendig %}<span class="etikett{% if p.meins %} meins{% endif %}"{% if p.meins %} title="{% translate 'Ihre Zuständigkeit' %}"{% endif %}>{{ p.get_zustaendig_display }}</span>{% endif %}
+            {% if p.erledigt or p.bemerkung %}<small class="leise blockzeile">
+              {% if p.erledigt %}{% blocktranslate with datum=p.erledigt_am|date:"SHORT_DATE_FORMAT" wer=p.erledigt_von.person.anzeigename|default:p.erledigt_von.get_username %}erledigt am {{ datum }} · {{ wer }}{% endblocktranslate %}{% endif %}{% if p.erledigt and p.bemerkung %} · {% endif %}{% if p.bemerkung %}<em>{{ p.bemerkung }}</em>{% endif %}</small>{% endif %}
+          </div>
+          {% if darf.abhaken %}
+          <details class="an-punkt-menue">
+            <summary aria-label="{% translate 'Weitere Aktionen' %}" title="{% translate 'Weitere Aktionen' %}">···</summary>
+            <div class="an-menue">
+              <form method="post" action="{% url 'anmeldung_aktion' a.pk %}" class="inline-form">
+                {% csrf_token %}<input type="hidden" name="punkt" value="{{ p.pk }}"><input type="hidden" name="aktion" value="bemerkung">
+                <label>{% translate "Bemerkung" %}<input type="text" name="bemerkung" value="{{ p.bemerkung }}" maxlength="200"></label>
+                <button type="submit" class="knopf klein zweitrangig">{% translate "Speichern" %}</button>
+              </form>
+              {% if darf.zusammenstellen %}
+              <form method="post" action="{% url 'anmeldung_aktion' a.pk %}" class="an-menue-knoepfe">
+                {% csrf_token %}<input type="hidden" name="punkt" value="{{ p.pk }}">
+                <button type="submit" name="aktion" value="pflicht" class="link">{% if p.pflicht %}{% translate "Als optional markieren" %}{% else %}{% translate "Als Pflicht markieren" %}{% endif %}</button>
+                <button type="submit" name="aktion" value="punkt_loeschen" class="link gefahr">{% translate "Punkt entfernen" %}</button>
+              </form>
+              {% endif %}
+            </div>
+          </details>
+          {% endif %}
+        </li>
+      {% empty %}
+        <li class="leer">{% translate "Noch keine Punkte. Ergänzen Sie eine Vorlage oder einzelne Punkte." %}</li>
+      {% endfor %}
+      </ul>
+
+      {% if darf.zusammenstellen %}
+      <div class="an-zusammenstellen">
+        <form method="post" action="{% url 'anmeldung_aktion' a.pk %}" class="inline-form">
+          {% csrf_token %}<input type="hidden" name="aktion" value="punkt_neu">
+          <label class="an-breit">{{ punkt_form.text.label }}{{ punkt_form.text }}</label>
+          <label>{{ punkt_form.zustaendig.label }}{{ punkt_form.zustaendig }}</label>
+          <label class="an-zeile">{{ punkt_form.pflicht }} {{ punkt_form.pflicht.label }}</label>
+          <button type="submit" class="knopf klein">{% translate "Ergänzen" %}</button>
+        </form>
+        {% if vorlagen %}
+        <form method="post" action="{% url 'anmeldung_aktion' a.pk %}" class="inline-form">
+          {% csrf_token %}<input type="hidden" name="aktion" value="vorlage">
+          <label>{% translate "Punkte aus Vorlage" %}
+            <select name="vorlage">{% for v in vorlagen %}<option value="{{ v.pk }}">{{ v.lokal_name }} (+{{ v.fehlend }})</option>{% endfor %}</select></label>
+          <button type="submit" class="knopf klein zweitrangig">{% translate "Hinzufügen" %}</button>
+        </form>
+        {% endif %}
+      </div>
+      {% endif %}
+    </section>
+
+    {# ------------------------------------------------ Unterlagen #}
+    <section class="karte" id="dateien">
+      <div class="karte-kopf">
+        <h2>{% translate "Zeugnisse und Unterlagen" %} <span class="leise">({{ dateien|length }})</span></h2>
+        {% if dateien|length > 1 %}<a class="klein" href="?sortierung={% if aelteste %}neu{% else %}alt{% endif %}#dateien">{% if aelteste %}{% translate "Neueste zuerst" %}{% else %}{% translate "Älteste zuerst" %}{% endif %}</a>{% endif %}
+      </div>
+      {% if dateien %}
+      <div class="rollbar">
+      <table class="liste anhaenge">
+        <thead><tr><th>{% translate "Hochgeladen" %}</th><th>{% translate "Titel" %}</th><th>{% translate "Datei" %}</th>
+          <th>{% translate "Nach der Übernahme" %}</th><th></th></tr></thead>
+        <tbody>
+        {% for d in dateien %}
+          <tr>
+            <td class="nowrap">{{ d.hochgeladen_am|date:"SHORT_DATETIME_FORMAT" }}<small class="leise blockzeile">{{ d.hochgeladen_von.person.anzeigename|default:d.hochgeladen_von.get_username|default:"" }}</small></td>
+            <td><strong>{{ d.titel }}</strong><small class="leise blockzeile">{{ d.get_kategorie_display }}</small>{% if d.notiz %}<small class="notiz">{{ d.notiz }}</small>{% endif %}</td>
+            <td class="nowrap">{% if d.inline_moeglich %}<a href="{% url 'aufnahme_datei' d.pk %}?ansehen=1" target="_blank" rel="noopener">{% translate "Öffnen" %}</a> · {% endif %}<a href="{% url 'aufnahme_datei' d.pk %}">{% translate "Herunterladen" %}</a>
+              <small class="leise blockzeile">{{ d.dateiendung }} · {{ d.groesse_lesbar }}</small></td>
+            <td>
+              {% if darf.bearbeiten %}
+              <form method="post" action="{% url 'anmeldung_aktion' a.pk %}" class="an-dateiwahl" data-sofort>
+                {% csrf_token %}<input type="hidden" name="aktion" value="datei"><input type="hidden" name="datei" value="{{ d.pk }}">
+                <label class="haken"><input type="checkbox" name="uebernehmen" value="1"{% if d.uebernehmen %} checked{% endif %}> {% translate "übernehmen" %}</label>
+                <select name="zugriffsstufe" aria-label="{% translate 'Sichtbar für' %}">{% for w, n in stufen %}<option value="{{ w }}"{% if w == d.zugriffsstufe %} selected{% endif %}>{{ n }}</option>{% endfor %}</select>
+                <noscript><button type="submit" class="knopf klein zweitrangig">{% translate "Speichern" %}</button></noscript>
+              </form>
+              {% else %}<small>{% if d.uebernehmen %}{{ d.get_zugriffsstufe_display }}{% else %}{% translate "wird nicht übernommen" %}{% endif %}</small>{% endif %}
+            </td>
+            <td>{% if d.darf_loeschen %}
+              <form method="post" action="{% url 'aufnahme_datei_loeschen' d.pk %}" onsubmit="return confirm('{% translate "Diese Datei endgültig löschen?" as frage %}{{ frage|escapejs }}')">
+                {% csrf_token %}<button type="submit" class="link gefahr">{% translate "Löschen" %}</button></form>{% endif %}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      </div>
+      {% else %}<p class="leer">{% translate "Noch keine Unterlagen." %}</p>{% endif %}
+
+      {% if datei_form %}
+      <details class="hochladen"{% if not dateien %} open{% endif %}>
+        <summary>{% translate "Dateien hinzufügen" %}</summary>
+        <form method="post" enctype="multipart/form-data" action="{% url 'anmeldung_datei_hochladen' a.pk %}" class="formular">
+          {% csrf_token %}
+          <label class="an-ablage" data-ablage>
+            {{ datei_form.dateien }}
+            <strong>{% translate "Dateien auswählen oder hierher ziehen" %}</strong>
+            <small class="leise">{% blocktranslate with mb=DOKUMENT_MAX_MB %}Mehrere Dateien möglich, je höchstens {{ mb }} MB.{% endblocktranslate %}</small>
+            <span class="an-dateinamen" data-dateinamen></span>
+          </label>
+          <div class="formzeile">
+            <label>{{ datei_form.kategorie.label }} {{ datei_form.kategorie }}</label>
+            <label>{{ datei_form.titel.label }} {{ datei_form.titel }}<small class="leise">{{ datei_form.titel.help_text }}</small></label>
+            <label>{{ datei_form.notiz.label }} {{ datei_form.notiz }}</label>
+          </div>
+          <button type="submit" class="knopf">{% translate "Hochladen" %}</button>
+        </form>
+      </details>
+      {% endif %}
+    </section>
+  </div>
+
+  <div class="an-seitenspalte">
+    {# ------------------------------------------------ Vorläufige Klasse #}
+    <section class="karte" id="klasse">
+      <h2>{% translate "Vorläufige Klasse" %}</h2>
+      {% if a.vorlaeufige_klasse %}
+        <p class="an-klasse-gross">{{ a.vorlaeufige_klasse.name }}</p>
+        <p class="leise klein">{% if a.vorlaeufige_klasse.leitung %}{% blocktranslate with kl=a.vorlaeufige_klasse.leitung.person.anzeigename %}Klassenleitung: {{ kl }}{% endblocktranslate %}{% endif %}</p>
+      {% else %}<p class="leer">{% translate "Noch keine Klasse zugeordnet." %}</p>{% endif %}
+      {% if darf.bearbeiten %}
+      <form method="post" action="{% url 'anmeldung_aktion' a.pk %}" class="inline-form">
+        {% csrf_token %}<input type="hidden" name="aktion" value="klasse">
+        <label>{% translate "Klasse" %}
+          <select name="klasse">
+            <option value="">{% translate "— keine —" %}</option>
+            {% for g in klassen %}{% if g.passend %}<option value="{{ g.pk }}"{% if g.pk == a.vorlaeufige_klasse_id %} selected{% endif %}>{{ g.name }} · {% blocktranslate count n=g.belegung %}{{ n }} Schüler:in{% plural %}{{ n }} Schüler:innen{% endblocktranslate %}{% if g.vorlaeufig %} + {{ g.vorlaeufig }} {% translate "vorläufig" %}{% endif %}</option>{% endif %}{% endfor %}
+            {% if a.jahrgang %}<optgroup label="{% translate 'Andere Jahrgänge' %}">
+            {% for g in klassen %}{% if not g.passend %}<option value="{{ g.pk }}"{% if g.pk == a.vorlaeufige_klasse_id %} selected{% endif %}>{{ g.name }} · {% blocktranslate count n=g.belegung %}{{ n }} Schüler:in{% plural %}{{ n }} Schüler:innen{% endblocktranslate %}{% if g.vorlaeufig %} + {{ g.vorlaeufig }} {% translate "vorläufig" %}{% endif %}</option>{% endif %}{% endfor %}
+            </optgroup>{% endif %}
+          </select></label>
+        <button type="submit" class="knopf klein">{% translate "Zuordnen" %}</button>
+      </form>
+      <p class="hinweistext">{% translate "Die Zuordnung ist vorläufig. Erst mit der Übernahme wird die Schülerin oder der Schüler zum Eintrittsdatum Mitglied der Klasse." %}</p>
+      {% endif %}
+    </section>
+
+    {# ------------------------------------------------ Kind #}
+    <section class="karte">
+      <h2>{% translate "Kind" %}</h2>
+      <dl class="daten">
+        <dt>{% translate "Name" %}</dt><dd>{{ a.vorname }} {{ a.nachname }}{% if a.rufname %} <span class="leise">({{ a.rufname }})</span>{% endif %}</dd>
+        <dt>{% translate "Geburtsdatum" %}</dt><dd>{{ a.geburtsdatum|kurzdatum|default:"–" }}{% if a.geburtsort or a.geburtsland %} <span class="leise">· {{ a.geburtsort }}{% if a.geburtsort and a.geburtsland %}, {% endif %}{{ a.geburtsland }}</span>{% endif %}</dd>
+        {% if a.geschlecht %}<dt>{% translate "Geschlecht" %}</dt><dd>{{ a.get_geschlecht_display }}</dd>{% endif %}
+        {% if a.staatsangehoerigkeiten %}<dt>{% translate "Staatsangehörigkeit" %}</dt><dd>{{ a.staatsangehoerigkeiten }}</dd>{% endif %}
+        {% if a.bildungsgang %}<dt>{% translate "Bildungsgang" %}</dt><dd>{{ a.bildungsgang.lokal_name }}</dd>{% endif %}
+        <dt>{% translate "Sprachen" %}</dt><dd>{{ a.muttersprache|default:"–" }}{% if a.familiensprache %} <span class="leise">· {% translate "Familie" %}: {{ a.familiensprache }}</span>{% endif %}</dd>
+        {% if a.deutschkenntnisse or a.daz %}<dt>{% translate "Deutsch" %}</dt><dd>{{ a.deutschkenntnisse|default:"–" }}{% if a.daz %} <span class="etikett">{% translate "DaZ/DaF" %}</span>{% endif %}</dd>{% endif %}
+        {% if a.religionsunterricht %}<dt>{% translate "Religion / Ethik" %}</dt><dd>{{ a.get_religionsunterricht_display }}</dd>{% endif %}
+        {% if a.strasse or a.ort %}<dt>{% translate "Adresse" %}</dt><dd>{% if a.strasse %}{{ a.strasse }}<br>{% endif %}{% if a.postfach %}{{ a.postfach }}<br>{% endif %}{{ a.plz }} {{ a.ort }}{% if a.land %}, {{ a.land }}{% endif %}</dd>{% endif %}
+        {% if a.vorherige_schule %}<dt>{% translate "Bisherige Schule" %}</dt><dd>{{ a.vorherige_schule }}<span class="leise blockzeile">{{ a.vorherige_schulform }}{% if a.letzter_jahrgang %} · {% translate "zuletzt" %} {{ a.letzter_jahrgang }}{% endif %}{% if a.vorherige_schule_ort %} · {{ a.vorherige_schule_ort }}{% endif %}</span></dd>{% endif %}
+        {% if a.geschwister %}<dt>{% translate "Geschwister" %}</dt><dd>{{ a.geschwister }}</dd>{% endif %}
+      </dl>
+      {% if a.bemerkungen %}<h3>{% translate "Bemerkungen" %}</h3><p class="an-bemerkung">{{ a.bemerkungen|linebreaksbr }}</p>{% endif %}
+    </section>
+
+    {# ------------------------------------------------ Kontakte #}
+    <section class="karte">
+      <div class="karte-kopf"><h2>{% translate "Erziehungsberechtigte" %}</h2>
+        {% if darf.kontakte %}<a class="klein" href="{% url 'anmeldung_bearbeiten' a.pk %}#kontakte">{% translate "bearbeiten" %}</a>{% endif %}</div>
+      {% for k in kontakte %}
+      <div class="kontakt">
+        <strong>{{ k.anrede }} {{ k.vorname }} {{ k.nachname }}</strong> <span class="leise">· {{ k.get_art_display }}</span>
+        <div class="etiketten">{% if k.sorgerecht %}<span class="etikett">{% translate "Sorgerecht" %}</span>{% endif %}{% if k.rechnungsempfaenger %}<span class="etikett">{% translate "Rechnungsempfänger:in" %}</span>{% endif %}{% if k.notfallkontakt %}<span class="etikett">{% translate "Notfallkontakt" %}</span>{% endif %}</div>
+        <small class="leise">{% if k.email %}<a href="mailto:{{ k.email }}">{{ k.email }}</a>{% endif %}{% if k.email and k.mobil %} · {% endif %}{{ k.mobil }}{% if k.beruf %} · {{ k.beruf }}{% endif %}</small>
+        {% if k.person %}<small class="leise blockzeile">{% translate "übernommen" %}</small>{% endif %}
+      </div>
+      {% empty %}<p class="leer">{% translate "Keine Kontakte erfasst." %}</p>{% endfor %}
+    </section>
+
+    {# ------------------------------------------------ Verlauf #}
+    <section class="karte">
+      <h2>{% translate "Verlauf" %}</h2>
+      <ul class="an-verlauf">
+      {% for h in historie %}
+        <li><span class="nowrap leise">{{ h.datum|date:"SHORT_DATETIME_FORMAT" }}</span>
+          <span>{{ h.text }}{% if h.wer %} <span class="leise">· {{ h.wer }}</span>{% endif %}</span></li>
+      {% empty %}<li class="leer">–</li>
+      {% endfor %}
+      </ul>
+      <p class="hinweistext">{% blocktranslate with datum=a.erstellt|date:"SHORT_DATE_FORMAT" %}Erfasst am {{ datum }}.{% endblocktranslate %}</p>
+      {% if darf.loeschen %}
+      <form method="post" action="{% url 'anmeldung_loeschen' a.pk %}" onsubmit="return confirm('{% translate "Anmeldung mit allen Unterlagen endgültig löschen?" as frage %}{{ frage|escapejs }}')">
+        {% csrf_token %}<button type="submit" class="link gefahr">{% translate "Anmeldung löschen" %}</button></form>
+      {% endif %}
+    </section>
+  </div>
+</div>
+<script src="{% static 'aufnahme.js' %}" defer></script>
+{% endblock %}

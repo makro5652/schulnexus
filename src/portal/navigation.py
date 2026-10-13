@@ -85,15 +85,30 @@ def menueband(request):
     for st in stufen_fuer(user):
         stufen.add(str(st["name"]), st["url"], "treppe", gross=True,
                    hinweis=_("%(name)s, Jahrgänge %(von)s bis %(bis)s") % {"name": st["name"], "von": st["von"], "bis": st["bis"]})
+    from aufnahme.rechte import darf_aufnahme
+
+    aufnahme = darf_aufnahme(user)
+    neuanmeldung = (
+        Gruppe(_("Neuanmeldung"))
+        .add(_("Neuanmeldungen"), _url("anmeldungen"), "tuer", gross=True, bedingung=aufnahme,
+             hinweis=_("Bewerbungen mit Unterlagen, Checkliste und vorläufiger Klasse"))
+        .add(_("Neue Anmeldung"), _url("anmeldung_neu"), "plus", bedingung=aufnahme and p("aufnahme.add_anmeldung"))
+        .add(_("Zugesagt"), _url("anmeldungen", query="?status=zugesagt"), "haken", bedingung=aufnahme,
+             hinweis=_("Zugesagte Anmeldungen, Übernahme offen"))
+        .add(_("Checklisten-Vorlagen"), _url("admin:aufnahme_checklistenvorlage_changelist"), "liste",
+             bedingung=aufnahme and admin and p("aufnahme.change_checklistenvorlage"))
+    )
     schueler = _karte(
         "schueler", _("Schüler:innen"),
         meine_klassen,
         stufen,
+        neuanmeldung,
         Gruppe(_("Schülerakten"))
         .add(_("Alle Schüler:innen"), _url("admin:stammdaten_schuelerprofil_changelist"), "personen", gross=True,
              bedingung=alle_sehen and p("stammdaten.view_schuelerprofil"))
-        .add(_("Aufnehmen"), _url("admin:stammdaten_schuelerprofil_add"), "person_plus",
-             bedingung=verwaltung and p("stammdaten.add_schuelerprofil"))
+        .add(_("Direkt anlegen"), _url("admin:stammdaten_schuelerprofil_add"), "plus",
+             bedingung=verwaltung and p("stammdaten.add_schuelerprofil"),
+             hinweis=_("Schüler:in ohne Anmeldeverfahren direkt anlegen"))
         .add(_("Eltern und Kontakte"), _url("admin:stammdaten_person_changelist", query="?rolle=eltern"), "personen",
              bedingung=verwaltung and p("stammdaten.view_person"))
         .add(_("Anhänge"), _url("admin:stammdaten_dokument_changelist"), "klammer", bedingung=p("stammdaten.view_dokument")),
@@ -244,7 +259,7 @@ def menueband(request):
     return {"karten": karten, "aktiv": aktiv, "rollen": rollen}
 
 
-PFAD_REGELN = [("/klassen/", "schueler"), ("/schueler/", "schueler"), ("/stufe/", "schueler"), ("/zuordnung/", "schueler"),
+PFAD_REGELN = [("/klassen/", "schueler"), ("/schueler/", "schueler"), ("/stufe/", "schueler"), ("/zuordnung/", "schueler"), ("/aufnahme/", "schueler"),
                ("/noten/", "unterricht"),
                ("/rollen/", "verwaltung"),
                ("/foerderung/", "foerderung"), ("/verwaltung/", "verwaltung")]

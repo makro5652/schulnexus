@@ -9,6 +9,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.db.models import Q
 
+from aufnahme.models import ChecklistenVorlage, VorlagenPunkt
 from foerderung.models import Ausgleichsmassnahme, Foerderschwerpunkt
 from noten.models import Notenskala, Notenstufe
 from portal import rollen as R
@@ -111,6 +112,38 @@ AUSGLEICHSMASSNAHMEN = [
     ("Stärkere Gewichtung mündlicher Leistungen", "Greater weighting of oral work", True),
 ]
 
+# Neuanmeldung: Checklisten-Vorlagen (Beispiele, in der Verwaltung frei änderbar; Punkte nur beim ersten Anlegen).
+# (Name, Name englisch, Beschreibung, ab Jg., bis Jg., immer vorschlagen, [(Punkt, englisch, zuständig, Pflicht)])
+CHECKLISTEN = [
+    ("Standard", "Standard", "Grundausstattung jeder Anmeldung", None, None, True, [
+        ("Anmeldeformular vollständig und unterschrieben", "Application form complete and signed", "sekretariat", True),
+        ("Pass oder Geburtsurkunde des Kindes (Kopie)", "Child's passport or birth certificate (copy)", "sekretariat", True),
+        ("Letzte zwei Zeugnisse liegen vor", "Last two school reports received", "sekretariat", True),
+        ("Impfnachweis liegt vor", "Immunisation record received", "sekretariat", True),
+        ("Aufnahmegespräch geführt", "Admission interview held", "koordination", True),
+        ("Einstufung und Klasse festgelegt", "Placement and class decided", "koordination", True),
+        ("Aufnahmeentscheidung der Schulleitung", "Admission decision by the head of school", "schulleitung", True),
+        ("Schulvertrag unterschrieben zurück", "Signed school contract returned", "finanzen", True),
+        ("Aufnahmegebühr bzw. Kaution eingegangen", "Admission fee or deposit received", "finanzen", True),
+        ("Rechnungsempfänger:in geklärt", "Invoice recipient confirmed", "finanzen", True),
+        ("Einwilligungen (Fotos, Datenverarbeitung) erhalten", "Consent forms (photos, data processing) received", "sekretariat", False),
+        ("Begrüßungsunterlagen versandt", "Welcome pack sent", "sekretariat", False),
+    ]),
+    ("Mittelstufe", "Lower secondary", "Zusätzlich für die Jahrgänge 5 bis 10", 5, 10, False, [
+        ("Bildungsgang (Haupt-, Realschule, Gymnasium) zugeordnet", "Track (Hauptschule, Realschule, Gymnasium) assigned", "koordination", True),
+        ("Fremdsprachenfolge geklärt", "Foreign language sequence clarified", "koordination", False),
+    ]),
+    ("Oberstufe", "Upper secondary", "Zusätzlich für die Jahrgänge 11 und 12", 11, 12, False, [
+        ("Anerkennung der bisherigen Abschlüsse geprüft", "Recognition of previous qualifications checked", "koordination", True),
+        ("Kurswahl festgelegt", "Course choices confirmed", "koordination", True),
+        ("Beratung zu den Abiturbedingungen dokumentiert", "Counselling on Abitur requirements documented", "koordination", False),
+    ]),
+    ("Geringe Deutschkenntnisse", "Limited German", "Quereinstieg mit DaZ-/DaF-Bedarf", None, None, False, [
+        ("Sprachstandsfeststellung Deutsch durchgeführt", "German language assessment carried out", "koordination", True),
+        ("DaZ-/DaF-Förderung eingeplant", "German support (DaZ/DaF) scheduled", "koordination", True),
+    ]),
+]
+
 # Rollen und ihre Standardrechte stehen in portal/rollen.py.
 
 
@@ -208,3 +241,14 @@ class Command(BaseCommand):
                 name=name, defaults={"notenschutz": notenschutz, "reihenfolge": (i + 1) * 10})
             englisch_ergaenzen(obj, name_en=name_en)
         self.stdout.write(self.style.SUCCESS("Förderschwerpunkte und Ausgleichsmaßnahmen eingerichtet."))
+
+        for i, (name, name_en, beschreibung, von, bis, standard, punkte) in enumerate(CHECKLISTEN):
+            vorlage, neu = ChecklistenVorlage.objects.get_or_create(name=name, defaults={
+                "beschreibung": beschreibung, "jahrgang_von": von, "jahrgang_bis": bis, "standard": standard,
+                "reihenfolge": (i + 1) * 10})
+            englisch_ergaenzen(vorlage, name_en=name_en)
+            if neu:
+                VorlagenPunkt.objects.bulk_create([
+                    VorlagenPunkt(vorlage=vorlage, text=t, text_en=t_en, zustaendig=z, pflicht=pf, reihenfolge=(j + 1) * 10)
+                    for j, (t, t_en, z, pf) in enumerate(punkte)])
+        self.stdout.write(self.style.SUCCESS("Checklisten-Vorlagen für Neuanmeldungen eingerichtet."))

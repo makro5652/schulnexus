@@ -1,0 +1,2 @@
+{% if f.widget_type == "checkbox" %}<label class="an-feld an-haken{% if breit %} breit{% endif %}">{{ f }} <span>{{ f.label }}</span>{% for e in f.errors %}<small class="fehler">{{ e }}</small>{% endfor %}</label>
+{% else %}<label class="an-feld{% if breit %} breit{% endif %}"><span>{{ f.label }}{% if f.field.required and not f.field.disabled %} *{% endif %}</span>{{ f }}{% if f.help_text %}<small class="leise">{{ f.help_text }}</small>{% endif %}{% for e in f.errors %}<small class="fehler">{{ e }}</small>{% endfor %}</label>{% endif %}
