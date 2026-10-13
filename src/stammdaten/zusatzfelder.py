@@ -7,6 +7,7 @@ from collections import OrderedDict
 
 from django import forms
 from django.contrib.admin.widgets import AdminDateWidget
+from django.utils.translation import gettext
 
 from portal.rechte import ist_personalverwaltung, ist_verwaltung
 
@@ -28,7 +29,7 @@ def sichtbare_felder(user, zielgruppe):
 
 
 def formfeld(feld: Zusatzfeld):
-    gemeinsam = {"label": feld.name, "required": feld.pflicht, "help_text": feld.hilfetext}
+    gemeinsam = {"label": feld.lokal_name, "required": feld.pflicht, "help_text": feld.lokal_hilfetext}
     if feld.typ == "langtext":
         return forms.CharField(widget=forms.Textarea(attrs={"rows": 3, "cols": 60}), **gemeinsam)
     if feld.typ == "zahl":
@@ -39,10 +40,10 @@ def formfeld(feld: Zusatzfeld):
         gemeinsam["required"] = False  # Pflicht wird in clean() geprüft (Ja/Nein muss gewählt sein)
         return forms.NullBooleanField(widget=forms.NullBooleanSelect, **gemeinsam)
     if feld.typ == "auswahl":
-        return forms.ChoiceField(choices=[("", "—")] + [(o, o) for o in feld.optionsliste], **gemeinsam)
+        return forms.ChoiceField(choices=[("", "—")] + feld.optionen_anzeige, **gemeinsam)
     if feld.typ == "mehrfach":
         return forms.MultipleChoiceField(
-            choices=[(o, o) for o in feld.optionsliste], widget=forms.CheckboxSelectMultiple, **gemeinsam
+            choices=feld.optionen_anzeige, widget=forms.CheckboxSelectMultiple, **gemeinsam
         )
     return forms.CharField(max_length=255, widget=forms.TextInput(attrs={"size": 40}), **gemeinsam)
 
@@ -67,7 +68,7 @@ class ZusatzfelderFormMixin:
                 continue
             wert = cleaned.get(f.formularname)
             if f.typ == "janein" and f.pflicht and wert is None:
-                self.add_error(f.formularname, "Bitte Ja oder Nein wählen.")
+                self.add_error(f.formularname, gettext("Bitte Ja oder Nein wählen."))
             gespeichert = f.in_speicher(wert)
             if gespeichert is None:
                 daten.pop(f.schluessel, None)
@@ -86,8 +87,8 @@ def zusatzform(basis, definitionen):
 def zusatz_fieldsets(definitionen):
     abschnitte = OrderedDict()
     for f in sorted(definitionen, key=lambda f: (f.abschnitt or "", f.reihenfolge, f.name)):
-        abschnitte.setdefault(f.abschnitt or "Weitere Angaben", []).append(f.formularname)
-    return [(f"Zusatzfelder – {titel}", {"fields": felder}) for titel, felder in abschnitte.items()]
+        abschnitte.setdefault(f.lokal_abschnitt or gettext("Weitere Angaben"), []).append(f.formularname)
+    return [(gettext("Zusatzfelder – %(abschnitt)s") % {"abschnitt": titel}, {"fields": felder}) for titel, felder in abschnitte.items()]
 
 
 class ZusatzfelderAdminMixin:
@@ -115,7 +116,7 @@ class ZusatzfelderAdminMixin:
             if f.in_liste:
                 def spalte(obj, f=f):
                     return f.anzeigewert((obj.zusatzfelder or {}).get(f.schluessel))
-                spalte.short_description = f.name
+                spalte.short_description = f.lokal_name
                 spalte.__name__ = f.formularname
                 spalten.append(spalte)
         return spalten
@@ -135,5 +136,6 @@ def anzeige(user, obj, zielgruppe):
     daten = getattr(obj, "zusatzfelder", None) or {}
     abschnitte = OrderedDict()
     for f in sorted(sichtbare_felder(user, zielgruppe), key=lambda f: (f.abschnitt or "", f.reihenfolge, f.name)):
-        abschnitte.setdefault(f.abschnitt or "Weitere Angaben", []).append((f.name, f.anzeigewert(daten.get(f.schluessel))))
+        abschnitte.setdefault(f.lokal_abschnitt or gettext("Weitere Angaben"), []).append(
+            (f.lokal_name, f.anzeigewert(daten.get(f.schluessel))))
     return list(abschnitte.items())

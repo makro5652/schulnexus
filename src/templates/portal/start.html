@@ -1,52 +1,53 @@
 {% extends "portal/base.html" %}
-{% block title %}Start{% endblock %}
+{% load i18n formate %}
+{% block title %}{% translate "Start" %}{% endblock %}
 {% block inhalt %}
-<h1>Guten Tag, {{ user.person.anzeigename|default:user.username }}</h1>
+<h1>{% blocktranslate with name=user.person.anzeigename|default:user.username %}Guten Tag, {{ name }}{% endblocktranslate %}</h1>
 
 {% if kennzahlen %}
-<section class="kennzahlen" aria-label="Kennzahlen">
-  <div><strong>{{ kennzahlen.schueler }}</strong><span>Schüler:innen aktiv</span></div>
-  <div><strong>{{ kennzahlen.klassen }}</strong><span>Stammklassen</span></div>
-  <div><strong>{{ kennzahlen.lerngruppen }}</strong><span>Lerngruppen</span></div>
-  <div><strong>{{ kennzahlen.ags }}</strong><span>AG-Angebote</span></div>
-  <div><strong>{{ kennzahlen.fehlzeiten_heute }}</strong><span>Fehlzeiten heute</span></div>
-  <div class="{% if kennzahlen.offene_entschuldigungen %}hinweis{% endif %}"><strong>{{ kennzahlen.offene_entschuldigungen }}</strong><span>offene Entschuldigungen</span></div>
+<section class="kennzahlen" aria-label="{% translate 'Kennzahlen' %}">
+  <div><strong>{{ kennzahlen.schueler }}</strong><span>{% translate "Schüler:innen aktiv" %}</span></div>
+  <div><strong>{{ kennzahlen.klassen }}</strong><span>{% translate "Stammklassen" %}</span></div>
+  <div><strong>{{ kennzahlen.lerngruppen }}</strong><span>{% translate "Lerngruppen" %}</span></div>
+  <div><strong>{{ kennzahlen.ags }}</strong><span>{% translate "AG-Angebote" %}</span></div>
+  <div><strong>{{ kennzahlen.fehlzeiten_heute }}</strong><span>{% translate "Fehlzeiten heute" %}</span></div>
+  <div class="{% if kennzahlen.offene_entschuldigungen %}hinweis{% endif %}"><strong>{{ kennzahlen.offene_entschuldigungen }}</strong><span>{% translate "offene Entschuldigungen" %}</span></div>
 </section>
 {% endif %}
 
 {% if hr %}
 <section class="karte hr">
   <div class="karte-kopf">
-    <h2>Personal · {{ hr.aktiv }} aktive Beschäftigte</h2>
-    <a class="knopf zweitrangig" href="{% url 'admin:stammdaten_personalprofil_changelist' %}">Personalliste</a>
+    <h2>{% blocktranslate with n=hr.aktiv %}Personal · {{ n }} aktive Beschäftigte{% endblocktranslate %}</h2>
+    <a class="knopf zweitrangig" href="{% url 'admin:stammdaten_personalprofil_changelist' %}">{% translate "Personalliste" %}</a>
   </div>
-  <p class="bereiche">{% for b in hr.bereiche %}<a class="etikett" href="{% url 'admin:stammdaten_personalprofil_changelist' %}?bereich__id__exact={{ b.pk }}">{{ b.name }} {{ b.anzahl }}</a>{% endfor %}</p>
+  <p class="bereiche">{% for b in hr.bereiche %}<a class="etikett" href="{% url 'admin:stammdaten_personalprofil_changelist' %}?bereich__id__exact={{ b.pk }}">{{ b.lokal_name }} {{ b.anzahl }}</a>{% endfor %}</p>
   <div class="spalten drei">
     <div>
-      <h3>Nachweise mit Handlungsbedarf ({{ hr.offen|length }})</h3>
+      <h3>{% blocktranslate with n=hr.offen|length %}Nachweise mit Handlungsbedarf ({{ n }}){% endblocktranslate %}</h3>
       {% if hr.offen %}
       <table class="liste kompakt">
         <tbody>
         {% for e in hr.offen|slice:":12" %}
           <tr>
-            <td><a href="{% url 'admin:stammdaten_personalprofil_change' e.personal.pk %}">{{ e.personal.person.anzeigename }}</a><br><span class="leise">{{ e.personal.bereich.name|default:"" }}</span></td>
-            <td>{{ e.art.name }}</td>
-            <td class="{% if e.status != 'laeuft_ab' %}auffaellig{% endif %}">{% if e.status == "fehlt" %}fehlt{% elif e.status == "abgelaufen" %}abgelaufen {{ e.nachweis.gueltig_bis|date:"d.m.Y" }}{% else %}bis {{ e.nachweis.gueltig_bis|date:"d.m.Y" }}{% endif %}</td>
+            <td><a href="{% url 'admin:stammdaten_personalprofil_change' e.personal.pk %}">{{ e.personal.person.anzeigename }}</a><br><span class="leise">{{ e.personal.bereich.lokal_name|default:"" }}</span></td>
+            <td>{{ e.art.lokal_name }}</td>
+            <td class="{% if e.status != 'laeuft_ab' %}auffaellig{% endif %}">{% if e.status == "fehlt" %}{% translate "fehlt" %}{% elif e.status == "abgelaufen" %}{% blocktranslate with datum=e.nachweis.gueltig_bis|kurzdatum %}abgelaufen {{ datum }}{% endblocktranslate %}{% else %}{% blocktranslate with datum=e.nachweis.gueltig_bis|kurzdatum %}bis {{ datum }}{% endblocktranslate %}{% endif %}</td>
           </tr>
         {% endfor %}
         </tbody>
       </table>
-      {% if hr.offen|length > 12 %}<p><a href="{% url 'admin:stammdaten_personalprofil_changelist' %}?nachweise=offen">alle {{ hr.offen|length }} anzeigen</a></p>{% endif %}
-      {% else %}<p class="leer">Alle Pflichtnachweise sind vorhanden und gültig.</p>{% endif %}
+      {% if hr.offen|length > 12 %}<p><a href="{% url 'admin:stammdaten_personalprofil_changelist' %}?nachweise=offen">{% blocktranslate with n=hr.offen|length %}alle {{ n }} anzeigen{% endblocktranslate %}</a></p>{% endif %}
+      {% else %}<p class="leer">{% translate "Alle Pflichtnachweise sind vorhanden und gültig." %}</p>{% endif %}
     </div>
     <div>
-      <h3>Heute abwesend</h3>
-      {% for a in hr.abwesend %}<p>{{ a.personal.person.anzeigename }} <span class="leise">· {{ a.get_art_display }} bis {{ a.bis|date:"d.m." }}</span></p>{% empty %}<p class="leer">Niemand.</p>{% endfor %}
-      {% if hr.beantragt %}<p><a href="{% url 'admin:stammdaten_personalabwesenheit_changelist' %}?status__exact=beantragt">Offene Abwesenheitsanträge: {{ hr.beantragt }}</a></p>{% endif %}
+      <h3>{% translate "Heute abwesend" %}</h3>
+      {% for a in hr.abwesend %}<p>{{ a.personal.person.anzeigename }} <span class="leise">· {% blocktranslate with art=a.get_art_display datum=a.bis|tagmonat %}{{ art }} bis {{ datum }}{% endblocktranslate %}</span></p>{% empty %}<p class="leer">{% translate "Niemand." %}</p>{% endfor %}
+      {% if hr.beantragt %}<p><a href="{% url 'admin:stammdaten_personalabwesenheit_changelist' %}?status__exact=beantragt">{% blocktranslate with n=hr.beantragt %}Offene Abwesenheitsanträge: {{ n }}{% endblocktranslate %}</a></p>{% endif %}
     </div>
     <div>
-      <h3>Vertragsenden (6 Monate)</h3>
-      {% for p in hr.vertragsende %}<p>{{ p.person.anzeigename }} <span class="leise">· {{ p.vertragsende|date:"d.m.Y" }}</span></p>{% empty %}<p class="leer">Keine.</p>{% endfor %}
+      <h3>{% translate "Vertragsenden (6 Monate)" %}</h3>
+      {% for p in hr.vertragsende %}<p>{{ p.person.anzeigename }} <span class="leise">· {{ p.vertragsende|kurzdatum }}</span></p>{% empty %}<p class="leer">{% translate "Keine." %}</p>{% endfor %}
     </div>
   </div>
 </section>
@@ -54,31 +55,31 @@
 
 <div class="spalten">
   <section class="karte">
-    <h2>{% if ist_verwaltung %}Unterrichte im Schuljahr{% else %}Meine Unterrichte{% endif %}</h2>
+    <h2>{% if ist_verwaltung %}{% translate "Unterrichte im Schuljahr" %}{% else %}{% translate "Meine Unterrichte" %}{% endif %}</h2>
     {% if unterrichte %}
     <table class="liste">
-      <thead><tr><th>Fach</th><th>Gruppe</th><th>Halbjahr</th>{% if ist_verwaltung %}<th>Lehrkraft</th>{% endif %}<th></th></tr></thead>
+      <thead><tr><th>{% translate "Fach" %}</th><th>{% translate "Gruppe" %}</th><th>{% translate "Halbjahr" %}</th>{% if ist_verwaltung %}<th>{% translate "Lehrkraft" %}</th>{% endif %}<th></th></tr></thead>
       <tbody>
       {% for u in unterrichte %}
         <tr>
-          <td>{{ u.fach.name }}</td><td>{{ u.gruppe.name }}</td><td>{{ u.abschnitt.name }}</td>
+          <td>{{ u.fach.lokal_name }}</td><td>{{ u.gruppe.name }}</td><td>{{ u.abschnitt.lokal_name }}</td>
           {% if ist_verwaltung %}<td>{{ u.lehrkraft.kuerzel }}</td>{% endif %}
-          <td><a href="{% url 'notenuebersicht' u.pk %}">Noten</a></td>
+          <td><a href="{% url 'notenuebersicht' u.pk %}">{% translate "Noten" %}</a></td>
         </tr>
       {% endfor %}
       </tbody>
     </table>
-    {% else %}<p class="leer">Keine Unterrichte zugeordnet.</p>{% endif %}
+    {% else %}<p class="leer">{% translate "Keine Unterrichte zugeordnet." %}</p>{% endif %}
   </section>
 
   <section class="karte">
-    <h2>Meine Klassen und Gruppen</h2>
+    <h2>{% translate "Meine Klassen und Gruppen" %}</h2>
     {% if klassen %}
     <ul class="kacheln">
-      {% for k in klassen %}<li><a href="{% url 'klassenliste' k.gruppe.pk %}"><strong>{{ k.gruppe.name }}</strong><span>{{ k.anzahl }} Schüler:innen</span></a></li>{% endfor %}
+      {% for k in klassen %}<li><a href="{% url 'klassenliste' k.gruppe.pk %}"><strong>{{ k.gruppe.name }}</strong><span>{% blocktranslate count n=k.anzahl %}{{ n }} Schüler:in{% plural %}{{ n }} Schüler:innen{% endblocktranslate %}</span></a></li>{% endfor %}
     </ul>
-    {% else %}<p class="leer">Keine Klassenleitung.</p>{% endif %}
-    {% if user.is_staff %}<p><a class="knopf zweitrangig" href="{% url 'admin:index' %}">Zur Verwaltungsoberfläche</a></p>{% endif %}
+    {% else %}<p class="leer">{% translate "Keine Klassenleitung." %}</p>{% endif %}
+    {% if user.is_staff %}<p><a class="knopf zweitrangig" href="{% url 'admin:index' %}">{% translate "Zur Verwaltungsoberfläche" %}</a></p>{% endif %}
   </section>
 </div>
 {% endblock %}

@@ -16,30 +16,30 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Q
+from django.utils.translation import gettext, gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
+from stammdaten.sprache import LokalerNameMixin
 from stammdaten.models import Abschnitt, Fach, Gruppe, Personalprofil, Schuelerprofil
 
 
-class Notenskala(models.Model):
-    name = models.CharField("Bezeichnung", max_length=60, unique=True)
-    beschreibung = models.TextField("Beschreibung", blank=True)
+class Notenskala(LokalerNameMixin, models.Model):
+    name = models.CharField(_("Bezeichnung"), max_length=60, unique=True)
+    name_en = models.CharField(_("Bezeichnung (Englisch)"), max_length=60, blank=True)
+    beschreibung = models.TextField(_("Beschreibung"), blank=True)
     hoeher_ist_besser = models.BooleanField(
-        "Höherer Wert ist besser", default=False,
-        help_text="Aus bei Noten 1–6 (1 ist am besten), an bei Punkten 0–15.",
+        _("Höherer Wert ist besser"), default=False,
+        help_text=_("Aus bei Noten 1–6 (1 ist am besten), an bei Punkten 0–15."),
     )
-    nachkommastellen = models.PositiveSmallIntegerField("Nachkommastellen im Schnitt", default=2)
+    nachkommastellen = models.PositiveSmallIntegerField(_("Nachkommastellen im Schnitt"), default=2)
     gefaehrdung_ab = models.DecimalField(
-        "Gefährdung ab Wert", max_digits=5, decimal_places=2, null=True, blank=True,
-        help_text="Ab diesem Durchschnitt wird eine Gefährdung markiert, z. B. 4,50 (Sek I) oder 4,49 Punkte (Sek II).",
+        _("Gefährdung ab Wert"), max_digits=5, decimal_places=2, null=True, blank=True,
+        help_text=_("Ab diesem Durchschnitt wird eine Gefährdung markiert, z. B. 4,50 (Sek I) oder 4,49 Punkte (Sek II)."),
     )
 
     class Meta:
-        verbose_name = "Notenskala"
-        verbose_name_plural = "Notenskalen"
-
-    def __str__(self):
-        return self.name
+        verbose_name = _("Notenskala")
+        verbose_name_plural = _("Notenskalen")
 
     def runden(self, wert: Decimal) -> Decimal:
         quant = Decimal(1).scaleb(-self.nachkommastellen)
@@ -59,14 +59,14 @@ class Notenskala(models.Model):
 
 
 class Notenstufe(models.Model):
-    skala = models.ForeignKey(Notenskala, on_delete=models.CASCADE, related_name="stufen", verbose_name="Skala")
-    bezeichnung = models.CharField("Anzeige", max_length=10, help_text="z. B. 2+ oder 11")
-    wert = models.DecimalField("Interner Wert", max_digits=5, decimal_places=2, help_text="z. B. 1,70 für 2+")
-    reihenfolge = models.PositiveSmallIntegerField("Reihenfolge", default=0)
+    skala = models.ForeignKey(Notenskala, on_delete=models.CASCADE, related_name="stufen", verbose_name=_("Skala"))
+    bezeichnung = models.CharField(_("Anzeige"), max_length=10, help_text=_("z. B. 2+ oder 11"))
+    wert = models.DecimalField(_("Interner Wert"), max_digits=5, decimal_places=2, help_text=_("z. B. 1,70 für 2+"))
+    reihenfolge = models.PositiveSmallIntegerField(_("Reihenfolge"), default=0)
 
     class Meta:
-        verbose_name = "Notenstufe"
-        verbose_name_plural = "Notenstufen"
+        verbose_name = _("Notenstufe")
+        verbose_name_plural = _("Notenstufen")
         ordering = ["skala", "reihenfolge"]
         unique_together = [("skala", "bezeichnung")]
 
@@ -75,13 +75,13 @@ class Notenstufe(models.Model):
 
 
 class Notenschluessel(models.Model):
-    name = models.CharField("Bezeichnung", max_length=80, unique=True)
-    skala = models.ForeignKey(Notenskala, on_delete=models.PROTECT, verbose_name="Skala")
-    beschreibung = models.TextField("Beschreibung", blank=True)
+    name = models.CharField(_("Bezeichnung"), max_length=80, unique=True)
+    skala = models.ForeignKey(Notenskala, on_delete=models.PROTECT, verbose_name=_("Skala"))
+    beschreibung = models.TextField(_("Beschreibung"), blank=True)
 
     class Meta:
-        verbose_name = "Notenschlüssel"
-        verbose_name_plural = "Notenschlüssel"
+        verbose_name = _("Notenschlüssel")
+        verbose_name_plural = _("Notenschlüssel")
 
     def __str__(self):
         return self.name
@@ -93,34 +93,34 @@ class Notenschluessel(models.Model):
 
 
 class Schluesselschwelle(models.Model):
-    schluessel = models.ForeignKey(Notenschluessel, on_delete=models.CASCADE, related_name="schwellen", verbose_name="Schlüssel")
+    schluessel = models.ForeignKey(Notenschluessel, on_delete=models.CASCADE, related_name="schwellen", verbose_name=_("Schlüssel"))
     min_prozent = models.DecimalField(
-        "ab Prozent", max_digits=5, decimal_places=2,
+        _("ab Prozent"), max_digits=5, decimal_places=2,
         validators=[MinValueValidator(0), MaxValueValidator(100)],
     )
-    stufe = models.ForeignKey(Notenstufe, on_delete=models.PROTECT, verbose_name="Notenstufe")
+    stufe = models.ForeignKey(Notenstufe, on_delete=models.PROTECT, verbose_name=_("Notenstufe"))
 
     class Meta:
-        verbose_name = "Schwelle"
-        verbose_name_plural = "Schwellen"
+        verbose_name = _("Schwelle")
+        verbose_name_plural = _("Schwellen")
         ordering = ["schluessel", "-min_prozent"]
         unique_together = [("schluessel", "min_prozent")]
 
     def __str__(self):
-        return f"ab {self.min_prozent} % → {self.stufe}"
+        return gettext("ab %(prozent)s %% → %(stufe)s") % {"prozent": self.min_prozent, "stufe": self.stufe}
 
     def clean(self):
         if self.stufe_id and self.schluessel_id and self.stufe.skala_id != self.schluessel.skala_id:
-            raise ValidationError("Die Notenstufe gehört nicht zur Skala dieses Schlüssels.")
+            raise ValidationError(_("Die Notenstufe gehört nicht zur Skala dieses Schlüssels."))
 
 
 class Gewichtungsvorlage(models.Model):
-    name = models.CharField("Bezeichnung", max_length=80, unique=True, help_text="z. B. Naturwissenschaften Sek I")
-    beschreibung = models.TextField("Beschreibung / Fachschaftsbeschluss", blank=True)
+    name = models.CharField(_("Bezeichnung"), max_length=80, unique=True, help_text=_("z. B. Naturwissenschaften Sek I"))
+    beschreibung = models.TextField(_("Beschreibung / Fachschaftsbeschluss"), blank=True)
 
     class Meta:
-        verbose_name = "Gewichtungsvorlage"
-        verbose_name_plural = "Gewichtungsvorlagen"
+        verbose_name = _("Gewichtungsvorlage")
+        verbose_name_plural = _("Gewichtungsvorlagen")
 
     def __str__(self):
         summe = sum(k.anteil for k in self.kategorien.all())
@@ -131,15 +131,15 @@ class Gewichtungsvorlage(models.Model):
 
 
 class Leistungskategorie(models.Model):
-    vorlage = models.ForeignKey(Gewichtungsvorlage, on_delete=models.CASCADE, related_name="kategorien", verbose_name="Vorlage")
-    name = models.CharField("Kategorie", max_length=60, help_text="z. B. Schriftlich, Sonstige Leistungen")
+    vorlage = models.ForeignKey(Gewichtungsvorlage, on_delete=models.CASCADE, related_name="kategorien", verbose_name=_("Vorlage"))
+    name = models.CharField(_("Kategorie"), max_length=60, help_text=_("z. B. Schriftlich, Sonstige Leistungen"))
     anteil = models.DecimalField(
-        "Anteil in %", max_digits=5, decimal_places=2, validators=[MinValueValidator(0), MaxValueValidator(100)]
+        _("Anteil in %"), max_digits=5, decimal_places=2, validators=[MinValueValidator(0), MaxValueValidator(100)]
     )
 
     class Meta:
-        verbose_name = "Leistungskategorie"
-        verbose_name_plural = "Leistungskategorien"
+        verbose_name = _("Leistungskategorie")
+        verbose_name_plural = _("Leistungskategorien")
         ordering = ["vorlage", "-anteil", "name"]
         unique_together = [("vorlage", "name")]
 
@@ -148,19 +148,19 @@ class Leistungskategorie(models.Model):
 
 
 class Unterricht(models.Model):
-    abschnitt = models.ForeignKey(Abschnitt, on_delete=models.PROTECT, related_name="unterrichte", verbose_name="Halbjahr")
-    gruppe = models.ForeignKey(Gruppe, on_delete=models.PROTECT, related_name="unterrichte", verbose_name="Gruppe / Klasse")
-    fach = models.ForeignKey(Fach, on_delete=models.PROTECT, related_name="unterrichte", verbose_name="Fach")
-    lehrkraft = models.ForeignKey(Personalprofil, on_delete=models.PROTECT, related_name="unterrichte", verbose_name="Lehrkraft")
-    skala = models.ForeignKey(Notenskala, on_delete=models.PROTECT, verbose_name="Notenskala")
+    abschnitt = models.ForeignKey(Abschnitt, on_delete=models.PROTECT, related_name="unterrichte", verbose_name=_("Halbjahr"))
+    gruppe = models.ForeignKey(Gruppe, on_delete=models.PROTECT, related_name="unterrichte", verbose_name=_("Gruppe / Klasse"))
+    fach = models.ForeignKey(Fach, on_delete=models.PROTECT, related_name="unterrichte", verbose_name=_("Fach"))
+    lehrkraft = models.ForeignKey(Personalprofil, on_delete=models.PROTECT, related_name="unterrichte", verbose_name=_("Lehrkraft"))
+    skala = models.ForeignKey(Notenskala, on_delete=models.PROTECT, verbose_name=_("Notenskala"))
     gewichtung = models.ForeignKey(
-        Gewichtungsvorlage, null=True, blank=True, on_delete=models.PROTECT, verbose_name="Startvorlage für Bewertungsordner",
-        help_text="Beim Anlegen werden daraus die obersten Ordner erzeugt. Danach sind die Ordner frei änderbar.",
+        Gewichtungsvorlage, null=True, blank=True, on_delete=models.PROTECT, verbose_name=_("Startvorlage für Bewertungsordner"),
+        help_text=_("Beim Anlegen werden daraus die obersten Ordner erzeugt. Danach sind die Ordner frei änderbar."),
     )
 
     class Meta:
-        verbose_name = "Unterricht"
-        verbose_name_plural = "Unterrichte"
+        verbose_name = _("Unterricht")
+        verbose_name_plural = _("Unterrichte")
         ordering = ["abschnitt", "gruppe__name", "fach__reihenfolge"]
         unique_together = [("abschnitt", "gruppe", "fach")]
 
@@ -207,24 +207,24 @@ class Bewertungsordner(models.Model):
 
     MAX_TIEFE = 5
 
-    unterricht = models.ForeignKey(Unterricht, on_delete=models.CASCADE, related_name="bewertungsordner", verbose_name="Unterricht")
+    unterricht = models.ForeignKey(Unterricht, on_delete=models.CASCADE, related_name="bewertungsordner", verbose_name=_("Unterricht"))
     eltern = models.ForeignKey(
         "self", null=True, blank=True, on_delete=models.CASCADE, related_name="unterordner",
-        verbose_name="Übergeordneter Ordner", help_text="leer = oberste Ebene",
+        verbose_name=_("Übergeordneter Ordner"), help_text=_("leer = oberste Ebene"),
     )
-    name = models.CharField("Name", max_length=80, help_text="z. B. Sonstige Mitarbeit oder Quartal 1")
+    name = models.CharField(_("Name"), max_length=80, help_text=_("z. B. Sonstige Mitarbeit oder Quartal 1"))
     gewicht = models.DecimalField(
-        "Gewicht", max_digits=6, decimal_places=2, default=Decimal("1"),
+        _("Gewicht"), max_digits=6, decimal_places=2, default=Decimal("1"),
         validators=[MinValueValidator(Decimal("0"))],
-        help_text="Relativ zu den anderen Einträgen derselben Ebene, z. B. 50 / 50 oder 2 / 1.",
+        help_text=_("Relativ zu den anderen Einträgen derselben Ebene, z. B. 50 / 50 oder 2 / 1."),
     )
-    reihenfolge = models.PositiveSmallIntegerField("Reihenfolge", default=10)
-    beschreibung = models.CharField("Beschreibung", max_length=200, blank=True)
-    history = HistoricalRecords(verbose_name="Änderungsprotokoll Bewertungsordner")
+    reihenfolge = models.PositiveSmallIntegerField(_("Reihenfolge"), default=10)
+    beschreibung = models.CharField(_("Beschreibung"), max_length=200, blank=True)
+    history = HistoricalRecords(verbose_name=_("Änderungsprotokoll Bewertungsordner"))
 
     class Meta:
-        verbose_name = "Bewertungsordner"
-        verbose_name_plural = "Bewertungsordner"
+        verbose_name = _("Bewertungsordner")
+        verbose_name_plural = _("Bewertungsordner")
         ordering = ["unterricht", "reihenfolge", "name"]
         constraints = [
             models.UniqueConstraint(fields=["unterricht", "eltern", "name"], name="ordnername_je_ebene_eindeutig"),
@@ -264,36 +264,36 @@ class Bewertungsordner(models.Model):
     def clean(self):
         if self.eltern_id:
             if self.eltern.unterricht_id != self.unterricht_id:
-                raise ValidationError({"eltern": "Der übergeordnete Ordner gehört zu einem anderen Unterricht."})
+                raise ValidationError({"eltern": _("Der übergeordnete Ordner gehört zu einem anderen Unterricht.")})
             if self.eltern_id == self.pk or self._erzeugt_zyklus():
-                raise ValidationError({"eltern": "Ein Ordner kann nicht in sich selbst oder einem seiner Unterordner liegen."})
+                raise ValidationError({"eltern": _("Ein Ordner kann nicht in sich selbst oder einem seiner Unterordner liegen.")})
             if len(self.eltern.vorfahren()) + 2 > self.MAX_TIEFE:
-                raise ValidationError({"eltern": f"Höchstens {self.MAX_TIEFE} Ordnerebenen sind möglich."})
+                raise ValidationError({"eltern": gettext("Höchstens %(n)s Ordnerebenen sind möglich.") % {"n": self.MAX_TIEFE}})
 
 
 class Leistungsnachweis(models.Model):
     unterricht = models.ForeignKey(
-        Unterricht, on_delete=models.CASCADE, related_name="leistungsnachweise", verbose_name="Unterricht", editable=False
+        Unterricht, on_delete=models.CASCADE, related_name="leistungsnachweise", verbose_name=_("Unterricht"), editable=False
     )
-    ordner = models.ForeignKey(Bewertungsordner, on_delete=models.PROTECT, related_name="leistungsnachweise", verbose_name="Ordner")
-    titel = models.CharField("Bezeichnung", max_length=100, help_text="frei wählbar, z. B. 1. Klassenarbeit oder Referat Säuren")
-    datum = models.DateField("Datum")
+    ordner = models.ForeignKey(Bewertungsordner, on_delete=models.PROTECT, related_name="leistungsnachweise", verbose_name=_("Ordner"))
+    titel = models.CharField(_("Bezeichnung"), max_length=100, help_text=_("frei wählbar, z. B. 1. Klassenarbeit oder Referat Säuren"))
+    datum = models.DateField(_("Datum"))
     gewicht = models.DecimalField(
-        "Gewicht im Ordner", max_digits=6, decimal_places=2, default=Decimal("1"),
+        _("Gewicht im Ordner"), max_digits=6, decimal_places=2, default=Decimal("1"),
         validators=[MinValueValidator(Decimal("0.01"))],
-        help_text="Relativ zu den anderen Einträgen im selben Ordner.",
+        help_text=_("Relativ zu den anderen Einträgen im selben Ordner."),
     )
     schluessel = models.ForeignKey(
-        Notenschluessel, null=True, blank=True, on_delete=models.PROTECT, verbose_name="Notenschlüssel",
-        help_text="Optional: Note wird aus erreichten Bewertungseinheiten (BE) berechnet.",
+        Notenschluessel, null=True, blank=True, on_delete=models.PROTECT, verbose_name=_("Notenschlüssel"),
+        help_text=_("Optional: Note wird aus erreichten Bewertungseinheiten (BE) berechnet."),
     )
-    max_be = models.DecimalField("Maximale BE", max_digits=6, decimal_places=2, null=True, blank=True)
+    max_be = models.DecimalField(_("Maximale BE"), max_digits=6, decimal_places=2, null=True, blank=True)
 
-    history = HistoricalRecords(verbose_name="Änderungsprotokoll Leistungsnachweis")
+    history = HistoricalRecords(verbose_name=_("Änderungsprotokoll Leistungsnachweis"))
 
     class Meta:
-        verbose_name = "Leistungsnachweis"
-        verbose_name_plural = "Leistungsnachweise"
+        verbose_name = _("Leistungsnachweis")
+        verbose_name_plural = _("Leistungsnachweise")
         ordering = ["unterricht", "datum"]
 
     def __str__(self):
@@ -303,9 +303,9 @@ class Leistungsnachweis(models.Model):
         if self.ordner_id:
             self.unterricht_id = self.ordner.unterricht_id
         if self.schluessel_id and not self.max_be:
-            raise ValidationError("Bei Verwendung eines Notenschlüssels bitte die maximalen BE angeben.")
+            raise ValidationError(_("Bei Verwendung eines Notenschlüssels bitte die maximalen BE angeben."))
         if self.schluessel_id and self.unterricht_id and self.schluessel.skala_id != self.unterricht.skala_id:
-            raise ValidationError("Der Notenschlüssel passt nicht zur Notenskala des Unterrichts.")
+            raise ValidationError(_("Der Notenschlüssel passt nicht zur Notenskala des Unterrichts."))
 
     def save(self, *args, **kwargs):
         # Der Unterricht ergibt sich immer aus dem Ordner.
@@ -323,34 +323,42 @@ class Leistungsnachweis(models.Model):
 class Note(models.Model):
     SONDERSTATUS = [
         ("", "—"),
-        ("entschuldigt", "Entschuldigt gefehlt"),
-        ("unentschuldigt", "Unentschuldigt gefehlt"),
-        ("befreit", "Befreit"),
-        ("nicht_bewertbar", "Nicht bewertbar"),
+        ("entschuldigt", _("Entschuldigt gefehlt")),
+        ("unentschuldigt", _("Unentschuldigt gefehlt")),
+        ("befreit", _("Befreit")),
+        ("nicht_bewertbar", _("Nicht bewertbar")),
     ]
 
-    leistungsnachweis = models.ForeignKey(Leistungsnachweis, on_delete=models.CASCADE, related_name="noten", verbose_name="Leistungsnachweis")
-    schueler = models.ForeignKey(Schuelerprofil, on_delete=models.CASCADE, related_name="noten", verbose_name="Schüler:in")
-    erreichte_be = models.DecimalField("Erreichte BE", max_digits=6, decimal_places=2, null=True, blank=True)
-    stufe = models.ForeignKey(Notenstufe, null=True, blank=True, on_delete=models.PROTECT, verbose_name="Note")
-    sonderstatus = models.CharField("Sonderstatus", max_length=16, choices=SONDERSTATUS, blank=True, default="")
+    leistungsnachweis = models.ForeignKey(Leistungsnachweis, on_delete=models.CASCADE, related_name="noten", verbose_name=_("Leistungsnachweis"))
+    schueler = models.ForeignKey(Schuelerprofil, on_delete=models.CASCADE, related_name="noten", verbose_name=_("Schüler:in"))
+    erreichte_be = models.DecimalField(_("Erreichte BE"), max_digits=6, decimal_places=2, null=True, blank=True)
+    stufe = models.ForeignKey(Notenstufe, null=True, blank=True, on_delete=models.PROTECT, verbose_name=_("Note"))
+    sonderstatus = models.CharField(_("Sonderstatus"), max_length=16, choices=SONDERSTATUS, blank=True, default="")
     gewicht_individuell = models.DecimalField(
-        "Individuelles Gewicht", max_digits=6, decimal_places=2, null=True, blank=True,
+        _("Individuelles Gewicht"), max_digits=6, decimal_places=2, null=True, blank=True,
         validators=[MinValueValidator(Decimal("0"))],
-        help_text="Nur ausfüllen, wenn diese eine Note anders zählen soll als der Leistungsnachweis "
-                  "(z. B. Nachschreibarbeit, Nachteilsausgleich). Leer = Gewicht des Leistungsnachweises.",
+        help_text=_("Nur ausfüllen, wenn diese eine Note anders zählen soll als der Leistungsnachweis "
+                  "(z. B. Nachschreibarbeit, Nachteilsausgleich). Leer = Gewicht des Leistungsnachweises."),
     )
-    gewicht_begruendung = models.CharField("Begründung für abweichendes Gewicht", max_length=200, blank=True)
-    kommentar = models.CharField("Kommentar", max_length=200, blank=True)
-    history = HistoricalRecords(verbose_name="Änderungsprotokoll Note")
+    gewicht_begruendung = models.CharField(_("Begründung für abweichendes Gewicht"), max_length=200, blank=True)
+    kommentar = models.CharField(_("Kommentar"), max_length=200, blank=True)
+    history = HistoricalRecords(verbose_name=_("Änderungsprotokoll Note"))
 
     class Meta:
-        verbose_name = "Note"
-        verbose_name_plural = "Noten"
+        verbose_name = _("Note")
+        verbose_name_plural = _("Noten")
         unique_together = [("leistungsnachweis", "schueler")]
 
     def __str__(self):
         return f"{self.schueler}: {self.stufe or self.get_sonderstatus_display()}"
+
+    SONDERSTATUS_KURZ = {
+        "entschuldigt": _("entsch."), "unentschuldigt": _("unentsch."), "befreit": _("befreit"), "nicht_bewertbar": _("n. b."),
+    }
+
+    @property
+    def sonderstatus_kurz(self):
+        return self.SONDERSTATUS_KURZ.get(self.sonderstatus, "")
 
     @property
     def wirksames_gewicht(self):
@@ -363,12 +371,12 @@ class Note(models.Model):
     def clean(self):
         if self.gewicht_individuell is not None and self.leistungsnachweis_id \
                 and self.gewicht_individuell != self.leistungsnachweis.gewicht and not self.gewicht_begruendung.strip():
-            raise ValidationError({"gewicht_begruendung": "Bitte begründen, warum diese Note anders gewichtet wird."})
+            raise ValidationError({"gewicht_begruendung": _("Bitte begründen, warum diese Note anders gewichtet wird.")})
         ln = self.leistungsnachweis
         if self.erreichte_be is not None and ln.max_be and self.erreichte_be > ln.max_be:
-            raise ValidationError("Die erreichten BE überschreiten die maximalen BE.")
+            raise ValidationError(_("Die erreichten BE überschreiten die maximalen BE."))
         if self.stufe_id and self.stufe.skala_id != ln.unterricht.skala_id:
-            raise ValidationError("Die Note gehört nicht zur Notenskala des Unterrichts.")
+            raise ValidationError(_("Die Note gehört nicht zur Notenskala des Unterrichts."))
 
     def save(self, *args, **kwargs):
         ln = self.leistungsnachweis
@@ -388,17 +396,17 @@ class Note(models.Model):
 
 
 class Zeugnisnote(models.Model):
-    unterricht = models.ForeignKey(Unterricht, on_delete=models.CASCADE, related_name="zeugnisnoten", verbose_name="Unterricht")
-    schueler = models.ForeignKey(Schuelerprofil, on_delete=models.CASCADE, related_name="zeugnisnoten", verbose_name="Schüler:in")
-    vorschlag = models.DecimalField("Berechneter Vorschlag", max_digits=5, decimal_places=2, null=True, blank=True)
-    stufe = models.ForeignKey(Notenstufe, on_delete=models.PROTECT, verbose_name="Festgesetzte Note")
-    begruendung = models.TextField("Pädagogische Begründung", blank=True, help_text="Pflicht bei Abweichung vom Vorschlag")
+    unterricht = models.ForeignKey(Unterricht, on_delete=models.CASCADE, related_name="zeugnisnoten", verbose_name=_("Unterricht"))
+    schueler = models.ForeignKey(Schuelerprofil, on_delete=models.CASCADE, related_name="zeugnisnoten", verbose_name=_("Schüler:in"))
+    vorschlag = models.DecimalField(_("Berechneter Vorschlag"), max_digits=5, decimal_places=2, null=True, blank=True)
+    stufe = models.ForeignKey(Notenstufe, on_delete=models.PROTECT, verbose_name=_("Festgesetzte Note"))
+    begruendung = models.TextField(_("Pädagogische Begründung"), blank=True, help_text=_("Pflicht bei Abweichung vom Vorschlag"))
     festgesetzt_am = models.DateTimeField(auto_now=True)
-    history = HistoricalRecords(verbose_name="Änderungsprotokoll Zeugnisnote")
+    history = HistoricalRecords(verbose_name=_("Änderungsprotokoll Zeugnisnote"))
 
     class Meta:
-        verbose_name = "Zeugnisnote"
-        verbose_name_plural = "Zeugnisnoten"
+        verbose_name = _("Zeugnisnote")
+        verbose_name_plural = _("Zeugnisnoten")
         unique_together = [("unterricht", "schueler")]
 
     def __str__(self):
@@ -408,10 +416,11 @@ class Zeugnisnote(models.Model):
         if not (self.unterricht_id and self.stufe_id):
             return
         if self.stufe.skala_id != self.unterricht.skala_id:
-            raise ValidationError("Die Note gehört nicht zur Notenskala des Unterrichts.")
+            raise ValidationError(_("Die Note gehört nicht zur Notenskala des Unterrichts."))
         if self.vorschlag is not None:
             vorgeschlagen = self.unterricht.skala.naechste_stufe(self.vorschlag)
             if vorgeschlagen and vorgeschlagen.pk != self.stufe_id and not self.begruendung.strip():
                 raise ValidationError(
-                    {"begruendung": f"Die Note weicht vom Vorschlag ({vorgeschlagen}) ab. Bitte pädagogisch begründen."}
+                    {"begruendung": gettext("Die Note weicht vom Vorschlag (%(vorschlag)s) ab. Bitte pädagogisch begründen.")
+                     % {"vorschlag": vorgeschlagen}}
                 )

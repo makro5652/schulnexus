@@ -50,6 +50,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "portal.middleware.BenutzerspracheMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
@@ -96,8 +97,14 @@ PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.PBKDF2PasswordHasher",
 ]
 
+# Sprachen: Standard Deutsch, umschaltbar auf Englisch (Menü oben rechts).
+# Die Wahl wird je Benutzerkonto gespeichert (portal.Benutzereinstellung).
 LANGUAGE_CODE = "de"
 LANGUAGES = [("de", "Deutsch"), ("en", "English")]
+LOCALE_PATHS = [BASE_DIR / "locale"]
+FORMAT_MODULE_PATH = ["config.formate"]
+LANGUAGE_COOKIE_NAME = "sprache"
+LANGUAGE_COOKIE_AGE = 60 * 60 * 24 * 365
 TIME_ZONE = os.environ.get("TIME_ZONE", "Africa/Nairobi")
 USE_I18N = True
 USE_TZ = True

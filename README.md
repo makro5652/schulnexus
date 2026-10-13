@@ -1,4 +1,4 @@
-# Schulverwaltung (Version 0.4, Entwicklungsstand)
+# Schulverwaltung (Version 0.4.1.1, Entwicklungsstand)
 
 Open-Source-Schulverwaltung für die DSN: Stammdaten, Klassen und Lerngruppen,
 Noten mit Gewichtung, Fehlzeiten, Nachmittagsprogramm. Läuft im Browser,
@@ -121,10 +121,30 @@ Die Felder erscheinen automatisch in den Formularen und (bei Schüler:innen) in 
 Werte unsichtbarer Felder bleiben beim Speichern durch andere Rollen unverändert. Alle Änderungen
 stehen im Änderungsprotokoll.
 
+## Sprache: Deutsch und Englisch
+
+Oben rechts (Weltkugel-Symbol) lässt sich die Oberfläche zwischen **Deutsch** und **English**
+umschalten – im Portal ebenso wie in der Verwaltungsoberfläche.
+
+- Die Wahl wird **im Benutzerkonto gespeichert** und gilt danach auf jedem Gerät und Browser.
+- Wer noch nie gewählt hat, behält die Sprache, in der er sich zum ersten Mal angemeldet hat
+  (vor der Anmeldung: Cookie oder Browsersprache, sonst Deutsch).
+- Datumsangaben: Deutsch `03.10.2026`, Englisch britisch `03/10/2026`; Dezimalzeichen Komma bzw. Punkt.
+- **Kataloge** (Fächer, Halbjahre, Bildungsgänge, Abschlussarten, Personalbereiche,
+  Nachweisarten, Notenskalen, Zusatzfelder) haben ein Feld „Bezeichnung (Englisch)“. Ist es leer,
+  erscheint auf Englisch die deutsche Bezeichnung.
+- **Freie Eingaben** (Namen, Bemerkungen, Ordner- und Prüfungsbezeichnungen, Berufe usw.) werden
+  nicht übersetzt.
+
+**Regel ab Version 0.4.1.1:** Jede neue Funktion wird zweisprachig gebaut. Die Übersetzungen
+liegen in `src/locale/en/LC_MESSAGES/django.po`; Pflege mit `tools/sprachdateien.py`
+(Ablauf in der Datei beschrieben). Ein Test schlägt fehl, sobald ein Text ohne Übersetzung ist.
+
 ## Update von einer älteren Version
 
 Neuen Ordnerinhalt über den alten kopieren (die `.env` behalten) und erneut `./start.sh`
 ausführen. Die Datenbank wird automatisch umgestellt; vorhandene Kategorien werden zu Ordnern.
+Bei eingeschalteten Demo-Daten werden die englischen Bezeichnungen der Beispieldaten nachgetragen.
 
 ## Wichtige Befehle
 
@@ -144,7 +164,9 @@ ausführen. Die Datenbank wird automatisch umgestellt; vorhandene Kategorien wer
 | `src/noten` | Notenskalen, Notenschlüssel (BE → Note), Gewichtungsvorlagen, Unterricht, Leistungsnachweise, Noten, Zeugnisnoten; Berechnung in `berechnung.py` |
 | `src/fehlzeiten` | Zeitraster, Fehlzeiten (ganztägig, stundenweise, Verspätung) |
 | `src/nachmittag` | AG-Angebote, Wünsche, Losverfahren in `zuteilung.py` |
-| `src/portal` | Startseite, Notenübersicht, Klassenliste, Rechteprüfung, Demo-Daten |
+| `src/portal` | Startseite, Notenübersicht, Klassenliste, Schülerakte, Rechteprüfung, Sprachwahl, Demo-Daten |
+| `src/locale` | Übersetzungen (Englisch) |
+| `src/config/version.py` | Versionsnummer (kleine Änderungen erhöhen die letzte Stelle) |
 
 Alle Änderungen an Personen, Noten, Fehlzeiten und Mitgliedschaften werden
 protokolliert (Schaltfläche „Geschichte“ in der Verwaltungsoberfläche).

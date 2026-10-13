@@ -25,6 +25,8 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from decimal import Decimal
 
+from django.utils.translation import gettext
+
 
 @dataclass
 class OrdnerErgebnis:
@@ -158,7 +160,8 @@ def vorschlagsnote(unterricht, schueler, noten=None, baum=None) -> Vorschlag:
         schnitt, _ = wert(w, 0, "")
         if schnitt is None:
             if w.gewicht > 0:
-                warnungen.append(f"Keine Note im Ordner „{w.name}“ – der Schnitt beruht nur auf den übrigen Ordnern.")
+                warnungen.append(gettext("Keine Note im Ordner „%(ordner)s“ – der Schnitt beruht nur auf den übrigen Ordnern.")
+                                 % {"ordner": w.name})
         else:
             gesamt_paare.append((schnitt, w.gewicht))
 
@@ -167,7 +170,7 @@ def vorschlagsnote(unterricht, schueler, noten=None, baum=None) -> Vorschlag:
 
     gesamt = gewichteter_schnitt(gesamt_paare)
     if gesamt is None:
-        return Vorschlag(None, None, haupt, alle, warnungen or ["Noch keine Noten vorhanden."])
+        return Vorschlag(None, None, haupt, alle, warnungen or [gettext("Noch keine Noten vorhanden.")])
 
     gesamt = skala.runden(gesamt)
     return Vorschlag(

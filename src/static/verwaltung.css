@@ -1,0 +1,11 @@
+/* Sprachmenü in der Verwaltungsoberfläche */
+#user-tools .sprachmenue { display: inline-block; margin-left: 0.6rem; position: relative; vertical-align: middle; }
+#user-tools .sprachmenue summary { color: var(--header-link-color, #fff); }
+#user-tools .sprachmenue form { right: 0; }
+.verwaltung-fuss { color: var(--body-quiet-color); font-size: 0.75rem; padding: 1rem 40px; text-align: right; }
+.sprachmenue summary { list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.04em; }
+.sprachmenue summary::-webkit-details-marker { display: none; }
+.sprachmenue form { position: absolute; z-index: 50; margin-top: 0.4rem; background: var(--body-bg, #fff); border: 1px solid var(--hairline-color, #ddd); border-radius: 8px; padding: 0.3rem; min-width: 8rem; box-shadow: 0 4px 16px rgba(0,0,0,.12); text-transform: none; letter-spacing: normal; }
+.sprachmenue button { display: block; width: 100%; text-align: left; border: 0; background: none; padding: 0.45rem 0.7rem; border-radius: 6px; cursor: pointer; font: inherit; font-size: 0.85rem; color: var(--body-fg, #333); }
+.sprachmenue button:hover { background: var(--darkened-bg, #f0f0f0); }
+.sprachmenue button[aria-current="true"] { font-weight: 700; }

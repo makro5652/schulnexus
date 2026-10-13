@@ -1,6 +1,9 @@
 from django.contrib import admin
 from django.urls import reverse
+from django.utils import formats
 from django.utils.html import format_html
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
 from simple_history.admin import SimpleHistoryAdmin
 
 from portal.rechte import ist_verwaltung
@@ -53,7 +56,7 @@ class GewichtungsvorlageAdmin(admin.ModelAdmin):
     list_display = ["name", "kategorien_text"]
     inlines = [KategorieInline]
 
-    @admin.display(description="Kategorien")
+    @admin.display(description=_("Kategorien"))
     def kategorien_text(self, obj):
         return ", ".join(str(k) for k in obj.kategorien.all())
 
@@ -82,7 +85,7 @@ def eigene_ordner(request):
 
 
 class EigenerUnterrichtFilter(admin.SimpleListFilter):
-    title = "Unterricht"
+    title = _("Unterricht")
     parameter_name = "unterricht"
 
     def lookups(self, request, model_admin):
@@ -96,7 +99,7 @@ class OberordnerInline(admin.TabularInline):
     model = Bewertungsordner
     extra = 0
     fields = ["name", "eltern", "gewicht", "reihenfolge"]
-    verbose_name_plural = "Bewertungsordner"
+    verbose_name_plural = _("Bewertungsordner")
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "eltern":
@@ -119,11 +122,12 @@ class UnterrichtAdmin(admin.ModelAdmin):
             return qs
         return qs.filter(lehrkraft__person__benutzer=request.user)
 
-    @admin.display(description="Noten")
+    @admin.display(description=_("Noten"))
     def links(self, obj):
         return format_html(
-            '<a href="{}">Notenübersicht</a> · <a href="{}?unterricht={}">Bewertungsordner</a>',
-            reverse("notenuebersicht", args=[obj.pk]), reverse("admin:noten_bewertungsordner_changelist"), obj.pk,
+            '<a href="{}">{}</a> · <a href="{}?unterricht={}">{}</a>',
+            reverse("notenuebersicht", args=[obj.pk]), gettext("Notenübersicht"),
+            reverse("admin:noten_bewertungsordner_changelist"), obj.pk, gettext("Bewertungsordner"),
         )
 
 
@@ -132,8 +136,8 @@ class LeistungsnachweisInline(admin.TabularInline):
     extra = 1
     fields = ["titel", "datum", "gewicht", "schluessel", "max_be"]
     show_change_link = True
-    verbose_name = "Leistungsnachweis in diesem Ordner"
-    verbose_name_plural = "Leistungsnachweise in diesem Ordner (Noten über „Ändern“ eintragen)"
+    verbose_name = _("Leistungsnachweis in diesem Ordner")
+    verbose_name_plural = _("Leistungsnachweise in diesem Ordner (Noten über „Ändern“ eintragen)")
 
 
 @admin.register(Bewertungsordner)
@@ -170,18 +174,18 @@ class BewertungsordnerAdmin(SimpleHistoryAdmin):
             kwargs["queryset"] = qs
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
-    @admin.display(description="Ordner", ordering="name")
+    @admin.display(description=_("Ordner"), ordering="name")
     def pfad_anzeige(self, obj):
         return obj.pfad
 
-    @admin.display(description="Anteil an der Gesamtnote")
+    @admin.display(description=_("Anteil an der Gesamtnote"))
     def anteil(self, obj):
         ordner = list(Bewertungsordner.objects.filter(unterricht_id=obj.unterricht_id))
         nachweise = list(Leistungsnachweis.objects.filter(unterricht_id=obj.unterricht_id))
         wert = nominale_anteile(ordner, nachweise)[0].get(obj.pk)
-        return f"{wert:.1f} %".replace(".", ",") if wert is not None else "—"
+        return f"{formats.number_format(wert, 1)} %" if wert is not None else "—"
 
-    @admin.display(description="Leistungsnachweise")
+    @admin.display(description=_("Leistungsnachweise"))
     def anzahl_nachweise(self, obj):
         return obj.leistungsnachweise.count()
 
@@ -190,7 +194,7 @@ class BewertungsordnerAdmin(SimpleHistoryAdmin):
         if formset.model is Leistungsnachweis:
             neu = sum(ln.notenzeilen_anlegen() for ln in form.instance.leistungsnachweise.all())
             if neu:
-                self.message_user(request, f"{neu} Notenzeilen angelegt – Noten über „Ändern“ beim Leistungsnachweis eintragen.")
+                self.message_user(request, gettext("%(n)s Notenzeilen angelegt – Noten über „Ändern“ beim Leistungsnachweis eintragen.") % {"n": neu})
 
 
 class NoteInline(admin.TabularInline):
@@ -224,11 +228,11 @@ class LeistungsnachweisAdmin(EigeneDatenMixin, SimpleHistoryAdmin):
     fields = ["ordner", "titel", "datum", "gewicht", "schluessel", "max_be"]
     inlines = [NoteInline]
 
-    @admin.display(description="Ordner", ordering="ordner__name")
+    @admin.display(description=_("Ordner"), ordering="ordner__name")
     def ordner_pfad(self, obj):
         return obj.ordner.pfad
 
-    @admin.display(description="Noten erfasst")
+    @admin.display(description=_("Noten erfasst"))
     def anzahl_noten(self, obj):
         return obj.noten.exclude(stufe__isnull=True, sonderstatus="").count()
 
@@ -247,7 +251,7 @@ class LeistungsnachweisAdmin(EigeneDatenMixin, SimpleHistoryAdmin):
         super().save_related(request, form, formsets, change)
         neu = form.instance.notenzeilen_anlegen()
         if neu:
-            self.message_user(request, f"{neu} Notenzeilen angelegt – bitte jetzt die Noten eintragen.")
+            self.message_user(request, gettext("%(n)s Notenzeilen angelegt – bitte jetzt die Noten eintragen.") % {"n": neu})
 
 
 @admin.register(Note)

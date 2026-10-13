@@ -12,5 +12,6 @@ urlpatterns = [
     path("klassen/<int:pk>/", views.klassenliste, name="klassenliste"),
     path("schueler/<int:pk>/", views.schuelerakte, name="schuelerakte"),
     path("gesundheit/", views.gesundheit, name="gesundheit"),
+    path("sprache/", views.sprache_wechseln, name="sprache_wechseln"),
     path("verwaltung/", admin.site.urls),
 ]

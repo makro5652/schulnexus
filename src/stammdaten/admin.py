@@ -1,7 +1,10 @@
 from django.contrib import admin
 from django.urls import reverse
 from django.utils import timezone
+from django.utils import formats
 from django.utils.html import format_html
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
 from simple_history.admin import SimpleHistoryAdmin
 
 from portal.rechte import ist_personalverwaltung, ist_verwaltung
@@ -37,9 +40,9 @@ from .models import (
 )
 from .zusatzfelder import ZusatzfelderAdminMixin, ZusatzfelderInlineMixin, zusatz_fieldsets
 
-admin.site.site_header = "Schulverwaltung"
-admin.site.site_title = "Schulverwaltung"
-admin.site.index_title = "Verwaltung"
+admin.site.site_header = _("Schulverwaltung")
+admin.site.site_title = _("Schulverwaltung")
+admin.site.index_title = _("Verwaltung")
 admin.site.enable_nav_sidebar = False  # volle Breite für Tabellen; Navigation über Startseite und Brotkrumen
 
 
@@ -62,7 +65,7 @@ class SchuelerprofilKurzInline(admin.StackedInline):
     max_num = 1
     fields = ["schuelernummer", "status", "eintrittsdatum"]
     show_change_link = True
-    verbose_name_plural = "Schülerprofil (vollständige Akte über „Ändern“)"
+    verbose_name_plural = _("Schülerprofil (vollständige Akte über „Ändern“)")
 
 
 class PersonalprofilKurzInline(admin.StackedInline):
@@ -71,7 +74,7 @@ class PersonalprofilKurzInline(admin.StackedInline):
     max_num = 1
     fields = ["bereich", "stellenbezeichnung", "kuerzel", "aktiv"]
     show_change_link = True
-    verbose_name_plural = "Personalprofil (vollständige Personalakte über „Ändern“)"
+    verbose_name_plural = _("Personalprofil (vollständige Personalakte über „Ändern“)")
 
 
 class ElternprofilInline(ZusatzfelderInlineMixin, admin.StackedInline):
@@ -79,7 +82,7 @@ class ElternprofilInline(ZusatzfelderInlineMixin, admin.StackedInline):
     model = Elternprofil
     extra = 0
     max_num = 1
-    verbose_name_plural = "Elternprofil (für Erziehungsberechtigte)"
+    verbose_name_plural = _("Elternprofil (für Erziehungsberechtigte)")
     fieldsets = [(None, {"fields": [("beruf", "arbeitgeber"), "korrespondenzweg",
                                     ("schulverein_mitglied", "mitgliedsnummer"), "elternvertretung", "kontaktdaten_weitergabe"]})]
 
@@ -88,8 +91,8 @@ class KinderInline(admin.TabularInline):
     model = Beziehung
     fk_name = "person"
     extra = 0
-    verbose_name = "Kind (Schüler:in)"
-    verbose_name_plural = "Ist Erziehungsberechtigte:r / Kontaktperson von"
+    verbose_name = _("Kind (Schüler:in)")
+    verbose_name_plural = _("Ist Erziehungsberechtigte:r / Kontaktperson von")
     autocomplete_fields = ["schueler"]
     fields = ["schueler", "art", "sorgerecht", "auskunftsrecht", "abholberechtigt", "notfallkontakt", "rechnungsempfaenger"]
 
@@ -101,20 +104,20 @@ class DokumentInline(admin.TabularInline):
 
 
 PERSON_FIELDSETS = [
-    ("Name", {"fields": [("anrede", "titel"), ("vorname", "rufname", "nachname"), "geschlecht"]}),
-    ("Geburt und Herkunft", {"fields": [("geburtsdatum", "geburtsort", "geburtsland"), "staatsangehoerigkeiten"]}),
-    ("Kontakt", {"fields": [("email", "sprache"), ("telefon", "mobil", "telefon_dienstlich")]}),
-    ("Anschrift", {"fields": ["strasse", ("postfach", "plz"), ("ort", "land")]}),
-    ("System", {"fields": ["benutzer", "notizen"], "classes": ["collapse"]}),
+    (_("Name"), {"fields": [("anrede", "titel"), ("vorname", "rufname", "nachname"), "geschlecht"]}),
+    (_("Geburt und Herkunft"), {"fields": [("geburtsdatum", "geburtsort", "geburtsland"), "staatsangehoerigkeiten"]}),
+    (_("Kontakt"), {"fields": [("email", "sprache"), ("telefon", "mobil", "telefon_dienstlich")]}),
+    (_("Anschrift"), {"fields": ["strasse", ("postfach", "plz"), ("ort", "land")]}),
+    (_("System"), {"fields": ["benutzer", "notizen"], "classes": ["collapse"]}),
 ]
 
 
 class RolleFilter(admin.SimpleListFilter):
-    title = "Rolle"
+    title = _("Rolle")
     parameter_name = "rolle"
 
     def lookups(self, request, model_admin):
-        return [("schueler", "Schüler:innen"), ("eltern", "Eltern / Kontaktpersonen"), ("personal", "Personal")]
+        return [("schueler", _("Schüler:innen")), ("eltern", _("Eltern / Kontaktpersonen")), ("personal", _("Personal"))]
 
     def queryset(self, request, qs):
         if self.value() == "schueler":
@@ -134,18 +137,18 @@ class PersonAdmin(SimpleHistoryAdmin):
     inlines = [SchuelerprofilKurzInline, PersonalprofilKurzInline, ElternprofilInline, KinderInline, DokumentInline]
     fieldsets = PERSON_FIELDSETS
 
-    @admin.display(description="Rolle")
+    @admin.display(description=_("Rolle"))
     def rolle(self, obj):
         rollen = []
         if hasattr(obj, "schueler"):
-            rollen.append("Schüler:in")
+            rollen.append(gettext("Schüler:in"))
         if hasattr(obj, "personal"):
-            rollen.append(obj.personal.stellenbezeichnung or (obj.personal.bereich.name if obj.personal.bereich else "Personal"))
+            rollen.append(obj.personal.stellenbezeichnung or (obj.personal.bereich.lokal_name if obj.personal.bereich else gettext("Personal")))
         if obj.kinder_beziehungen.exists():
-            rollen.append("Eltern / Kontakt")
+            rollen.append(gettext("Eltern / Kontakt"))
         return ", ".join(rollen) or "—"
 
-    @admin.display(description="Telefon")
+    @admin.display(description=_("Telefon"))
     def mobil_oder_telefon(self, obj):
         return obj.mobil or obj.telefon or "—"
 
@@ -166,7 +169,7 @@ class BeziehungInline(admin.TabularInline):
     fk_name = "schueler"
     extra = 0
     autocomplete_fields = ["person"]
-    verbose_name_plural = "Eltern / Erziehungsberechtigte / Kontaktpersonen"
+    verbose_name_plural = _("Eltern / Erziehungsberechtigte / Kontaktpersonen")
 
 
 class MitgliedschaftInline(admin.TabularInline):
@@ -174,7 +177,7 @@ class MitgliedschaftInline(admin.TabularInline):
     extra = 0
     autocomplete_fields = ["gruppe"]
     fields = ["gruppe", "von", "bis", "rolle"]
-    verbose_name_plural = "Klassen und Gruppen"
+    verbose_name_plural = _("Klassen und Gruppen")
 
 
 class EinwilligungInline(admin.TabularInline):
@@ -187,7 +190,7 @@ class LaufbahnInline(admin.TabularInline):
     model = Laufbahnabschnitt
     extra = 0
     fields = ["schuljahr", "jahrgang", "bildungsgang", "stammklasse", "von", "bis", "ergebnis", "bemerkung"]
-    verbose_name_plural = "Schullaufbahn"
+    verbose_name_plural = _("Schullaufbahn")
 
 
 class AbschlussInline(admin.TabularInline):
@@ -212,13 +215,13 @@ class GesundheitInline(admin.StackedInline):
     model = Gesundheitsangaben
     extra = 0
     max_num = 1
-    verbose_name_plural = "Gesundheitsangaben (vertraulich)"
+    verbose_name_plural = _("Gesundheitsangaben (vertraulich)")
     fieldsets = [(None, {"fields": [("allergien", "erkrankungen"), "medikamente", "notfallhinweise",
                                     ("arzt", "krankenversicherung"), "schwimmen_erlaubt"]})]
 
 
 class StammklasseFilter(admin.SimpleListFilter):
-    title = "Stammklasse (aktuell)"
+    title = _("Stammklasse (aktuell)")
     parameter_name = "klasse"
 
     def lookups(self, request, model_admin):
@@ -236,7 +239,7 @@ class StammklasseFilter(admin.SimpleListFilter):
 
 
 class BildungsgangFilter(admin.SimpleListFilter):
-    title = "Bildungsgang (aktuelles Schuljahr)"
+    title = _("Bildungsgang (aktuelles Schuljahr)")
     parameter_name = "bildungsgang"
 
     def lookups(self, request, model_admin):
@@ -256,11 +259,11 @@ class SchuelerprofilAdmin(ZusatzfelderAdminMixin, SimpleHistoryAdmin):
     search_fields = ["person__nachname", "person__vorname", "schuelernummer"]
     autocomplete_fields = ["person"]
     fieldsets = [
-        ("Schüler:in", {"fields": ["person", ("schuelernummer", "status")]}),
-        ("Eintritt und Austritt", {"fields": [("eintrittsdatum", "eintritt_jahrgang"), ("austrittsdatum", "austrittsgrund")]}),
-        ("Sprache und Förderung", {"fields": [("muttersprache", "familiensprache"), ("daz", "nachteilsausgleich"),
+        (_("Schüler:in"), {"fields": ["person", ("schuelernummer", "status")]}),
+        (_("Eintritt und Austritt"), {"fields": [("eintrittsdatum", "eintritt_jahrgang"), ("austrittsdatum", "austrittsgrund")]}),
+        (_("Sprache und Förderung"), {"fields": [("muttersprache", "familiensprache"), ("daz", "nachteilsausgleich"),
                                               "foerderbedarf", "religionsunterricht"]}),
-        ("Organisatorisches", {"fields": ["lebt_bei", ("schulweg", "buslinie"), "abholhinweise", "bemerkungen"]}),
+        (_("Organisatorisches"), {"fields": ["lebt_bei", ("schulweg", "buslinie"), "abholhinweise", "bemerkungen"]}),
     ]
 
     def get_inlines(self, request, obj):
@@ -270,19 +273,19 @@ class SchuelerprofilAdmin(ZusatzfelderAdminMixin, SimpleHistoryAdmin):
             inlines.append(GesundheitInline)
         return inlines
 
-    @admin.display(description="Stammklasse")
+    @admin.display(description=_("Stammklasse"))
     def klasse(self, obj):
         g = obj.stammklasse()
         return g.name if g else "—"
 
-    @admin.display(description="Bildungsgang")
+    @admin.display(description=_("Bildungsgang"))
     def bildungsgang(self, obj):
         abschnitt = obj.aktueller_laufbahnabschnitt()
         return abschnitt.bildungsgang.kuerzel if abschnitt else "—"
 
-    @admin.display(description="Akte")
+    @admin.display(description=_("Akte"))
     def akte(self, obj):
-        return format_html('<a href="{}">Schülerakte</a>', reverse("schuelerakte", args=[obj.pk]))
+        return format_html('<a href="{}">{}</a>', reverse("schuelerakte", args=[obj.pk]), gettext("Schülerakte"))
 
 
 # ---------------------------------------------------------------- Personal
@@ -303,7 +306,7 @@ class NachweisInline(admin.TabularInline):
     fields = ["art", "ausgestellt_am", "gueltig_bis", "datei", "bemerkung", "status_anzeige"]
     readonly_fields = ["status_anzeige"]
 
-    @admin.display(description="Status")
+    @admin.display(description=_("Status"))
     def status_anzeige(self, obj):
         if not obj.pk:
             return "—"
@@ -316,7 +319,7 @@ class AbwesenheitInline(admin.TabularInline):
     fields = ["art", "von", "bis", "halbtags", "status", "bemerkung"]
 
 
-STATUS_TEXT = {"fehlt": "fehlt", "abgelaufen": "abgelaufen", "laeuft_ab": "läuft bald ab", "gueltig": "gültig"}
+STATUS_TEXT = {"fehlt": _("fehlt"), "abgelaufen": _("abgelaufen"), "laeuft_ab": _("läuft bald ab"), "gueltig": _("gültig")}
 STATUS_FARBE = {"fehlt": "#b4532a", "abgelaufen": "#b4532a", "laeuft_ab": "#9a6b00", "gueltig": "#1f5f5b"}
 
 
@@ -325,11 +328,11 @@ def status_etikett(status):
 
 
 class NachweisFilter(admin.SimpleListFilter):
-    title = "Nachweise"
+    title = _("Nachweise")
     parameter_name = "nachweise"
 
     def lookups(self, request, model_admin):
-        return [("offen", "fehlend, abgelaufen oder bald ablaufend"), ("ok", "vollständig und gültig")]
+        return [("offen", _("fehlend, abgelaufen oder bald ablaufend")), ("ok", _("vollständig und gültig"))]
 
     def queryset(self, request, queryset):
         if not self.value():
@@ -363,16 +366,16 @@ class PersonalprofilAdmin(ZusatzfelderAdminMixin, SimpleHistoryAdmin):
 
     def get_fieldsets(self, request, obj=None):
         basis = [
-            ("Person und Einsatz", {"fields": ["person", ("bereich", "stellenbezeichnung"), ("kuerzel", "aktiv"), "vorgesetzt"]}),
-            ("Tätigkeit", {"fields": ["lehrbefaehigungen", "weitere_funktionen", ("dienst_email", "raum"), "ausweisnummer"]}),
+            (_("Person und Einsatz"), {"fields": ["person", ("bereich", "stellenbezeichnung"), ("kuerzel", "aktiv"), "vorgesetzt"]}),
+            (_("Tätigkeit"), {"fields": ["lehrbefaehigungen", "weitere_funktionen", ("dienst_email", "raum"), "ausweisnummer"]}),
         ]
         if obj is not None and obj.bereich_id and not obj.bereich.unterrichtet:
             basis[1][1]["fields"] = basis[1][1]["fields"][1:]  # Lehrbefähigungen nur bei unterrichtendem Personal
         if self._hr(request):
-            basis.insert(1, ("Dienstverhältnis (HR)", {"fields": [
+            basis.insert(1, (_("Dienstverhältnis (HR)"), {"fields": [
                 ("personalnummer", "anstellungsart"), "dienstleister", ("dienstbeginn", "vertragsende"),
                 ("wochenstunden", "ermaessigung"), "arbeitszeit", "arbeitserlaubnis_bis"]}))
-            basis.append(("Intern (HR)", {"fields": ["bemerkungen"], "classes": ["collapse"]}))
+            basis.append((_("Intern (HR)"), {"fields": ["bemerkungen"], "classes": ["collapse"]}))
         return basis + zusatz_fieldsets(self._zusatz_definitionen(request))
 
     def get_inlines(self, request, obj):
@@ -387,13 +390,13 @@ class PersonalprofilAdmin(ZusatzfelderAdminMixin, SimpleHistoryAdmin):
             return qs
         return qs.filter(person__benutzer=request.user)
 
-    @admin.display(description="Nachweise")
+    @admin.display(description=_("Nachweise"))
     def nachweise_anzeige(self, obj):
         offen = obj.offene_nachweise()
         if not offen:
             return status_etikett("gueltig")
         schlimmster = min(offen, key=lambda t: ["fehlt", "abgelaufen", "laeuft_ab"].index(t[1]))
-        return format_html('<span title="{}">{} ({})</span>', "; ".join(f"{a.name}: {STATUS_TEXT[st]}" for a, st, _ in offen),
+        return format_html('<span title="{}">{} ({})</span>', "; ".join(f"{a.lokal_name}: {STATUS_TEXT[st]}" for a, st, n in offen),
                            status_etikett(schlimmster[1]), len(offen))
 
 
@@ -414,11 +417,11 @@ class GruppeAdmin(SimpleHistoryAdmin):
     inlines = [GruppenMitgliederInline]
     actions = ["aus_stammklassen_fuellen"]
 
-    @admin.display(description="Mitglieder (aktuell)")
+    @admin.display(description=_("Mitglieder (aktuell)"))
     def anzahl_mitglieder(self, obj):
         return Mitgliedschaft.objects.aktiv().filter(gruppe=obj).count()
 
-    @admin.action(description="Alle Schüler:innen der Ursprungs-Stammklassen hinzufügen")
+    @admin.action(description=_("Alle Schüler:innen der Ursprungs-Stammklassen hinzufügen"))
     def aus_stammklassen_fuellen(self, request, queryset):
         heute = timezone.localdate()
         neu = 0
@@ -429,7 +432,7 @@ class GruppeAdmin(SimpleHistoryAdmin):
                         gruppe=gruppe, schueler=schueler, defaults={"von": max(heute, gruppe.schuljahr.beginn)}
                     )
                     neu += int(erstellt)
-        self.message_user(request, f"{neu} Mitgliedschaften angelegt. Danach bitte Abwählende wieder entfernen.")
+        self.message_user(request, gettext("%(n)s Mitgliedschaften angelegt. Danach bitte Abwählende wieder entfernen.") % {"n": neu})
 
 
 @admin.register(Mitgliedschaft)
@@ -442,9 +445,9 @@ class MitgliedschaftAdmin(SimpleHistoryAdmin):
 
 @admin.register(Fach)
 class FachAdmin(admin.ModelAdmin):
-    list_display = ["kuerzel", "name", "reihenfolge"]
+    list_display = ["kuerzel", "name", "name_en", "reihenfolge"]
     list_editable = ["reihenfolge"]
-    search_fields = ["kuerzel", "name"]
+    search_fields = ["kuerzel", "name", "name_en"]
 
 
 @admin.register(Beziehung)
@@ -462,7 +465,7 @@ class EinwilligungAdmin(SimpleHistoryAdmin):
     search_fields = ["schueler__person__nachname"]
     autocomplete_fields = ["schueler", "erteilt_durch"]
 
-    @admin.display(boolean=True, description="Gültig")
+    @admin.display(boolean=True, description=_("Gültig"))
     def gueltig(self, obj):
         return obj.gueltig
 
@@ -483,13 +486,13 @@ class DokumentAdmin(admin.ModelAdmin):
 
 @admin.register(Bildungsgang)
 class BildungsgangAdmin(admin.ModelAdmin):
-    list_display = ["kuerzel", "name", "angestrebter_abschluss", "jahrgang_von", "jahrgang_bis", "reihenfolge"]
+    list_display = ["kuerzel", "name", "name_en", "angestrebter_abschluss", "jahrgang_von", "jahrgang_bis", "reihenfolge"]
     list_editable = ["reihenfolge"]
 
 
 @admin.register(Abschlussart)
 class AbschlussartAdmin(admin.ModelAdmin):
-    list_display = ["kuerzel", "name", "reihenfolge"]
+    list_display = ["kuerzel", "name", "name_en", "reihenfolge"]
     list_editable = ["reihenfolge"]
 
 
@@ -529,10 +532,10 @@ class GesundheitsangabenAdmin(SimpleHistoryAdmin):
 
 @admin.register(Personalbereich)
 class PersonalbereichAdmin(admin.ModelAdmin):
-    list_display = ["name", "kuerzel", "unterrichtet", "anzahl", "reihenfolge"]
+    list_display = ["name", "name_en", "kuerzel", "unterrichtet", "anzahl", "reihenfolge"]
     list_editable = ["reihenfolge"]
 
-    @admin.display(description="Personen (aktiv)")
+    @admin.display(description=_("Personen (aktiv)"))
     def anzahl(self, obj):
         return obj.personal.filter(aktiv=True).count()
 
@@ -542,20 +545,20 @@ class DienstleisterAdmin(admin.ModelAdmin):
     list_display = ["name", "leistung", "ansprechperson", "telefon", "vertrag_bis", "anzahl"]
     search_fields = ["name", "leistung"]
 
-    @admin.display(description="Eingesetzte Personen")
+    @admin.display(description=_("Eingesetzte Personen"))
     def anzahl(self, obj):
         return obj.personal.filter(aktiv=True).count()
 
 
 @admin.register(Nachweisart)
 class NachweisartAdmin(admin.ModelAdmin):
-    list_display = ["name", "gueltigkeit_monate", "pflicht_text", "reihenfolge"]
+    list_display = ["name", "name_en", "gueltigkeit_monate", "pflicht_text", "reihenfolge"]
     list_editable = ["reihenfolge"]
     filter_horizontal = ["pflicht_fuer"]
 
-    @admin.display(description="Pflicht für")
+    @admin.display(description=_("Pflicht für"))
     def pflicht_text(self, obj):
-        return ", ".join(b.name for b in obj.pflicht_fuer.all()) or "—"
+        return ", ".join(b.lokal_name for b in obj.pflicht_fuer.all()) or "—"
 
 
 @admin.register(Nachweis)
@@ -575,9 +578,9 @@ class PersonalabwesenheitAdmin(SimpleHistoryAdmin):
     autocomplete_fields = ["personal"]
     date_hierarchy = "von"
 
-    @admin.display(description="Arbeitstage")
+    @admin.display(description=_("Arbeitstage"))
     def arbeitstage_anzeige(self, obj):
-        return str(obj.arbeitstage).replace(".", ",")
+        return formats.number_format(obj.arbeitstage)
 
 
 @admin.register(Zusatzfeld)
@@ -588,7 +591,8 @@ class ZusatzfeldAdmin(admin.ModelAdmin):
     search_fields = ["name", "abschnitt"]
     fieldsets = [
         (None, {"fields": [("zielgruppe", "name"), "schluessel", ("typ", "pflicht"), "optionen", "abschnitt", "hilfetext"]}),
-        ("Sichtbarkeit und Anzeige", {"fields": ["sichtbarkeit", ("in_liste", "reihenfolge", "aktiv")]}),
+        (_("Englische Bezeichnungen"), {"fields": ["name_en", "optionen_en", "abschnitt_en", "hilfetext_en"], "classes": ["collapse"]}),
+        (_("Sichtbarkeit und Anzeige"), {"fields": ["sichtbarkeit", ("in_liste", "reihenfolge", "aktiv")]}),
     ]
 
     def get_readonly_fields(self, request, obj=None):

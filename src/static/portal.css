@@ -75,6 +75,10 @@ th, td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--linie); text-ali
 thead th { font-size: 0.8rem; color: var(--leise); font-weight: 600; background: var(--flaeche); }
 tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 .liste td.zahl, .liste th.zahl { text-align: right; }
+.rollbar { overflow-x: auto; }
+.eng th, .eng td { padding: 0.45rem 0.4rem; }
+.eng th:first-child, .eng td:first-child { padding-left: 0; }
+.eng th:last-child, .eng td:last-child { padding-right: 0; }
 .auffaellig { color: var(--warnung); font-weight: 600; }
 
 .noten th, .noten td { text-align: center; white-space: nowrap; }
@@ -135,3 +139,13 @@ tr.auffaellig td { color: var(--warnung); }
 .spalten.drei { grid-template-columns: 2fr 1fr 1fr; margin-top: 0.4rem; }
 @media (max-width: 980px) { .spalten.drei { grid-template-columns: 1fr; } }
 .liste.kompakt td { padding: 0.35rem 0.5rem; font-size: 0.9rem; }
+
+/* Sprachmenü oben rechts */
+.sprachmenue { position: relative; }
+.sprachmenue summary { list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.3rem 0.55rem; border: 1px solid var(--linie); border-radius: 999px; font-size: 0.8rem; font-weight: 600; color: var(--text); }
+.sprachmenue summary::-webkit-details-marker { display: none; }
+.sprachmenue summary:hover { border-color: var(--akzent); color: var(--akzent); }
+.sprachmenue form { position: absolute; right: 0; z-index: 20; margin-top: 0.4rem; background: var(--flaeche); border: 1px solid var(--linie); border-radius: 10px; padding: 0.3rem; min-width: 9rem; box-shadow: 0 6px 20px rgba(0,0,0,.12); }
+.sprachmenue button { display: block; width: 100%; text-align: left; border: 0; background: none; padding: 0.5rem 0.75rem; border-radius: 7px; cursor: pointer; font: inherit; font-size: 0.9rem; color: var(--text); }
+.sprachmenue button:hover { background: var(--akzent-hell); }
+.sprachmenue button[aria-current="true"] { font-weight: 700; color: var(--akzent); }

@@ -1,4 +1,5 @@
 from django.contrib import admin, messages
+from django.utils.translation import gettext, gettext_lazy as _
 from simple_history.admin import SimpleHistoryAdmin
 
 from .models import AGAngebot, AGWahl, AGZuteilung
@@ -27,23 +28,23 @@ class AGAngebotAdmin(SimpleHistoryAdmin):
     inlines = [WahlInline, ZuteilungInline]
     actions = ["losverfahren"]
 
-    @admin.display(description="Belegt / Plätze")
+    @admin.display(description=_("Belegt / Plätze"))
     def plaetze(self, obj):
         return f"{obj.belegt} / {obj.kapazitaet}"
 
-    @admin.display(description="Erstwünsche")
+    @admin.display(description=_("Erstwünsche"))
     def erstwuensche(self, obj):
         return obj.wahlen.filter(prioritaet=1).count()
 
-    @admin.action(description="Plätze per Losverfahren zuteilen (Halbjahr der Auswahl)")
+    @admin.action(description=_("Plätze per Losverfahren zuteilen (Halbjahr der Auswahl)"))
     def losverfahren(self, request, queryset):
         for abschnitt in {a.abschnitt for a in queryset}:
             ergebnis = lose_zuteilen(abschnitt)
             z = ergebnis.zugeteilt
             self.message_user(
                 request,
-                f"{abschnitt}: {z[1]} Erstwünsche, {z[2]} Zweitwünsche, {z[3]} Drittwünsche erfüllt; "
-                f"{len(ergebnis.ohne_platz)} ohne Platz.",
+                gettext("%(abschnitt)s: %(e1)s Erstwünsche, %(e2)s Zweitwünsche, %(e3)s Drittwünsche erfüllt; %(ohne)s ohne Platz.")
+                % {"abschnitt": abschnitt, "e1": z[1], "e2": z[2], "e3": z[3], "ohne": len(ergebnis.ohne_platz)},
                 messages.WARNING if ergebnis.ohne_platz else messages.SUCCESS,
             )
 

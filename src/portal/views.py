@@ -223,3 +223,28 @@ def schuelerakte(request, pk):
         "ist_verwaltung": ist_verwaltung(request.user),
         "zusatz": zusatz_anzeige(request.user, schueler, "schueler"),
     })
+
+
+def sprache_wechseln(request):
+    """Sprache umschalten: gilt sofort, wird als Cookie und – wenn angemeldet – im Benutzerkonto gespeichert."""
+    from django.conf import settings
+    from django.http import HttpResponseNotAllowed, HttpResponseRedirect
+    from django.utils import translation
+    from django.utils.http import url_has_allowed_host_and_scheme
+
+    from .models import Benutzereinstellung
+
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+    sprache = request.POST.get("sprache")
+    ziel = request.POST.get("next") or request.META.get("HTTP_REFERER") or "/"
+    if not url_has_allowed_host_and_scheme(ziel, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
+        ziel = "/"
+    antwort = HttpResponseRedirect(ziel)
+    if sprache in dict(settings.LANGUAGES):
+        translation.activate(sprache)
+        antwort.set_cookie(settings.LANGUAGE_COOKIE_NAME, sprache, max_age=settings.LANGUAGE_COOKIE_AGE, samesite="Lax",
+                           secure=settings.SESSION_COOKIE_SECURE, httponly=True)
+        if request.user.is_authenticated:
+            Benutzereinstellung.objects.update_or_create(benutzer=request.user, defaults={"sprache": sprache})
+    return antwort

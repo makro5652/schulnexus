@@ -77,13 +77,53 @@ SCHLUESSEL = [
 class Command(BaseCommand):
     help = "Legt einen Demo-Datensatz mit erfundenen Personen an."
 
+    # Englische Bezeichnungen der Demo-Daten; werden bei Installationen aus Version 0.4 nachgetragen.
+    FAECHER_EN = {"D": "German", "E": "English", "M": "Mathematics", "CH": "Chemistry", "BIO": "Biology", "PH": "Physics",
+                  "ETH": "Ethics", "REL": "Religious education", "SW": "Kiswahili", "F": "French"}
+    ABSCHNITTE_EN = {"1. Halbjahr": "1st semester", "2. Halbjahr": "2nd semester"}
+    ZUSATZFELDER_EN = {
+        "Schulhaus (House)": {"name_en": "House", "abschnitt_en": "School life"},
+        "Instrument": {"name_en": "Instrument", "abschnitt_en": "School life"},
+        "Darf allein nach Hause gehen": {"name_en": "May go home alone", "abschnitt_en": "Pick-up",
+                                         "hilfetext_en": "Written permission from the parents or guardians must be on file."},
+        "Schulgeld-Ermäßigung bis": {"name_en": "School fee reduction until", "abschnitt_en": "Administration"},
+        "T-Shirt-Größe": {"name_en": "T-shirt size", "abschnitt_en": "Equipment"},
+        "Schlüsselberechtigungen": {"name_en": "Key access", "abschnitt_en": "Equipment",
+                                    "optionen_en": "Main building\nScience block\nSports hall\nServer room\nKitchen"},
+        "Aufenthaltstitel / Visum": {"name_en": "Residence permit / Visa", "abschnitt_en": "Personnel file"},
+        "Bereitschaft zur Mithilfe": {"name_en": "Willing to help with",
+                                      "optionen_en": "School fair\nLibrary\nAccompanying trips\nSports day"},
+    }
+
+    def englisch_nachtragen(self):
+        """Füllt nur leere englische Felder; eigene Eingaben bleiben unangetastet."""
+        anzahl = 0
+
+        def ergaenzen(obj, felder):
+            nonlocal anzahl
+            geaendert = [f for f, wert in felder.items() if not getattr(obj, f) and wert]
+            for f in geaendert:
+                setattr(obj, f, felder[f])
+            if geaendert:
+                obj.save(update_fields=geaendert)
+                anzahl += len(geaendert)
+
+        for fach in Fach.objects.filter(kuerzel__in=self.FAECHER_EN):
+            ergaenzen(fach, {"name_en": self.FAECHER_EN[fach.kuerzel]})
+        for abschnitt in Abschnitt.objects.filter(name__in=self.ABSCHNITTE_EN):
+            ergaenzen(abschnitt, {"name_en": self.ABSCHNITTE_EN[abschnitt.name]})
+        for feld in Zusatzfeld.objects.filter(name__in=self.ZUSATZFELDER_EN):
+            ergaenzen(feld, self.ZUSATZFELDER_EN[feld.name])
+        return anzahl
+
     def add_arguments(self, parser):
         parser.add_argument("--passwort", default=os.environ.get("DEMO_PASSWORT", "Schule-Demo-2026"))
 
     @transaction.atomic
     def handle(self, *args, **opts):
         if Schuljahr.objects.filter(name="2026/27").exists():
-            self.stdout.write("Demo-Daten sind bereits vorhanden – nichts zu tun.")
+            n = self.englisch_nachtragen()
+            self.stdout.write(f"Demo-Daten sind bereits vorhanden – {n} englische Bezeichnungen ergänzt.")
             return
 
         call_command("grundeinrichtung", stdout=self.stdout)
@@ -91,8 +131,8 @@ class Command(BaseCommand):
         pw = opts["passwort"]
 
         sj = Schuljahr.objects.create(name="2026/27", beginn=date(2026, 8, 17), ende=date(2027, 6, 25), aktiv=True)
-        hj1 = Abschnitt.objects.create(schuljahr=sj, name="1. Halbjahr", nummer=1, beginn=date(2026, 8, 17), ende=date(2027, 1, 29))
-        Abschnitt.objects.create(schuljahr=sj, name="2. Halbjahr", nummer=2, beginn=date(2027, 2, 1), ende=date(2027, 6, 25))
+        hj1 = Abschnitt.objects.create(schuljahr=sj, name="1. Halbjahr", name_en="1st semester", nummer=1, beginn=date(2026, 8, 17), ende=date(2027, 1, 29))
+        Abschnitt.objects.create(schuljahr=sj, name="2. Halbjahr", name_en="2nd semester", nummer=2, beginn=date(2027, 2, 1), ende=date(2027, 6, 25))
 
         raster = [((7, 40), (8, 25)), ((8, 30), (9, 15)), ((9, 35), (10, 20)), ((10, 25), (11, 10)),
                   ((11, 30), (12, 15)), ((12, 20), (13, 5)), ((13, 45), (14, 30)), ((14, 35), (15, 20))]
@@ -100,10 +140,11 @@ class Command(BaseCommand):
             Stunde.objects.create(schuljahr=sj, nummer=i, beginn=time(*b), ende=time(*e))
 
         faecher = {}
-        for i, (k, n) in enumerate([("D", "Deutsch"), ("E", "Englisch"), ("M", "Mathematik"), ("CH", "Chemie"),
-                                    ("BIO", "Biologie"), ("PH", "Physik"), ("ETH", "Ethik"), ("REL", "Religion"),
-                                    ("SW", "Kiswahili"), ("F", "Französisch")]):
-            faecher[k], _ = Fach.objects.get_or_create(kuerzel=k, defaults={"name": n, "reihenfolge": (i + 1) * 10})
+        for i, (k, n, en) in enumerate([("D", "Deutsch", "German"), ("E", "Englisch", "English"), ("M", "Mathematik", "Mathematics"),
+                                        ("CH", "Chemie", "Chemistry"), ("BIO", "Biologie", "Biology"), ("PH", "Physik", "Physics"),
+                                        ("ETH", "Ethik", "Ethics"), ("REL", "Religion", "Religious education"),
+                                        ("SW", "Kiswahili", "Kiswahili"), ("F", "Französisch", "French")]):
+            faecher[k], _ = Fach.objects.get_or_create(kuerzel=k, defaults={"name": n, "name_en": en, "reihenfolge": (i + 1) * 10})
 
         # Frühere Schuljahre (für die Schullaufbahn)
         sj_alt = {
@@ -207,23 +248,28 @@ class Command(BaseCommand):
         Personalabwesenheit.objects.create(personal=mue, art="urlaub", von=date(2026, 12, 14), bis=date(2026, 12, 18), status="beantragt")
 
         # Beispiel-Zusatzfelder (frei definierbar unter Stammdaten › Zusatzfelder)
-        Zusatzfeld.objects.create(zielgruppe="schueler", name="Schulhaus (House)", typ="auswahl", optionen="Kilimanjaro\nKenya\nElgon\nMeru",
-                                  abschnitt="Schulleben", sichtbarkeit="alle", in_liste=True, reihenfolge=10)
-        Zusatzfeld.objects.create(zielgruppe="schueler", name="Instrument", typ="text", abschnitt="Schulleben", sichtbarkeit="alle", reihenfolge=20)
-        Zusatzfeld.objects.create(zielgruppe="schueler", name="Darf allein nach Hause gehen", typ="janein", abschnitt="Abholung",
-                                  sichtbarkeit="alle", reihenfolge=10,
-                                  hilfetext="Schriftliche Erlaubnis der Erziehungsberechtigten muss vorliegen.")
-        Zusatzfeld.objects.create(zielgruppe="schueler", name="Schulgeld-Ermäßigung bis", typ="datum", abschnitt="Verwaltung",
-                                  sichtbarkeit="verwaltung", reihenfolge=10)
-        Zusatzfeld.objects.create(zielgruppe="personal", name="T-Shirt-Größe", typ="auswahl", optionen="S\nM\nL\nXL\nXXL",
-                                  abschnitt="Ausstattung", sichtbarkeit="verwaltung", reihenfolge=10)
-        Zusatzfeld.objects.create(zielgruppe="personal", name="Schlüsselberechtigungen", typ="mehrfach",
+        Zusatzfeld.objects.create(zielgruppe="schueler", name="Schulhaus (House)", name_en="House", typ="auswahl",
+                                  optionen="Kilimanjaro\nKenya\nElgon\nMeru", abschnitt="Schulleben", abschnitt_en="School life",
+                                  sichtbarkeit="alle", in_liste=True, reihenfolge=10)
+        Zusatzfeld.objects.create(zielgruppe="schueler", name="Instrument", name_en="Instrument", typ="text", abschnitt="Schulleben",
+                                  abschnitt_en="School life", sichtbarkeit="alle", reihenfolge=20)
+        Zusatzfeld.objects.create(zielgruppe="schueler", name="Darf allein nach Hause gehen", name_en="May go home alone", typ="janein",
+                                  abschnitt="Abholung", abschnitt_en="Pick-up", sichtbarkeit="alle", reihenfolge=10,
+                                  hilfetext="Schriftliche Erlaubnis der Erziehungsberechtigten muss vorliegen.",
+                                  hilfetext_en="Written permission from the parents or guardians must be on file.")
+        Zusatzfeld.objects.create(zielgruppe="schueler", name="Schulgeld-Ermäßigung bis", name_en="School fee reduction until", typ="datum",
+                                  abschnitt="Verwaltung", abschnitt_en="Administration", sichtbarkeit="verwaltung", reihenfolge=10)
+        Zusatzfeld.objects.create(zielgruppe="personal", name="T-Shirt-Größe", name_en="T-shirt size", typ="auswahl", optionen="S\nM\nL\nXL\nXXL",
+                                  abschnitt="Ausstattung", abschnitt_en="Equipment", sichtbarkeit="verwaltung", reihenfolge=10)
+        Zusatzfeld.objects.create(zielgruppe="personal", name="Schlüsselberechtigungen", name_en="Key access", typ="mehrfach",
                                   optionen="Hauptgebäude\nNaturwissenschaften\nSporthalle\nServerraum\nKüche",
-                                  abschnitt="Ausstattung", sichtbarkeit="verwaltung", in_liste=True, reihenfolge=20)
-        Zusatzfeld.objects.create(zielgruppe="personal", name="Aufenthaltstitel / Visum", typ="text", abschnitt="Personalakte",
-                                  sichtbarkeit="hr", reihenfolge=10)
-        Zusatzfeld.objects.create(zielgruppe="eltern", name="Bereitschaft zur Mithilfe", typ="mehrfach",
-                                  optionen="Schulfest\nBibliothek\nAusflugsbegleitung\nSportfest", sichtbarkeit="verwaltung")
+                                  optionen_en="Main building\nScience block\nSports hall\nServer room\nKitchen",
+                                  abschnitt="Ausstattung", abschnitt_en="Equipment", sichtbarkeit="verwaltung", in_liste=True, reihenfolge=20)
+        Zusatzfeld.objects.create(zielgruppe="personal", name="Aufenthaltstitel / Visum", name_en="Residence permit / Visa", typ="text",
+                                  abschnitt="Personalakte", abschnitt_en="Personnel file", sichtbarkeit="hr", reihenfolge=10)
+        Zusatzfeld.objects.create(zielgruppe="eltern", name="Bereitschaft zur Mithilfe", name_en="Willing to help with", typ="mehrfach",
+                                  optionen="Schulfest\nBibliothek\nAusflugsbegleitung\nSportfest",
+                                  optionen_en="School fair\nLibrary\nAccompanying trips\nSports day", sichtbarkeit="verwaltung")
         schluessel_opt = ["Hauptgebäude", "Naturwissenschaften", "Sporthalle", "Serverraum", "Küche"]
         for pp in Personalprofil.objects.all():
             pp.zusatzfelder = {"t_shirt_groesse": rng.choice(["S", "M", "L", "XL"]),

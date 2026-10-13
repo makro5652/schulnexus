@@ -12,25 +12,31 @@ from noten.models import Notenskala, Notenstufe
 from stammdaten.models import Abschlussart, Bildungsgang, Nachweisart, Personalbereich
 
 # Voreinstellungen – in der Verwaltung frei änderbar (Stammdaten › Bildungsgänge / Abschlussarten).
+# (Kürzel, Name, Name englisch, angestrebter Abschluss, … englisch, ab Jahrgang, bis Jahrgang)
 BILDUNGSGAENGE = [
-    ("KG", "Kindergarten / Vorschule", "", None, None),
-    ("GS", "Grundschule", "", 1, 4),
-    ("HS", "Hauptschulbildungsgang", "Erster allgemeinbildender Schulabschluss (Hauptschulabschluss)", 5, 10),
-    ("RS", "Realschulbildungsgang", "Mittlerer Schulabschluss (Realschulabschluss)", 5, 10),
-    ("GYM", "Gymnasialer Bildungsgang (Sek I)", "Berechtigung zum Besuch der gymnasialen Oberstufe", 5, 10),
-    ("GOS", "Gymnasiale Oberstufe", "Allgemeine Hochschulreife", 11, 12),
+    ("KG", "Kindergarten / Vorschule", "Kindergarten / Pre-school", "", "", None, None),
+    ("GS", "Grundschule", "Primary school", "", "", 1, 4),
+    ("HS", "Hauptschulbildungsgang", "Hauptschule track",
+     "Erster allgemeinbildender Schulabschluss (Hauptschulabschluss)",
+     "First general school-leaving certificate (Hauptschulabschluss)", 5, 10),
+    ("RS", "Realschulbildungsgang", "Realschule track",
+     "Mittlerer Schulabschluss (Realschulabschluss)", "Intermediate school-leaving certificate (Realschulabschluss)", 5, 10),
+    ("GYM", "Gymnasialer Bildungsgang (Sek I)", "Gymnasium track (lower secondary)",
+     "Berechtigung zum Besuch der gymnasialen Oberstufe", "Entitlement to enter the Gymnasium upper level", 5, 10),
+    ("GOS", "Gymnasiale Oberstufe", "Gymnasium upper level (Oberstufe)",
+     "Allgemeine Hochschulreife", "General higher education entrance qualification (Abitur)", 11, 12),
 ]
 ABSCHLUSSARTEN = [
-    ("ESA", "Erster allgemeinbildender Schulabschluss (Hauptschulabschluss)"),
-    ("EESA", "Erweiterter erster allgemeinbildender Schulabschluss"),
-    ("MSA", "Mittlerer Schulabschluss (Realschulabschluss)"),
-    ("OS", "Berechtigung zum Besuch der gymnasialen Oberstufe"),
-    ("FHR", "Fachhochschulreife (schulischer Teil)"),
-    ("AHR", "Allgemeine Hochschulreife (Abitur)"),
-    ("DIA", "Deutsches Internationales Abitur (DIA)"),
-    ("DSD1", "Deutsches Sprachdiplom Stufe I (DSD I)"),
-    ("DSD2", "Deutsches Sprachdiplom Stufe II (DSD II)"),
-    ("SONST", "Sonstiges Zertifikat"),
+    ("ESA", "Erster allgemeinbildender Schulabschluss (Hauptschulabschluss)", "First general school-leaving certificate (Hauptschulabschluss)"),
+    ("EESA", "Erweiterter erster allgemeinbildender Schulabschluss", "Extended first general school-leaving certificate"),
+    ("MSA", "Mittlerer Schulabschluss (Realschulabschluss)", "Intermediate school-leaving certificate (Realschulabschluss)"),
+    ("OS", "Berechtigung zum Besuch der gymnasialen Oberstufe", "Entitlement to enter the Gymnasium upper level"),
+    ("FHR", "Fachhochschulreife (schulischer Teil)", "Entrance qualification for universities of applied sciences (school part)"),
+    ("AHR", "Allgemeine Hochschulreife (Abitur)", "General higher education entrance qualification (Abitur)"),
+    ("DIA", "Deutsches Internationales Abitur (DIA)", "German International Abitur (DIA)"),
+    ("DSD1", "Deutsches Sprachdiplom Stufe I (DSD I)", "German Language Certificate Level I (DSD I)"),
+    ("DSD2", "Deutsches Sprachdiplom Stufe II (DSD II)", "German Language Certificate Level II (DSD II)"),
+    ("SONST", "Sonstiges Zertifikat", "Other certificate"),
 ]
 
 SEK1 = [
@@ -41,32 +47,32 @@ SEK1 = [
 
 # Personalbereiche: (Kürzel, Bezeichnung, unterrichtend)
 PERSONALBEREICHE = [
-    ("SL", "Schulleitung", True),
-    ("LK", "Lehrkräfte", True),
-    ("KITA", "Kindergarten / Vorschule", False),
-    ("NACHM", "Nachmittagsbereich / Coaches", False),
-    ("VERW", "Verwaltung / Sekretariat", False),
-    ("HR", "Personalverwaltung (HR)", False),
-    ("FIN", "Finanzen / Buchhaltung", False),
-    ("IT", "IT", False),
-    ("FAC", "Facility Management / Haustechnik", False),
-    ("REIN", "Reinigung", False),
-    ("SICH", "Sicherheit", False),
-    ("KUE", "Küche / Cafeteria", False),
-    ("TRANS", "Transport / Fahrdienst", False),
-    ("GES", "Schulgesundheit / Krankenstation", False),
-    ("BIB", "Bibliothek", False),
+    ("SL", "Schulleitung", "School management", True),
+    ("LK", "Lehrkräfte", "Teaching staff", True),
+    ("KITA", "Kindergarten / Vorschule", "Kindergarten / Pre-school", False),
+    ("NACHM", "Nachmittagsbereich / Coaches", "Afternoon programme / Coaches", False),
+    ("VERW", "Verwaltung / Sekretariat", "Administration / School office", False),
+    ("HR", "Personalverwaltung (HR)", "Human resources (HR)", False),
+    ("FIN", "Finanzen / Buchhaltung", "Finance / Accounting", False),
+    ("IT", "IT", "IT", False),
+    ("FAC", "Facility Management / Haustechnik", "Facility management / Maintenance", False),
+    ("REIN", "Reinigung", "Cleaning", False),
+    ("SICH", "Sicherheit", "Security", False),
+    ("KUE", "Küche / Cafeteria", "Kitchen / Cafeteria", False),
+    ("TRANS", "Transport / Fahrdienst", "Transport / Drivers", False),
+    ("GES", "Schulgesundheit / Krankenstation", "School health / Sick bay", False),
+    ("BIB", "Bibliothek", "Library", False),
 ]
 # Nachweisarten: (Bezeichnung, Gültigkeit in Monaten, Pflicht für Bereiche – "*" = alle)
 NACHWEISARTEN = [
-    ("Polizeiliches Führungszeugnis / Certificate of Good Conduct", None, ["*"]),
-    ("Kinderschutz-Schulung (Child Safeguarding)", 24, ["*"]),
-    ("Erste-Hilfe-Kurs", 24, ["NACHM", "SICH", "TRANS", "KITA"]),
-    ("Arbeitserlaubnis / Work Permit", None, []),
-    ("Gesundheitszeugnis Lebensmittel (Food Handler)", 12, ["KUE"]),
-    ("Fahrerlaubnis (Personenbeförderung)", None, ["TRANS"]),
-    ("Rettungsschwimmer-Nachweis", 24, []),
-    ("Trainerlizenz / Coaching-Qualifikation", None, []),
+    ("Polizeiliches Führungszeugnis / Certificate of Good Conduct", "Police clearance / Certificate of Good Conduct", None, ["*"]),
+    ("Kinderschutz-Schulung (Child Safeguarding)", "Child safeguarding training", 24, ["*"]),
+    ("Erste-Hilfe-Kurs", "First aid course", 24, ["NACHM", "SICH", "TRANS", "KITA"]),
+    ("Arbeitserlaubnis / Work Permit", "Work permit", None, []),
+    ("Gesundheitszeugnis Lebensmittel (Food Handler)", "Food handler's certificate", 12, ["KUE"]),
+    ("Fahrerlaubnis (Personenbeförderung)", "Driving licence (passenger transport)", None, ["TRANS"]),
+    ("Rettungsschwimmer-Nachweis", "Lifeguard certificate", 24, []),
+    ("Trainerlizenz / Coaching-Qualifikation", "Coaching licence / qualification", None, []),
 ]
 
 # Rechte, die NUR Personalverwaltung und Schulleitung erhalten (nicht das Sekretariat)
@@ -100,6 +106,15 @@ ROLLEN = {
 FACH_APPS = ["stammdaten", "noten", "fehlzeiten", "nachmittag"]
 
 
+def englisch_ergaenzen(obj, **felder):
+    """Setzt englische Bezeichnungen nur, wenn sie noch leer sind – eigene Anpassungen bleiben erhalten."""
+    geaendert = [f for f, wert in felder.items() if wert and not getattr(obj, f)]
+    for f in geaendert:
+        setattr(obj, f, felder[f])
+    if geaendert:
+        obj.save(update_fields=geaendert)
+
+
 class Command(BaseCommand):
     help = "Legt Rollen und Standard-Notenskalen an (idempotent)."
 
@@ -129,6 +144,7 @@ class Command(BaseCommand):
             Notenstufe.objects.bulk_create(
                 [Notenstufe(skala=sek1, bezeichnung=b, wert=Decimal(w), reihenfolge=i) for i, (b, w) in enumerate(SEK1)]
             )
+        englisch_ergaenzen(sek1, name_en="Lower secondary – grades 1 to 6 with +/-")
 
         sek2, neu = Notenskala.objects.get_or_create(
             name="Sek II – Punkte 0 bis 15",
@@ -138,24 +154,29 @@ class Command(BaseCommand):
             Notenstufe.objects.bulk_create(
                 [Notenstufe(skala=sek2, bezeichnung=str(p), wert=Decimal(p), reihenfolge=15 - p) for p in range(15, -1, -1)]
             )
+        englisch_ergaenzen(sek2, name_en="Upper secondary – points 0 to 15")
         self.stdout.write(self.style.SUCCESS("Notenskalen eingerichtet."))
 
-        for i, (k, name, abschluss, von, bis) in enumerate(BILDUNGSGAENGE):
-            Bildungsgang.objects.get_or_create(
+        for i, (k, name, name_en, abschluss, abschluss_en, von, bis) in enumerate(BILDUNGSGAENGE):
+            obj, _ = Bildungsgang.objects.get_or_create(
                 kuerzel=k, defaults={"name": name, "angestrebter_abschluss": abschluss,
                                      "jahrgang_von": von, "jahrgang_bis": bis, "reihenfolge": (i + 1) * 10},
             )
-        for i, (k, name) in enumerate(ABSCHLUSSARTEN):
-            Abschlussart.objects.get_or_create(kuerzel=k, defaults={"name": name, "reihenfolge": (i + 1) * 10})
+            englisch_ergaenzen(obj, name_en=name_en, angestrebter_abschluss_en=abschluss_en)
+        for i, (k, name, name_en) in enumerate(ABSCHLUSSARTEN):
+            obj, _ = Abschlussart.objects.get_or_create(kuerzel=k, defaults={"name": name, "reihenfolge": (i + 1) * 10})
+            englisch_ergaenzen(obj, name_en=name_en)
         self.stdout.write(self.style.SUCCESS("Bildungsgänge und Abschlussarten eingerichtet."))
 
         bereiche = {}
-        for i, (k, name, unterrichtet) in enumerate(PERSONALBEREICHE):
+        for i, (k, name, name_en, unterrichtet) in enumerate(PERSONALBEREICHE):
             bereiche[k], _ = Personalbereich.objects.get_or_create(
                 kuerzel=k, defaults={"name": name, "unterrichtet": unterrichtet, "reihenfolge": (i + 1) * 10}
             )
-        for i, (name, monate, pflicht) in enumerate(NACHWEISARTEN):
+            englisch_ergaenzen(bereiche[k], name_en=name_en)
+        for i, (name, name_en, monate, pflicht) in enumerate(NACHWEISARTEN):
             art, neu = Nachweisart.objects.get_or_create(name=name, defaults={"gueltigkeit_monate": monate, "reihenfolge": (i + 1) * 10})
+            englisch_ergaenzen(art, name_en=name_en)
             if neu:
                 art.pflicht_fuer.set(list(bereiche.values()) if pflicht == ["*"] else [bereiche[k] for k in pflicht])
         self.stdout.write(self.style.SUCCESS("Personalbereiche und Nachweisarten eingerichtet."))

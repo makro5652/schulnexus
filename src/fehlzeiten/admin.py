@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.utils import formats
+from django.utils.translation import gettext, gettext_lazy as _
 from simple_history.admin import SimpleHistoryAdmin
 
 from .models import Fehlzeit, Stunde
@@ -21,22 +23,22 @@ class FehlzeitAdmin(SimpleHistoryAdmin):
     actions = ["als_entschuldigt", "als_unentschuldigt"]
     fieldsets = [
         (None, {"fields": ["schueler", "art", "status"]}),
-        ("Zeitraum", {"fields": [("datum_von", "datum_bis"), ("stunde_von", "stunde_bis"), "minuten"]}),
-        ("Details", {"fields": ["grund", "quelle", "erfasst_von", "erfasst_am"]}),
+        (_("Zeitraum"), {"fields": [("datum_von", "datum_bis"), ("stunde_von", "stunde_bis"), "minuten"]}),
+        (_("Details"), {"fields": ["grund", "quelle", "erfasst_von", "erfasst_am"]}),
     ]
 
-    @admin.display(description="Zeitraum")
+    @admin.display(description=_("Zeitraum"))
     def zeitraum(self, obj):
-        text = f"{obj.datum_von:%d.%m.%Y}"
+        text = formats.date_format(obj.datum_von, "SHORT_DATE_FORMAT")
         if obj.datum_bis and obj.datum_bis != obj.datum_von:
-            text += f" – {obj.datum_bis:%d.%m.%Y}"
+            text += " – " + formats.date_format(obj.datum_bis, "SHORT_DATE_FORMAT")
         if obj.art == Fehlzeit.STUNDEN:
-            text += f", {obj.stunde_von}.–{obj.stunde_bis}. Std."
+            text += ", " + gettext("%(von)s.–%(bis)s. Std.") % {"von": obj.stunde_von, "bis": obj.stunde_bis}
         if obj.art == Fehlzeit.VERSPAETUNG:
-            text += f", {obj.minuten} Min."
+            text += ", " + gettext("%(n)s Min.") % {"n": obj.minuten}
         return text
 
-    @admin.display(description="Fehlstunden")
+    @admin.display(description=_("Fehlstunden"))
     def fehlstunden_anzeige(self, obj):
         return obj.fehlstunden()
 
@@ -45,12 +47,12 @@ class FehlzeitAdmin(SimpleHistoryAdmin):
             obj.erfasst_von = request.user
         super().save_model(request, obj, form, change)
 
-    @admin.action(description="Als entschuldigt markieren")
+    @admin.action(description=_("Als entschuldigt markieren"))
     def als_entschuldigt(self, request, queryset):
         n = queryset.update(status="entschuldigt")
-        self.message_user(request, f"{n} Fehlzeiten als entschuldigt markiert.")
+        self.message_user(request, gettext("%(n)s Fehlzeiten als entschuldigt markiert.") % {"n": n})
 
-    @admin.action(description="Als unentschuldigt markieren")
+    @admin.action(description=_("Als unentschuldigt markieren"))
     def als_unentschuldigt(self, request, queryset):
         n = queryset.update(status="unentschuldigt")
-        self.message_user(request, f"{n} Fehlzeiten als unentschuldigt markiert.")
+        self.message_user(request, gettext("%(n)s Fehlzeiten als unentschuldigt markiert.") % {"n": n})
