@@ -306,3 +306,26 @@ def sprache_wechseln(request):
         if request.user.is_authenticated:
             Benutzereinstellung.objects.update_or_create(benutzer=request.user, defaults={"sprache": sprache})
     return antwort
+
+
+def design_wechseln(request):
+    """Design umschalten: wird als Cookie (auch für die Anmeldeseite) und – wenn angemeldet – im Benutzerkonto gespeichert."""
+    from django.conf import settings
+    from django.http import HttpResponseNotAllowed, HttpResponseRedirect
+    from django.utils.http import url_has_allowed_host_and_scheme
+
+    from .models import DESIGN_COOKIE, DESIGNS, Benutzereinstellung
+
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+    design = request.POST.get("design")
+    ziel = request.POST.get("next") or request.META.get("HTTP_REFERER") or "/"
+    if not url_has_allowed_host_and_scheme(ziel, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
+        ziel = "/"
+    antwort = HttpResponseRedirect(ziel)
+    if design in dict(DESIGNS):
+        antwort.set_cookie(DESIGN_COOKIE, design, max_age=settings.LANGUAGE_COOKIE_AGE, samesite="Lax",
+                           secure=settings.SESSION_COOKIE_SECURE, httponly=True)
+        if request.user.is_authenticated:
+            Benutzereinstellung.objects.update_or_create(benutzer=request.user, defaults={"design": design})
+    return antwort

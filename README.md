@@ -1,4 +1,4 @@
-# Schulverwaltung (Version 0.4.2.7, Entwicklungsstand)
+# Schulverwaltung (Version 0.4.2.8, Entwicklungsstand)
 
 Open-Source-Schulverwaltung für die DSN: Stammdaten, Klassen und Lerngruppen,
 Noten mit Gewichtung, Fehlzeiten, Nachmittagsprogramm, Anhänge zur Schülerakte,
@@ -354,6 +354,26 @@ umschalten – im Portal ebenso wie in der Verwaltungsoberfläche.
 **Regel ab Version 0.4.1.1:** Jede neue Funktion wird zweisprachig gebaut. Die Übersetzungen
 liegen in `src/locale/en/LC_MESSAGES/django.po`; Pflege mit `tools/sprachdateien.py`
 (Ablauf in der Datei beschrieben). Ein Test schlägt fehl, sobald ein Text ohne Übersetzung ist.
+
+## Design: Standard, Catppuccin Latte, Catppuccin Mocha
+
+Oben rechts neben der Sprachauswahl (Paletten-Symbol, „Design“) stehen drei Farbschemata zur Wahl –
+im Portal, in der Verwaltungsoberfläche und auf der Anmeldeseite:
+
+| Design | Beschreibung |
+|---|---|
+| **Standard** | das bisherige Grün-Schema; hell oder dunkel je nach Einstellung des Betriebssystems |
+| **Catppuccin Latte** | helle Palette von [Catppuccin](https://catppuccin.com) (Akzent Mauve), immer hell |
+| **Catppuccin Mocha** | dunkle Palette von Catppuccin, immer dunkel |
+
+- Die Wahl wird wie die Sprache **im Benutzerkonto gespeichert** und gilt auf jedem Gerät;
+  vor der Anmeldung merkt sich der Browser sie per Cookie.
+- Die Druckansichten (Zeugnis, Protokoll, Gefährdungsmitteilungen) bleiben weiß; nur die
+  Bildschirmleiste darüber folgt dem Design.
+- Technisch: `data-design` am `<html>`-Element; die Farben stehen als CSS-Variablen in
+  `portal.css`, `menueband.css` und `verwaltung.css` (Abschnitte „Designs“). Schriftfarben auf
+  getönten Flächen sind gegenüber der Palette leicht abgedunkelt, damit der Kontrast reicht.
+  Catppuccin steht unter MIT-Lizenz.
 
 ## Update von einer älteren Version
 

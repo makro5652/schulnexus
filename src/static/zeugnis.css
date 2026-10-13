@@ -74,3 +74,14 @@ table { border-collapse: collapse; width: 100%; }
 .ruecklauf { margin-top: auto; padding-top: 8mm; font-size: 10pt; }
 .ruecklauf .unterschriften { margin-top: 12mm; }
 .abtrennen { border-top: 1px dashed #000; padding-top: 1.5mm; font-size: 8.5pt; text-align: center; color: #333; }
+
+/* Bildschirmleiste im gewählten Design; das Blatt selbst bleibt weiß */
+@media screen {
+  html[data-design="latte"] body { background: #dce0e8; }
+  html[data-design="latte"] .werkzeug { background: #8839ef; }
+  html[data-design="latte"] .werkzeug button { color: #8839ef; }
+  html[data-design="mocha"] body { background: #181825; }
+  html[data-design="mocha"] .werkzeug { background: #11111b; color: #cdd6f4; }
+  html[data-design="mocha"] .werkzeug a { color: #cba6f7; }
+  html[data-design="mocha"] .werkzeug button { background: #cba6f7; color: #11111b; }
+}

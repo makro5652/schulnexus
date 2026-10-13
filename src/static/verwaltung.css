@@ -37,3 +37,34 @@ html[data-theme="dark"] {
 }
 .breadcrumbs { padding: 0.55rem 40px; }
 .mb-konto summary, .mb .sprachmenue summary { background: transparent; }
+
+/* Designs (Catppuccin Latte / Mocha) für die Verwaltungsoberfläche.
+   html[data-design]:root (0,2,1) hat Vorrang vor Djangos dark_mode.css und den Standardfarben oben. */
+html[data-design="latte"]:root {
+  color-scheme: light;
+  --primary: #8839ef; --secondary: #8839ef; --accent: #efe6fc; --primary-fg: #eff1f5;
+  --body-fg: #4c4f69; --body-bg: #eff1f5; --body-quiet-color: #5c5f77; --body-medium-color: #4c4f69; --body-loud-color: #4c4f69;
+  --header-color: #eff1f5; --header-branding-color: #eff1f5; --header-bg: #8839ef; --header-link-color: #eff1f5;
+  --breadcrumbs-fg: #5c5f77; --breadcrumbs-link-fg: #8839ef; --breadcrumbs-bg: #e6e9ef;
+  --link-fg: #8839ef; --link-hover-color: #1e66f5; --link-selected-fg: #8839ef;
+  --hairline-color: #ccd0da; --border-color: #bcc0cc;
+  --error-fg: #d20f39; --message-success-bg: #dceadb; --message-warning-bg: #f6ead8; --message-error-bg: #f9e5ea;
+  --darkened-bg: #e6e9ef; --selected-bg: #dce0e8; --selected-row: #efe6fc;
+  --button-fg: #eff1f5; --button-bg: #8839ef; --button-hover-bg: #7a2ee0; --default-button-bg: #7a2ee0; --default-button-hover-bg: #8839ef;
+  --close-button-bg: #7c7f93; --close-button-hover-bg: #5c5f77; --delete-button-bg: #d20f39; --delete-button-hover-bg: #b50d31;
+  --object-tools-fg: #eff1f5; --object-tools-bg: #7c7f93; --object-tools-hover-bg: #8839ef;
+}
+html[data-design="mocha"]:root {
+  color-scheme: dark;
+  --primary: #cba6f7; --secondary: #cba6f7; --accent: #3a3350; --primary-fg: #11111b;
+  --body-fg: #cdd6f4; --body-bg: #1e1e2e; --body-quiet-color: #a6adc8; --body-medium-color: #bac2de; --body-loud-color: #cdd6f4;
+  --header-color: #cdd6f4; --header-branding-color: #cdd6f4; --header-bg: #11111b; --header-link-color: #cdd6f4;
+  --breadcrumbs-fg: #a6adc8; --breadcrumbs-link-fg: #cba6f7; --breadcrumbs-bg: #181825;
+  --link-fg: #cba6f7; --link-hover-color: #b4befe; --link-selected-fg: #cba6f7;
+  --hairline-color: #313244; --border-color: #45475a;
+  --error-fg: #f38ba8; --message-success-bg: #2b3d35; --message-warning-bg: #3f3b41; --message-error-bg: #432f42;
+  --darkened-bg: #181825; --selected-bg: #313244; --selected-row: #2a2b3c;
+  --button-fg: #11111b; --button-bg: #cba6f7; --button-hover-bg: #b4befe; --default-button-bg: #cba6f7; --default-button-hover-bg: #b4befe;
+  --close-button-bg: #585b70; --close-button-hover-bg: #7f849c; --delete-button-bg: #f38ba8; --delete-button-hover-bg: #eba0ac;
+  --object-tools-fg: #11111b; --object-tools-bg: #9399b2; --object-tools-hover-bg: #cba6f7;
+}

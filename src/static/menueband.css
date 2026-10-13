@@ -17,6 +17,16 @@ html[data-theme="dark"] .mb {
   --mb-titel: #163f3c; --mb-flaeche: #1e2428; --mb-text: #e8eaec; --mb-leise: #9aa5ae; --mb-linie: #313a40;
   --mb-akzent: #6fbfb6; --mb-akzent-hell: #20332f; --mb-hover: #263034; --mb-schatten: rgba(0, 0, 0, .35);
 }
+/* Designs (Catppuccin) – nach den Dunkel-Regeln, damit sie bei gleicher Spezifität Vorrang haben */
+html[data-design="latte"] .mb {
+  --mb-titel: #8839ef; --mb-titel-text: #eff1f5; --mb-flaeche: #eff1f5; --mb-text: #4c4f69; --mb-leise: #5c5f77; --mb-linie: #ccd0da;
+  --mb-akzent: #8839ef; --mb-akzent-hell: #efe6fc; --mb-hover: #e6e9ef; --mb-schatten: rgba(76, 79, 105, .12);
+}
+html[data-design="mocha"] .mb {
+  --mb-titel: #11111b; --mb-titel-text: #cdd6f4; --mb-flaeche: #1e1e2e; --mb-text: #cdd6f4; --mb-leise: #a6adc8; --mb-linie: #313244;
+  --mb-akzent: #cba6f7; --mb-akzent-hell: #3a3350; --mb-hover: #313244; --mb-schatten: rgba(0, 0, 0, .4);
+}
+html[data-design="mocha"] .mb-zeichen { background: var(--mb-akzent); color: #11111b; }
 .mb *, .mb *::before, .mb *::after { box-sizing: border-box; }
 .mb svg { width: 16px; height: 16px; flex: none; }
 .mb a, .mb a:link, .mb a:visited { color: inherit; text-decoration: none; }
@@ -52,6 +62,16 @@ html[data-theme="dark"] .mb {
 .mb .sprachmenue button { display: block; width: 100%; text-align: left; padding: 0.5rem 0.75rem; border-radius: 7px; font-size: 0.88rem; }
 .mb .sprachmenue button:hover { background: var(--mb-hover); }
 .mb .sprachmenue button[aria-current="true"] { font-weight: 700; color: var(--mb-akzent); }
+
+/* Designmenü (nutzt die Gestaltung des Sprachmenüs) mit kleinen Farbmustern */
+.mb .designmenue form { min-width: 19rem; }
+.sprachmenue.designmenue button { white-space: nowrap; }
+.sprachmenue.designmenue button { display: flex; align-items: center; gap: 0.6rem; }
+.design-muster { display: inline-flex; flex: none; border-radius: 999px; overflow: hidden; box-shadow: 0 0 0 1px rgba(127, 127, 127, .35); }
+.design-muster i { display: block; width: 0.7rem; height: 1rem; }
+.design-muster-standard i:nth-child(1) { background: #f6f5f1; } .design-muster-standard i:nth-child(2) { background: #1f5f5b; } .design-muster-standard i:nth-child(3) { background: #1e2428; }
+.design-muster-latte i:nth-child(1) { background: #eff1f5; } .design-muster-latte i:nth-child(2) { background: #8839ef; } .design-muster-latte i:nth-child(3) { background: #1e66f5; }
+.design-muster-mocha i:nth-child(1) { background: #1e1e2e; } .design-muster-mocha i:nth-child(2) { background: #cba6f7; } .design-muster-mocha i:nth-child(3) { background: #89b4fa; }
 
 /* Konto */
 .mb-konto { position: relative; }
@@ -106,7 +126,9 @@ html[data-theme="dark"] .mb {
 @media (max-width: 760px) {
   .mb-titel { flex-wrap: wrap; gap: 0.5rem 0.8rem; padding: 0.45rem 0.8rem; }
   .mb-suche { order: 3; flex-basis: 100%; max-width: none; }
-  .mb-name { display: none; }
+  .mb-name, .mb .designmenue-text { display: none; }
+  /* Auswahlmenüs auf schmalen Bildschirmen über die volle Breite, damit sie nicht aus dem Bild ragen */
+  .mb .sprachmenue form { position: fixed; left: 0.6rem; right: 0.6rem; top: auto; min-width: 0; }
   .mb-reiter { padding: 0 0.3rem; }
 }
 @media (prefers-reduced-motion: reduce) { .mb-einklappen svg { transition: none; } }

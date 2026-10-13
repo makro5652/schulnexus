@@ -2,7 +2,8 @@
 {% load i18n static %}
 {% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
 {% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static 'verwaltung.css' %}"><link rel="stylesheet" href="{% static 'menueband.css' %}">{% endblock %}
-{% block extrahead %}{{ block.super }}<script src="{% static 'menueband.js' %}" defer></script>{% endblock %}
+{# Design: das <html>-Element der Verwaltung stammt aus Django – das Attribut setzt ein kleines Skript ohne Verzögerung #}
+{% block extrahead %}{{ block.super }}<script src="{% static 'design.js' %}" data-design="{{ DESIGN|default:'standard' }}"></script><script src="{% static 'menueband.js' %}" defer></script>{% endblock %}
 {# Kopfbereich: dasselbe Menüband wie im Portal statt der Standard-Kopfzeile #}
 {% block header %}{% if MENUEBAND %}{% include "portal/_menueband.html" %}{% else %}{{ block.super }}{% endif %}{% endblock %}
 {% block branding %}
@@ -12,5 +13,6 @@
   <a href="{% url 'start' %}">{% translate "Startseite" %}</a> /
   {{ block.super }}
   {% include "portal/_sprachmenue.html" %}
+  {% include "portal/_designmenue.html" %}
 {% endblock %}
 {% block footer %}<div id="footer" class="verwaltung-fuss">{% blocktranslate %}Version {{ VERSION }}{% endblocktranslate %}</div>{% endblock %}

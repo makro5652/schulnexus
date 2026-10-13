@@ -3,13 +3,24 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
+# Farbschemata der Oberfläche. „standard“ folgt der Hell-/Dunkel-Einstellung des Betriebssystems,
+# die beiden anderen sind feste Paletten von Catppuccin (https://catppuccin.com, MIT-Lizenz).
+DESIGN_COOKIE = "design"
+DESIGNS = [
+    ("standard", _("Standard (hell/dunkel nach System)")),
+    ("latte", _("Catppuccin Latte (hell)")),
+    ("mocha", _("Catppuccin Mocha (dunkel)")),
+]
+
+
 class Benutzereinstellung(models.Model):
-    """Persönliche Einstellungen je Benutzerkonto (derzeit: Sprache der Oberfläche)."""
+    """Persönliche Einstellungen je Benutzerkonto: Sprache und Design der Oberfläche."""
 
     benutzer = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="einstellung", verbose_name=_("Benutzerkonto")
     )
     sprache = models.CharField(_("Sprache der Oberfläche"), max_length=8, choices=settings.LANGUAGES, default=settings.LANGUAGE_CODE)
+    design = models.CharField(_("Design"), max_length=12, choices=DESIGNS, default="standard")
 
     class Meta:
         verbose_name = _("Benutzereinstellung")

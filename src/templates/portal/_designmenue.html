@@ -1,0 +1,16 @@
+{% load i18n %}
+<details class="sprachmenue designmenue">
+  <summary aria-label="{% translate 'Design wählen' %}" title="{% translate 'Design wählen' %}">
+    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.8-.8 1.8-1.7 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-.9.8-1.7 1.7-1.7h2.1A4.4 4.4 0 0 0 21 10.8C21 6.5 17 3 12 3z"/><circle cx="7.5" cy="11.5" r="1.1"/><circle cx="10" cy="7.5" r="1.1"/><circle cx="14.5" cy="7.5" r="1.1"/><circle cx="17" cy="11" r="1.1"/></svg>
+    <span class="designmenue-text">{% translate "Design" %}</span>
+  </summary>
+  <form method="post" action="{% url 'design_wechseln' %}">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+    {% for code, name in DESIGNS %}
+      <button type="submit" name="design" value="{{ code }}"{% if code == DESIGN %} aria-current="true"{% endif %}>
+        <span class="design-muster design-muster-{{ code }}" aria-hidden="true"><i></i><i></i><i></i></span>{{ name }}
+      </button>
+    {% endfor %}
+  </form>
+</details>

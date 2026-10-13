@@ -26,7 +26,7 @@ class NurPersonalMiddleware:
     Andere angemeldete Konten – etwa spätere Eltern- oder Schülerkonten – werden abgemeldet.
     """
 
-    FREI = ("/anmelden/", "/abmelden/", "/sprache/", "/gesundheit/", "/static/")
+    FREI = ("/anmelden/", "/abmelden/", "/sprache/", "/design/", "/gesundheit/", "/static/")
 
     def __init__(self, get_response):
         self.get_response = get_response

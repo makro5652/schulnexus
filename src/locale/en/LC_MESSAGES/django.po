@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-13 21:31+0300\n"
+"POT-Creation-Date: 2026-10-13 22:00+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -64,8 +64,8 @@ msgstr "Title"
 msgid "leer = Dateiname"
 msgstr "empty = file name"
 
-#: aufnahme/ansichten.py:116 aufnahme/models.py:312 portal/models.py:31
-#: portal/models.py:44 stammdaten/admin.py:501 stammdaten/models.py:718
+#: aufnahme/ansichten.py:116 aufnahme/models.py:312 portal/models.py:42
+#: portal/models.py:55 stammdaten/admin.py:509 stammdaten/models.py:718
 msgid "Notiz"
 msgstr "Note"
 
@@ -625,7 +625,7 @@ msgstr "Contact (application)"
 msgid "Kontakte (Anmeldung)"
 msgstr "Contacts (application)"
 
-#: aufnahme/models.py:307 stammdaten/admin.py:498 stammdaten/models.py:369
+#: aufnahme/models.py:307 stammdaten/admin.py:506 stammdaten/models.py:369
 #: stammdaten/models.py:720 templates/aufnahme/anmeldung.html:130
 #: templates/portal/_anhaenge.html:26
 msgid "Datei"
@@ -671,7 +671,7 @@ msgstr "File (application)"
 msgid "Dateien (Anmeldung)"
 msgstr "Files (application)"
 
-#: aufnahme/models.py:351 portal/models.py:39
+#: aufnahme/models.py:351 portal/models.py:50
 #: templates/portal/_notizen.html:36 zeugnisse/models.py:160
 msgid "Erledigt"
 msgstr "Done"
@@ -1251,7 +1251,7 @@ msgid "Erstellt von"
 msgstr "Created by"
 
 #: foerderung/models.py:110 foerderung/models.py:193 foerderung/models.py:237
-#: portal/models.py:40
+#: portal/models.py:51
 msgid "Erstellt am"
 msgstr "Created on"
 
@@ -1392,14 +1392,14 @@ msgstr "Evaluation"
 msgid "Sonstiges"
 msgstr "Other"
 
-#: foerderung/models.py:188 noten/models.py:280 portal/models.py:34
+#: foerderung/models.py:188 noten/models.py:280 portal/models.py:45
 #: stammdaten/models.py:445 stammdaten/models.py:859 stammdaten/models.py:954
 #: templates/zeugnisse/protokoll.html:18 templates/zeugnisse/zeugnis.html:120
 #: zeugnisse/models.py:181
 msgid "Datum"
 msgstr "Date"
 
-#: foerderung/models.py:192 portal/models.py:30
+#: foerderung/models.py:192 portal/models.py:41
 msgid "Verfasst von"
 msgstr "Written by"
 
@@ -2218,55 +2218,71 @@ msgstr "All categories"
 msgid "Dieses Portal ist nur für Beschäftigte der Schule zugänglich."
 msgstr "This portal is only available to school staff."
 
-#: portal/models.py:10 stammdaten/models.py:102
+#: portal/models.py:10
+msgid "Standard (hell/dunkel nach System)"
+msgstr "Default (light/dark as set by the system)"
+
+#: portal/models.py:11
+msgid "Catppuccin Latte (hell)"
+msgstr "Catppuccin Latte (light)"
+
+#: portal/models.py:12
+msgid "Catppuccin Mocha (dunkel)"
+msgstr "Catppuccin Mocha (dark)"
+
+#: portal/models.py:20 stammdaten/models.py:102
 msgid "Benutzerkonto"
 msgstr "User account"
 
-#: portal/models.py:12
+#: portal/models.py:22
 msgid "Sprache der Oberfläche"
 msgstr "Interface language"
 
-#: portal/models.py:15
+#: portal/models.py:23 templates/portal/_designmenue.html:5
+msgid "Design"
+msgstr "Theme"
+
+#: portal/models.py:26
 msgid "Benutzereinstellung"
 msgstr "User setting"
 
-#: portal/models.py:16
+#: portal/models.py:27
 msgid "Benutzereinstellungen"
 msgstr "User settings"
 
-#: portal/models.py:26
+#: portal/models.py:37
 msgid "Nur für mich"
 msgstr "Only me"
 
-#: portal/models.py:26
+#: portal/models.py:37
 msgid "Mitteilung an alle"
 msgstr "Announcement to everyone"
 
-#: portal/models.py:27
+#: portal/models.py:38
 msgid "Gelb"
 msgstr "Yellow"
 
-#: portal/models.py:27
+#: portal/models.py:38
 msgid "Grün"
 msgstr "Green"
 
-#: portal/models.py:27
+#: portal/models.py:38
 msgid "Blau"
 msgstr "Blue"
 
-#: portal/models.py:27
+#: portal/models.py:38
 msgid "Rosa"
 msgstr "Pink"
 
-#: portal/models.py:27
+#: portal/models.py:38
 msgid "Grau"
 msgstr "Grey"
 
-#: portal/models.py:32
+#: portal/models.py:43
 msgid "Farbe"
 msgstr "Colour"
 
-#: portal/models.py:35
+#: portal/models.py:46
 msgid ""
 "Notiz: fällig am (wird ab diesem Tag hervorgehoben). Mitteilung: sichtbar "
 "bis einschließlich."
@@ -2274,20 +2290,20 @@ msgstr ""
 "Note: due date (highlighted from this day). Announcement: visible up to and "
 "including this date."
 
-#: portal/models.py:37 stammdaten/models.py:727 stammdaten/models.py:984
+#: portal/models.py:48 stammdaten/models.py:727 stammdaten/models.py:984
 #: templates/aufnahme/anmeldung.html:144 templates/portal/_anhaenge.html:26
 msgid "Sichtbar für"
 msgstr "Visible to"
 
-#: portal/models.py:38
+#: portal/models.py:49
 msgid "Angeheftet"
 msgstr "Pinned"
 
-#: portal/models.py:41
+#: portal/models.py:52
 msgid "Geändert am"
 msgstr "Changed on"
 
-#: portal/models.py:45 portal/navigation.py:66
+#: portal/models.py:56 portal/navigation.py:66
 #: templates/portal/_notizen.html:23
 msgid "Notizen"
 msgstr "Notes"
@@ -2310,7 +2326,7 @@ msgstr "Home"
 msgid "Übersicht"
 msgstr "Overview"
 
-#: portal/navigation.py:63 templates/admin/base_site.html:12
+#: portal/navigation.py:63 templates/admin/base_site.html:13
 msgid "Startseite"
 msgstr "Home"
 
@@ -2331,12 +2347,12 @@ msgstr "Birthdays"
 msgid "Mitteilung schreiben"
 msgstr "Write announcement"
 
-#: portal/navigation.py:69 templates/portal/_menueband.html:20
-#: templates/portal/_menueband.html:26
+#: portal/navigation.py:69 templates/portal/_menueband.html:21
+#: templates/portal/_menueband.html:27
 msgid "Konto"
 msgstr "Account"
 
-#: portal/navigation.py:70 templates/portal/_menueband.html:27
+#: portal/navigation.py:70 templates/portal/_menueband.html:28
 msgid "Passwort ändern"
 msgstr "Change password"
 
@@ -3097,36 +3113,36 @@ msgid ""
 "%(n)s Mitgliedschaften angelegt. Danach bitte Abwählende wieder entfernen."
 msgstr "%(n)s memberships created. Please then remove students who opted out."
 
-#: stammdaten/admin.py:475 templates/foerderung/_akte.html:16
+#: stammdaten/admin.py:483 templates/foerderung/_akte.html:16
 #: templates/foerderung/nachteilsausgleich.html:33
 msgid "Gültig"
 msgstr "Valid"
 
-#: stammdaten/admin.py:505
+#: stammdaten/admin.py:513
 msgid "Größe"
 msgstr "Size"
 
-#: stammdaten/admin.py:566
+#: stammdaten/admin.py:574
 msgid "Personen (aktiv)"
 msgstr "People (active)"
 
-#: stammdaten/admin.py:576
+#: stammdaten/admin.py:584
 msgid "Eingesetzte Personen"
 msgstr "People deployed"
 
-#: stammdaten/admin.py:587
+#: stammdaten/admin.py:595
 msgid "Pflicht für"
 msgstr "Required for"
 
-#: stammdaten/admin.py:609
+#: stammdaten/admin.py:617
 msgid "Arbeitstage"
 msgstr "Working days"
 
-#: stammdaten/admin.py:622
+#: stammdaten/admin.py:630
 msgid "Englische Bezeichnungen"
 msgstr "English names"
 
-#: stammdaten/admin.py:623
+#: stammdaten/admin.py:631
 msgid "Sichtbarkeit und Anzeige"
 msgstr "Visibility and display"
 
@@ -4325,11 +4341,11 @@ msgstr "Custom fields – %(abschnitt)s"
 msgid "Django site admin"
 msgstr "Django site admin"
 
-#: templates/admin/base_site.html:9
+#: templates/admin/base_site.html:10
 msgid "Django administration"
 msgstr "Django administration"
 
-#: templates/admin/base_site.html:16
+#: templates/admin/base_site.html:18
 #, python-format
 msgid "Version %(VERSION)s"
 msgstr "Version %(VERSION)s"
@@ -5182,6 +5198,10 @@ msgid ""
 msgstr ""
 "Any file type, maximum %(mb)s MB. Without a file, only the note is saved."
 
+#: templates/portal/_designmenue.html:3
+msgid "Design wählen"
+msgstr "Choose theme"
+
 #: templates/portal/_geburtstage.html:5
 msgid "heute und die nächsten 7 Tage"
 msgstr "today and the next 7 days"
@@ -5220,20 +5240,20 @@ msgstr "No birthdays in the next seven days."
 msgid "Schüler:in, Kolleg:in oder Eltern suchen"
 msgstr "Search students, staff or parents"
 
-#: templates/portal/_menueband.html:29
+#: templates/portal/_menueband.html:30
 msgid "Abmelden"
 msgstr "Log out"
 
-#: templates/portal/_menueband.html:38
+#: templates/portal/_menueband.html:39
 msgid "Menüband"
 msgstr "Ribbon"
 
-#: templates/portal/_menueband.html:45
+#: templates/portal/_menueband.html:46
 msgid "Menüband einblenden"
 msgstr "Show ribbon"
 
-#: templates/portal/_menueband.html:45 templates/portal/_menueband.html:46
-#: templates/portal/_menueband.html:47
+#: templates/portal/_menueband.html:46 templates/portal/_menueband.html:47
+#: templates/portal/_menueband.html:48
 msgid "Menüband ausblenden"
 msgstr "Hide ribbon"
 

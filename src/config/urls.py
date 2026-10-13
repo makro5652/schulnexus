@@ -31,5 +31,6 @@ urlpatterns = [
     path("notizen/erledigte-loeschen/", startseite.erledigte_loeschen, name="notizen_erledigte_loeschen"),
     path("gesundheit/", views.gesundheit, name="gesundheit"),
     path("sprache/", views.sprache_wechseln, name="sprache_wechseln"),
+    path("design/", views.design_wechseln, name="design_wechseln"),
     path("verwaltung/", admin.site.urls),
 ]
