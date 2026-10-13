@@ -124,6 +124,10 @@ class Command(BaseCommand):
         if Schuljahr.objects.filter(name="2026/27").exists():
             n = self.englisch_nachtragen()
             self.stdout.write(f"Demo-Daten sind bereits vorhanden – {n} englische Bezeichnungen ergänzt.")
+            if not User.objects.filter(username="foerderung").exists():
+                call_command("grundeinrichtung", stdout=self.stdout)
+                self.foerderung_anlegen(opts["passwort"])
+                self.stdout.write("Beispiele für Förderung und Anhänge ergänzt.")
             return
 
         call_command("grundeinrichtung", stdout=self.stdout)
@@ -475,10 +479,181 @@ class Command(BaseCommand):
                 s_.zusatzfelder["instrument"] = rng.choice(["Klavier", "Gitarre", "Geige", "Schlagzeug"])
             s_.save(update_fields=["zusatzfelder"])
 
+        self.foerderung_anlegen(pw)
+
         self.stdout.write(self.style.SUCCESS(
             f"Demo-Daten angelegt: {len(alle)} Schüler:innen, {Person.objects.count()} Personen, "
             f"{Fehlzeit.objects.count()} Fehlzeiten, AG-Zuteilung {ergebnis.zugeteilt} "
             f"({len(ergebnis.ohne_platz)} ohne Platz)."
         ))
         self.stdout.write(f"Demo-Konten: 'lehrkraft' (Klassenleitung 9a, Chemie), 'verwaltung' (Sekretariat), "
-                          f"'personal' (HR) – Passwort: {pw}")
+                          f"'personal' (HR), 'foerderung' (Förderkoordination, Klassenleitung 9b) – Passwort: {pw}")
+
+    # ------------------------------------------------------------ Förderung und Anhänge (ab Version 0.4.2.0)
+    def foerderung_anlegen(self, pw):
+        from django.core.files.base import ContentFile
+
+        from foerderung.models import (
+            Aushaendigung, Ausgleichsmassnahme, Foerdereintrag, Foerderplan, Foerderschwerpunkt, Foerderziel, Nachteilsausgleich,
+        )
+        from stammdaten.models import Dokument
+
+        heute = timezone.localdate()
+        sj = Schuljahr.objects.get(name="2026/27")
+        kl9a = Gruppe.objects.get(schuljahr=sj, name="9a")
+        kl9b = Gruppe.objects.get(schuljahr=sj, name="9b")
+        kro, sch = kl9a.leitung, kl9b.leitung
+        lehrkraft = User.objects.get(username="lehrkraft")
+
+        # Förderkoordination: Thomas Schwarz (zugleich Klassenleitung 9b)
+        konto = User.objects.create_user("foerderung", password=pw, is_staff=True, first_name="Thomas", last_name="Schwarz")
+        konto.groups.add(Group.objects.get(name="Förderkoordination"), Group.objects.get(name="Lehrkraft"))
+        sch.person.benutzer = konto
+        sch.person.save(update_fields=["benutzer"])
+        sch.weitere_funktionen = "Förderkoordination"
+        sch.save(update_fields=["weitere_funktionen"])
+
+        sp = {f.name: f for f in Foerderschwerpunkt.objects.all()}
+        ma = {m.name: m for m in Ausgleichsmassnahme.objects.all()}
+        fach = {f.kuerzel: f for f in Fach.objects.all()}
+        s9a = list(kl9a.aktuelle_mitglieder().order_by("person__nachname"))
+        s9b = list(kl9b.aktuelle_mitglieder().order_by("person__nachname"))
+
+        def elternteil(s):
+            b = s.beziehungen.filter(sorgerecht=True).select_related("person").first()
+            return b.person if b else None
+
+        # 1) Lesen und Rechtschreiben, 9a: Plan aktiv, Eltern haben bestätigt; Nachteilsausgleich mit Notenschutz
+        a = s9a[1]
+        plan = Foerderplan.objects.create(
+            schueler=a, schuljahr=sj, titel="Lesen und Rechtschreiben", status=Foerderplan.AKTIV,
+            gueltig_von=date(2026, 9, 1), gueltig_bis=date(2027, 1, 29), evaluation_am=date(2027, 1, 15),
+            verantwortlich=kro, erstellt_von=lehrkraft,
+            ausgangslage="Lesetempo deutlich unter Klassenniveau; viele Fehler bei Dehnung und Doppelkonsonanten. "
+                         "Mündlich sehr sicher und engagiert.",
+            staerken="Sehr gutes Sachwissen in den Naturwissenschaften, hilfsbereit, arbeitet gern in Gruppen.",
+            grundlagen="Gutachten Kinder- und Jugendpsychiatrie (Nairobi) vom 12.05.2026; HSP 7-9 im September 2026.",
+            vereinbarungen="Wöchentlich 20 Minuten Lesetraining zu Hause; Nutzung der Rechtschreibkartei im Unterricht.",
+        )
+        plan.schwerpunkte.set([sp["Lesen und Rechtschreiben"]])
+        plan.beteiligte.set([sch])
+        Foerderziel.objects.create(plan=plan, fach=fach["D"], reihenfolge=1,
+                                   ziel="Liest einen unbekannten Sachtext (ca. 250 Wörter) in höchstens 3 Minuten und beantwortet 4 von 5 Verständnisfragen.",
+                                   massnahmen="Lautlesetandem zweimal pro Woche; Lesestrategien (Überschriften, Schlüsselwörter).",
+                                   zustaendig="Deutschlehrkraft, Eltern", bis=date(2027, 1, 15))
+        Foerderziel.objects.create(plan=plan, bereich="Rechtschreibung", reihenfolge=2,
+                                   ziel="Wendet die Regeln zu Dehnung und Schärfung in eigenen Texten zu 80 % richtig an.",
+                                   massnahmen="Rechtschreibkartei, Fehleranalyse nach jeder Klassenarbeit.",
+                                   zustaendig="Deutschlehrkraft, Schüler:in", bis=date(2027, 1, 15), ergebnis=Foerderziel.TEILWEISE,
+                                   bewertung="Deutliche Fortschritte bei Doppelkonsonanten, Dehnung noch unsicher.")
+        for tage, art, text, wer in [
+            (40, "gespraech_eltern", "Elterngespräch zur Vorstellung des Förderplans; Eltern unterstützen das Lesetraining.", lehrkraft),
+            (21, "beobachtung", "Liest im Chemieunterricht Arbeitsaufträge inzwischen selbstständig; braucht etwas mehr Zeit.", lehrkraft),
+            (7, "massnahme", "Lautlesetandem gestartet (Partnerin aus der Klasse).", konto),
+        ]:
+            Foerdereintrag.objects.create(schueler=a, plan=plan, datum=heute - timedelta(days=tage), art=art, text=text, verfasst_von=wer)
+        mutter = elternteil(a)
+        if mutter:
+            Aushaendigung.objects.create(foerderplan=plan, empfaenger=mutter, ausgehaendigt_am=date(2026, 9, 3), weg="gespraech",
+                                         bestaetigt_am=date(2026, 9, 7), bestaetigung="unterschrift", erfasst_von=lehrkraft,
+                                         bestaetigt_durch_konto=lehrkraft)
+        nta = Nachteilsausgleich.objects.create(
+            schueler=a, begruendung="Lese-Rechtschreib-Schwierigkeit laut Gutachten vom 12.05.2026; Beschluss der Klassenkonferenz.",
+            zeitverlaengerung=25, gueltig_von=date(2026, 9, 1), gueltig_bis=date(2027, 7, 31), status=Nachteilsausgleich.GENEHMIGT,
+            beschlossen_am=date(2026, 8, 28), beschlossen_durch="Klassenkonferenz 9a", foerderplan=plan, erstellt_von=konto,
+        )
+        nta.massnahmen.set([ma["Rechtschreibung wird nicht bewertet"], ma["Vorlesen der Aufgabenstellung"]])
+        nta.faecher.set([fach["D"], fach["E"]])
+        nta.schwerpunkte.set([sp["Lesen und Rechtschreiben"]])
+        if mutter:
+            Aushaendigung.objects.create(nachteilsausgleich=nta, empfaenger=mutter, ausgehaendigt_am=heute - timedelta(days=5),
+                                         weg="email", erfasst_von=konto)
+
+        # 2) Aufmerksamkeit, 9a: Plan aktiv, noch nicht ausgehändigt, Evaluation bald; Nachteilsausgleich beantragt
+        b = s9a[4]
+        plan2 = Foerderplan.objects.create(
+            schueler=b, schuljahr=sj, titel="Arbeitsorganisation", status=Foerderplan.AKTIV,
+            gueltig_von=heute - timedelta(days=30), evaluation_am=heute + timedelta(days=9), verantwortlich=kro, erstellt_von=lehrkraft,
+            ausgangslage="Verliert bei längeren Arbeitsphasen den Faden; Hausaufgaben häufig unvollständig.",
+            staerken="Kreativ, gute Ideen im Experimentalunterricht.",
+        )
+        plan2.schwerpunkte.set([sp["Aufmerksamkeit und Konzentration"], sp["Arbeits- und Lernverhalten"]])
+        Foerderziel.objects.create(plan=plan2, bereich="Arbeitsverhalten", reihenfolge=1,
+                                   ziel="Notiert alle Hausaufgaben im Planer und hakt sie ab (Kontrolle freitags durch die Klassenleitung).",
+                                   massnahmen="Wochenplaner, kurze Rückmeldung am Freitag.", zustaendig="Klassenleitung, Eltern")
+        n2 = Nachteilsausgleich.objects.create(
+            schueler=b, begruendung="Beobachtungen der Fachlehrkräfte; ärztliche Stellungnahme wird nachgereicht.",
+            gueltig_von=heute, status=Nachteilsausgleich.BEANTRAGT, erstellt_von=lehrkraft)
+        n2.massnahmen.set([ma["Separater, ruhiger Raum"], ma["Zusätzliche Pausen"]])
+
+        # 3) DaZ, 9b: Nachteilsausgleich läuft bald ab, Erhalt bestätigt
+        c = s9b[2]
+        plan3 = Foerderplan.objects.create(
+            schueler=c, schuljahr=sj, titel="Deutsch als Zweitsprache", status=Foerderplan.AKTIV,
+            gueltig_von=date(2026, 8, 17), evaluation_am=date(2027, 1, 20), verantwortlich=sch, erstellt_von=konto,
+            ausgangslage="Seit März 2026 an der Schule; Deutsch auf Niveau A2, Englisch sehr gut.",
+            staerken="Sehr gute Mathematikkenntnisse, schnelle Auffassungsgabe.",
+        )
+        plan3.schwerpunkte.set([sp["Deutsch als Zweitsprache (DaZ/DaF)"]])
+        Foerderziel.objects.create(plan=plan3, fach=fach["D"], reihenfolge=1,
+                                   ziel="Erreicht bis Januar das Niveau B1 im Bereich Leseverstehen.",
+                                   massnahmen="DaZ-Kurs (2 Stunden/Woche), Wortschatzlisten je Fach.", zustaendig="DaZ-Lehrkraft")
+        n3 = Nachteilsausgleich.objects.create(
+            schueler=c, begruendung="Zweitsprachenerwerb; Beschluss der Schulleitung.", zeitverlaengerung=15,
+            gueltig_von=date(2026, 3, 1), gueltig_bis=heute + timedelta(days=20), status=Nachteilsausgleich.GENEHMIGT,
+            beschlossen_am=date(2026, 2, 25), beschlossen_durch="Schulleitung", foerderplan=plan3, erstellt_von=konto)
+        n3.massnahmen.set([ma["Wörterbuch zugelassen"]])
+        eltern_c = elternteil(c)
+        if eltern_c:
+            Aushaendigung.objects.create(nachteilsausgleich=n3, empfaenger=eltern_c, ausgehaendigt_am=date(2026, 3, 2),
+                                         weg="persoenlich", bestaetigt_am=date(2026, 3, 4), bestaetigung="unterschrift",
+                                         erfasst_von=konto, bestaetigt_durch_konto=konto)
+            Aushaendigung.objects.create(foerderplan=plan3, empfaenger=eltern_c, ausgehaendigt_am=date(2026, 9, 10),
+                                         weg="gespraech", erfasst_von=konto)
+        Schuelerprofil.objects.filter(pk__in=[a.pk, c.pk]).update(nachteilsausgleich=True)
+
+        # Anhänge (Beispieldateien) – Upload-Zeitpunkte gestaffelt, damit die Sortierung sichtbar wird
+        verwaltung = User.objects.get(username="verwaltung")
+        jetzt = timezone.now()
+        beispiele = [
+            (a, "Zeugnis 8. Klasse, 2. Halbjahr", "zeugnis", "akte", "zeugnis_2025-26.pdf", verwaltung, 120),
+            (a, "Gutachten Lese-Rechtschreib-Schwierigkeit", "diagnostik", "foerderung", "gutachten_lrs.pdf", konto, 150),
+            (a, "Rückmeldung der Mutter zum Lesetraining", "korrespondenz", "akte", None, lehrkraft, 6),
+            (a, "Unterschriebener Rücklauf Förderplan", "foerderung", "foerderung", "ruecklauf_foerderplan.pdf", lehrkraft, 36),
+            (b, "Anmeldeformular", "vertrag", "verwaltung", "anmeldung.pdf", verwaltung, 400),
+            (c, "Einstufungstest Deutsch (A2)", "diagnostik", "foerderung", "einstufung_daz.pdf", konto, 220),
+        ]
+        for schueler, titel, kategorie, stufe, datei, wer, tage in beispiele:
+            d = Dokument(person=schueler.person, titel=titel, kategorie=kategorie, zugriffsstufe=stufe, hochgeladen_von=wer)
+            if datei:
+                d.datei = ContentFile(beispiel_pdf(titel, schueler.person.anzeigename), name=datei)
+            else:
+                d.notiz = ("Mutter berichtet per E-Mail, dass das tägliche Lesetraining gut klappt; "
+                           "bittet um Rückmeldung zur nächsten Klassenarbeit.")
+            d.save()
+            Dokument.objects.filter(pk=d.pk).update(hochgeladen_am=jetzt - timedelta(days=tage))
+
+
+def beispiel_pdf(titel, name):
+    """Kleines, gültiges PDF mit einer Textzeile – nur für Demo-Anhänge."""
+    def esc(t):
+        return t.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)").encode("latin-1", "replace").decode("latin-1")
+
+    text = f"BT /F1 16 Tf 60 760 Td ({esc(titel)}) Tj 0 -26 Td /F1 11 Tf (Demo-Dokument fuer {esc(name)} - keine echten Daten) Tj ET"
+    objekte = [
+        "<< /Type /Catalog /Pages 2 0 R >>",
+        "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+        "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>",
+        f"<< /Length {len(text.encode('latin-1'))} >>\nstream\n{text}\nendstream",
+        "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>",
+    ]
+    aus = "%PDF-1.4\n"
+    positionen = []
+    for i, obj in enumerate(objekte, start=1):
+        positionen.append(len(aus.encode("latin-1")))
+        aus += f"{i} 0 obj\n{obj}\nendobj\n"
+    xref = len(aus.encode("latin-1"))
+    aus += f"xref\n0 {len(objekte) + 1}\n0000000000 65535 f \n"
+    aus += "".join(f"{p:010d} 00000 n \n" for p in positionen)
+    aus += f"trailer\n<< /Size {len(objekte) + 1} /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF\n"
+    return aus.encode("latin-1")

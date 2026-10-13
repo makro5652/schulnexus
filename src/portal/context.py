@@ -10,4 +10,5 @@ def schulinfo(request):
         "AKTUELLES_SCHULJAHR": Schuljahr.aktuelles(),
         "VERSION": VERSION,
         "SPRACHEN": settings.LANGUAGES,
+        "DOKUMENT_MAX_MB": settings.DOKUMENT_MAX_MB,
     }

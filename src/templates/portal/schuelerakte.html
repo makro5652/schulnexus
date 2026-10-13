@@ -18,7 +18,8 @@
 
 <div class="hinweisleiste">
   {% if s.daz %}<span class="etikett">{% translate "DaZ/DaF" %}</span>{% endif %}
-  {% if s.nachteilsausgleich %}<span class="etikett">{% translate "Nachteilsausgleich" %}</span>{% endif %}
+  {% if foerderung.nta_aktiv %}<a class="etikett" href="#foerderung">{% translate "Nachteilsausgleich" %}</a>{% elif s.nachteilsausgleich %}<span class="etikett">{% translate "Nachteilsausgleich" %}</span>{% endif %}
+  {% if anhaenge %}<a class="etikett" href="#anhaenge">{% blocktranslate count n=anhaenge|length %}{{ n }} Anhang{% plural %}{{ n }} Anhänge{% endblocktranslate %}</a>{% endif %}
   {% if gesundheit and gesundheit.hat_eintraege %}<span class="etikett warnend">{% translate "Gesundheitshinweise" %}</span>{% endif %}
   {% if fz.offen %}<span class="etikett warnend">{% blocktranslate count n=fz.offen %}{{ n }} offene Entschuldigung{% plural %}{{ n }} offene Entschuldigungen{% endblocktranslate %}</span>{% endif %}
 </div>
@@ -129,6 +130,8 @@
     {% else %}<p class="leer">{% translate "Keine Unterrichte im aktuellen Schuljahr." %}</p>{% endif %}
   </section>
 
+  {% if foerderung %}{% include "foerderung/_akte.html" %}{% endif %}
+
   <section class="karte">
     <h2>{% translate "Einwilligungen" %}</h2>
     {% for e in einwilligungen %}<p>{% if e.gueltig %}✓{% else %}✗{% endif %} {{ e.get_zweck_display }} <span class="leise">· {{ e.erteilt_am|kurzdatum }}{% if e.widerrufen_am %}, {% blocktranslate with datum=e.widerrufen_am|kurzdatum %}widerrufen {{ datum }}{% endblocktranslate %}{% endif %}</span></p>{% empty %}<p class="leer">{% translate "Keine Einwilligungen erfasst – im Zweifel gilt: nicht erteilt." %}</p>{% endfor %}
@@ -160,5 +163,7 @@
     {% else %}<p class="leer">{% translate "Keine Angaben hinterlegt." %}</p>{% endif %}
   </section>
   {% endif %}
+
+  {% include "portal/_anhaenge.html" %}
 </div>
 {% endblock %}

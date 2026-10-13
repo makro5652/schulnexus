@@ -1,0 +1,54 @@
+{% extends "portal/base.html" %}
+{% load i18n formate %}
+{% block title %}{% blocktranslate with name=p.anzeigename %}Nachteilsausgleich {{ name }}{% endblocktranslate %}{% endblock %}
+{% block inhalt %}
+<div class="dokument">
+<p class="druckkopf">{{ SCHULNAME }} · {% translate "vertraulich" %} · {% now "SHORT_DATE_FORMAT" %}</p>
+<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a>{% if klasse %} › <a href="{% url 'klassenliste' klasse.pk %}">{% blocktranslate with name=klasse.name %}Klasse {{ name }}{% endblocktranslate %}</a>{% endif %} › {% if darf_akte %}<a href="{% url 'schuelerakte' s.pk %}#foerderung">{{ p.anzeigename }}</a>{% else %}{{ p.anzeigename }}{% endif %} › {% translate "Nachteilsausgleich" %}</p>
+
+<div class="akte-kopf">
+  <div>
+    <h1>{% translate "Nachteilsausgleich" %}</h1>
+    <p class="unterzeile">
+      {{ p.vorname }} {{ p.nachname }}{% if p.geburtsdatum %} · {% blocktranslate with datum=p.geburtsdatum|kurzdatum %}geb. {{ datum }}{% endblocktranslate %}{% endif %}
+      {% if klasse %} · {% blocktranslate with name=klasse.name %}Klasse {{ name }}{% endblocktranslate %}{% endif %}
+      · {% if nta.aktiv %}<strong>{% translate "gültig" %}</strong>{% else %}{{ nta.get_status_display }}{% endif %}
+    </p>
+  </div>
+  <div class="knopfreihe nicht-drucken">
+    <button type="button" class="knopf zweitrangig" onclick="window.print()">{% translate "Drucken / PDF" %}</button>
+    {% if bearbeiten and user.is_staff %}<a class="knopf zweitrangig" href="{% url 'admin:foerderung_nachteilsausgleich_change' nta.pk %}">{% translate "Bearbeiten" %}</a>{% endif %}
+  </div>
+</div>
+
+<section class="karte">
+  <h2>{% translate "Gewährte Maßnahmen" %}</h2>
+  <ul class="schlicht">
+    {% for m in nta.massnahmen_liste %}<li>{{ m }}</li>{% empty %}<li class="leer">—</li>{% endfor %}
+  </ul>
+  {% if nta.weitere_massnahmen %}<p>{{ nta.weitere_massnahmen|linebreaksbr }}</p>{% endif %}
+  {% if nta.mit_notenschutz %}<p class="auffaellig">{% translate "Enthält Notenschutz (Abweichung von den allgemeinen Bewertungsgrundsätzen). Dies wird in der Regel im Zeugnis vermerkt." %}</p>{% endif %}
+  <dl class="daten">
+    <dt>{% translate "Fächer" %}</dt><dd>{{ nta.faecher_text }}</dd>
+    <dt>{% translate "Gültig" %}</dt><dd>{{ nta.gueltig_von|kurzdatum }} – {% if nta.gueltig_bis %}{{ nta.gueltig_bis|kurzdatum }}{% else %}{% translate "bis auf Weiteres" %}{% endif %}</dd>
+    <dt>{% translate "Beschluss" %}</dt><dd>{% if nta.beschlossen_am %}{{ nta.beschlossen_am|kurzdatum }}{% if nta.beschlossen_durch %} · {{ nta.beschlossen_durch }}{% endif %}{% else %}—{% endif %}</dd>
+    {% if nta.foerderplan and bearbeiten %}<dt>{% translate "Förderplan" %}</dt><dd><a href="{% url 'foerderplan' nta.foerderplan.pk %}">{{ nta.foerderplan.gueltig_von|kurzdatum }}</a></dd>{% endif %}
+  </dl>
+</section>
+
+{% if bearbeiten %}
+<section class="karte">
+  <h2>{% translate "Begründung / Grundlage" %}</h2>
+  <p>{{ nta.begruendung|linebreaksbr }}</p>
+</section>
+{% endif %}
+
+<div class="unterschriften">
+  <div>{% translate "Datum, Unterschrift Erziehungsberechtigte" %}{% for b in sorgeberechtigte %}<br>{{ b.person.anzeigename }}{% endfor %}</div>
+  <div>{% translate "Unterschrift Klassenleitung" %}</div>
+  <div>{% translate "Unterschrift Schulleitung" %}</div>
+</div>
+
+{% if bearbeiten %}{% include "foerderung/_aushaendigung.html" with dokument=nta dokument_art="nta" %}{% endif %}
+</div>
+{% endblock %}

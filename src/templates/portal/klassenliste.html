@@ -11,7 +11,7 @@
   <tbody>
   {% for z in zeilen %}
     <tr>
-      <td><a href="{% url 'schuelerakte' z.schueler.pk %}">{{ z.schueler.person }}</a></td>
+      <td><a href="{% url 'schuelerakte' z.schueler.pk %}">{{ z.schueler.person }}</a>{% if z.nta %}<a class="nta-marke" href="{% url 'nachteilsausgleich' z.nta.0.pk %}" title="{% translate 'Nachteilsausgleich' %}: {{ z.nta_text }}">{% translate "NTA" %}</a>{% endif %}{% if z.foerderplan %}<a class="nta-marke" href="{% url 'schuelerakte' z.schueler.pk %}#foerderung" title="{% translate 'aktiver Förderplan' %}">{% translate "FP" %}</a>{% endif %}</td>
       <td>{{ z.schueler.schuelernummer }}</td>
       <td class="zahl">{{ z.fehlstunden }}</td>
       <td class="zahl {% if z.unentschuldigt %}auffaellig{% endif %}">{{ z.unentschuldigt }}</td>

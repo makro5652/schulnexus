@@ -14,6 +14,7 @@ from django.utils import timezone
 from django.utils.translation import gettext, gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
+from .dokumente import ablagepfad, geschuetzter_speicher, groesse_lesbar, groesse_pruefen
 from .sprache import LokalerNameMixin, datum, englisch_aktiv, lokal
 
 
@@ -139,7 +140,9 @@ class Schuelerprofil(models.Model):
     muttersprache = models.CharField(_("Erstsprache(n)"), max_length=80, blank=True)
     familiensprache = models.CharField(_("Familiensprache(n)"), max_length=80, blank=True)
     daz = models.BooleanField(_("DaZ-/DaF-Förderung"), default=False)
-    nachteilsausgleich = models.BooleanField(_("Nachteilsausgleich"), default=False)
+    nachteilsausgleich = models.BooleanField(
+        _("Nachteilsausgleich"), default=False, help_text=_("Einzelheiten im Bereich Förderung › Nachteilsausgleiche")
+    )
     foerderbedarf = models.CharField(_("Förderbedarf / Förderschwerpunkt"), max_length=200, blank=True)
     religionsunterricht = models.CharField(_("Religion / Ethik"), max_length=10, choices=RELIGIONSUNTERRICHT, blank=True)
 
@@ -666,34 +669,82 @@ class Einwilligung(models.Model):
 
 
 class Dokument(models.Model):
+    """Anhang zu einer Person – beliebige Dateien (oder reine Notizen), sortiert nach Upload-Datum."""
+
     KATEGORIEN = [
         ("attest", _("Attest / Entschuldigung")),
         ("zeugnis", _("Zeugnis")),
+        ("diagnostik", _("Gutachten / Diagnostik")),
+        ("foerderung", _("Förderplan / Nachteilsausgleich")),
+        ("korrespondenz", _("Elternkorrespondenz")),
         ("einwilligung", _("Einverständniserklärung")),
         ("vertrag", _("Vertrag / Anmeldung")),
-        ("foerderung", _("Förderplan / Nachteilsausgleich")),
+        ("ausweis", _("Ausweis / Pass / Visum")),
         ("sonstiges", _("Sonstiges")),
     ]
-    STUFEN = [("normal", _("Normal (Klassenleitung, Verwaltung)")), ("vertraulich", _("Vertraulich (nur Verwaltung, Leitung)"))]
+    STUFEN = [
+        ("akte", _("Alle mit Aktenzugriff (inkl. Klassenleitung)")),
+        ("verwaltung", _("Verwaltung und Schulleitung")),
+        ("foerderung", _("Förderteam (Förderkoordination, Klassenleitung, Leitung)")),
+        ("leitung", _("Nur Schulleitung")),
+    ]
 
     person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name="dokumente", verbose_name=_("Person"))
-    kategorie = models.CharField(_("Kategorie"), max_length=15, choices=KATEGORIEN)
+    kategorie = models.CharField(_("Kategorie"), max_length=15, choices=KATEGORIEN, default="sonstiges")
     titel = models.CharField(_("Titel"), max_length=120)
-    datei = models.FileField(_("Datei"), upload_to="personen/%Y/")
-    zugriffsstufe = models.CharField(_("Zugriffsstufe"), max_length=12, choices=STUFEN, default="normal")
+    notiz = models.TextField(_("Notiz"), blank=True, help_text=_("Beschreibung oder Inhalt, falls keine Datei angehängt wird"))
+    datei = models.FileField(
+        _("Datei"), upload_to=ablagepfad, storage=geschuetzter_speicher, blank=True, max_length=200,
+        validators=[groesse_pruefen],
+    )
+    originalname = models.CharField(_("Dateiname"), max_length=200, blank=True, editable=False)
+    groesse = models.PositiveBigIntegerField(_("Größe (Byte)"), default=0, editable=False)
+    inhaltstyp = models.CharField(_("Dateityp"), max_length=100, blank=True, editable=False)
+    zugriffsstufe = models.CharField(
+        _("Sichtbar für"), max_length=12, choices=STUFEN, default="akte",
+        help_text=_("Bei Personalunterlagen gilt immer: nur Personalverwaltung und Leitung."),
+    )
     aufbewahren_bis = models.DateField(_("Aufbewahren bis"), null=True, blank=True)
-    hochgeladen_am = models.DateTimeField(auto_now_add=True)
+    hochgeladen_am = models.DateTimeField(_("Hochgeladen am"), auto_now_add=True)
     hochgeladen_von = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, verbose_name=_("Hochgeladen von")
     )
+    history = HistoricalRecords(verbose_name=_("Änderungsprotokoll Dokument"))
 
     class Meta:
-        verbose_name = _("Dokument")
-        verbose_name_plural = _("Dokumente")
-        ordering = ["-hochgeladen_am"]
+        verbose_name = _("Anhang / Dokument")
+        verbose_name_plural = _("Anhänge / Dokumente")
+        ordering = ["-hochgeladen_am", "-pk"]
 
     def __str__(self):
         return f"{self.titel} ({self.person})"
+
+    def clean(self):
+        if not self.datei and not self.notiz.strip():
+            raise ValidationError(_("Bitte eine Datei anhängen oder eine Notiz eingeben."))
+
+    def save(self, *args, **kwargs):
+        datei = self.datei
+        if datei and not getattr(datei, "_committed", True):
+            # Neue Datei: Originalname, Größe und Typ festhalten.
+            import mimetypes
+            import os
+
+            self.originalname = os.path.basename(datei.name)[:200]
+            self.groesse = datei.size or 0
+            self.inhaltstyp = (getattr(datei.file, "content_type", None)
+                               or mimetypes.guess_type(datei.name)[0] or "application/octet-stream")[:100]
+        super().save(*args, **kwargs)
+
+    @property
+    def groesse_lesbar(self):
+        return groesse_lesbar(self.groesse)
+
+    @property
+    def dateiendung(self):
+        import os
+
+        return os.path.splitext(self.originalname or self.datei.name or "")[1].lstrip(".").upper()
 
 
 class Bildungsgang(LokalerNameMixin, models.Model):

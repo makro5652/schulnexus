@@ -1,0 +1,71 @@
+{% load i18n formate %}
+<section class="karte breit-2" id="anhaenge">
+  <div class="karte-kopf">
+    <h2>{% translate "Anhänge" %} <span class="leise">({{ anhaenge|length }})</span></h2>
+    <form method="get" action="#anhaenge" class="filterzeile">
+      <label>{% translate "Kategorie" %}
+        <select name="kategorie" onchange="this.form.submit()">
+          {% for wert, name in anhang_kategorien %}<option value="{{ wert }}"{% if wert == anhang_kategorie or not wert and not anhang_kategorie %} selected{% endif %}>{{ name }}</option>{% endfor %}
+        </select>
+      </label>
+      <label>{% translate "Sortierung" %}
+        <select name="sortierung" onchange="this.form.submit()">
+          <option value="neu"{% if not anhang_aelteste_zuerst %} selected{% endif %}>{% translate "Neueste zuerst" %}</option>
+          <option value="alt"{% if anhang_aelteste_zuerst %} selected{% endif %}>{% translate "Älteste zuerst" %}</option>
+        </select>
+      </label>
+      <noscript><button type="submit" class="knopf zweitrangig">{% translate "Anzeigen" %}</button></noscript>
+    </form>
+  </div>
+
+  {% if anhaenge %}
+  <div class="rollbar">
+  <table class="liste anhaenge">
+    <thead><tr>
+      <th>{% translate "Hochgeladen" %}</th><th>{% translate "Titel" %}</th><th>{% translate "Kategorie" %}</th>
+      <th>{% translate "Datei" %}</th><th>{% translate "Sichtbar für" %}</th><th></th>
+    </tr></thead>
+    <tbody>
+    {% for d in anhaenge %}
+      <tr>
+        <td class="nowrap">{{ d.hochgeladen_am|date:"SHORT_DATETIME_FORMAT" }}<small class="leise blockzeile">{% if d.hochgeladen_von %}{{ d.hochgeladen_von.person.anzeigename|default:d.hochgeladen_von.get_username }}{% endif %}</small></td>
+        <td><strong>{{ d.titel }}</strong>{% if d.notiz %}<small class="notiz">{{ d.notiz|linebreaksbr }}</small>{% endif %}</td>
+        <td>{{ d.get_kategorie_display }}</td>
+        <td class="nowrap">
+          {% if d.datei %}
+            {% if d.inline_moeglich %}<a href="{% url 'anhang' d.pk %}?ansehen=1" target="_blank" rel="noopener">{% translate "Öffnen" %}</a> · {% endif %}<a href="{% url 'anhang' d.pk %}">{% translate "Herunterladen" %}</a>
+            <small class="leise blockzeile">{{ d.dateiendung }} · {{ d.groesse_lesbar }}</small>
+          {% else %}<span class="leise">{% translate "nur Notiz" %}</span>{% endif %}
+        </td>
+        <td><small>{{ d.get_zugriffsstufe_display }}</small></td>
+        <td>{% if d.darf_loeschen %}
+          <form method="post" action="{% url 'anhang_loeschen' d.pk %}" onsubmit="return confirm('{% translate "Diesen Anhang endgültig löschen?" as frage %}{{ frage|escapejs }}')">
+            {% csrf_token %}<button type="submit" class="link gefahr">{% translate "Löschen" %}</button>
+          </form>{% endif %}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% else %}
+  <p class="leer">{% if anhang_kategorie %}{% translate "Keine Anhänge in dieser Kategorie." %}{% else %}{% translate "Noch keine Anhänge." %}{% endif %}</p>
+  {% endif %}
+
+  {% if anhang_form %}
+  <details class="hochladen"{% if not anhaenge %} open{% endif %}>
+    <summary>{% translate "Neuen Anhang hinzufügen" %}</summary>
+    <form method="post" enctype="multipart/form-data" action="{% url 'anhang_hochladen' s.pk %}" class="formular">
+      {% csrf_token %}
+      <div class="formzeile">
+        <label class="breit">{{ anhang_form.titel.label }} {{ anhang_form.titel }}</label>
+        <label>{{ anhang_form.kategorie.label }} {{ anhang_form.kategorie }}</label>
+        <label>{{ anhang_form.zugriffsstufe.label }} {{ anhang_form.zugriffsstufe }}</label>
+      </div>
+      <label>{{ anhang_form.datei.label }} {{ anhang_form.datei }}
+        <small class="leise">{% blocktranslate with mb=DOKUMENT_MAX_MB %}Beliebiger Dateityp, höchstens {{ mb }} MB. Ohne Datei wird nur die Notiz gespeichert.{% endblocktranslate %}</small></label>
+      <label>{{ anhang_form.notiz.label }} {{ anhang_form.notiz }}</label>
+      <button type="submit" class="knopf">{% translate "Hochladen" %}</button>
+    </form>
+  </details>
+  {% endif %}
+</section>

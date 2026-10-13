@@ -10,13 +10,17 @@ from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 
 from fehlzeiten.models import Fehlzeit
+from foerderung.ansichten import aktive_nta_je_schueler, foerder_hinweise, foerder_kontext, nta_kurztext
+from foerderung.models import Foerderplan
 from nachmittag.models import AGAngebot
 from noten.berechnung import Baum, nominale_anteile, vorschlagsnote
 from noten.models import Note, Unterricht
-from stammdaten.models import Gruppe, Mitgliedschaft, Personalabwesenheit, Personalbereich, Personalprofil, Schuelerprofil, Schuljahr
+from stammdaten.models import Dokument, Gruppe, Mitgliedschaft, Personalabwesenheit, Personalbereich, Personalprofil, Schuelerprofil, Schuljahr
 from stammdaten.zusatzfelder import anzeige as zusatz_anzeige
 
-from .rechte import darf_unterricht_sehen, ist_personalverwaltung, ist_verwaltung
+
+from .anhaenge import KATEGORIE_FILTER, anhaenge_fuer, anhang_form
+from .rechte import darf_akte_sehen, darf_nachteilsausgleich_sehen, darf_unterricht_sehen, ist_personalverwaltung, ist_verwaltung
 
 
 def gesundheit(request):
@@ -85,7 +89,7 @@ def start(request):
         request,
         "portal/start.html",
         {"unterrichte": meine_unterrichte, "klassen": klassen_info, "kennzahlen": kennzahlen, "hr": hr,
-         "ist_verwaltung": ist_verwaltung(request.user)},
+         "foerderung": foerder_hinweise(request.user), "ist_verwaltung": ist_verwaltung(request.user)},
     )
 
 
@@ -122,10 +126,15 @@ def notenuebersicht(request, pk):
         noten_je_schueler[n.schueler_id].append(n)
 
     zeilen = []
-    for s in unterricht.schueler():
+    schueler_liste = list(unterricht.schueler())
+    nta = aktive_nta_je_schueler([s.pk for s in schueler_liste])
+    for s in schueler_liste:
         noten = noten_je_schueler[s.pk]
         nach_ln = {n.leistungsnachweis_id: n for n in noten}
+        eigene_nta = [n for n in nta.get(s.pk, []) if not n.faecher.all() or unterricht.fach in n.faecher.all()]
         zeilen.append({
+            "nta": eigene_nta if eigene_nta and darf_nachteilsausgleich_sehen(request.user, s) else None,
+            "nta_text": nta_kurztext(eigene_nta),
             "schueler": s,
             "zellen": [nach_ln.get(sp["ln"].pk) for sp in spalten],
             "vorschlag": vorschlagsnote(unterricht, s, noten, baum),
@@ -149,6 +158,9 @@ def klassenliste(request, pk):
     schueler = gruppe.aktuelle_mitglieder().annotate(
         offene=Count("fehlzeiten", filter=Q(fehlzeiten__status="offen"), distinct=True)
     ).order_by("person__nachname", "person__vorname")
+    schueler = list(schueler)
+    nta = aktive_nta_je_schueler([s.pk for s in schueler])
+    aktive_plaene = set(Foerderplan.objects.filter(schueler__in=schueler, status=Foerderplan.AKTIV).values_list("schueler_id", flat=True))
     zeilen = []
     for s in schueler:
         fz = list(s.fehlzeiten.filter(datum_von__gte=gruppe.schuljahr.beginn, datum_von__lte=gruppe.schuljahr.ende))
@@ -160,6 +172,9 @@ def klassenliste(request, pk):
             "verspaetungen": sum(1 for f in fz if f.art == Fehlzeit.VERSPAETUNG),
             "offene": s.offene,
             "kontakte": s.beziehungen.select_related("person").all(),
+            "nta": nta.get(s.pk),
+            "nta_text": nta_kurztext(nta.get(s.pk, [])),
+            "foerderplan": s.pk in aktive_plaene,
         })
     return render(request, "portal/klassenliste.html", {"gruppe": gruppe, "zeilen": zeilen})
 
@@ -170,7 +185,7 @@ def schuelerakte(request, pk):
     klasse = schueler.stammklasse()
     person = getattr(request.user, "person", None)
     ist_klassenleitung = bool(person and klasse and klasse.leitung and klasse.leitung.person_id == person.pk)
-    if not (ist_verwaltung(request.user) or ist_klassenleitung):
+    if not darf_akte_sehen(request.user, schueler):
         raise PermissionDenied
 
     darf_gesundheit = request.user.has_perm("stammdaten.view_gesundheitsangaben") or (
@@ -194,6 +209,11 @@ def schuelerakte(request, pk):
             "fach", "abschnitt", "lehrkraft", "skala"
         ).distinct().order_by("abschnitt__nummer", "fach__reihenfolge"):
             noten.append({"unterricht": u, "vorschlag": vorschlagsnote(u, schueler)})
+
+    kategorie = request.GET.get("kategorie") or None
+    if kategorie not in dict(Dokument.KATEGORIEN):
+        kategorie = None
+    aelteste_zuerst = request.GET.get("sortierung") == "alt"
 
     alter = None
     if schueler.person.geburtsdatum:
@@ -222,6 +242,12 @@ def schuelerakte(request, pk):
         "noten": noten,
         "ist_verwaltung": ist_verwaltung(request.user),
         "zusatz": zusatz_anzeige(request.user, schueler, "schueler"),
+        "anhaenge": anhaenge_fuer(request.user, schueler.person, kategorie, aelteste_zuerst),
+        "anhang_kategorie": kategorie,
+        "anhang_aelteste_zuerst": aelteste_zuerst,
+        "anhang_kategorien": KATEGORIE_FILTER,
+        "anhang_form": anhang_form(request.user, schueler),
+        "foerderung": foerder_kontext(request.user, schueler),
     })
 
 

@@ -53,6 +53,8 @@
 </section>
 {% endif %}
 
+{% if foerderung %}{% include "foerderung/_start.html" %}{% endif %}
+
 <div class="spalten">
   <section class="karte">
     <h2>{% if ist_verwaltung %}{% translate "Unterrichte im Schuljahr" %}{% else %}{% translate "Meine Unterrichte" %}{% endif %}</h2>

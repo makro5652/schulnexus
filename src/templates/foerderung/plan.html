@@ -1,0 +1,101 @@
+{% extends "portal/base.html" %}
+{% load i18n formate %}
+{% block title %}{% blocktranslate with name=p.anzeigename %}Förderplan {{ name }}{% endblocktranslate %}{% endblock %}
+{% block inhalt %}
+<div class="dokument">
+<p class="druckkopf">{{ SCHULNAME }} · {% translate "vertraulich" %} · {% now "SHORT_DATE_FORMAT" %}</p>
+<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a>{% if klasse %} › <a href="{% url 'klassenliste' klasse.pk %}">{% blocktranslate with name=klasse.name %}Klasse {{ name }}{% endblocktranslate %}</a>{% endif %} › {% if darf_akte %}<a href="{% url 'schuelerakte' s.pk %}#foerderung">{{ p.anzeigename }}</a>{% else %}{{ p.anzeigename }}{% endif %} › {% translate "Förderplan" %}</p>
+
+<div class="akte-kopf">
+  <div>
+    <h1>{% translate "Förderplan" %}{% if plan.titel %}: {{ plan.titel }}{% endif %}</h1>
+    <p class="unterzeile">
+      {{ p.vorname }} {{ p.nachname }}{% if p.geburtsdatum %} · {% blocktranslate with datum=p.geburtsdatum|kurzdatum %}geb. {{ datum }}{% endblocktranslate %}{% endif %}
+      {% if klasse %} · {% blocktranslate with name=klasse.name %}Klasse {{ name }}{% endblocktranslate %}{% endif %} · {{ plan.schuljahr }}
+    </p>
+  </div>
+  <div class="knopfreihe nicht-drucken">
+    <button type="button" class="knopf zweitrangig" onclick="window.print()">{% translate "Drucken / PDF" %}</button>
+    {% if bearbeiten and user.is_staff %}<a class="knopf zweitrangig" href="{% url 'admin:foerderung_foerderplan_change' plan.pk %}">{% translate "Bearbeiten" %}</a>{% endif %}
+  </div>
+</div>
+
+<section class="karte">
+  <dl class="daten">
+    <dt>{% translate "Status" %}</dt><dd>{{ plan.get_status_display }}</dd>
+    <dt>{% translate "Zeitraum" %}</dt><dd>{{ plan.gueltig_von|kurzdatum }} – {% if plan.gueltig_bis %}{{ plan.gueltig_bis|kurzdatum }}{% else %}{% translate "offen" %}{% endif %}</dd>
+    <dt>{% translate "Förderschwerpunkte" %}</dt><dd>{{ plan.schwerpunkt_text|default:"—" }}</dd>
+    <dt>{% translate "Verantwortlich" %}</dt><dd>{{ plan.verantwortlich.person.anzeigename|default:"—" }}{% if beteiligte %} · {% translate "beteiligt" %}: {% for b in beteiligte %}{{ b.person.anzeigename }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}</dd>
+    <dt>{% translate "Evaluation geplant" %}</dt><dd>{% if plan.evaluation_am %}<span{% if plan.evaluation_faellig %} class="auffaellig"{% endif %}>{{ plan.evaluation_am|kurzdatum }}</span>{% else %}—{% endif %}</dd>
+    {% if plan.vorgaenger %}<dt>{% translate "Fortschreibung von" %}</dt><dd><a href="{% url 'foerderplan' plan.vorgaenger.pk %}">{{ plan.vorgaenger.gueltig_von|kurzdatum }}</a></dd>{% endif %}
+  </dl>
+</section>
+
+<section class="karte">
+  <h2>{% translate "Ausgangslage" %}</h2>
+  <h3>{% translate "Lernausgangslage" %}</h3><p>{{ plan.ausgangslage|default:"—"|linebreaksbr }}</p>
+  <h3>{% translate "Stärken und Interessen" %}</h3><p>{{ plan.staerken|default:"—"|linebreaksbr }}</p>
+  {% if plan.grundlagen %}<h3>{% translate "Grundlagen / Diagnostik" %}</h3><p>{{ plan.grundlagen|linebreaksbr }}</p>{% endif %}
+</section>
+
+<section class="karte">
+  <h2>{% translate "Förderziele und Maßnahmen" %}</h2>
+  {% for z in ziele %}
+  <div class="ziel">
+    <div class="ziel-kopf">
+      <strong>{{ forloop.counter }}. {{ z.bereich_anzeige|default:"" }}</strong>
+      <span class="leise">{% if z.bis %}{% blocktranslate with datum=z.bis|kurzdatum %}bis {{ datum }}{% endblocktranslate %} · {% endif %}{{ z.get_ergebnis_display }}</span>
+    </div>
+    <dl class="daten">
+      <dt>{% translate "Ziel" %}</dt><dd>{{ z.ziel|linebreaksbr }}</dd>
+      {% if z.massnahmen %}<dt>{% translate "Maßnahmen" %}</dt><dd>{{ z.massnahmen|linebreaksbr }}</dd>{% endif %}
+      {% if z.zustaendig %}<dt>{% translate "Zuständig" %}</dt><dd>{{ z.zustaendig }}</dd>{% endif %}
+      {% if z.bewertung %}<dt>{% translate "Bewertung" %}</dt><dd>{{ z.bewertung|linebreaksbr }}</dd>{% endif %}
+    </dl>
+  </div>
+  {% empty %}<p class="leer">{% translate "Noch keine Ziele formuliert." %}</p>{% endfor %}
+</section>
+
+{% if nta %}
+<section class="karte">
+  <h2>{% translate "Zugehörige Nachteilsausgleiche" %}</h2>
+  {% for n in nta %}<p><a href="{% url 'nachteilsausgleich' n.pk %}">{{ n.massnahmen_liste|join:"; "|default:"—" }}</a> <span class="leise">· {{ n.faecher_text }} · {{ n.get_status_display }}</span></p>{% endfor %}
+</section>
+{% endif %}
+
+{% if plan.vereinbarungen or plan.evaluation %}
+<section class="karte">
+  {% if plan.vereinbarungen %}<h2>{% translate "Vereinbarungen mit Schüler:in und Eltern" %}</h2><p>{{ plan.vereinbarungen|linebreaksbr }}</p>{% endif %}
+  {% if plan.evaluation %}<h2>{% translate "Evaluation" %}</h2><p>{{ plan.evaluation|linebreaksbr }}</p>{% endif %}
+</section>
+{% endif %}
+
+<div class="unterschriften">
+  <div>{% translate "Datum, Unterschrift Erziehungsberechtigte" %}{% for b in sorgeberechtigte %}<br>{{ b.person.anzeigename }}{% endfor %}</div>
+  <div>{% translate "Unterschrift Schüler:in" %}</div>
+  <div>{% translate "Unterschrift Klassenleitung / Förderkoordination" %}</div>
+</div>
+
+{% include "foerderung/_aushaendigung.html" with dokument=plan dokument_art="plan" %}
+
+<section class="karte nicht-drucken" id="verlauf">
+  <h2>{% translate "Verlaufsdokumentation" %} <span class="etikett warnend">{% translate "intern" %}</span></h2>
+  <form method="post" action="{% url 'foerdereintrag_anlegen' plan.pk %}" class="formular">
+    {% csrf_token %}
+    <div class="formzeile">
+      <label>{{ eintrag_form.datum.label }} {{ eintrag_form.datum }}</label>
+      <label>{{ eintrag_form.art.label }} {{ eintrag_form.art }}</label>
+      <span></span>
+    </div>
+    <label>{{ eintrag_form.text.label }} {{ eintrag_form.text }}</label>
+    <button type="submit" class="knopf klein">{% translate "Eintrag hinzufügen" %}</button>
+  </form>
+  {% for e in eintraege %}
+    <div class="kontakt">
+      <strong>{{ e.datum|kurzdatum }}</strong> · {{ e.get_art_display }} <span class="leise">· {{ e.verfasst_von.person.anzeigename|default:e.verfasst_von.get_username|default:"—" }}</span>
+      <div>{{ e.text|linebreaksbr }}</div>
+    </div>
+  {% empty %}<p class="leer">{% translate "Noch keine Einträge." %}</p>{% endfor %}
+</section>
+</div>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% load i18n formate %}
+<section class="karte breit-2" id="foerderung">
+  <div class="karte-kopf">
+    <h2>{% translate "Förderung" %} <span class="etikett warnend">{% translate "vertraulich" %}</span></h2>
+    {% if foerderung.bearbeiten and user.is_staff %}
+    <div class="knopfreihe">
+      <a class="knopf zweitrangig klein" href="{% url 'admin:foerderung_foerderplan_add' %}?schueler={{ s.pk }}">{% translate "Neuer Förderplan" %}</a>
+      <a class="knopf zweitrangig klein" href="{% url 'admin:foerderung_nachteilsausgleich_add' %}?schueler={{ s.pk }}">{% translate "Nachteilsausgleich erfassen" %}</a>
+    </div>
+    {% endif %}
+  </div>
+
+  <h3>{% translate "Nachteilsausgleiche" %}</h3>
+  {% if foerderung.nta %}
+  <div class="rollbar"><table class="liste">
+    <thead><tr><th>{% translate "Maßnahmen" %}</th><th>{% translate "Fächer" %}</th><th>{% translate "Gültig" %}</th><th>{% translate "Status" %}</th><th>{% translate "Eltern" %}</th><th></th></tr></thead>
+    <tbody>
+    {% for n in foerderung.nta %}
+      <tr>
+        <td>{{ n.massnahmen_liste|join:"; "|default:"—" }}{% if n.mit_notenschutz %} <span class="etikett warnend">{% translate "Notenschutz" %}</span>{% endif %}</td>
+        <td>{{ n.faecher_text }}</td>
+        <td class="nowrap">{{ n.gueltig_von|kurzdatum }} – {% if n.gueltig_bis %}{{ n.gueltig_bis|kurzdatum }}{% else %}{% translate "offen" %}{% endif %}</td>
+        <td>{% if n.aktiv %}<strong>{% translate "gültig" %}</strong>{% else %}{{ n.get_status_display }}{% endif %}</td>
+        <td><span class="ampel {{ n.eltern_status }}">{{ n.eltern_status_text }}</span></td>
+        <td><a href="{% url 'nachteilsausgleich' n.pk %}">{% translate "Ansehen" %}</a></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  {% else %}<p class="leer">{% translate "Kein Nachteilsausgleich erfasst." %}</p>{% endif %}
+
+  {% if foerderung.sehen %}
+  <h3>{% translate "Förderpläne" %}</h3>
+  {% if foerderung.plaene %}
+  <div class="rollbar"><table class="liste">
+    <thead><tr><th>{% translate "Zeitraum" %}</th><th>{% translate "Förderschwerpunkte" %}</th><th>{% translate "Status" %}</th><th>{% translate "Evaluation" %}</th><th>{% translate "Eltern" %}</th><th></th></tr></thead>
+    <tbody>
+    {% for pl in foerderung.plaene %}
+      <tr>
+        <td class="nowrap">{{ pl.gueltig_von|kurzdatum }} – {% if pl.gueltig_bis %}{{ pl.gueltig_bis|kurzdatum }}{% else %}{% translate "offen" %}{% endif %}</td>
+        <td>{% if pl.titel %}<strong>{{ pl.titel }}</strong><br>{% endif %}<small>{{ pl.schwerpunkt_text|default:"—" }}</small></td>
+        <td>{{ pl.get_status_display }}</td>
+        <td class="nowrap">{% if pl.evaluation_am %}<span{% if pl.evaluation_faellig %} class="auffaellig"{% endif %}>{{ pl.evaluation_am|kurzdatum }}</span>{% else %}—{% endif %}</td>
+        <td><span class="ampel {{ pl.eltern_status }}">{{ pl.eltern_status_text }}</span></td>
+        <td><a href="{% url 'foerderplan' pl.pk %}">{% translate "Ansehen" %}</a></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  {% else %}<p class="leer">{% translate "Kein Förderplan vorhanden." %}</p>{% endif %}
+  {% endif %}
+</section>

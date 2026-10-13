@@ -1,0 +1,54 @@
+{% load i18n formate %}
+<section class="karte nicht-drucken" id="eltern">
+  <h2>{% translate "Aushändigung an die Eltern" %}</h2>
+  {% if dokument.eltern_status == "veraltet" %}
+    <p class="auffaellig">{% translate "Das Dokument wurde nach der letzten Aushändigung inhaltlich geändert. Bitte die aktuelle Fassung erneut aushändigen." %}</p>
+  {% endif %}
+  {% if aushaendigungen %}
+  <div class="rollbar"><table class="liste">
+    <thead><tr><th>{% translate "Empfänger:in" %}</th><th>{% translate "Ausgehändigt" %}</th><th>{% translate "Erhalt bestätigt" %}</th><th></th></tr></thead>
+    <tbody>
+    {% for a in aushaendigungen %}
+      <tr>
+        <td>{{ a.empfaenger.anzeigename }}{% if a.bemerkung %}<small class="notiz">{{ a.bemerkung }}</small>{% endif %}</td>
+        <td class="nowrap">{{ a.ausgehaendigt_am|kurzdatum }}<small class="leise blockzeile">{{ a.get_weg_display }}</small></td>
+        <td>
+          {% if a.bestaetigt_am %}
+            <span class="ampel ok">✓ {{ a.bestaetigt_am|kurzdatum }}</span><small class="leise blockzeile">{{ a.get_bestaetigung_display }}</small>
+          {% elif bearbeiten %}
+            <form method="post" action="{% url 'erhalt_bestaetigen' a.pk %}" class="inline-form">
+              {% csrf_token %}
+              <label>{% translate "am" %} <input type="date" name="best-bestaetigt_am" value="{{ heute|date:'Y-m-d' }}" min="{{ a.ausgehaendigt_am|date:'Y-m-d' }}" required></label>
+              <label>{% translate "durch" %} {{ best_form.bestaetigung }}</label>
+              <button type="submit" class="knopf klein">{% translate "Erhalt bestätigen" %}</button>
+            </form>
+          {% else %}<span class="ampel offen">{% translate "offen" %}</span>{% endif %}
+        </td>
+        <td>{% if a.veraltet %}<span class="etikett warnend">{% translate "ältere Fassung" %}</span>{% endif %}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  {% else %}
+    <p class="leer">{% translate "Noch nicht an die Eltern ausgehändigt." %}</p>
+  {% endif %}
+
+  {% if aush_form %}
+  {% if aush_form.fields.empfaenger.queryset.exists %}
+  <details class="hochladen"{% if not aushaendigungen %} open{% endif %}>
+    <summary>{% translate "Aushändigung vermerken" %}</summary>
+    <form method="post" action="{% url 'aushaendigung_anlegen' %}" class="inline-form" style="margin-top:.6rem">
+      {% csrf_token %}
+      <input type="hidden" name="dokument" value="{{ dokument_art }}"><input type="hidden" name="dokument_id" value="{{ dokument.pk }}">
+      <label>{{ aush_form.empfaenger.label }} {{ aush_form.empfaenger }}</label>
+      <label>{{ aush_form.ausgehaendigt_am.label }} {{ aush_form.ausgehaendigt_am }}</label>
+      <label>{{ aush_form.weg.label }} {{ aush_form.weg }}</label>
+      <label>{{ aush_form.bemerkung.label }} {{ aush_form.bemerkung }}</label>
+      <button type="submit" class="knopf klein">{% translate "Vermerken" %}</button>
+    </form>
+  </details>
+  {% else %}
+    <p class="leer">{% translate "Für diese Person sind keine Eltern oder Kontaktpersonen eingetragen." %}</p>
+  {% endif %}
+  {% endif %}
+</section>

@@ -100,7 +100,14 @@ class KinderInline(admin.TabularInline):
 class DokumentInline(admin.TabularInline):
     model = Dokument
     extra = 0
-    fields = ["kategorie", "titel", "datei", "zugriffsstufe", "aufbewahren_bis"]
+    fields = ["hochgeladen_am", "kategorie", "titel", "datei", "zugriffsstufe", "aufbewahren_bis"]
+    readonly_fields = ["hochgeladen_am"]
+    verbose_name_plural = _("Anhänge (neueste zuerst)")
+
+    def get_queryset(self, request):
+        from portal.rechte import sichtbare_dokumente
+
+        return sichtbare_dokumente(request.user, super().get_queryset(request))
 
 
 PERSON_FIELDSETS = [
@@ -471,12 +478,33 @@ class EinwilligungAdmin(SimpleHistoryAdmin):
 
 
 @admin.register(Dokument)
-class DokumentAdmin(admin.ModelAdmin):
-    list_display = ["titel", "person", "kategorie", "zugriffsstufe", "hochgeladen_am"]
-    list_filter = ["kategorie", "zugriffsstufe"]
-    search_fields = ["titel", "person__nachname"]
+class DokumentAdmin(SimpleHistoryAdmin):
+    list_display = ["hochgeladen_am", "titel", "person", "kategorie", "zugriffsstufe", "datei_info", "hochgeladen_von"]
+    list_display_links = ["hochgeladen_am", "titel"]
+    list_filter = ["kategorie", "zugriffsstufe", ("hochgeladen_am", admin.DateFieldListFilter)]
+    search_fields = ["titel", "notiz", "originalname", "person__nachname", "person__vorname"]
     autocomplete_fields = ["person"]
-    readonly_fields = ["hochgeladen_von"]
+    readonly_fields = ["hochgeladen_am", "hochgeladen_von", "originalname", "groesse_anzeige", "inhaltstyp"]
+    fields = ["person", ("titel", "kategorie"), "datei", "notiz", ("zugriffsstufe", "aufbewahren_bis"),
+              ("hochgeladen_am", "hochgeladen_von"), ("originalname", "groesse_anzeige", "inhaltstyp")]
+    date_hierarchy = "hochgeladen_am"
+    ordering = ["-hochgeladen_am", "-pk"]
+
+    def get_queryset(self, request):
+        from portal.rechte import sichtbare_dokumente
+
+        return sichtbare_dokumente(request.user, super().get_queryset(request).select_related("person", "hochgeladen_von"))
+
+    @admin.display(description=_("Datei"))
+    def datei_info(self, obj):
+        if not obj.datei:
+            return gettext("Notiz")
+        return format_html('<a href="{}">{}</a> <span class="quiet">{}</span>',
+                           reverse("anhang", args=[obj.pk]), obj.dateiendung or "?", obj.groesse_lesbar)
+
+    @admin.display(description=_("Größe"))
+    def groesse_anzeige(self, obj):
+        return obj.groesse_lesbar or "—"
 
     def save_model(self, request, obj, form, change):
         if not obj.hochgeladen_von_id:

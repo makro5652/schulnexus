@@ -1,0 +1,39 @@
+{% load i18n formate %}
+<section class="karte hr" id="foerderung">
+  <div class="karte-kopf">
+    <h2>{% if foerderung.koordination %}{% translate "Förderung · alle Klassen" %}{% else %}{% translate "Förderung · meine Klasse" %}{% endif %}
+      <span class="leise">· {% blocktranslate count n=foerderung.aktive_plaene %}{{ n }} aktiver Förderplan{% plural %}{{ n }} aktive Förderpläne{% endblocktranslate %}, {% blocktranslate count n=foerderung.aktive_nta %}{{ n }} gültiger Nachteilsausgleich{% plural %}{{ n }} gültige Nachteilsausgleiche{% endblocktranslate %}</span></h2>
+    {% if user.is_staff %}<div class="knopfreihe">
+      <a class="knopf zweitrangig klein" href="{% url 'admin:foerderung_foerderplan_changelist' %}">{% translate "Förderpläne" %}</a>
+      <a class="knopf zweitrangig klein" href="{% url 'admin:foerderung_nachteilsausgleich_changelist' %}?gueltig=aktiv">{% translate "Nachteilsausgleiche" %}</a>
+    </div>{% endif %}
+  </div>
+  {% if foerderung.anzahl %}
+  <div class="spalten drei">
+    <div>
+      <h3>{% blocktranslate with n=foerderung.offen|length %}Elternbestätigung offen ({{ n }}){% endblocktranslate %}</h3>
+      {% for a in foerderung.offen|slice:":10" %}
+        <p><a href="{% if a.foerderplan_id %}{% url 'foerderplan' a.foerderplan_id %}{% else %}{% url 'nachteilsausgleich' a.nachteilsausgleich_id %}{% endif %}#eltern">{{ a.schueler.person.anzeigename }}</a>
+          <span class="leise">· {{ a.dokument_art }} · {% blocktranslate with datum=a.ausgehaendigt_am|kurzdatum name=a.empfaenger.anzeigename %}an {{ name }} am {{ datum }}{% endblocktranslate %}</span></p>
+      {% empty %}<p class="leer">{% translate "Keine." %}</p>{% endfor %}
+      {% if foerderung.plan_ohne or foerderung.nta_ohne %}
+      <h3>{% translate "Noch nicht ausgehändigt" %}</h3>
+      {% for pl in foerderung.plan_ohne %}<p><a href="{% url 'foerderplan' pl.pk %}#eltern">{{ pl.schueler.person.anzeigename }}</a> <span class="leise">· {% translate "Förderplan" %}</span></p>{% endfor %}
+      {% for n in foerderung.nta_ohne %}<p><a href="{% url 'nachteilsausgleich' n.pk %}#eltern">{{ n.schueler.person.anzeigename }}</a> <span class="leise">· {% translate "Nachteilsausgleich" %}</span></p>{% endfor %}
+      {% endif %}
+    </div>
+    <div>
+      <h3>{% translate "Evaluation fällig (14 Tage)" %}</h3>
+      {% for pl in foerderung.evaluation %}<p><a href="{% url 'foerderplan' pl.pk %}">{{ pl.schueler.person.anzeigename }}</a> <span class="leise{% if pl.evaluation_am < foerderung.heute %} auffaellig{% endif %}">· {{ pl.evaluation_am|kurzdatum }}</span></p>{% empty %}<p class="leer">{% translate "Keine." %}</p>{% endfor %}
+      {% if foerderung.beantragt %}
+      <h3>{% translate "Nachteilsausgleich beantragt" %}</h3>
+      {% for n in foerderung.beantragt %}<p><a href="{% url 'admin:foerderung_nachteilsausgleich_change' n.pk %}">{{ n.schueler.person.anzeigename }}</a> <span class="leise">· {{ n.gueltig_von|kurzdatum }}</span></p>{% endfor %}
+      {% endif %}
+    </div>
+    <div>
+      <h3>{% translate "Nachteilsausgleich läuft ab (30 Tage)" %}</h3>
+      {% for n in foerderung.ablauf %}<p><a href="{% url 'nachteilsausgleich' n.pk %}">{{ n.schueler.person.anzeigename }}</a> <span class="leise">· {{ n.gueltig_bis|kurzdatum }}</span></p>{% empty %}<p class="leer">{% translate "Keine." %}</p>{% endfor %}
+    </div>
+  </div>
+  {% else %}<p class="leer">{% translate "Keine offenen Punkte." %}</p>{% endif %}
+</section>

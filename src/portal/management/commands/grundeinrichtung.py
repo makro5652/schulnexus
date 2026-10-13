@@ -7,7 +7,9 @@ from decimal import Decimal
 from django.contrib.auth.models import Group, Permission
 from django.core.management.base import BaseCommand
 from django.db import transaction
+from django.db.models import Q
 
+from foerderung.models import Ausgleichsmassnahme, Foerderschwerpunkt
 from noten.models import Notenskala, Notenstufe
 from stammdaten.models import Abschlussart, Bildungsgang, Nachweisart, Personalbereich
 
@@ -75,6 +77,42 @@ NACHWEISARTEN = [
     ("Trainerlizenz / Coaching-Qualifikation", "Coaching licence / qualification", None, []),
 ]
 
+# Förderung: Voreinstellungen, in der Verwaltung frei änderbar (Förderung › Förderschwerpunkte / Ausgleichsmaßnahmen).
+FOERDERSCHWERPUNKTE = [
+    ("Lesen und Rechtschreiben", "Reading and spelling"),
+    ("Rechnen", "Mathematics / numeracy"),
+    ("Deutsch als Zweitsprache (DaZ/DaF)", "German as a second language"),
+    ("Lernen", "Learning"),
+    ("Sprache und Kommunikation", "Speech, language and communication"),
+    ("Emotionale und soziale Entwicklung", "Emotional and social development"),
+    ("Aufmerksamkeit und Konzentration", "Attention and concentration"),
+    ("Arbeits- und Lernverhalten", "Work and learning habits"),
+    ("Körperliche und motorische Entwicklung", "Physical and motor development"),
+    ("Sehen", "Vision"),
+    ("Hören", "Hearing"),
+    ("Autismus-Spektrum", "Autism spectrum"),
+    ("Begabtenförderung", "Gifted and talented"),
+]
+# (Name, Name englisch, Notenschutz)
+AUSGLEICHSMASSNAHMEN = [
+    ("Zusätzliche Pausen", "Additional breaks", False),
+    ("Separater, ruhiger Raum", "Separate, quiet room", False),
+    ("Vorlesen der Aufgabenstellung", "Questions read aloud", False),
+    ("Vergrößerte oder angepasste Arbeitsblätter", "Enlarged or adapted worksheets", False),
+    ("Laptop / technische Hilfsmittel", "Laptop / assistive technology", False),
+    ("Wörterbuch zugelassen", "Dictionary permitted", False),
+    ("Strukturierungshilfen (Gliederung, Checklisten)", "Structuring aids (outlines, checklists)", False),
+    ("Teilweise mündlich statt schriftlich", "Partly oral instead of written", False),
+    ("Bevorzugter Sitzplatz", "Preferential seating", False),
+    ("Lärmschutz-Kopfhörer", "Ear defenders / noise-cancelling headphones", False),
+    ("Rechtschreibung wird nicht bewertet", "Spelling not assessed", True),
+    ("Vorlesen wird nicht bewertet", "Reading aloud not assessed", True),
+    ("Stärkere Gewichtung mündlicher Leistungen", "Greater weighting of oral work", True),
+]
+
+# Förderunterlagen sind vertraulich: das Sekretariat sieht nur Nachteilsausgleiche (Prüfungsorganisation).
+VERWALTUNG_FOERDERRECHTE = {"view_nachteilsausgleich", "view_foerderschwerpunkt", "view_ausgleichsmassnahme"}
+
 # Rechte, die NUR Personalverwaltung und Schulleitung erhalten (nicht das Sekretariat)
 HR_RECHTE = {"view_hr_daten"} | {f"{a}_{m}" for a in ("add", "change", "delete", "view")
                                   for m in ("nachweis", "nachweisart", "personalabwesenheit")}
@@ -100,10 +138,26 @@ ROLLEN = {
         "add_zeugnisnote", "change_zeugnisnote", "view_zeugnisnote",
         "add_fehlzeit", "change_fehlzeit", "view_fehlzeit", "view_stunde",
         "view_agangebot", "view_agwahl", "view_agzuteilung",
+        # Anhänge (sichtbar nur nach Zugriffsstufe) und Förderung (zeilenweise: eigene Klasse / eigene Schüler:innen)
+        "add_dokument", "view_dokument",
+        "add_foerderplan", "change_foerderplan", "view_foerderplan",
+        "add_foerderziel", "change_foerderziel", "view_foerderziel", "delete_foerderziel",
+        "add_foerdereintrag", "change_foerdereintrag", "view_foerdereintrag",
+        "add_nachteilsausgleich", "change_nachteilsausgleich", "view_nachteilsausgleich",
+        "add_aushaendigung", "change_aushaendigung", "view_aushaendigung",
+        "view_foerderschwerpunkt", "view_ausgleichsmassnahme",
     ],
+    "Förderkoordination": "__foerderung__",
 }
 
-FACH_APPS = ["stammdaten", "noten", "fehlzeiten", "nachmittag"]
+FACH_APPS = ["stammdaten", "noten", "fehlzeiten", "nachmittag", "foerderung"]
+
+# Grundlegende Leserechte der Förderkoordination außerhalb des Förderbereichs
+FOERDERKOORDINATION_EXTRA = [
+    "view_person", "view_schuelerprofil", "view_gruppe", "view_mitgliedschaft", "view_fach", "view_beziehung",
+    "view_elternprofil", "view_laufbahnabschnitt", "view_bildungsgang", "view_sprachenfolge", "view_personalprofil",
+    "view_unterricht", "add_dokument", "change_dokument", "view_dokument", "delete_dokument",
+]
 
 
 def englisch_ergaenzen(obj, **felder):
@@ -125,7 +179,10 @@ class Command(BaseCommand):
             gruppe, _ = Group.objects.get_or_create(name=rolle)
             perms = Permission.objects.filter(content_type__app_label__in=FACH_APPS)
             if rechte == "__alle_ausser_hr__":
-                perms = perms.exclude(codename__in=HR_RECHTE)
+                perms = perms.exclude(codename__in=HR_RECHTE).exclude(
+                    Q(content_type__app_label="foerderung") & ~Q(codename__in=VERWALTUNG_FOERDERRECHTE))
+            elif rechte == "__foerderung__":
+                perms = perms.filter(Q(content_type__app_label="foerderung") | Q(codename__in=FOERDERKOORDINATION_EXTRA))
             elif rechte != "__alle__":
                 perms = perms.filter(codename__in=rechte)
             gruppe.permissions.add(*perms)
@@ -180,3 +237,12 @@ class Command(BaseCommand):
             if neu:
                 art.pflicht_fuer.set(list(bereiche.values()) if pflicht == ["*"] else [bereiche[k] for k in pflicht])
         self.stdout.write(self.style.SUCCESS("Personalbereiche und Nachweisarten eingerichtet."))
+
+        for i, (name, name_en) in enumerate(FOERDERSCHWERPUNKTE):
+            obj, _ = Foerderschwerpunkt.objects.get_or_create(name=name, defaults={"reihenfolge": (i + 1) * 10})
+            englisch_ergaenzen(obj, name_en=name_en)
+        for i, (name, name_en, notenschutz) in enumerate(AUSGLEICHSMASSNAHMEN):
+            obj, _ = Ausgleichsmassnahme.objects.get_or_create(
+                name=name, defaults={"notenschutz": notenschutz, "reihenfolge": (i + 1) * 10})
+            englisch_ergaenzen(obj, name_en=name_en)
+        self.stdout.write(self.style.SUCCESS("Förderschwerpunkte und Ausgleichsmaßnahmen eingerichtet."))

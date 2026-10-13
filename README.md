@@ -1,7 +1,8 @@
-# Schulverwaltung (Version 0.4.1.1, Entwicklungsstand)
+# Schulverwaltung (Version 0.4.2.0, Entwicklungsstand)
 
 Open-Source-Schulverwaltung für die DSN: Stammdaten, Klassen und Lerngruppen,
-Noten mit Gewichtung, Fehlzeiten, Nachmittagsprogramm. Läuft im Browser,
+Noten mit Gewichtung, Fehlzeiten, Nachmittagsprogramm, Anhänge zur Schülerakte,
+Förderpläne und Nachteilsausgleiche. Läuft im Browser,
 betrieben mit Docker.
 
 > Nur mit **erfundenen Testdaten** verwenden. Für echte Schülerdaten fehlen noch
@@ -30,6 +31,7 @@ http://localhost:8000. Die Zugangsdaten stehen in der Datei `.env`
 | `lehrkraft` | Demo-Lehrkraft, Klassenleitung 9a, Chemie 9a/9b, Biologie 9a | `DEMO_PASSWORT` in `.env` |
 | `verwaltung` | Demo-Sekretariat | `DEMO_PASSWORT` in `.env` |
 | `personal` | Demo-Personalverwaltung (HR) | `DEMO_PASSWORT` in `.env` |
+| `foerderung` | Demo-Förderkoordination (zugleich Klassenleitung 9b, Deutsch 9a) | `DEMO_PASSWORT` in `.env` |
 
 ## Noten mit Bewertungsordnern
 
@@ -120,6 +122,51 @@ Personal und Eltern anlegen – ohne Programmierung:
 Die Felder erscheinen automatisch in den Formularen und (bei Schüler:innen) in der Schülerakte.
 Werte unsichtbarer Felder bleiben beim Speichern durch andere Rollen unverändert. Alle Änderungen
 stehen im Änderungsprotokoll.
+
+## Anhänge zur Schülerakte
+
+In der Schülerakte (Abschnitt **Anhänge**) lassen sich beliebige Dateien hochladen – PDF, Fotos,
+Word, Excel, Scans usw. – oder reine Notizen ohne Datei. Die Liste ist nach Upload-Datum sortiert
+(neueste zuerst, umschaltbar) und nach Kategorie filterbar.
+
+| Sichtbar für | Wer sieht den Anhang |
+| --- | --- |
+| Alle mit Aktenzugriff | Verwaltung, Schulleitung, Förderkoordination, Klassenleitung |
+| Verwaltung und Schulleitung | z. B. Anmeldung, Verträge |
+| Förderteam | Förderkoordination, Klassenleitung, Schulleitung – z. B. Gutachten |
+| Nur Schulleitung | besonders vertrauliche Unterlagen |
+
+Dateien werden nie über einen öffentlichen Link ausgeliefert, sondern nur nach Rechteprüfung;
+auf dem Datenträger tragen sie einen Zufallsnamen. Gelöschte Anhänge werden auch als Datei
+entfernt. Höchstgröße je Datei: `DOKUMENT_MAX_MB` in `.env` (Standard 25). Personalunterlagen
+sehen ausschließlich Personalverwaltung und Schulleitung.
+
+## Förderung: Förderpläne und Nachteilsausgleiche
+
+**Förderpläne** (Verwaltung › Förderung › Förderpläne oder aus der Schülerakte):
+Förderschwerpunkte, Lernausgangslage, Stärken, Förderziele mit Maßnahmen, Zuständigkeit und
+Evaluation, Verlaufsdokumentation, Fortschreibung des Vorjahresplans. Eine Druckansicht
+(„Drucken / PDF“) enthält Unterschriftsfelder für die Aushändigung.
+
+**Nachteilsausgleiche**: Maßnahmen aus einem anpassbaren Katalog (z. B. Zeitverlängerung,
+separater Raum, Vorlesen), betroffene Fächer, Geltungsdauer, Beschluss. Maßnahmen mit
+**Notenschutz** sind gekennzeichnet. Lehrkräfte sehen in der Notenübersicht und Klassenliste
+eine Markierung „NTA“ bei allen Schüler:innen mit gültigem Nachteilsausgleich im eigenen Fach.
+
+**Elternbestätigung**: Bei jedem Plan und Nachteilsausgleich wird vermerkt, wann er wem
+ausgehändigt wurde und wann die Eltern den Erhalt bestätigt haben („Erhalt bestätigen“).
+Wird ein Dokument danach inhaltlich geändert, erscheint der Hinweis „seit Aushändigung
+geändert“. Die Startseite zeigt offene Bestätigungen, fällige Evaluationen und ablaufende
+Nachteilsausgleiche. Sobald es ein Elternportal gibt, können Eltern dort selbst abhaken.
+
+| Rolle | Rechte in der Förderung |
+| --- | --- |
+| Förderkoordination, Schulleitung | alles, auch Genehmigung von Nachteilsausgleichen |
+| Klassenleitung | Förderpläne der eigenen Klasse anlegen und bearbeiten, Nachteilsausgleiche beantragen, Aushändigung und Erhalt vermerken |
+| Fachlehrkraft | Förderpläne und Nachteilsausgleiche der eigenen Schüler:innen lesen, Verlaufseinträge ergänzen |
+| Sekretariat | nur gültige Nachteilsausgleiche (für die Prüfungsorganisation), keine Förderpläne |
+
+Die Rolle *Förderkoordination* wird unter Verwaltung › Benutzer zugewiesen.
 
 ## Sprache: Deutsch und Englisch
 
