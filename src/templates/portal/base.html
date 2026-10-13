@@ -5,22 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}{% translate "Schulverwaltung" %}{% endblock %} · {{ SCHULNAME }}</title>
   <link rel="stylesheet" href="{% static 'portal.css' %}">
+  <link rel="stylesheet" href="{% static 'menueband.css' %}">
+  <script src="{% static 'menueband.js' %}" defer></script>
 </head>
 <body>
-  <header class="kopf">
-    <a class="marke" href="{% url 'start' %}">
-      <span class="marke-zeichen" aria-hidden="true">S</span>
-      <span><strong>{% translate "Schulverwaltung" %}</strong><small>{{ SCHULNAME }}{% if AKTUELLES_SCHULJAHR %} · {{ AKTUELLES_SCHULJAHR }}{% endif %}</small></span>
-    </a>
-    <nav class="navi">
-      {% if user.is_authenticated %}
-      <a href="{% url 'start' %}">{% translate "Start" %}</a>
-      {% if user.is_staff %}<a href="{% url 'admin:index' %}">{% translate "Verwaltung" %}</a>{% endif %}
-      <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit" class="link">{% translate "Abmelden" %}</button></form>
-      {% endif %}
-      {% include "portal/_sprachmenue.html" %}
-    </nav>
-  </header>
+  {% include "portal/_menueband.html" %}
   <main class="inhalt {% block inhaltsklasse %}{% endblock %}">
     {% if messages %}<ul class="meldungen">{% for m in messages %}<li class="{{ m.tags }}">{{ m }}</li>{% endfor %}</ul>{% endif %}
     {% block inhalt %}{% endblock %}

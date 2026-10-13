@@ -2,8 +2,6 @@
 {% load i18n formate %}
 {% block title %}{% translate "Start" %}{% endblock %}
 {% block inhalt %}
-{% include "portal/_symbole.html" %}
-
 <header class="startkopf">
   <div class="kalenderblatt" aria-hidden="true">
     <span class="kb-tag">{{ heute|date:"D" }}</span>
@@ -14,16 +12,10 @@
     <h1>{{ begruessung }}, {{ user.person.rufname|default:user.person.vorname|default:user.get_username }}</h1>
     <p class="unterzeile">{{ heute|langdatum }}, {% blocktranslate with kw=kalenderwoche %}Kalenderwoche {{ kw }}{% endblocktranslate %}</p>
   </div>
-  <form class="suchfeld" method="get" action="{% url 'suche' %}" role="search">
-    <label for="suche-q" class="unsichtbar">{% translate "Person suchen" %}</label>
-    <svg class="symbol" viewBox="0 0 24 24" aria-hidden="true"><use href="#s-lupe"/></svg>
-    <input id="suche-q" type="search" name="q" placeholder="{% translate 'Person suchen …' %}" minlength="2" required>
-    <button type="submit" class="knopf klein">{% translate "Suchen" %}</button>
-  </form>
 </header>
 
 {% with sz=schnellzugriff %}
-{% if sz.klassen or sz.kurse or sz.bereiche %}
+{% if sz.klassen or sz.kurse %}
 <nav class="schnellzugriff" aria-label="{% translate 'Schnellzugriff' %}">
   {% if sz.klassen %}
   <div class="sz-gruppe">
@@ -34,13 +26,7 @@
   {% if sz.kurse %}
   <div class="sz-gruppe">
     <h2>{% translate "Mein Unterricht" %}</h2>
-    <ul>{% for k in sz.kurse %}<li><a href="{{ k.url }}"><strong>{{ k.titel }}</strong><span>{% translate "Noten" %} · {{ k.unter }}</span></a></li>{% endfor %}</ul>
-  </div>
-  {% endif %}
-  {% if sz.bereiche %}
-  <div class="sz-gruppe">
-    <h2>{% translate "Bereiche" %}</h2>
-    <ul class="sz-bereiche">{% for b in sz.bereiche %}<li><a href="{{ b.url }}"><svg class="symbol" viewBox="0 0 24 24" aria-hidden="true"><use href="#s-{{ b.symbol }}"/></svg><strong>{{ b.titel }}</strong></a></li>{% endfor %}</ul>
+    <ul>{% for k in sz.kurse %}<li><a href="{{ k.url }}"><strong>{{ k.titel }}</strong><span>{% translate "Notenübersicht" %} · {{ k.unter }}</span></a></li>{% endfor %}</ul>
   </div>
   {% endif %}
 </nav>
@@ -67,7 +53,7 @@
 
     {% if unterrichte is not None %}
     <section class="karte">
-      <h2>{% translate "Unterrichte im Schuljahr" %}</h2>
+      <h2>{% blocktranslate with sj=AKTUELLES_SCHULJAHR %}Unterricht im Schuljahr {{ sj }}{% endblocktranslate %}</h2>
       {% if unterrichte %}
       <div class="rollbar"><table class="liste">
         <thead><tr><th>{% translate "Fach" %}</th><th>{% translate "Gruppe" %}</th><th>{% translate "Halbjahr" %}</th><th>{% translate "Lehrkraft" %}</th><th></th></tr></thead>
@@ -78,14 +64,14 @@
         {% endfor %}
         </tbody>
       </table></div>
-      {% else %}<p class="leer">{% translate "Keine Unterrichte zugeordnet." %}</p>{% endif %}
+      {% else %}<p class="leer">{% translate "Kein Unterricht zugeordnet." %}</p>{% endif %}
     </section>
     {% endif %}
 
     {% if not foerderung and not hr and unterrichte is None and not schnellzugriff.klassen and not schnellzugriff.kurse %}
     <section class="karte">
       <h2>{% translate "Willkommen" %}</h2>
-      <p class="leer">{% translate "Ihrem Konto sind noch keine Klassen oder Unterrichte zugeordnet. Die Verwaltung kann das unter Personal und Klassen nachtragen." %}</p>
+      <p class="leer">{% translate "Ihrem Konto sind noch keine Klassen und kein Unterricht zugeordnet. Die Verwaltung trägt das unter Unterricht › Unterrichtsverteilung ein." %}</p>
     </section>
     {% endif %}
   </div>

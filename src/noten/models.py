@@ -16,7 +16,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Q
-from django.utils.translation import gettext, gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _, pgettext_lazy
 from simple_history.models import HistoricalRecords
 
 from stammdaten.sprache import LokalerNameMixin
@@ -160,7 +160,7 @@ class Unterricht(models.Model):
 
     class Meta:
         verbose_name = _("Unterricht")
-        verbose_name_plural = _("Unterrichte")
+        verbose_name_plural = pgettext_lazy("Mehrzahl", "Unterricht")
         ordering = ["abschnitt", "gruppe__name", "fach__reihenfolge"]
         unique_together = [("abschnitt", "gruppe", "fach")]
 

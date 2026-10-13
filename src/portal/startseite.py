@@ -38,7 +38,7 @@ def begruessung(jetzt=None):
 # ---------------------------------------------------------------- Schnellzugriff
 
 def schnellzugriff(user, sj):
-    """Direkte Wege zu den eigenen Klassen, Kursen und den Bereichen der jeweiligen Rolle."""
+    """Kacheln für die eigenen Klassen und den eigenen Unterricht (weitere Wege: Menüband)."""
     from noten.models import Unterricht
 
     personal = personal_von(user)
@@ -52,26 +52,8 @@ def schnellzugriff(user, sj):
             kurse.append({"titel": f"{u.fach.lokal_name} {u.gruppe.name}", "unter": u.abschnitt.lokal_name,
                           "url": reverse("notenuebersicht", args=[u.pk])})
 
-    bereiche = []
-    if user.is_staff:
-        if ist_verwaltung(user):
-            bereiche += [
-                {"titel": gettext("Schüler:innen"), "url": reverse("admin:stammdaten_schuelerprofil_changelist"), "symbol": "personen"},
-                {"titel": gettext("Klassen und Gruppen"), "url": reverse("admin:stammdaten_gruppe_changelist"), "symbol": "gruppen"},
-                {"titel": gettext("Fehlzeiten"), "url": reverse("admin:fehlzeiten_fehlzeit_changelist"), "symbol": "uhr"},
-                {"titel": gettext("Nachmittag / AGs"), "url": reverse("admin:nachmittag_agangebot_changelist"), "symbol": "ball"},
-            ]
-        if ist_foerderkoordination(user) or (klassenleitung_schueler_ids(user) and user.has_perm("foerderung.view_foerderplan")):
-            bereiche.append({"titel": gettext("Förderpläne"), "url": reverse("admin:foerderung_foerderplan_changelist"), "symbol": "pflanze"})
-        if user.has_perm("foerderung.view_nachteilsausgleich"):
-            bereiche.append({"titel": gettext("Nachteilsausgleiche"),
-                             "url": reverse("admin:foerderung_nachteilsausgleich_changelist") + "?gueltig=aktiv", "symbol": "waage"})
-        if ist_personalverwaltung(user) or ist_verwaltung(user):
-            bereiche.append({"titel": gettext("Personal"), "url": reverse("admin:stammdaten_personalprofil_changelist"), "symbol": "ausweis"})
-        if user.has_perm("stammdaten.view_dokument"):
-            bereiche.append({"titel": gettext("Anhänge"), "url": reverse("admin:stammdaten_dokument_changelist"), "symbol": "klammer"})
-        bereiche.append({"titel": gettext("Verwaltung"), "url": reverse("admin:index"), "symbol": "zahnrad"})
-    return {"klassen": klassen, "kurse": kurse, "bereiche": bereiche}
+
+    return {"klassen": klassen, "kurse": kurse}
 
 
 # ---------------------------------------------------------------- Geburtstage

@@ -1,0 +1,113 @@
+/* Menüband (Ribbon) – gemeinsam für Portal und Verwaltungsoberfläche. Alle Regeln sind auf .mb begrenzt. */
+.mb {
+  --mb-titel: #1f5f5b; --mb-titel-text: #ffffff; --mb-flaeche: #ffffff; --mb-text: #1d2327; --mb-leise: #5b6670;
+  --mb-linie: #dfe3e6; --mb-akzent: #1f5f5b; --mb-akzent-hell: #e3efed; --mb-hover: #eef3f2; --mb-schatten: rgba(16, 24, 32, .08);
+  position: relative; z-index: 40; display: block;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px; line-height: 1.35; color: var(--mb-text); background: var(--mb-flaeche);
+  box-shadow: 0 1px 0 var(--mb-linie), 0 2px 6px var(--mb-schatten);
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .mb {
+    --mb-titel: #163f3c; --mb-flaeche: #1e2428; --mb-text: #e8eaec; --mb-leise: #9aa5ae; --mb-linie: #313a40;
+    --mb-akzent: #6fbfb6; --mb-akzent-hell: #20332f; --mb-hover: #263034; --mb-schatten: rgba(0, 0, 0, .35);
+  }
+}
+html[data-theme="dark"] .mb {
+  --mb-titel: #163f3c; --mb-flaeche: #1e2428; --mb-text: #e8eaec; --mb-leise: #9aa5ae; --mb-linie: #313a40;
+  --mb-akzent: #6fbfb6; --mb-akzent-hell: #20332f; --mb-hover: #263034; --mb-schatten: rgba(0, 0, 0, .35);
+}
+.mb *, .mb *::before, .mb *::after { box-sizing: border-box; }
+.mb svg { width: 16px; height: 16px; flex: none; }
+.mb a, .mb a:link, .mb a:visited { color: inherit; text-decoration: none; }
+.mb button { font: inherit; color: inherit; background: none; border: 0; margin: 0; cursor: pointer; }
+.mb :focus-visible { outline: 2px solid var(--mb-akzent); outline-offset: 2px; border-radius: 5px; }
+.mb-unsichtbar { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Titelleiste */
+.mb-titel { display: flex; align-items: center; gap: 1rem; padding: 0.45rem 1.1rem; background: var(--mb-titel); color: var(--mb-titel-text); }
+.mb-titel :focus-visible { outline-color: #fff; }
+.mb-marke { display: flex; align-items: center; gap: 0.6rem; color: var(--mb-titel-text) !important; flex: none; }
+.mb-zeichen { display: grid; place-items: center; width: 1.9rem; height: 1.9rem; border-radius: 7px; background: rgba(255, 255, 255, .16); font-weight: 700; }
+.mb-marke strong { display: block; font-size: 0.95rem; }
+.mb-marke small { display: block; font-size: 0.72rem; opacity: 0.8; }
+.mb-suche { flex: 1 1 auto; max-width: 480px; margin: 0 auto; display: flex; align-items: center; gap: 0.45rem;
+  padding: 0.32rem 0.7rem; border-radius: 7px; background: rgba(255, 255, 255, .14); color: var(--mb-titel-text); }
+.mb-suche input { flex: 1; min-width: 0; border: 0; background: transparent; color: inherit; font: inherit; padding: 0.1rem 0; box-shadow: none; }
+.mb-suche input::placeholder { color: rgba(255, 255, 255, .75); }
+.mb-suche input:focus { outline: none; }
+.mb-suche:focus-within { background: var(--mb-flaeche); color: var(--mb-text); box-shadow: 0 0 0 2px rgba(255, 255, 255, .5); }
+.mb-suche:focus-within input::placeholder { color: var(--mb-leise); }
+.mb-rechts { display: flex; align-items: center; gap: 0.6rem; flex: none; margin-left: auto; }
+.mb-suche + .mb-rechts { margin-left: 0; }
+
+/* Sprachmenü in der Titelleiste */
+.mb .sprachmenue { position: relative; }
+.mb .sprachmenue summary { list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem;
+  padding: 0.3rem 0.55rem; border: 1px solid rgba(255, 255, 255, .35); border-radius: 999px; font-size: 0.78rem; font-weight: 600; color: var(--mb-titel-text); }
+.mb .sprachmenue summary::-webkit-details-marker { display: none; }
+.mb .sprachmenue summary:hover { background: rgba(255, 255, 255, .12); }
+.mb .sprachmenue form { position: absolute; right: 0; z-index: 60; margin-top: 0.45rem; background: var(--mb-flaeche); color: var(--mb-text);
+  border: 1px solid var(--mb-linie); border-radius: 10px; padding: 0.3rem; min-width: 9rem; box-shadow: 0 8px 24px var(--mb-schatten); }
+.mb .sprachmenue button { display: block; width: 100%; text-align: left; padding: 0.5rem 0.75rem; border-radius: 7px; font-size: 0.88rem; }
+.mb .sprachmenue button:hover { background: var(--mb-hover); }
+.mb .sprachmenue button[aria-current="true"] { font-weight: 700; color: var(--mb-akzent); }
+
+/* Konto */
+.mb-konto { position: relative; }
+.mb-konto summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; padding: 0.15rem 0.35rem 0.15rem 0.15rem; border-radius: 999px; }
+.mb-konto summary::-webkit-details-marker { display: none; }
+.mb-konto summary:hover { background: rgba(255, 255, 255, .12); }
+.mb-initialen { display: grid; place-items: center; width: 1.9rem; height: 1.9rem; border-radius: 50%; background: rgba(255, 255, 255, .2); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.02em; }
+.mb-name { font-size: 0.85rem; }
+.mb-konto-menue { position: absolute; right: 0; top: calc(100% + 0.45rem); z-index: 60; min-width: 15rem; padding: 0.4rem;
+  background: var(--mb-flaeche); color: var(--mb-text); border: 1px solid var(--mb-linie); border-radius: 10px; box-shadow: 0 8px 24px var(--mb-schatten); }
+.mb-konto-kopf { margin: 0 0 0.3rem; padding: 0.45rem 0.6rem 0.55rem; border-bottom: 1px solid var(--mb-linie); }
+.mb-konto-kopf strong, .mb-konto-kopf small { display: block; }
+.mb-konto-kopf small { color: var(--mb-leise); font-size: 0.78rem; margin-top: 0.1rem; }
+.mb-konto-menue a, .mb-konto-menue button { display: flex; align-items: center; gap: 0.55rem; width: 100%; padding: 0.5rem 0.6rem; border-radius: 7px; font-size: 0.88rem; text-align: left; }
+.mb-konto-menue a:hover, .mb-konto-menue button:hover { background: var(--mb-hover); }
+.mb-konto-menue svg { color: var(--mb-akzent); }
+.mb-konto-menue form { margin: 0; }
+
+/* Registerkarten */
+.mb-reiter { display: flex; align-items: flex-end; gap: 0.1rem; padding: 0.1rem 0.8rem 0; overflow-x: auto; scrollbar-width: none; }
+.mb-reiter::-webkit-scrollbar { display: none; }
+.mb-reiter [role="tab"] { padding: 0.55rem 0.85rem 0.45rem; color: var(--mb-leise); border-bottom: 3px solid transparent; white-space: nowrap; font-size: 0.9rem; }
+.mb-reiter [role="tab"]:hover { color: var(--mb-text); }
+.mb-reiter [role="tab"][aria-selected="true"] { color: var(--mb-akzent); border-bottom-color: var(--mb-akzent); font-weight: 600; }
+.mb-einklappen { margin-left: auto; align-self: center; display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 6px; color: var(--mb-leise); }
+.mb-einklappen:hover { background: var(--mb-hover); color: var(--mb-text); }
+.mb-einklappen svg { transition: transform .15s ease; }
+.mb.eingeklappt .mb-einklappen svg { transform: rotate(180deg); }
+
+/* Band mit Befehlsgruppen */
+.mb-band { display: flex; align-items: stretch; padding: 0.4rem 0.5rem 0.25rem; border-top: 1px solid var(--mb-linie); overflow-x: auto; scrollbar-width: thin; }
+.mb-band[hidden] { display: none; }
+.mb-gruppe { display: flex; flex-direction: column; justify-content: space-between; padding: 0 0.55rem; border-right: 1px solid var(--mb-linie); flex: none; }
+.mb-gruppe:last-child { border-right: 0; }
+.mb-befehle { display: flex; align-items: flex-start; gap: 0.2rem; }
+.mb-gross { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; min-width: 4.4rem; max-width: 6.6rem; padding: 0.4rem 0.45rem 0.35rem;
+  border-radius: 6px; text-align: center; font-size: 0.78rem; line-height: 1.2; }
+.mb-gross svg { width: 26px; height: 26px; color: var(--mb-akzent); }
+.mb-klein { display: grid; grid-template-rows: repeat(3, auto); grid-auto-flow: column; gap: 0.05rem 0.5rem; align-content: start; }
+.mb-klein a { display: flex; align-items: center; gap: 0.45rem; padding: 0.24rem 0.5rem; border-radius: 5px; font-size: 0.8rem; white-space: nowrap; }
+.mb-klein svg { color: var(--mb-akzent); }
+.mb-gross:hover, .mb-klein a:hover { background: var(--mb-hover); }
+.mb-gross.aktiv, .mb-klein a.aktiv { background: var(--mb-akzent-hell); color: var(--mb-akzent); font-weight: 600; }
+.mb-gruppentitel { margin: 0.3rem 0 0 !important; padding: 0 !important; font-size: 0.7rem !important; font-weight: 400 !important; color: var(--mb-leise) !important;
+  text-align: center; white-space: nowrap; text-transform: none !important; letter-spacing: 0 !important; background: none !important; }
+
+/* Eingeklappt: Band nur nach Klick auf eine Registerkarte, als Überlagerung */
+.mb.eingeklappt .mb-band { display: none; }
+.mb.eingeklappt.offen .mb-band:not([hidden]) { display: flex; position: absolute; left: 0; right: 0; top: 100%; background: var(--mb-flaeche);
+  box-shadow: 0 10px 24px var(--mb-schatten); border-bottom: 1px solid var(--mb-linie); }
+
+@media (max-width: 760px) {
+  .mb-titel { flex-wrap: wrap; gap: 0.5rem 0.8rem; padding: 0.45rem 0.8rem; }
+  .mb-suche { order: 3; flex-basis: 100%; max-width: none; }
+  .mb-name { display: none; }
+  .mb-reiter { padding: 0 0.3rem; }
+}
+@media (prefers-reduced-motion: reduce) { .mb-einklappen svg { transition: none; } }
+@media print { .mb { display: none !important; } }

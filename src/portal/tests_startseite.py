@@ -182,12 +182,112 @@ class StartseiteTest(TestCase):
         self.assertContains(r, "Birthdays")
         self.assertContains(r, "Notes")
 
-    def test_schnellzugriff_rollenabhaengig(self):
+    def test_schnellzugriff_kacheln(self):
         self.anmelden("lehrkraft")
         sz = self.client.get(reverse("start")).context["schnellzugriff"]
         self.assertIn("9a", [k["titel"] for k in sz["klassen"]])
         self.assertTrue(any(k["titel"].startswith("Chemie") for k in sz["kurse"]))
-        self.assertNotIn(reverse("admin:stammdaten_personalprofil_changelist"), [b["url"] for b in sz["bereiche"]])
-        self.anmelden("personal")
-        sz = self.client.get(reverse("start")).context["schnellzugriff"]
-        self.assertIn(reverse("admin:stammdaten_personalprofil_changelist"), [b["url"] for b in sz["bereiche"]])
+
+
+class MenuebandTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        call_command("demodaten", passwort=PW, stdout=open("/dev/null", "w"))
+
+    def anmelden(self, name):
+        self.client.logout()
+        self.assertTrue(self.client.login(username=name, password=PW))
+
+    def band(self, url="/"):
+        r = self.client.get(url)
+        self.assertEqual(r.status_code, 200)
+        return r.context["MENUEBAND"], r
+
+    def befehle(self, mb):
+        return {b["titel"]: b for k in mb["karten"] for g in k["gruppen"] for b in g.befehle}
+
+    def test_karten_je_rolle(self):
+        erwartet = {
+            "lehrkraft": {"start", "schueler", "unterricht", "foerderung", "verwaltung"},
+            "verwaltung": {"start", "schueler", "unterricht", "foerderung", "personal", "verwaltung"},
+            "personal": {"start", "schueler", "personal", "verwaltung"},
+            "foerderung": {"start", "schueler", "unterricht", "foerderung", "verwaltung"},
+        }
+        for name, karten in erwartet.items():
+            self.anmelden(name)
+            mb, _ = self.band()
+            self.assertEqual({k["schluessel"] for k in mb["karten"]}, karten, name)
+
+    def test_rechte_im_band(self):
+        self.anmelden("lehrkraft")
+        mb, r = self.band()
+        b = self.befehle(mb)
+        self.assertIn("CH 9a", b)              # eigener Unterricht
+        self.assertIn("9a", b)                 # eigene Klasse
+        self.assertNotIn("Personalliste", b)
+        self.assertNotIn("Alle Schüler:innen", b)
+        self.assertNotIn("Unterrichtsverteilung", b)
+        self.assertContains(r, 'role="tablist"')
+        self.anmelden("verwaltung")
+        b = self.befehle(self.band()[0])
+        for titel in ("Alle Schüler:innen", "Unterrichtsverteilung", "Personalliste", "Schuljahre"):
+            self.assertIn(titel, b)
+        self.assertNotIn("Förderpläne", b)    # Förderpläne sind dem Förderteam vorbehalten
+
+    def test_aktive_karte_nach_seite(self):
+        from noten.models import Unterricht
+
+        self.anmelden("lehrkraft")
+        u = Unterricht.objects.get(fach__kuerzel="CH", gruppe__name="9a")
+        self.assertEqual(self.band(reverse("notenuebersicht", args=[u.pk]))[0]["aktiv"], "unterricht")
+        self.assertEqual(self.band(reverse("admin:noten_leistungsnachweis_changelist"))[0]["aktiv"], "unterricht")
+        self.assertEqual(self.band(reverse("admin:foerderung_foerderplan_changelist"))[0]["aktiv"], "foerderung")
+        mb, r = self.band(reverse("admin:noten_leistungsnachweis_changelist"))
+        self.assertTrue(self.befehle(mb)["Leistungsnachweise"]["aktiv"])
+        self.assertContains(r, 'aria-current="page"')
+        self.assertEqual(self.band("/")[0]["aktiv"], "start")
+
+    def test_band_auch_in_der_verwaltungsoberflaeche(self):
+        self.anmelden("verwaltung")
+        r = self.client.get(reverse("admin:index"))
+        self.assertContains(r, 'id="menueband"')
+        self.assertContains(r, "menueband.js")
+
+    def test_englisch(self):
+        self.anmelden("lehrkraft")
+        self.client.post(reverse("sprache_wechseln"), {"sprache": "en", "next": "/"})
+        mb, r = self.band()
+        self.assertEqual([k["titel"] for k in mb["karten"]][:3], ["Home", "Students", "Teaching"])
+        self.assertContains(r, "Hide ribbon")
+
+    def test_begriff_unterricht(self):
+        self.anmelden("verwaltung")
+        r = self.client.get("/")
+        self.assertNotContains(r, "Unterrichte")
+        self.assertContains(r, "Unterricht im Schuljahr")
+
+
+class NurPersonalTest(TestCase):
+    def setUp(self):
+        self.konto = User.objects.create_user("elternteil", password=PW)  # weder Personal noch Verwaltung
+
+    def test_anmeldung_abgelehnt(self):
+        r = self.client.post(reverse("login"), {"username": "elternteil", "password": PW})
+        self.assertEqual(r.status_code, 200)
+        self.assertContains(r, "nur für Beschäftigte")
+        self.assertNotIn("_auth_user_id", self.client.session)
+
+    def test_bestehende_sitzung_wird_beendet(self):
+        self.client.force_login(self.konto)
+        r = self.client.get(reverse("start"))
+        self.assertRedirects(r, reverse("login"), fetch_redirect_response=False)
+        self.assertNotIn("_auth_user_id", self.client.session)
+
+    def test_personal_ohne_verwaltungszugang_darf(self):
+        from stammdaten.models import Person, Personalbereich
+
+        call_command("grundeinrichtung", stdout=open("/dev/null", "w"))
+        p = Person.objects.create(vorname="Ann", nachname="Wanjiru", benutzer=self.konto)
+        Personalprofil.objects.create(person=p, bereich=Personalbereich.objects.first())
+        self.client.force_login(self.konto)
+        self.assertEqual(self.client.get(reverse("start")).status_code, 200)

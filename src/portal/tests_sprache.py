@@ -39,10 +39,10 @@ class UebersetzungVollstaendig(TestCase):
     def test_mo_datei_aktuell(self):
         mo = PO.with_suffix(".mo")
         self.assertTrue(mo.exists())
-        katalog = {e.msgid: e.msgstr for e in polib.mofile(str(mo))}
+        katalog = {(e.msgctxt, e.msgid): e.msgstr for e in polib.mofile(str(mo))}
         for e in polib.pofile(str(PO)):
             if not e.msgid_plural:
-                self.assertEqual(katalog.get(e.msgid), e.msgstr, f"django.mo veraltet: {e.msgid!r} – bitte kompilieren")
+                self.assertEqual(katalog.get((e.msgctxt, e.msgid)), e.msgstr, f"django.mo veraltet: {e.msgid!r} – bitte kompilieren")
 
 
 class SprachwahlTest(TestCase):

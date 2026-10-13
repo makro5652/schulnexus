@@ -9,3 +9,31 @@
 .sprachmenue button { display: block; width: 100%; text-align: left; border: 0; background: none; padding: 0.45rem 0.7rem; border-radius: 6px; cursor: pointer; font: inherit; font-size: 0.85rem; color: var(--body-fg, #333); }
 .sprachmenue button:hover { background: var(--darkened-bg, #f0f0f0); }
 .sprachmenue button[aria-current="true"] { font-weight: 700; }
+
+/* Farben der Verwaltungsoberfläche an das Portal angleichen (Grün statt Blau) */
+:root, html[data-theme="light"] {
+  --primary: #2f6f6a; --secondary: #1f5f5b; --accent: #e3efed; --primary-fg: #fff;
+  --header-bg: #1f5f5b; --header-branding-color: #fff; --header-color: #e3efed;
+  --breadcrumbs-bg: #e3efed; --breadcrumbs-fg: #4b5a63; --breadcrumbs-link-fg: #1f5f5b;
+  --link-fg: #1f5f5b; --link-hover-color: #0f3d3a; --link-selected-fg: #1f5f5b;
+  --button-bg: #1f5f5b; --button-hover-bg: #174845; --default-button-bg: #174845; --default-button-hover-bg: #1f5f5b;
+  --selected-row: #eef6f4; --object-tools-bg: #5b6670; --object-tools-hover-bg: #1f5f5b;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --primary: #2f6f6a; --secondary: #6fbfb6; --primary-fg: #f0f4f3;
+    --header-bg: #163f3c; --breadcrumbs-bg: #20332f; --breadcrumbs-fg: #9aa5ae; --breadcrumbs-link-fg: #6fbfb6;
+    --link-fg: #6fbfb6; --link-hover-color: #9fdcd5; --link-selected-fg: #6fbfb6;
+    --button-bg: #2f6f6a; --button-hover-bg: #3a8780; --default-button-bg: #3a8780; --default-button-hover-bg: #2f6f6a;
+    --selected-row: #20332f;
+  }
+}
+html[data-theme="dark"] {
+  --primary: #2f6f6a; --secondary: #6fbfb6; --primary-fg: #f0f4f3;
+  --header-bg: #163f3c; --breadcrumbs-bg: #20332f; --breadcrumbs-fg: #9aa5ae; --breadcrumbs-link-fg: #6fbfb6;
+  --link-fg: #6fbfb6; --link-hover-color: #9fdcd5; --link-selected-fg: #6fbfb6;
+  --button-bg: #2f6f6a; --button-hover-bg: #3a8780; --default-button-bg: #3a8780; --default-button-hover-bg: #2f6f6a;
+  --selected-row: #20332f;
+}
+.breadcrumbs { padding: 0.55rem 40px; }
+.mb-konto summary, .mb .sprachmenue summary { background: transparent; }

@@ -1,0 +1,64 @@
+{% load i18n %}
+{% include "portal/_symbole.html" %}
+<header class="mb" id="menueband">
+  <div class="mb-titel">
+    <a class="mb-marke" href="{% url 'start' %}">
+      <span class="mb-zeichen" aria-hidden="true">S</span>
+      <span><strong>{% translate "Schulverwaltung" %}</strong><small>{{ SCHULNAME }}{% if AKTUELLES_SCHULJAHR %} · {{ AKTUELLES_SCHULJAHR }}{% endif %}</small></span>
+    </a>
+    {% if MENUEBAND %}
+    <form class="mb-suche" method="get" action="{% url 'suche' %}" role="search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-lupe"/></svg>
+      <label for="mb-suche-q" class="mb-unsichtbar">{% translate "Person suchen" %}</label>
+      <input id="mb-suche-q" type="search" name="q" placeholder="{% translate 'Schüler:in, Kolleg:in oder Eltern suchen' %}" minlength="2" required autocomplete="off">
+    </form>
+    {% endif %}
+    <div class="mb-rechts">
+      {% include "portal/_sprachmenue.html" %}
+      {% if MENUEBAND %}
+      <details class="mb-konto">
+        <summary aria-label="{% translate 'Konto' %}">
+          <span class="mb-initialen" aria-hidden="true">{% if user.person %}{{ user.person.vorname|slice:":1" }}{{ user.person.nachname|slice:":1" }}{% else %}{{ user.get_username|slice:":2"|upper }}{% endif %}</span>
+          <span class="mb-name">{{ user.person.anzeigename|default:user.get_username }}</span>
+        </summary>
+        <div class="mb-konto-menue">
+          <p class="mb-konto-kopf"><strong>{{ user.person.anzeigename|default:user.get_username }}</strong>
+            <small>{{ MENUEBAND.rollen|join:", "|default:_("Konto") }}</small></p>
+          {% if user.is_staff and user.has_usable_password %}<a href="{% url 'admin:password_change' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-schluessel"/></svg>{% translate "Passwort ändern" %}</a>{% endif %}
+          <form method="post" action="{% url 'logout' %}">{% csrf_token %}
+            <button type="submit"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-tuer"/></svg>{% translate "Abmelden" %}</button>
+          </form>
+        </div>
+      </details>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if MENUEBAND %}
+  <div class="mb-reiter" role="tablist" aria-label="{% translate 'Menüband' %}">
+    {% for k in MENUEBAND.karten %}
+      <button type="button" role="tab" id="mb-reiter-{{ k.schluessel }}" aria-controls="mb-band-{{ k.schluessel }}"
+              aria-selected="{% if k.schluessel == MENUEBAND.aktiv %}true{% else %}false{% endif %}"
+              tabindex="{% if k.schluessel == MENUEBAND.aktiv %}0{% else %}-1{% endif %}">{{ k.titel }}</button>
+    {% endfor %}
+    <button type="button" class="mb-einklappen" aria-expanded="true"
+            data-text-ein="{% translate 'Menüband einblenden' %}" data-text-aus="{% translate 'Menüband ausblenden' %}"
+            title="{% translate 'Menüband ausblenden' %}">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-hoch"/></svg><span class="mb-unsichtbar">{% translate "Menüband ausblenden" %}</span>
+    </button>
+  </div>
+  {% for k in MENUEBAND.karten %}
+  <div class="mb-band" role="tabpanel" id="mb-band-{{ k.schluessel }}" aria-labelledby="mb-reiter-{{ k.schluessel }}"{% if k.schluessel != MENUEBAND.aktiv %} hidden{% endif %}>
+    {% for g in k.gruppen %}
+    <section class="mb-gruppe" aria-label="{{ g.titel }}">
+      <div class="mb-befehle">
+        {% for b in g.grosse %}<a class="mb-gross{% if b.aktiv %} aktiv{% endif %}" href="{{ b.url }}" title="{{ b.hinweis }}"{% if b.aktiv %} aria-current="page"{% endif %}><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-{{ b.symbol }}"/></svg><span>{{ b.titel }}</span></a>{% endfor %}
+        {% if g.kleine %}<div class="mb-klein">{% for b in g.kleine %}<a class="{% if b.aktiv %}aktiv{% endif %}" href="{{ b.url }}" title="{{ b.hinweis }}"{% if b.aktiv %} aria-current="page"{% endif %}><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-{{ b.symbol }}"/></svg><span>{{ b.titel }}</span></a>{% endfor %}</div>{% endif %}
+      </div>
+      <h3 class="mb-gruppentitel">{{ g.titel }}</h3>
+    </section>
+    {% endfor %}
+  </div>
+  {% endfor %}
+  {% endif %}
+</header>

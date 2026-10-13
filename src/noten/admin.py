@@ -62,7 +62,7 @@ class GewichtungsvorlageAdmin(admin.ModelAdmin):
 
 
 class EigeneDatenMixin:
-    """Lehrkräfte sehen nur ihre eigenen Unterrichte; Verwaltung und Leitung sehen alles."""
+    """Lehrkräfte sehen nur ihren eigenen Unterricht; Verwaltung und Leitung sehen alles."""
 
     unterricht_pfad = "unterricht"
 

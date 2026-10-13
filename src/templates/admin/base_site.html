@@ -1,7 +1,10 @@
 {% extends "admin/base.html" %}
 {% load i18n static %}
 {% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
-{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static 'verwaltung.css' %}">{% endblock %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static 'verwaltung.css' %}"><link rel="stylesheet" href="{% static 'menueband.css' %}">{% endblock %}
+{% block extrahead %}{{ block.super }}<script src="{% static 'menueband.js' %}" defer></script>{% endblock %}
+{# Kopfbereich: dasselbe Menüband wie im Portal statt der Standard-Kopfzeile #}
+{% block header %}{% if MENUEBAND %}{% include "portal/_menueband.html" %}{% else %}{{ block.super }}{% endif %}{% endblock %}
 {% block branding %}
 <div id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a></div>
 {% endblock %}

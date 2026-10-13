@@ -4,7 +4,7 @@
 {% block inhalt %}
 <section class="karte anmeldung">
   <h1>{% translate "Anmelden" %}</h1>
-  {% if form.errors %}<p class="fehler">{% translate "Benutzername oder Passwort sind falsch." %}</p>{% endif %}
+  {% if form.errors %}<p class="fehler">{% for e in form.non_field_errors.as_data %}{% if e.code == "kein_personal" %}{{ e.message }}{% else %}{% translate "Benutzername oder Passwort sind falsch." %}{% endif %}{% empty %}{% translate "Benutzername oder Passwort sind falsch." %}{% endfor %}</p>{% endif %}
   <form method="post">
     {% csrf_token %}
     <label>{% translate "Benutzername" %} <input name="username" autocomplete="username" required autofocus></label>

@@ -1,4 +1,4 @@
-# Schulverwaltung (Version 0.4.2.1, Entwicklungsstand)
+# Schulverwaltung (Version 0.4.2.2, Entwicklungsstand)
 
 Open-Source-Schulverwaltung für die DSN: Stammdaten, Klassen und Lerngruppen,
 Noten mit Gewichtung, Fehlzeiten, Nachmittagsprogramm, Anhänge zur Schülerakte,
@@ -123,12 +123,28 @@ Die Felder erscheinen automatisch in den Formularen und (bei Schüler:innen) in 
 Werte unsichtbarer Felder bleiben beim Speichern durch andere Rollen unverändert. Alle Änderungen
 stehen im Änderungsprotokoll.
 
+## Navigation: Menüband
+
+Portal und Verwaltungsoberfläche haben oben dasselbe **Menüband** (wie in Word):
+
+- **Titelleiste:** Schulname und Schuljahr, Personensuche, Sprache, Benutzermenü
+  (Passwort ändern, Abmelden).
+- **Registerkarten:** Start · Schüler:innen · Unterricht · Förderung · Personal · Verwaltung,
+  jeweils mit beschrifteten Befehlsgruppen (z. B. Unterricht: Mein Unterricht, Bewertung,
+  Zeugnis, Nachmittag, Einstellungen).
+- Jede Rolle sieht nur die Karten und Befehle, für die sie Rechte hat. Beim Öffnen einer Seite
+  ist die passende Karte aktiv und der aktuelle Befehl hervorgehoben.
+- Mit dem Pfeil rechts neben den Registerkarten lässt sich das Band einklappen; der Browser
+  merkt sich die Einstellung. Tastatur: Pfeiltasten wechseln die Karte, Esc schließt Menüs.
+
+Das Portal ist **nur für Beschäftigte** (Verwaltung und Lehrkräfte). Konten ohne Personalakte
+und ohne Verwaltungszugang können sich nicht anmelden.
+
 ## Startseite
 
-- **Kopf:** Begrüßung, Kalenderblatt mit Datum und Kalenderwoche, Suche nach Schüler:innen,
-  Kolleg:innen und (für die Verwaltung) Eltern. Gefunden werden nur Personen, die man sehen darf.
-- **Schnellzugriff:** eigene Klassen und Gruppen, eigener Unterricht (direkt zur Notenübersicht)
-  und die Bereiche der eigenen Rolle (z. B. Förderpläne, Personal, Fehlzeiten).
+- **Kopf:** Begrüßung, Kalenderblatt mit Datum und Kalenderwoche. Die Suche (Schüler:innen,
+  Kolleg:innen, für die Verwaltung auch Eltern) steht in der Titelleiste; gefunden wird nur, wen man sehen darf.
+- **Schnellzugriff:** eigene Klassen und Gruppen sowie eigener Unterricht (direkt zur Notenübersicht).
 - **Notizen:** nur für die eigene Person sichtbar; Farbe, optionales Fälligkeitsdatum
   (ab diesem Tag hervorgehoben), anheften, abhaken, bearbeiten, löschen.
   Verwaltung und Schulleitung können eine Notiz als **Mitteilung an alle** veröffentlichen;

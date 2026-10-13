@@ -53,6 +53,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "portal.middleware.BenutzerspracheMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
+    "portal.middleware.NurPersonalMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
 ]
