@@ -14,6 +14,44 @@
 </section>
 {% endif %}
 
+{% if hr %}
+<section class="karte hr">
+  <div class="karte-kopf">
+    <h2>Personal · {{ hr.aktiv }} aktive Beschäftigte</h2>
+    <a class="knopf zweitrangig" href="{% url 'admin:stammdaten_personalprofil_changelist' %}">Personalliste</a>
+  </div>
+  <p class="bereiche">{% for b in hr.bereiche %}<a class="etikett" href="{% url 'admin:stammdaten_personalprofil_changelist' %}?bereich__id__exact={{ b.pk }}">{{ b.name }} {{ b.anzahl }}</a>{% endfor %}</p>
+  <div class="spalten drei">
+    <div>
+      <h3>Nachweise mit Handlungsbedarf ({{ hr.offen|length }})</h3>
+      {% if hr.offen %}
+      <table class="liste kompakt">
+        <tbody>
+        {% for e in hr.offen|slice:":12" %}
+          <tr>
+            <td><a href="{% url 'admin:stammdaten_personalprofil_change' e.personal.pk %}">{{ e.personal.person.anzeigename }}</a><br><span class="leise">{{ e.personal.bereich.name|default:"" }}</span></td>
+            <td>{{ e.art.name }}</td>
+            <td class="{% if e.status != 'laeuft_ab' %}auffaellig{% endif %}">{% if e.status == "fehlt" %}fehlt{% elif e.status == "abgelaufen" %}abgelaufen {{ e.nachweis.gueltig_bis|date:"d.m.Y" }}{% else %}bis {{ e.nachweis.gueltig_bis|date:"d.m.Y" }}{% endif %}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      {% if hr.offen|length > 12 %}<p><a href="{% url 'admin:stammdaten_personalprofil_changelist' %}?nachweise=offen">alle {{ hr.offen|length }} anzeigen</a></p>{% endif %}
+      {% else %}<p class="leer">Alle Pflichtnachweise sind vorhanden und gültig.</p>{% endif %}
+    </div>
+    <div>
+      <h3>Heute abwesend</h3>
+      {% for a in hr.abwesend %}<p>{{ a.personal.person.anzeigename }} <span class="leise">· {{ a.get_art_display }} bis {{ a.bis|date:"d.m." }}</span></p>{% empty %}<p class="leer">Niemand.</p>{% endfor %}
+      {% if hr.beantragt %}<p><a href="{% url 'admin:stammdaten_personalabwesenheit_changelist' %}?status__exact=beantragt">Offene Abwesenheitsanträge: {{ hr.beantragt }}</a></p>{% endif %}
+    </div>
+    <div>
+      <h3>Vertragsenden (6 Monate)</h3>
+      {% for p in hr.vertragsende %}<p>{{ p.person.anzeigename }} <span class="leise">· {{ p.vertragsende|date:"d.m.Y" }}</span></p>{% empty %}<p class="leer">Keine.</p>{% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
 <div class="spalten">
   <section class="karte">
     <h2>{% if ist_verwaltung %}Unterrichte im Schuljahr{% else %}Meine Unterrichte{% endif %}</h2>

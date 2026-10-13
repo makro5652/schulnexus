@@ -1,4 +1,5 @@
 from collections import defaultdict
+from datetime import timedelta
 
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -12,9 +13,10 @@ from fehlzeiten.models import Fehlzeit
 from nachmittag.models import AGAngebot
 from noten.berechnung import Baum, nominale_anteile, vorschlagsnote
 from noten.models import Note, Unterricht
-from stammdaten.models import Gruppe, Mitgliedschaft, Schuelerprofil, Schuljahr
+from stammdaten.models import Gruppe, Mitgliedschaft, Personalabwesenheit, Personalbereich, Personalprofil, Schuelerprofil, Schuljahr
+from stammdaten.zusatzfelder import anzeige as zusatz_anzeige
 
-from .rechte import darf_unterricht_sehen, ist_verwaltung
+from .rechte import darf_unterricht_sehen, ist_personalverwaltung, ist_verwaltung
 
 
 def gesundheit(request):
@@ -59,10 +61,31 @@ def start(request):
     klassen_info = [
         {"gruppe": g, "anzahl": Mitgliedschaft.objects.aktiv().filter(gruppe=g).count()} for g in meine_klassen
     ]
+
+    hr = None
+    if ist_personalverwaltung(request.user):
+        aktiv = Personalprofil.objects.filter(aktiv=True).select_related("person", "bereich")
+        offen = []
+        for p in aktiv:
+            for art, status, n in p.offene_nachweise(heute=heute):
+                offen.append({"personal": p, "art": art, "status": status, "nachweis": n})
+        reihenfolge = {"abgelaufen": 0, "fehlt": 1, "laeuft_ab": 2}
+        offen.sort(key=lambda e: (reihenfolge[e["status"]], e["nachweis"].gueltig_bis if e["nachweis"] and e["nachweis"].gueltig_bis else heute, e["personal"].person.nachname))
+        hr = {
+            "aktiv": aktiv.count(),
+            "bereiche": Personalbereich.objects.annotate(anzahl=Count("personal", filter=Q(personal__aktiv=True))).filter(anzahl__gt=0),
+            "offen": offen,
+            "abwesend": Personalabwesenheit.objects.filter(von__lte=heute, bis__gte=heute).exclude(status="abgelehnt")
+            .select_related("personal__person"),
+            "beantragt": Personalabwesenheit.objects.filter(status="beantragt").count(),
+            "vertragsende": aktiv.filter(vertragsende__gte=heute, vertragsende__lte=heute + timedelta(days=180)).order_by("vertragsende"),
+        }
+
     return render(
         request,
         "portal/start.html",
-        {"unterrichte": meine_unterrichte, "klassen": klassen_info, "kennzahlen": kennzahlen, "ist_verwaltung": ist_verwaltung(request.user)},
+        {"unterrichte": meine_unterrichte, "klassen": klassen_info, "kennzahlen": kennzahlen, "hr": hr,
+         "ist_verwaltung": ist_verwaltung(request.user)},
     )
 
 
@@ -198,4 +221,5 @@ def schuelerakte(request, pk):
         "fz": fz,
         "noten": noten,
         "ist_verwaltung": ist_verwaltung(request.user),
+        "zusatz": zusatz_anzeige(request.user, schueler, "schueler"),
     })

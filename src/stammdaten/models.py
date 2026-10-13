@@ -145,6 +145,7 @@ class Schuelerprofil(models.Model):
     buslinie = models.CharField("Buslinie / Haltestelle", max_length=80, blank=True)
     abholhinweise = models.CharField("Abholhinweise", max_length=200, blank=True)
     bemerkungen = models.TextField("Bemerkungen (Verwaltung)", blank=True)
+    zusatzfelder = models.JSONField("Zusatzfelder", default=dict, blank=True, editable=False)
     history = HistoricalRecords(verbose_name="Änderungsprotokoll Schüler:in")
 
     class Meta:
@@ -167,34 +168,87 @@ class Schuelerprofil(models.Model):
         return self.laufbahn.select_related("bildungsgang", "schuljahr").order_by("-schuljahr__beginn", "-von").first()
 
 
+class Personalbereich(models.Model):
+    """
+    Arbeitsbereich / Abteilung, frei pflegbar: z. B. Lehrkräfte, HR, Reinigung, Sicherheit,
+    Facility, Coaches im Nachmittagsbereich, Küche, Transport.
+    """
+
+    kuerzel = models.CharField("Kürzel", max_length=12, unique=True)
+    name = models.CharField("Bezeichnung", max_length=80)
+    unterrichtet = models.BooleanField(
+        "Unterrichtender Bereich", default=False,
+        help_text="Für unterrichtendes Personal sind Kürzel (Stundenplan) und Lehrbefähigungen relevant.",
+    )
+    reihenfolge = models.PositiveSmallIntegerField("Reihenfolge", default=10)
+
+    class Meta:
+        verbose_name = "Personalbereich"
+        verbose_name_plural = "Personalbereiche"
+        ordering = ["reihenfolge", "name"]
+
+    def __str__(self):
+        return self.name
+
+
+class Dienstleister(models.Model):
+    """Externe Firma, über die Personal eingesetzt wird (z. B. Sicherheits- oder Reinigungsfirma)."""
+
+    name = models.CharField("Firma", max_length=120, unique=True)
+    leistung = models.CharField("Leistung", max_length=120, blank=True, help_text="z. B. Sicherheitsdienst, Gebäudereinigung")
+    ansprechperson = models.CharField("Ansprechperson", max_length=120, blank=True)
+    telefon = models.CharField("Telefon", max_length=40, blank=True)
+    email = models.EmailField("E-Mail", blank=True)
+    vertrag_bis = models.DateField("Vertrag bis", null=True, blank=True)
+    bemerkungen = models.TextField("Bemerkungen", blank=True)
+
+    class Meta:
+        verbose_name = "Dienstleister (Firma)"
+        verbose_name_plural = "Dienstleister (Firmen)"
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+
 class Personalprofil(models.Model):
-    FUNKTIONEN = [
-        ("lehrkraft", "Lehrkraft"),
-        ("verwaltung", "Verwaltung / Sekretariat"),
-        ("leitung", "Schulleitung"),
-        ("paedagogik", "Pädagogische Fachkraft / Betreuung"),
-        ("technik", "Technik / Haustechnik / IT"),
-        ("sonstige", "Sonstiges Personal"),
-    ]
     ANSTELLUNG = [
         ("adlk", "Auslandsdienstlehrkraft (ADLK)"),
         ("bplk", "Bundesprogrammlehrkraft (BPLK)"),
         ("lplk", "Landesprogrammlehrkraft (LPLK)"),
         ("olk", "Ortslehrkraft (OLK)"),
-        ("ortskraft", "Ortskraft (Verwaltung / Service)"),
-        ("honorar", "Honorarkraft"),
+        ("ortskraft", "Ortskraft (direkt angestellt)"),
+        ("teilzeit", "Ortskraft in Teilzeit / Aushilfe"),
+        ("honorar", "Honorarkraft / Coach auf Honorarbasis"),
+        ("dienstleister", "Über externen Dienstleister eingesetzt"),
         ("praktikum", "Praktikum / Referendariat / Freiwilligendienst"),
         ("sonstige", "Sonstige"),
     ]
 
     person = models.OneToOneField(Person, on_delete=models.CASCADE, related_name="personal", verbose_name="Person")
-    kuerzel = models.CharField("Kürzel", max_length=8, unique=True, help_text="wie im Stundenplan, z. B. KRO")
-    funktion = models.CharField("Funktion", max_length=12, choices=FUNKTIONEN, default="lehrkraft")
+    bereich = models.ForeignKey(
+        Personalbereich, null=True, blank=True, on_delete=models.PROTECT, related_name="personal", verbose_name="Bereich"
+    )
+    stellenbezeichnung = models.CharField(
+        "Stellenbezeichnung", max_length=100, blank=True,
+        help_text="z. B. Reinigungskraft, Head of Security, Fußballcoach, HR-Referentin",
+    )
+    kuerzel = models.CharField(
+        "Kürzel", max_length=8, unique=True, null=True, blank=True,
+        help_text="wie im Stundenplan, z. B. KRO – Pflicht für unterrichtende Bereiche",
+    )
     aktiv = models.BooleanField("Aktiv", default=True)
+    vorgesetzt = models.ForeignKey(
+        "self", null=True, blank=True, on_delete=models.SET_NULL, related_name="mitarbeitende", verbose_name="Vorgesetzte:r"
+    )
 
     # Dienstverhältnis
     personalnummer = models.CharField("Personalnummer", max_length=20, blank=True)
-    anstellungsart = models.CharField("Anstellungsart", max_length=10, choices=ANSTELLUNG, blank=True)
+    anstellungsart = models.CharField("Anstellungsart", max_length=14, choices=ANSTELLUNG, blank=True)
+    dienstleister = models.ForeignKey(
+        Dienstleister, null=True, blank=True, on_delete=models.PROTECT, related_name="personal",
+        verbose_name="Dienstleister (Firma)", help_text="nur bei Einsatz über eine externe Firma",
+    )
     dienstbeginn = models.DateField("Dienstbeginn an der Schule", null=True, blank=True)
     vertragsende = models.DateField("Vertragsende / Rückkehr", null=True, blank=True)
     wochenstunden = models.DecimalField(
@@ -202,29 +256,177 @@ class Personalprofil(models.Model):
         help_text="bei Lehrkräften Unterrichtsstunden, sonst Arbeitsstunden",
     )
     ermaessigung = models.DecimalField("Ermäßigung / Anrechnung (Std.)", max_digits=4, decimal_places=1, null=True, blank=True)
+    arbeitszeit = models.CharField("Arbeitszeit / Schicht", max_length=120, blank=True, help_text="z. B. Mo–Fr 6–14 Uhr, Nachtschicht")
     arbeitserlaubnis_bis = models.DateField("Arbeitserlaubnis gültig bis", null=True, blank=True)
 
     # Tätigkeit
     lehrbefaehigungen = models.ManyToManyField("Fach", blank=True, related_name="lehrkraefte", verbose_name="Lehrbefähigungen")
     weitere_funktionen = models.CharField(
-        "Weitere Funktionen", max_length=200, blank=True, help_text="z. B. Mittelstufenkoordination, Fachleitung Chemie"
+        "Weitere Funktionen", max_length=200, blank=True, help_text="z. B. Mittelstufenkoordination, Fachleitung Chemie, Ersthelfer:in"
     )
     dienst_email = models.EmailField("Dienstliche E-Mail", blank=True)
-    raum = models.CharField("Büro / Fachraum", max_length=40, blank=True)
+    raum = models.CharField("Büro / Fachraum / Einsatzort", max_length=60, blank=True)
+    ausweisnummer = models.CharField("Dienstausweis / Badge-Nr.", max_length=30, blank=True)
     bemerkungen = models.TextField("Bemerkungen (Personalverwaltung)", blank=True)
+    zusatzfelder = models.JSONField("Zusatzfelder", default=dict, blank=True, editable=False)
     history = HistoricalRecords(verbose_name="Änderungsprotokoll Personal", m2m_fields=[lehrbefaehigungen])
 
     class Meta:
         verbose_name = "Personal"
         verbose_name_plural = "Personal"
-        ordering = ["kuerzel"]
+        ordering = ["person__nachname", "person__vorname"]
+        permissions = [("view_hr_daten", "Darf HR-Daten sehen (Dienstverhältnis, Nachweise, Abwesenheiten)")]
 
     def __str__(self):
-        return f"{self.kuerzel} – {self.person.anzeigename}"
+        return f"{self.kuerzel} – {self.person.anzeigename}" if self.kuerzel else self.person.anzeigename
 
     def clean(self):
         if self.dienstbeginn and self.vertragsende and self.vertragsende < self.dienstbeginn:
             raise ValidationError("Das Vertragsende liegt vor dem Dienstbeginn.")
+        if self.bereich_id and self.bereich.unterrichtet and not self.kuerzel:
+            raise ValidationError({"kuerzel": "Für unterrichtendes Personal ist ein Kürzel erforderlich (Stundenplan)."})
+        if self.anstellungsart == "dienstleister" and not self.dienstleister_id:
+            raise ValidationError({"dienstleister": "Bitte die Firma angeben, über die die Person eingesetzt wird."})
+        if self.vorgesetzt_id and self.vorgesetzt_id == self.pk:
+            raise ValidationError({"vorgesetzt": "Eine Person kann nicht ihre eigene Vorgesetzte sein."})
+
+    def save(self, *args, **kwargs):
+        self.kuerzel = (self.kuerzel or "").strip().upper() or None
+        super().save(*args, **kwargs)
+
+    @property
+    def ist_lehrkraft(self):
+        return bool(self.bereich_id and self.bereich.unterrichtet)
+
+    def nachweisstatus(self, heute=None, vorlauf_tage=60):
+        """
+        Liste von (Nachweisart, Status, Nachweis|None) für alle relevanten Nachweisarten.
+        Status: "fehlt", "abgelaufen", "laeuft_ab", "gueltig".
+        """
+        from datetime import timedelta
+
+        heute = heute or timezone.localdate()
+        vorhandene = {}
+        for n in self.nachweise.select_related("art").order_by("art_id", "-gueltig_bis"):
+            vorhandene.setdefault(n.art_id, n)
+        arten = {n.art for n in vorhandene.values()}
+        if self.bereich_id:
+            arten |= set(self.bereich.pflichtnachweise.all())
+        ergebnis = []
+        for art in sorted(arten, key=lambda a: (a.reihenfolge, a.name)):
+            n = vorhandene.get(art.pk)
+            if n is None:
+                status = "fehlt"
+            elif n.gueltig_bis and n.gueltig_bis < heute:
+                status = "abgelaufen"
+            elif n.gueltig_bis and n.gueltig_bis <= heute + timedelta(days=vorlauf_tage):
+                status = "laeuft_ab"
+            else:
+                status = "gueltig"
+            ergebnis.append((art, status, n))
+        return ergebnis
+
+    def offene_nachweise(self, **kw):
+        return [(a, st, n) for a, st, n in self.nachweisstatus(**kw) if st != "gueltig"]
+
+
+class Nachweisart(models.Model):
+    """z. B. Führungszeugnis / Certificate of Good Conduct, Erste-Hilfe-Kurs, Kinderschutzschulung."""
+
+    name = models.CharField("Bezeichnung", max_length=120, unique=True)
+    gueltigkeit_monate = models.PositiveSmallIntegerField(
+        "Gültigkeit (Monate)", null=True, blank=True, help_text="leer = unbefristet; dient als Vorschlag für „gültig bis“"
+    )
+    pflicht_fuer = models.ManyToManyField(
+        Personalbereich, blank=True, related_name="pflichtnachweise", verbose_name="Pflicht für Bereiche"
+    )
+    reihenfolge = models.PositiveSmallIntegerField("Reihenfolge", default=10)
+    beschreibung = models.CharField("Beschreibung", max_length=200, blank=True)
+
+    class Meta:
+        verbose_name = "Nachweisart"
+        verbose_name_plural = "Nachweisarten"
+        ordering = ["reihenfolge", "name"]
+
+    def __str__(self):
+        return self.name
+
+
+class Nachweis(models.Model):
+    personal = models.ForeignKey(Personalprofil, on_delete=models.CASCADE, related_name="nachweise", verbose_name="Personal")
+    art = models.ForeignKey(Nachweisart, on_delete=models.PROTECT, verbose_name="Nachweis")
+    ausgestellt_am = models.DateField("Ausgestellt am", null=True, blank=True)
+    gueltig_bis = models.DateField("Gültig bis", null=True, blank=True, help_text="leer = wird aus der Nachweisart berechnet bzw. unbefristet")
+    datei = models.FileField("Datei", upload_to="nachweise/%Y/", blank=True)
+    bemerkung = models.CharField("Bemerkung", max_length=200, blank=True)
+    history = HistoricalRecords(verbose_name="Änderungsprotokoll Nachweis")
+
+    class Meta:
+        verbose_name = "Nachweis"
+        verbose_name_plural = "Nachweise"
+        ordering = ["personal", "art__reihenfolge", "-gueltig_bis"]
+
+    def __str__(self):
+        return f"{self.art} – {self.personal}"
+
+    def save(self, *args, **kwargs):
+        if not self.gueltig_bis and self.ausgestellt_am and self.art.gueltigkeit_monate:
+            m = self.ausgestellt_am.month - 1 + self.art.gueltigkeit_monate
+            jahr, monat = self.ausgestellt_am.year + m // 12, m % 12 + 1
+            import calendar
+
+            tag = min(self.ausgestellt_am.day, calendar.monthrange(jahr, monat)[1])
+            self.gueltig_bis = self.ausgestellt_am.replace(year=jahr, month=monat, day=tag)
+        super().save(*args, **kwargs)
+
+    def clean(self):
+        if self.ausgestellt_am and self.gueltig_bis and self.gueltig_bis < self.ausgestellt_am:
+            raise ValidationError("„Gültig bis“ liegt vor dem Ausstellungsdatum.")
+
+
+class Personalabwesenheit(models.Model):
+    ARTEN = [
+        ("urlaub", "Urlaub"),
+        ("krank", "Krankmeldung"),
+        ("fortbildung", "Fortbildung"),
+        ("dienstreise", "Dienstreise / Klassenfahrt"),
+        ("sonderurlaub", "Sonderurlaub"),
+        ("sonstige", "Sonstiges"),
+    ]
+    STATUS = [("beantragt", "beantragt"), ("genehmigt", "genehmigt"), ("abgelehnt", "abgelehnt")]
+
+    personal = models.ForeignKey(Personalprofil, on_delete=models.CASCADE, related_name="abwesenheiten", verbose_name="Personal")
+    art = models.CharField("Art", max_length=14, choices=ARTEN)
+    von = models.DateField("Von")
+    bis = models.DateField("Bis")
+    halbtags = models.BooleanField("Nur halbtags", default=False)
+    status = models.CharField("Status", max_length=10, choices=STATUS, default="genehmigt")
+    bemerkung = models.CharField(
+        "Bemerkung", max_length=200, blank=True, help_text="Keine Diagnosen oder Gesundheitsdaten eintragen."
+    )
+    history = HistoricalRecords(verbose_name="Änderungsprotokoll Personalabwesenheit")
+
+    class Meta:
+        verbose_name = "Personalabwesenheit"
+        verbose_name_plural = "Personalabwesenheiten"
+        ordering = ["-von"]
+
+    def __str__(self):
+        return f"{self.personal}: {self.get_art_display()} {self.von:%d.%m.}–{self.bis:%d.%m.%Y}"
+
+    def clean(self):
+        if self.von and self.bis and self.bis < self.von:
+            raise ValidationError("„Bis“ darf nicht vor „Von“ liegen.")
+
+    @property
+    def arbeitstage(self):
+        from datetime import timedelta
+
+        tag, n = self.von, 0
+        while tag <= self.bis:
+            n += tag.weekday() < 5
+            tag += timedelta(days=1)
+        return n / 2 if self.halbtags else n
 
 
 class Fortbildung(models.Model):
@@ -279,6 +481,7 @@ class Elternprofil(models.Model):
     kontaktdaten_weitergabe = models.BooleanField(
         "Einverstanden mit Weitergabe der Kontaktdaten an die Klassenelternschaft", default=False
     )
+    zusatzfelder = models.JSONField("Zusatzfelder", default=dict, blank=True, editable=False)
     history = HistoricalRecords(verbose_name="Änderungsprotokoll Elternprofil")
 
     class Meta:
@@ -654,3 +857,130 @@ class Gesundheitsangaben(models.Model):
     @property
     def hat_eintraege(self):
         return any([self.allergien, self.erkrankungen, self.medikamente, self.notfallhinweise])
+
+
+class Zusatzfeld(models.Model):
+    """
+    Frei definierbares Datenfeld für Schüler:innen, Personal oder Eltern.
+    Die Werte liegen im Feld „zusatzfelder“ der jeweiligen Akte (JSON, Schlüssel = `schluessel`).
+    Der Schlüssel bleibt nach dem Anlegen fest, damit gespeicherte Werte zugeordnet bleiben;
+    Bezeichnung, Reihenfolge, Abschnitt usw. sind jederzeit änderbar.
+    """
+
+    ZIELGRUPPEN = [("schueler", "Schüler:innen"), ("personal", "Personal"), ("eltern", "Eltern / Kontaktpersonen")]
+    TYPEN = [
+        ("text", "Text (einzeilig)"),
+        ("langtext", "Text (mehrzeilig)"),
+        ("zahl", "Zahl"),
+        ("datum", "Datum"),
+        ("janein", "Ja / Nein"),
+        ("auswahl", "Auswahl (eine Option)"),
+        ("mehrfach", "Mehrfachauswahl"),
+    ]
+    SICHTBARKEIT = [
+        ("alle", "Alle mit Aktenzugriff"),
+        ("verwaltung", "Verwaltung, Leitung, HR"),
+        ("hr", "Nur HR und Leitung"),
+    ]
+
+    zielgruppe = models.CharField("Für", max_length=10, choices=ZIELGRUPPEN)
+    name = models.CharField("Bezeichnung", max_length=80)
+    schluessel = models.SlugField(
+        "Technischer Schlüssel", max_length=50, blank=True,
+        help_text="wird automatisch aus der Bezeichnung erzeugt und ist danach fest",
+    )
+    typ = models.CharField("Feldtyp", max_length=10, choices=TYPEN, default="text")
+    optionen = models.TextField("Optionen", blank=True, help_text="nur bei Auswahl / Mehrfachauswahl: eine Option pro Zeile")
+    abschnitt = models.CharField("Abschnitt", max_length=60, blank=True, help_text="Überschrift zur Gruppierung, z. B. Sport, Logistik")
+    hilfetext = models.CharField("Hilfetext", max_length=200, blank=True)
+    pflicht = models.BooleanField("Pflichtfeld", default=False)
+    sichtbarkeit = models.CharField(
+        "Sichtbar für", max_length=10, choices=SICHTBARKEIT, default="verwaltung",
+        help_text="„Alle mit Aktenzugriff“ schließt bei Schüler:innen die Klassenleitung ein; "
+                  "„Nur HR und Leitung“ eignet sich für vertrauliche Personaldaten.",
+    )
+    in_liste = models.BooleanField("In Liste", default=False, help_text="als Spalte in der Übersichtsliste zeigen")
+    reihenfolge = models.PositiveSmallIntegerField("Reihenfolge", default=10)
+    aktiv = models.BooleanField("Aktiv", default=True, help_text="Deaktivieren statt löschen – gespeicherte Werte bleiben erhalten.")
+
+    class Meta:
+        verbose_name = "Zusatzfeld"
+        verbose_name_plural = "Zusatzfelder (eigene Datenfelder)"
+        ordering = ["zielgruppe", "abschnitt", "reihenfolge", "name"]
+        constraints = [models.UniqueConstraint(fields=["zielgruppe", "schluessel"], name="zusatzfeld_schluessel_eindeutig")]
+
+    def __str__(self):
+        return f"{self.name} ({self.get_zielgruppe_display()})"
+
+    @property
+    def optionsliste(self):
+        return [o.strip() for o in self.optionen.splitlines() if o.strip()]
+
+    @property
+    def formularname(self):
+        return f"zusatz__{self.schluessel}"
+
+    def clean(self):
+        if self.typ in {"auswahl", "mehrfach"} and not self.optionsliste:
+            raise ValidationError({"optionen": "Bitte mindestens eine Option angeben (eine pro Zeile)."})
+        if not self.schluessel and self.name:
+            self.schluessel = self._erzeuge_schluessel()
+
+    def _erzeuge_schluessel(self):
+        import re
+
+        from django.utils.text import slugify
+
+        basis = slugify(self.name.replace("ß", "ss").replace("ä", "ae").replace("ö", "oe").replace("ü", "ue"))
+        basis = re.sub(r"[^a-z0-9]+", "_", basis).strip("_")[:40] or "feld"
+        kandidat, n = basis, 2
+        while Zusatzfeld.objects.filter(zielgruppe=self.zielgruppe, schluessel=kandidat).exclude(pk=self.pk).exists():
+            kandidat, n = f"{basis}_{n}", n + 1
+        return kandidat
+
+    def save(self, *args, **kwargs):
+        if not self.schluessel:
+            self.schluessel = self._erzeuge_schluessel()
+        super().save(*args, **kwargs)
+
+    # ---- Umwandlung zwischen Formular, Speicher (JSON) und Anzeige
+
+    def in_speicher(self, wert):
+        if wert in (None, "", []):
+            return None
+        if self.typ == "datum":
+            return wert.isoformat()
+        if self.typ == "zahl":
+            return str(wert)
+        if self.typ == "mehrfach":
+            return list(wert)
+        return wert
+
+    def aus_speicher(self, wert):
+        from datetime import date
+        from decimal import Decimal, InvalidOperation
+
+        if wert in (None, ""):
+            return None
+        try:
+            if self.typ == "datum":
+                return date.fromisoformat(wert)
+            if self.typ == "zahl":
+                return Decimal(str(wert))
+        except (ValueError, InvalidOperation):
+            return None
+        return wert
+
+    def anzeigewert(self, wert):
+        wert = self.aus_speicher(wert)
+        if wert is None or wert == []:
+            return "—"
+        if self.typ == "datum":
+            return wert.strftime("%d.%m.%Y")
+        if self.typ == "janein":
+            return "ja" if wert else "nein"
+        if self.typ == "mehrfach":
+            return ", ".join(wert)
+        if self.typ == "zahl":
+            return format(wert.normalize(), "f").replace(".", ",")
+        return str(wert)

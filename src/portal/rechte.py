@@ -1,6 +1,7 @@
 """Zentrale Rechteprüfung. Rollen werden als Django-Benutzergruppen abgebildet."""
 
 VERWALTUNGSGRUPPEN = {"Verwaltung", "Schulleitung"}
+PERSONALGRUPPEN = {"Personalverwaltung", "Schulleitung"}
 
 
 def ist_verwaltung(user) -> bool:
@@ -9,6 +10,14 @@ def ist_verwaltung(user) -> bool:
     if user.is_superuser:
         return True
     return user.groups.filter(name__in=VERWALTUNGSGRUPPEN).exists()
+
+
+def ist_personalverwaltung(user) -> bool:
+    if not user.is_authenticated:
+        return False
+    if user.is_superuser:
+        return True
+    return user.groups.filter(name__in=PERSONALGRUPPEN).exists()
 
 
 def darf_unterricht_sehen(user, unterricht) -> bool:

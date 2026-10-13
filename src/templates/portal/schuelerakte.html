@@ -133,6 +133,16 @@
     {% for e in einwilligungen %}<p>{% if e.gueltig %}✓{% else %}✗{% endif %} {{ e.get_zweck_display }} <span class="leise">· {{ e.erteilt_am|date:"d.m.Y" }}{% if e.widerrufen_am %}, widerrufen {{ e.widerrufen_am|date:"d.m.Y" }}{% endif %}</span></p>{% empty %}<p class="leer">Keine Einwilligungen erfasst – im Zweifel gilt: nicht erteilt.</p>{% endfor %}
   </section>
 
+  {% if zusatz %}
+  <section class="karte">
+    <h2>Weitere Angaben</h2>
+    {% for abschnitt, felder in zusatz %}
+      {% if zusatz|length > 1 %}<h3>{{ abschnitt }}</h3>{% endif %}
+      <dl class="daten">{% for name, wert in felder %}<dt>{{ name }}</dt><dd>{{ wert }}</dd>{% endfor %}</dl>
+    {% endfor %}
+  </section>
+  {% endif %}
+
   {% if darf_gesundheit %}
   <section class="karte vertraulich">
     <h2>Gesundheitsangaben <span class="etikett warnend">vertraulich</span></h2>

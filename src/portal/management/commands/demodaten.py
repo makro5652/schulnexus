@@ -11,6 +11,7 @@ from django.contrib.auth.models import Group, User
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.db import transaction
+from django.utils import timezone
 
 from fehlzeiten.models import Fehlzeit, Stunde
 from nachmittag.models import AGAngebot, AGWahl
@@ -28,6 +29,12 @@ from noten.models import (
 )
 from stammdaten.models import (
     Abschnitt,
+    Dienstleister,
+    Nachweis,
+    Nachweisart,
+    Personalabwesenheit,
+    Personalbereich,
+    Zusatzfeld,
     Bildungsgang,
     Elternprofil,
     Fortbildung,
@@ -105,39 +112,123 @@ class Command(BaseCommand):
         }
         bg = {b.kuerzel: b for b in Bildungsgang.objects.all()}
 
-        # Personal mit Benutzerkonten und Personalakte
-        def personal(kuerzel, vorname, nachname, funktion="lehrkraft", benutzername=None, rolle="Lehrkraft",
-                     anstellung="olk", faecher_k=(), stunden=None, beginn=2022, funktionen="", anrede="Frau"):
+        # Personal aller Bereiche mit Personalakte
+        bereich = {b.kuerzel: b for b in Personalbereich.objects.all()}
+        heute = timezone.localdate()
+        sicherheitsfirma = Dienstleister.objects.create(
+            name="SafeGuard Security Ltd.", leistung="Sicherheitsdienst (Tor, Nachtwache)", ansprechperson="John Mutua",
+            telefon="+254 711 000 111", vertrag_bis=date(2027, 7, 31))
+        reinigungsfirma = Dienstleister.objects.create(
+            name="CleanPro Kenya", leistung="Gebäudereinigung", ansprechperson="Agnes Wairimu",
+            telefon="+254 722 000 222", vertrag_bis=date(2026, 12, 31))
+
+        def personal(vorname, nachname, bereich_k, stelle="", kuerzel=None, benutzername=None, rolle="Lehrkraft",
+                     anstellung="ortskraft", faecher_k=(), stunden=None, beginn=2022, funktionen="", anrede="Frau",
+                     firma=None, schicht="", nachweise="vollstaendig"):
             user = None
             if benutzername:
                 user = User.objects.create_user(benutzername, password=pw, is_staff=True, first_name=vorname, last_name=nachname)
                 user.groups.add(Group.objects.get(name=rolle))
-            p = Person.objects.create(anrede=anrede, vorname=vorname, nachname=nachname, email=f"{kuerzel.lower()}@privat.example",
+            p = Person.objects.create(anrede=anrede, vorname=vorname, nachname=nachname,
+                                      email=f"{vorname.lower()}.{nachname.lower()}@privat.example",
                                       mobil=f"+254 7{rng.randint(10, 99)} {rng.randint(100, 999)} {rng.randint(100, 999)}",
                                       ort="Nairobi", benutzer=user)
             pp = Personalprofil.objects.create(
-                person=p, kuerzel=kuerzel, funktion=funktion, personalnummer=f"P-{rng.randint(1000, 9999)}",
-                anstellungsart=anstellung, dienstbeginn=date(beginn, 8, 1),
+                person=p, bereich=bereich[bereich_k], stellenbezeichnung=stelle, kuerzel=kuerzel,
+                personalnummer=f"P-{rng.randint(1000, 9999)}" if not firma else "",
+                anstellungsart="dienstleister" if firma else anstellung, dienstleister=firma, dienstbeginn=date(beginn, 8, 1),
                 vertragsende=date(beginn + 6, 7, 31) if anstellung in {"adlk", "bplk"} else None,
-                wochenstunden=stunden, weitere_funktionen=funktionen, dienst_email=f"{kuerzel.lower()}@schule.example",
+                wochenstunden=stunden, weitere_funktionen=funktionen, arbeitszeit=schicht,
+                dienst_email=f"{(kuerzel or vorname).lower()}@schule.example" if not firma else "",
                 arbeitserlaubnis_bis=date(beginn + 3, 7, 31) if anstellung in {"adlk", "bplk", "lplk"} else None,
+                ausweisnummer=f"DSN-{rng.randint(100, 999)}",
             )
             pp.lehrbefaehigungen.set([faecher[k] for k in faecher_k])
             Notfallkontakt.objects.create(personal=pp, name=f"{rng.choice(VORNAMEN)} {nachname}", beziehung="Partner:in",
                                           telefon=f"+254 7{rng.randint(10, 99)} {rng.randint(100, 999)} {rng.randint(100, 999)}")
-            if funktion == "lehrkraft":
+            # Nachweise: vollständig, eines läuft bald ab, eines abgelaufen oder fehlt
+            for art in pp.bereich.pflichtnachweise.all():
+                if nachweise == "fehlt" and art.name.startswith("Polizeiliches"):
+                    continue
+                ausgestellt = heute - timedelta(days=rng.randint(30, 300))
+                if nachweise == "abgelaufen" and art.name.startswith("Erste"):
+                    ausgestellt = heute - timedelta(days=800)  # 24 Monate gültig -> abgelaufen
+                if nachweise == "laeuft_ab" and art.name.startswith("Kinderschutz"):
+                    ausgestellt = heute - timedelta(days=700)  # läuft in gut einem Monat ab
+                Nachweis.objects.create(personal=pp, art=art, ausgestellt_am=ausgestellt)
+            if pp.ist_lehrkraft:
                 Fortbildung.objects.create(personal=pp, titel="Sprachsensibler Fachunterricht", anbieter="ZfA Region Afrika",
                                            datum=date(2025, 11, rng.randint(3, 28)), umfang_stunden=Decimal(12), nachweis_liegt_vor=True)
             return pp
 
-        kro = personal("KRA", "Martin", "Krause", benutzername="lehrkraft", anstellung="adlk", faecher_k=("CH", "BIO"),
-                       stunden=Decimal(25), beginn=2024, funktionen="Fachleitung Naturwissenschaften", anrede="Herr")
-        mue = personal("MUE", "Sabine", "Müller", anstellung="bplk", faecher_k=("M", "PH"), stunden=Decimal(26), beginn=2023)
-        sch = personal("SCH", "Thomas", "Schwarz", anstellung="adlk", faecher_k=("D", "E"), stunden=Decimal(23), beginn=2021, anrede="Herr")
-        oko = personal("OKO", "Grace", "Okoth", anstellung="olk", faecher_k=("ETH", "E", "SW"), stunden=Decimal(20), beginn=2019)
-        bra = personal("BRA", "Peter", "Brandt", anstellung="lplk", faecher_k=("REL", "D"), stunden=Decimal(26), beginn=2025, anrede="Herr")
-        personal("SEK", "Mercy", "Wambui", funktion="verwaltung", benutzername="verwaltung", rolle="Verwaltung",
-                 anstellung="ortskraft", stunden=Decimal(40), beginn=2018, funktionen="Schulsekretariat")
+        kro = personal("Martin", "Krause", "LK", "Lehrkraft Chemie/Biologie", "KRA", benutzername="lehrkraft", anstellung="adlk",
+                       faecher_k=("CH", "BIO"), stunden=Decimal(25), beginn=2024, funktionen="Fachleitung Naturwissenschaften", anrede="Herr")
+        mue = personal("Sabine", "Müller", "LK", "Lehrkraft Mathematik/Physik", "MUE", anstellung="bplk", faecher_k=("M", "PH"),
+                       stunden=Decimal(26), beginn=2021, nachweise="laeuft_ab")
+        sch = personal("Thomas", "Schwarz", "LK", "Lehrkraft Deutsch/Englisch", "SCH", anstellung="adlk", faecher_k=("D", "E"),
+                       stunden=Decimal(23), beginn=2021, anrede="Herr")
+        oko = personal("Grace", "Okoth", "LK", "Lehrkraft Ethik/Englisch", "OKO", anstellung="olk", faecher_k=("ETH", "E", "SW"),
+                       stunden=Decimal(20), beginn=2019)
+        bra = personal("Peter", "Brandt", "LK", "Lehrkraft Religion/Deutsch", "BRA", anstellung="lplk", faecher_k=("REL", "D"),
+                       stunden=Decimal(26), beginn=2025, anrede="Herr")
+        personal("Mercy", "Wambui", "VERW", "Schulsekretärin", benutzername="verwaltung", rolle="Verwaltung",
+                 stunden=Decimal(40), beginn=2018, schicht="Mo–Fr 7:00–15:30")
+        hr_leitung = personal("Esther", "Njeri", "HR", "HR-Managerin", benutzername="personal", rolle="Personalverwaltung",
+                              stunden=Decimal(40), beginn=2020)
+        fm = personal("Joseph", "Ochieng", "FAC", "Facility Manager", stunden=Decimal(45), beginn=2017, anrede="Herr",
+                      schicht="Mo–Fr 6:30–15:30")
+        personal("Kevin", "Mutiso", "FAC", "Haustechniker", stunden=Decimal(45), beginn=2022, anrede="Herr", schicht="Mo–Fr 7:00–16:00")
+        personal("Daniel", "Kimani", "IT", "IT-Administrator", stunden=Decimal(40), beginn=2023, anrede="Herr")
+        personal("Lucy", "Akinyi", "FIN", "Buchhalterin", stunden=Decimal(40), beginn=2016)
+        for vn, nn, schicht, nw in [("Peter", "Kiprono", "Tagschicht 6–18 Uhr, Haupttor", "vollstaendig"),
+                                    ("Samuel", "Wekesa", "Nachtschicht 18–6 Uhr", "abgelaufen"),
+                                    ("Ruth", "Chebet", "Tagschicht 6–18 Uhr, Eingang Kindergarten", "fehlt")]:
+            personal(vn, nn, "SICH", "Sicherheitskraft", firma=sicherheitsfirma, stunden=Decimal(60), beginn=2024,
+                     anrede="Frau" if vn == "Ruth" else "Herr", schicht=schicht, nachweise=nw)
+        for vn, nn in [("Mary", "Atieno"), ("Jane", "Wanjiru"), ("Rose", "Nduta")]:
+            personal(vn, nn, "REIN", "Reinigungskraft", firma=reinigungsfirma, stunden=Decimal(45), beginn=2025, schicht="Mo–Fr 14–20 Uhr")
+        personal("Alice", "Muthoni", "KUE", "Köchin Cafeteria", stunden=Decimal(45), beginn=2019)
+        personal("George", "Omondi", "TRANS", "Busfahrer Linie 1", stunden=Decimal(40), beginn=2021, anrede="Herr", nachweise="abgelaufen")
+        personal("Faith", "Wairimu", "GES", "Schulkrankenschwester", stunden=Decimal(40), beginn=2020)
+        coach_fb = personal("Brian", "Otieno", "NACHM", "Fußballcoach", anstellung="honorar", stunden=Decimal(6), beginn=2024,
+                            anrede="Herr", schicht="Di + Do 14:45–16:15")
+        coach_sw = personal("Nicole", "Achieng", "NACHM", "Schwimmcoach", anstellung="honorar", stunden=Decimal(4), beginn=2025,
+                            schicht="Mi 14:45–16:15")
+        Nachweis.objects.create(personal=coach_sw, art=Nachweisart.objects.get(name__startswith="Rettungsschwimmer"),
+                                ausgestellt_am=heute - timedelta(days=120))
+        for pp in Personalprofil.objects.exclude(pk=hr_leitung.pk).filter(bereich__kuerzel__in=["FAC", "IT", "REIN", "SICH"]):
+            if pp.bereich.kuerzel in {"FAC", "IT"}:
+                pp.vorgesetzt = fm if pp != fm else hr_leitung
+                pp.save(update_fields=["vorgesetzt"])
+
+        # Personalabwesenheiten
+        Personalabwesenheit.objects.create(personal=sch, art="fortbildung", von=heute, bis=heute + timedelta(days=2), bemerkung="Regionale Fortbildung")
+        Personalabwesenheit.objects.create(personal=fm, art="krank", von=heute - timedelta(days=1), bis=heute + timedelta(days=1))
+        Personalabwesenheit.objects.create(personal=mue, art="urlaub", von=date(2026, 12, 14), bis=date(2026, 12, 18), status="beantragt")
+
+        # Beispiel-Zusatzfelder (frei definierbar unter Stammdaten › Zusatzfelder)
+        Zusatzfeld.objects.create(zielgruppe="schueler", name="Schulhaus (House)", typ="auswahl", optionen="Kilimanjaro\nKenya\nElgon\nMeru",
+                                  abschnitt="Schulleben", sichtbarkeit="alle", in_liste=True, reihenfolge=10)
+        Zusatzfeld.objects.create(zielgruppe="schueler", name="Instrument", typ="text", abschnitt="Schulleben", sichtbarkeit="alle", reihenfolge=20)
+        Zusatzfeld.objects.create(zielgruppe="schueler", name="Darf allein nach Hause gehen", typ="janein", abschnitt="Abholung",
+                                  sichtbarkeit="alle", reihenfolge=10,
+                                  hilfetext="Schriftliche Erlaubnis der Erziehungsberechtigten muss vorliegen.")
+        Zusatzfeld.objects.create(zielgruppe="schueler", name="Schulgeld-Ermäßigung bis", typ="datum", abschnitt="Verwaltung",
+                                  sichtbarkeit="verwaltung", reihenfolge=10)
+        Zusatzfeld.objects.create(zielgruppe="personal", name="T-Shirt-Größe", typ="auswahl", optionen="S\nM\nL\nXL\nXXL",
+                                  abschnitt="Ausstattung", sichtbarkeit="verwaltung", reihenfolge=10)
+        Zusatzfeld.objects.create(zielgruppe="personal", name="Schlüsselberechtigungen", typ="mehrfach",
+                                  optionen="Hauptgebäude\nNaturwissenschaften\nSporthalle\nServerraum\nKüche",
+                                  abschnitt="Ausstattung", sichtbarkeit="verwaltung", in_liste=True, reihenfolge=20)
+        Zusatzfeld.objects.create(zielgruppe="personal", name="Aufenthaltstitel / Visum", typ="text", abschnitt="Personalakte",
+                                  sichtbarkeit="hr", reihenfolge=10)
+        Zusatzfeld.objects.create(zielgruppe="eltern", name="Bereitschaft zur Mithilfe", typ="mehrfach",
+                                  optionen="Schulfest\nBibliothek\nAusflugsbegleitung\nSportfest", sichtbarkeit="verwaltung")
+        schluessel_opt = ["Hauptgebäude", "Naturwissenschaften", "Sporthalle", "Serverraum", "Küche"]
+        for pp in Personalprofil.objects.all():
+            pp.zusatzfelder = {"t_shirt_groesse": rng.choice(["S", "M", "L", "XL"]),
+                               "schluesselberechtigungen": rng.sample(schluessel_opt, k=rng.randint(1, 3))}
+            pp.save(update_fields=["zusatzfelder"])
 
         # Klassen und Schüler:innen
         klassen = {
@@ -314,7 +405,7 @@ class Command(BaseCommand):
         ags = [
             AGAngebot.objects.create(abschnitt=hj1, titel="Robotik", leitung=kro, wochentag=1, beginn=time(14, 45), ende=time(16, 15), raum="NW-Labor", kapazitaet=8, jahrgang_min=7, jahrgang_max=10),
             AGAngebot.objects.create(abschnitt=hj1, titel="Theater", leitung=sch, wochentag=2, beginn=time(14, 45), ende=time(16, 15), raum="Aula", kapazitaet=12),
-            AGAngebot.objects.create(abschnitt=hj1, titel="Fußball", externe_leitung="Coach Otieno", wochentag=3, beginn=time(14, 45), ende=time(16, 15), raum="Sportplatz", kapazitaet=14),
+            AGAngebot.objects.create(abschnitt=hj1, titel="Fußball", leitung=coach_fb, wochentag=3, beginn=time(14, 45), ende=time(16, 15), raum="Sportplatz", kapazitaet=14),
             AGAngebot.objects.create(abschnitt=hj1, titel="Chor", leitung=bra, wochentag=0, beginn=time(14, 45), ende=time(15, 45), raum="Musikraum", kapazitaet=10),
         ]
         beliebtheit = [5, 2, 3, 1]
@@ -331,9 +422,17 @@ class Command(BaseCommand):
             AGWahl.objects.bulk_create(wahl)
         ergebnis = lose_zuteilen(hj1, seed=7)
 
+        for s_ in Schuelerprofil.objects.all():
+            s_.zusatzfelder = {"schulhaus_house": rng.choice(["Kilimanjaro", "Kenya", "Elgon", "Meru"]),
+                               "darf_allein_nach_hause_gehen": rng.random() < 0.3}
+            if rng.random() < 0.3:
+                s_.zusatzfelder["instrument"] = rng.choice(["Klavier", "Gitarre", "Geige", "Schlagzeug"])
+            s_.save(update_fields=["zusatzfelder"])
+
         self.stdout.write(self.style.SUCCESS(
             f"Demo-Daten angelegt: {len(alle)} Schüler:innen, {Person.objects.count()} Personen, "
             f"{Fehlzeit.objects.count()} Fehlzeiten, AG-Zuteilung {ergebnis.zugeteilt} "
             f"({len(ergebnis.ohne_platz)} ohne Platz)."
         ))
-        self.stdout.write(f"Demo-Konten: 'lehrkraft' (Klassenleitung 9a, Chemie) und 'verwaltung' – Passwort: {pw}")
+        self.stdout.write(f"Demo-Konten: 'lehrkraft' (Klassenleitung 9a, Chemie), 'verwaltung' (Sekretariat), "
+                          f"'personal' (HR) – Passwort: {pw}")

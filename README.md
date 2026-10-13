@@ -1,4 +1,4 @@
-# Schulverwaltung (Version 0.3, Entwicklungsstand)
+# Schulverwaltung (Version 0.4, Entwicklungsstand)
 
 Open-Source-Schulverwaltung für die DSN: Stammdaten, Klassen und Lerngruppen,
 Noten mit Gewichtung, Fehlzeiten, Nachmittagsprogramm. Läuft im Browser,
@@ -29,6 +29,7 @@ http://localhost:8000. Die Zugangsdaten stehen in der Datei `.env`
 | `admin` | Vollzugriff | `ADMIN_PASSWORT` in `.env` |
 | `lehrkraft` | Demo-Lehrkraft, Klassenleitung 9a, Chemie 9a/9b, Biologie 9a | `DEMO_PASSWORT` in `.env` |
 | `verwaltung` | Demo-Sekretariat | `DEMO_PASSWORT` in `.env` |
+| `personal` | Demo-Personalverwaltung (HR) | `DEMO_PASSWORT` in `.env` |
 
 ## Noten mit Bewertungsordnern
 
@@ -68,7 +69,7 @@ Abweichung muss begründet werden und ist in der Notenübersicht mit „×Gewich
 | Schullaufbahn | je Schuljahr: Jahrgang, **Bildungsgang** (Haupt-/Realschul-/gymnasialer Bildungsgang, Oberstufe …), Stammklasse, Ergebnis (versetzt, Wiederholung, Wechsel, Abschluss …), Bemerkung; Wechsel im Schuljahr über Von/Bis |
 | Gesundheitsangaben | Allergien, Erkrankungen, Medikamente, Notfallhinweise, Arzt, Versicherung, Schwimmen – **eigene Tabelle mit eigenem Zugriffsrecht**, Lehrkräfte sehen sie standardmäßig nicht |
 | Eltern | Beruf, Arbeitgeber, bevorzugter Kommunikationsweg, Schulverein (Mitgliedschaft, Nummer), Elternvertretung, Einverständnis zur Kontaktweitergabe; je Kind: Sorgerecht, Auskunftsrecht, Abholberechtigung, Notfallkontakt, Rechnungsempfang |
-| Personal | Kürzel, Funktion, Personalnummer, Anstellungsart (ADLK, BPLK, LPLK, OLK, Ortskraft …), Dienstbeginn, Vertragsende, Deputat, Ermäßigung, Arbeitserlaubnis bis, Lehrbefähigungen, weitere Funktionen, Fortbildungen, Notfallkontakte |
+| Personal | Bereich, Stellenbezeichnung, Kürzel (nur für Unterrichtende Pflicht), Vorgesetzte:r, Personalnummer, Anstellungsart (ADLK, BPLK, LPLK, OLK, Ortskraft, Honorar/Coach, externer Dienstleister …), Firma, Dienstbeginn, Vertragsende, Deputat/Wochenstunden, Arbeitszeit/Schicht, Arbeitserlaubnis, Lehrbefähigungen, Dienstausweis, Nachweise, Abwesenheiten, Fortbildungen, Notfallkontakte |
 
 Bildungsgänge und Abschlussarten sind unter „Stammdaten“ frei anpassbar. Die **Schülerakte**
 (Link in der Klassenliste und in der Schülerliste) zeigt alles auf einer Seite; sie ist für
@@ -76,6 +77,49 @@ Verwaltung, Schulleitung und die Klassenleitung der aktuellen Stammklasse sichtb
 
 Klassenleitungen sollen Gesundheitsangaben der eigenen Klasse sehen? Dann in der Verwaltung
 unter „Gruppen“ der Rolle „Lehrkraft“ das Recht „Darf Gesundheitsangaben der eigenen Klasse sehen“ geben.
+
+## Personal aller Bereiche und HR
+
+**Personalbereiche** sind frei pflegbar (Stammdaten › Personalbereiche). Voreingestellt:
+Schulleitung, Lehrkräfte, Kindergarten/Vorschule, Nachmittagsbereich/Coaches, Verwaltung,
+Personalverwaltung (HR), Finanzen, IT, Facility/Haustechnik, Reinigung, Sicherheit,
+Küche/Cafeteria, Transport/Fahrdienst, Schulgesundheit, Bibliothek.
+
+- **Externe Dienstleister** (z. B. Sicherheits- oder Reinigungsfirma) werden als Firma erfasst;
+  die eingesetzten Personen sind trotzdem einzeln geführt (wichtig für Zutritt und Kinderschutz).
+- **Coaches** im Nachmittagsbereich sind normales Personal (z. B. Honorarbasis) und können als
+  AG-Leitung eingetragen werden.
+- **Nachweise mit Ablaufdatum**: Führungszeugnis / Certificate of Good Conduct, Kinderschutz-Schulung,
+  Erste Hilfe, Gesundheitszeugnis Küche, Fahrerlaubnis, Rettungsschwimmer, Trainerlizenz …
+  Je Nachweisart: Gültigkeitsdauer und für welche Bereiche sie Pflicht ist. „Gültig bis“ wird
+  automatisch berechnet. Fehlende, abgelaufene und bald (60 Tage) ablaufende Nachweise erscheinen
+  auf der Startseite der Personalverwaltung und als Filter in der Personalliste.
+- **Personalabwesenheiten**: Urlaub, Krankmeldung (ohne Diagnosen), Fortbildung, Dienstreise
+  mit Status beantragt/genehmigt/abgelehnt und Arbeitstage-Berechnung.
+
+**Rollen:** Die neue Rolle *Personalverwaltung* sieht Dienstverhältnis, Nachweise, Abwesenheiten
+und vertrauliche Personal-Zusatzfelder, aber keine Noten und keine Gesundheitsangaben von
+Schüler:innen. Das *Sekretariat* sieht Personal (Kontakt, Einsatz), aber keine HR-Daten.
+Rechte lassen sich unter „Gruppen“ anpassen; beim Neustart werden Anpassungen nicht mehr
+überschrieben (es werden nur fehlende Standardrechte ergänzt).
+
+## Eigene Datenfelder (Zusatzfelder)
+
+Unter **Stammdaten › Zusatzfelder** lassen sich beliebig viele eigene Felder für Schüler:innen,
+Personal und Eltern anlegen – ohne Programmierung:
+
+| Einstellung | Möglichkeiten |
+| --- | --- |
+| Feldtyp | Text, mehrzeiliger Text, Zahl, Datum, Ja/Nein, Auswahl, Mehrfachauswahl |
+| Pflichtfeld | ja/nein |
+| Abschnitt | Überschrift zur Gruppierung im Formular, z. B. „Schulleben“, „Ausstattung“ |
+| Sichtbar für | alle mit Aktenzugriff (inkl. Klassenleitung) · Verwaltung, Leitung, HR · nur HR und Leitung |
+| In Liste | Feld erscheint als Spalte in der Übersichtsliste |
+| Aktiv | Deaktivieren blendet das Feld aus; gespeicherte Werte bleiben erhalten |
+
+Die Felder erscheinen automatisch in den Formularen und (bei Schüler:innen) in der Schülerakte.
+Werte unsichtbarer Felder bleiben beim Speichern durch andere Rollen unverändert. Alle Änderungen
+stehen im Änderungsprotokoll.
 
 ## Update von einer älteren Version
 

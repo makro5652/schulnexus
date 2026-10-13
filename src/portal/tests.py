@@ -82,7 +82,9 @@ class PortalTest(TestCase):
         for name in ["stammdaten_person", "stammdaten_schuelerprofil", "stammdaten_gruppe", "noten_unterricht",
                      "noten_leistungsnachweis", "noten_note", "fehlzeiten_fehlzeit", "nachmittag_agangebot",
                      "stammdaten_personalprofil", "stammdaten_laufbahnabschnitt", "stammdaten_elternprofil",
-                     "stammdaten_abschluss", "stammdaten_gesundheitsangaben", "noten_bewertungsordner"]:
+                     "stammdaten_abschluss", "stammdaten_gesundheitsangaben", "noten_bewertungsordner",
+                     "stammdaten_personalbereich", "stammdaten_dienstleister", "stammdaten_nachweisart",
+                     "stammdaten_nachweis", "stammdaten_personalabwesenheit", "stammdaten_zusatzfeld"]:
             self.assertEqual(self.client.get(reverse(f"admin:{name}_changelist")).status_code, 200, name)
             self.assertEqual(self.client.get(reverse(f"admin:{name}_add")).status_code, 200, name)
         # Detailseiten mit allen Inlines
@@ -91,6 +93,33 @@ class PortalTest(TestCase):
         for obj, name in [(Schuelerprofil.objects.first(), "stammdaten_schuelerprofil"), (Personalprofil.objects.first(), "stammdaten_personalprofil"),
                           (Person.objects.filter(elternprofil__isnull=False).first(), "stammdaten_person")]:
             self.assertEqual(self.client.get(reverse(f"admin:{name}_change", args=[obj.pk])).status_code, 200, name)
+
+    def test_hr_startseite(self):
+        self.client.login(username="personal", password="Test-Passwort-123")
+        r = self.client.get(reverse("start"))
+        self.assertContains(r, "Nachweise mit Handlungsbedarf")
+        self.assertContains(r, "abgelaufen")
+        self.assertContains(r, "Heute abwesend")
+        self.client.login(username="verwaltung", password="Test-Passwort-123")
+        self.assertNotContains(self.client.get(reverse("start")), "Nachweise mit Handlungsbedarf")
+
+    def test_personalliste_mit_zusatzspalte_und_filter(self):
+        self.client.login(username="personal", password="Test-Passwort-123")
+        r = self.client.get(reverse("admin:stammdaten_personalprofil_changelist") + "?nachweise=offen")
+        self.assertEqual(r.status_code, 200)
+        self.assertContains(r, "Schlüsselberechtigungen")
+        self.assertContains(r, "Wekesa")      # Erste Hilfe abgelaufen
+        self.assertContains(r, "Chebet")      # Führungszeugnis fehlt
+        self.assertNotContains(r, "Kiprono")  # alles gültig
+
+    def test_schuelerakte_zeigt_zusatzfelder(self):
+        from stammdaten.models import Gruppe
+
+        s = Gruppe.objects.get(name="9a").aktuelle_mitglieder().first()
+        self.client.login(username="lehrkraft", password="Test-Passwort-123")
+        r = self.client.get(reverse("schuelerakte", args=[s.pk]))
+        self.assertContains(r, "Schulhaus (House)")
+        self.assertNotContains(r, "Schulgeld-Ermäßigung")  # nur für Verwaltung sichtbar
 
     def test_lehrkraft_admin_nur_eigene_leistungsnachweise(self):
         self.client.login(username="lehrkraft", password="Test-Passwort-123")

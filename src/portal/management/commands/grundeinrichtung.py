@@ -9,7 +9,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 
 from noten.models import Notenskala, Notenstufe
-from stammdaten.models import Abschlussart, Bildungsgang
+from stammdaten.models import Abschlussart, Bildungsgang, Nachweisart, Personalbereich
 
 # Voreinstellungen – in der Verwaltung frei änderbar (Stammdaten › Bildungsgänge / Abschlussarten).
 BILDUNGSGAENGE = [
@@ -39,9 +39,49 @@ SEK1 = [
     ("5+", "4.7"), ("5", "5.0"), ("5-", "5.3"), ("6", "6.0"),
 ]
 
+# Personalbereiche: (Kürzel, Bezeichnung, unterrichtend)
+PERSONALBEREICHE = [
+    ("SL", "Schulleitung", True),
+    ("LK", "Lehrkräfte", True),
+    ("KITA", "Kindergarten / Vorschule", False),
+    ("NACHM", "Nachmittagsbereich / Coaches", False),
+    ("VERW", "Verwaltung / Sekretariat", False),
+    ("HR", "Personalverwaltung (HR)", False),
+    ("FIN", "Finanzen / Buchhaltung", False),
+    ("IT", "IT", False),
+    ("FAC", "Facility Management / Haustechnik", False),
+    ("REIN", "Reinigung", False),
+    ("SICH", "Sicherheit", False),
+    ("KUE", "Küche / Cafeteria", False),
+    ("TRANS", "Transport / Fahrdienst", False),
+    ("GES", "Schulgesundheit / Krankenstation", False),
+    ("BIB", "Bibliothek", False),
+]
+# Nachweisarten: (Bezeichnung, Gültigkeit in Monaten, Pflicht für Bereiche – "*" = alle)
+NACHWEISARTEN = [
+    ("Polizeiliches Führungszeugnis / Certificate of Good Conduct", None, ["*"]),
+    ("Kinderschutz-Schulung (Child Safeguarding)", 24, ["*"]),
+    ("Erste-Hilfe-Kurs", 24, ["NACHM", "SICH", "TRANS", "KITA"]),
+    ("Arbeitserlaubnis / Work Permit", None, []),
+    ("Gesundheitszeugnis Lebensmittel (Food Handler)", 12, ["KUE"]),
+    ("Fahrerlaubnis (Personenbeförderung)", None, ["TRANS"]),
+    ("Rettungsschwimmer-Nachweis", 24, []),
+    ("Trainerlizenz / Coaching-Qualifikation", None, []),
+]
+
+# Rechte, die NUR Personalverwaltung und Schulleitung erhalten (nicht das Sekretariat)
+HR_RECHTE = {"view_hr_daten"} | {f"{a}_{m}" for a in ("add", "change", "delete", "view")
+                                  for m in ("nachweis", "nachweisart", "personalabwesenheit")}
+
 ROLLEN = {
-    "Verwaltung": "__alle__",
+    "Verwaltung": "__alle_ausser_hr__",
     "Schulleitung": "__alle__",
+    "Personalverwaltung": [
+        f"{a}_{m}" for a in ("add", "change", "view", "delete")
+        for m in ("personalprofil", "personalbereich", "dienstleister", "nachweisart", "nachweis",
+                  "personalabwesenheit", "fortbildung", "notfallkontakt", "dokument")
+    ] + ["add_person", "change_person", "view_person", "view_fach", "view_hr_daten",
+         "add_zusatzfeld", "change_zusatzfeld", "view_zusatzfeld"],
     "Lehrkraft": [
         "view_person", "view_schuelerprofil", "view_gruppe", "view_mitgliedschaft", "view_fach", "view_beziehung",
         "view_unterricht", "view_notenskala", "view_notenstufe", "view_notenschluessel", "view_gewichtungsvorlage",
@@ -65,13 +105,15 @@ class Command(BaseCommand):
 
     @transaction.atomic
     def handle(self, *args, **options):
+        # Rechte werden nur ERGÄNZT, nie entfernt: Anpassungen in der Verwaltung bleiben erhalten.
         for rolle, rechte in ROLLEN.items():
             gruppe, _ = Group.objects.get_or_create(name=rolle)
-            if rechte == "__alle__":
-                perms = Permission.objects.filter(content_type__app_label__in=FACH_APPS)
-            else:
-                perms = Permission.objects.filter(content_type__app_label__in=FACH_APPS, codename__in=rechte)
-            gruppe.permissions.set(perms)
+            perms = Permission.objects.filter(content_type__app_label__in=FACH_APPS)
+            if rechte == "__alle_ausser_hr__":
+                perms = perms.exclude(codename__in=HR_RECHTE)
+            elif rechte != "__alle__":
+                perms = perms.filter(codename__in=rechte)
+            gruppe.permissions.add(*perms)
         self.stdout.write("Rollen eingerichtet: " + ", ".join(ROLLEN))
 
         sek1, neu = Notenskala.objects.get_or_create(
@@ -106,3 +148,14 @@ class Command(BaseCommand):
         for i, (k, name) in enumerate(ABSCHLUSSARTEN):
             Abschlussart.objects.get_or_create(kuerzel=k, defaults={"name": name, "reihenfolge": (i + 1) * 10})
         self.stdout.write(self.style.SUCCESS("Bildungsgänge und Abschlussarten eingerichtet."))
+
+        bereiche = {}
+        for i, (k, name, unterrichtet) in enumerate(PERSONALBEREICHE):
+            bereiche[k], _ = Personalbereich.objects.get_or_create(
+                kuerzel=k, defaults={"name": name, "unterrichtet": unterrichtet, "reihenfolge": (i + 1) * 10}
+            )
+        for i, (name, monate, pflicht) in enumerate(NACHWEISARTEN):
+            art, neu = Nachweisart.objects.get_or_create(name=name, defaults={"gueltigkeit_monate": monate, "reihenfolge": (i + 1) * 10})
+            if neu:
+                art.pflicht_fuer.set(list(bereiche.values()) if pflicht == ["*"] else [bereiche[k] for k in pflicht])
+        self.stdout.write(self.style.SUCCESS("Personalbereiche und Nachweisarten eingerichtet."))

@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.utils.html import format_html
 from simple_history.admin import SimpleHistoryAdmin
 
-from portal.rechte import ist_verwaltung
+from portal.rechte import ist_personalverwaltung, ist_verwaltung
 
 from .models import (
     Abschluss,
@@ -12,6 +12,7 @@ from .models import (
     Abschnitt,
     Beziehung,
     Bildungsgang,
+    Dienstleister,
     Dokument,
     Einwilligung,
     Elternprofil,
@@ -21,18 +22,25 @@ from .models import (
     Gruppe,
     Laufbahnabschnitt,
     Mitgliedschaft,
+    Nachweis,
+    Nachweisart,
     Notfallkontakt,
     Person,
+    Personalabwesenheit,
+    Personalbereich,
     Personalprofil,
     Schuelerprofil,
     Schuljahr,
     Sprachenfolge,
     VorherigeSchule,
+    Zusatzfeld,
 )
+from .zusatzfelder import ZusatzfelderAdminMixin, ZusatzfelderInlineMixin, zusatz_fieldsets
 
 admin.site.site_header = "Schulverwaltung"
 admin.site.site_title = "Schulverwaltung"
 admin.site.index_title = "Verwaltung"
+admin.site.enable_nav_sidebar = False  # volle Breite für Tabellen; Navigation über Startseite und Brotkrumen
 
 
 class AbschnittInline(admin.TabularInline):
@@ -61,12 +69,13 @@ class PersonalprofilKurzInline(admin.StackedInline):
     model = Personalprofil
     extra = 0
     max_num = 1
-    fields = ["kuerzel", "funktion", "aktiv"]
+    fields = ["bereich", "stellenbezeichnung", "kuerzel", "aktiv"]
     show_change_link = True
     verbose_name_plural = "Personalprofil (vollständige Personalakte über „Ändern“)"
 
 
-class ElternprofilInline(admin.StackedInline):
+class ElternprofilInline(ZusatzfelderInlineMixin, admin.StackedInline):
+    zusatz_zielgruppe = "eltern"
     model = Elternprofil
     extra = 0
     max_num = 1
@@ -131,7 +140,7 @@ class PersonAdmin(SimpleHistoryAdmin):
         if hasattr(obj, "schueler"):
             rollen.append("Schüler:in")
         if hasattr(obj, "personal"):
-            rollen.append(obj.personal.get_funktion_display())
+            rollen.append(obj.personal.stellenbezeichnung or (obj.personal.bereich.name if obj.personal.bereich else "Personal"))
         if obj.kinder_beziehungen.exists():
             rollen.append("Eltern / Kontakt")
         return ", ".join(rollen) or "—"
@@ -240,7 +249,8 @@ class BildungsgangFilter(admin.SimpleListFilter):
 
 
 @admin.register(Schuelerprofil)
-class SchuelerprofilAdmin(SimpleHistoryAdmin):
+class SchuelerprofilAdmin(ZusatzfelderAdminMixin, SimpleHistoryAdmin):
+    zusatz_zielgruppe = "schueler"
     list_display = ["person", "schuelernummer", "klasse", "bildungsgang", "status", "akte"]
     list_filter = ["status", StammklasseFilter, BildungsgangFilter, "daz", "nachteilsausgleich"]
     search_fields = ["person__nachname", "person__vorname", "schuelernummer"]
@@ -287,25 +297,104 @@ class NotfallkontaktInline(admin.TabularInline):
     extra = 0
 
 
+class NachweisInline(admin.TabularInline):
+    model = Nachweis
+    extra = 0
+    fields = ["art", "ausgestellt_am", "gueltig_bis", "datei", "bemerkung", "status_anzeige"]
+    readonly_fields = ["status_anzeige"]
+
+    @admin.display(description="Status")
+    def status_anzeige(self, obj):
+        if not obj.pk:
+            return "—"
+        return status_etikett(next((st for a, st, n in obj.personal.nachweisstatus() if n and n.pk == obj.pk), "gueltig"))
+
+
+class AbwesenheitInline(admin.TabularInline):
+    model = Personalabwesenheit
+    extra = 0
+    fields = ["art", "von", "bis", "halbtags", "status", "bemerkung"]
+
+
+STATUS_TEXT = {"fehlt": "fehlt", "abgelaufen": "abgelaufen", "laeuft_ab": "läuft bald ab", "gueltig": "gültig"}
+STATUS_FARBE = {"fehlt": "#b4532a", "abgelaufen": "#b4532a", "laeuft_ab": "#9a6b00", "gueltig": "#1f5f5b"}
+
+
+def status_etikett(status):
+    return format_html('<strong style="color:{}">{}</strong>', STATUS_FARBE[status], STATUS_TEXT[status])
+
+
+class NachweisFilter(admin.SimpleListFilter):
+    title = "Nachweise"
+    parameter_name = "nachweise"
+
+    def lookups(self, request, model_admin):
+        return [("offen", "fehlend, abgelaufen oder bald ablaufend"), ("ok", "vollständig und gültig")]
+
+    def queryset(self, request, queryset):
+        if not self.value():
+            return queryset
+        offen = [p.pk for p in queryset.select_related("bereich") if p.offene_nachweise()]
+        return queryset.filter(pk__in=offen) if self.value() == "offen" else queryset.exclude(pk__in=offen)
+
+
 @admin.register(Personalprofil)
-class PersonalprofilAdmin(SimpleHistoryAdmin):
-    list_display = ["kuerzel", "person", "funktion", "anstellungsart", "wochenstunden", "vertragsende", "aktiv"]
-    list_filter = ["funktion", "anstellungsart", "aktiv", "lehrbefaehigungen"]
-    search_fields = ["kuerzel", "person__nachname", "person__vorname", "personalnummer"]
-    autocomplete_fields = ["person"]
+class PersonalprofilAdmin(ZusatzfelderAdminMixin, SimpleHistoryAdmin):
+    zusatz_zielgruppe = "personal"
+    list_display = ["person", "bereich", "stellenbezeichnung", "kuerzel"]
+    list_filter = ["bereich", "anstellungsart", "dienstleister", "aktiv", "lehrbefaehigungen"]
+    search_fields = ["kuerzel", "person__nachname", "person__vorname", "personalnummer", "stellenbezeichnung", "ausweisnummer"]
+    autocomplete_fields = ["person", "vorgesetzt"]
     filter_horizontal = ["lehrbefaehigungen"]
-    inlines = [FortbildungInline, NotfallkontaktInline]
-    fieldsets = [
-        ("Person", {"fields": ["person", ("kuerzel", "funktion", "aktiv")]}),
-        ("Dienstverhältnis", {"fields": [("personalnummer", "anstellungsart"), ("dienstbeginn", "vertragsende"),
-                                         ("wochenstunden", "ermaessigung"), "arbeitserlaubnis_bis"]}),
-        ("Tätigkeit", {"fields": ["lehrbefaehigungen", "weitere_funktionen", ("dienst_email", "raum")]}),
-        ("Intern", {"fields": ["bemerkungen"], "classes": ["collapse"]}),
-    ]
+    list_select_related = ["person", "bereich"]
+
+    def _hr(self, request):
+        return ist_personalverwaltung(request.user) or request.user.has_perm("stammdaten.view_hr_daten")
+
+    def get_list_display(self, request):
+        spalten = list(super().get_list_display(request))
+        if self._hr(request):
+            spalten.insert(4, "nachweise_anzeige")
+        return spalten
+
+    def get_list_filter(self, request):
+        filter_ = list(super().get_list_filter(request))
+        return filter_ + [NachweisFilter] if self._hr(request) else filter_
+
+    def get_fieldsets(self, request, obj=None):
+        basis = [
+            ("Person und Einsatz", {"fields": ["person", ("bereich", "stellenbezeichnung"), ("kuerzel", "aktiv"), "vorgesetzt"]}),
+            ("Tätigkeit", {"fields": ["lehrbefaehigungen", "weitere_funktionen", ("dienst_email", "raum"), "ausweisnummer"]}),
+        ]
+        if obj is not None and obj.bereich_id and not obj.bereich.unterrichtet:
+            basis[1][1]["fields"] = basis[1][1]["fields"][1:]  # Lehrbefähigungen nur bei unterrichtendem Personal
+        if self._hr(request):
+            basis.insert(1, ("Dienstverhältnis (HR)", {"fields": [
+                ("personalnummer", "anstellungsart"), "dienstleister", ("dienstbeginn", "vertragsende"),
+                ("wochenstunden", "ermaessigung"), "arbeitszeit", "arbeitserlaubnis_bis"]}))
+            basis.append(("Intern (HR)", {"fields": ["bemerkungen"], "classes": ["collapse"]}))
+        return basis + zusatz_fieldsets(self._zusatz_definitionen(request))
+
+    def get_inlines(self, request, obj):
+        inlines = [NotfallkontaktInline, FortbildungInline]
+        if self._hr(request):
+            inlines = [NachweisInline, AbwesenheitInline] + inlines
+        return inlines
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        return qs if ist_verwaltung(request.user) else qs.filter(person__benutzer=request.user)
+        if ist_verwaltung(request.user) or ist_personalverwaltung(request.user):
+            return qs
+        return qs.filter(person__benutzer=request.user)
+
+    @admin.display(description="Nachweise")
+    def nachweise_anzeige(self, obj):
+        offen = obj.offene_nachweise()
+        if not offen:
+            return status_etikett("gueltig")
+        schlimmster = min(offen, key=lambda t: ["fehlt", "abgelaufen", "laeuft_ab"].index(t[1]))
+        return format_html('<span title="{}">{} ({})</span>', "; ".join(f"{a.name}: {STATUS_TEXT[st]}" for a, st, _ in offen),
+                           status_etikett(schlimmster[1]), len(offen))
 
 
 class GruppenMitgliederInline(admin.TabularInline):
@@ -421,7 +510,10 @@ class AbschlussAdmin(SimpleHistoryAdmin):
 
 
 @admin.register(Elternprofil)
-class ElternprofilAdmin(SimpleHistoryAdmin):
+class ElternprofilAdmin(ZusatzfelderAdminMixin, SimpleHistoryAdmin):
+    zusatz_zielgruppe = "eltern"
+    fieldsets = [(None, {"fields": ["person", ("beruf", "arbeitgeber"), "korrespondenzweg",
+                                    ("schulverein_mitglied", "mitgliedsnummer"), "elternvertretung", "kontaktdaten_weitergabe"]})]
     list_display = ["person", "beruf", "korrespondenzweg", "schulverein_mitglied", "elternvertretung"]
     list_filter = ["schulverein_mitglied", "korrespondenzweg"]
     search_fields = ["person__nachname", "person__vorname", "beruf"]
@@ -433,3 +525,83 @@ class GesundheitsangabenAdmin(SimpleHistoryAdmin):
     list_display = ["schueler", "allergien", "medikamente", "schwimmen_erlaubt"]
     search_fields = ["schueler__person__nachname"]
     autocomplete_fields = ["schueler"]
+
+
+@admin.register(Personalbereich)
+class PersonalbereichAdmin(admin.ModelAdmin):
+    list_display = ["name", "kuerzel", "unterrichtet", "anzahl", "reihenfolge"]
+    list_editable = ["reihenfolge"]
+
+    @admin.display(description="Personen (aktiv)")
+    def anzahl(self, obj):
+        return obj.personal.filter(aktiv=True).count()
+
+
+@admin.register(Dienstleister)
+class DienstleisterAdmin(admin.ModelAdmin):
+    list_display = ["name", "leistung", "ansprechperson", "telefon", "vertrag_bis", "anzahl"]
+    search_fields = ["name", "leistung"]
+
+    @admin.display(description="Eingesetzte Personen")
+    def anzahl(self, obj):
+        return obj.personal.filter(aktiv=True).count()
+
+
+@admin.register(Nachweisart)
+class NachweisartAdmin(admin.ModelAdmin):
+    list_display = ["name", "gueltigkeit_monate", "pflicht_text", "reihenfolge"]
+    list_editable = ["reihenfolge"]
+    filter_horizontal = ["pflicht_fuer"]
+
+    @admin.display(description="Pflicht für")
+    def pflicht_text(self, obj):
+        return ", ".join(b.name for b in obj.pflicht_fuer.all()) or "—"
+
+
+@admin.register(Nachweis)
+class NachweisAdmin(SimpleHistoryAdmin):
+    list_display = ["personal", "art", "ausgestellt_am", "gueltig_bis"]
+    list_filter = ["art", "personal__bereich"]
+    search_fields = ["personal__person__nachname", "personal__person__vorname"]
+    autocomplete_fields = ["personal"]
+    date_hierarchy = "gueltig_bis"
+
+
+@admin.register(Personalabwesenheit)
+class PersonalabwesenheitAdmin(SimpleHistoryAdmin):
+    list_display = ["personal", "art", "von", "bis", "arbeitstage_anzeige", "status"]
+    list_filter = ["art", "status", "personal__bereich"]
+    search_fields = ["personal__person__nachname", "personal__person__vorname"]
+    autocomplete_fields = ["personal"]
+    date_hierarchy = "von"
+
+    @admin.display(description="Arbeitstage")
+    def arbeitstage_anzeige(self, obj):
+        return str(obj.arbeitstage).replace(".", ",")
+
+
+@admin.register(Zusatzfeld)
+class ZusatzfeldAdmin(admin.ModelAdmin):
+    list_display = ["name", "zielgruppe", "typ", "abschnitt", "pflicht", "sichtbarkeit", "in_liste", "reihenfolge", "aktiv"]
+    list_editable = ["reihenfolge", "aktiv", "in_liste"]
+    list_filter = ["zielgruppe", "typ", "sichtbarkeit", "aktiv"]
+    search_fields = ["name", "abschnitt"]
+    fieldsets = [
+        (None, {"fields": [("zielgruppe", "name"), "schluessel", ("typ", "pflicht"), "optionen", "abschnitt", "hilfetext"]}),
+        ("Sichtbarkeit und Anzeige", {"fields": ["sichtbarkeit", ("in_liste", "reihenfolge", "aktiv")]}),
+    ]
+
+    def get_readonly_fields(self, request, obj=None):
+        return ["zielgruppe", "schluessel"] if obj else []
+
+    def _nur_personal(self, request):
+        return not ist_verwaltung(request.user) and ist_personalverwaltung(request.user)
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(zielgruppe="personal") if self._nur_personal(request) else qs
+
+    def formfield_for_choice_field(self, db_field, request, **kwargs):
+        if db_field.name == "zielgruppe" and self._nur_personal(request):
+            kwargs["choices"] = [("personal", "Personal")]
+        return super().formfield_for_choice_field(db_field, request, **kwargs)
