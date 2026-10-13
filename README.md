@@ -1,4 +1,4 @@
-# Schulverwaltung (Version 0.4.2.5, Entwicklungsstand)
+# Schulverwaltung (Version 0.4.2.6, Entwicklungsstand)
 
 Open-Source-Schulverwaltung für die DSN: Stammdaten, Klassen und Lerngruppen,
 Noten mit Gewichtung, Fehlzeiten, Nachmittagsprogramm, Anhänge zur Schülerakte,
@@ -63,6 +63,14 @@ Arbeitsseite mit drei Spalten:
   Name es nahelegt – auf Ethik bzw. Religion voreingestellt.
 - **Rechte:** Sekretariat, Verwaltungsleitung, Schulleitung alle Gruppen; Stufenkoordination die
   Gruppen ihrer Stufe (AGs ohne Jahrgang bleiben bei der Verwaltung).
+
+## Betrieb auf Unraid (Zugriff über Tailscale)
+
+Für den Dauerbetrieb auf einem Unraid-Server gibt es eine eigene Variante im Ordner `unraid/`:
+ein veröffentlichter Port (voreingestellt 8010), erreichbar über das Tailscale des Servers,
+Daten unter `/mnt/user/appdata/schulverwaltung-daten`, tägliche Datenbanksicherung.
+Einrichtung im Unraid-Terminal mit `sh unraid/einrichten.sh` – Schritt für Schritt in
+[ANLEITUNG-UNRAID.md](ANLEITUNG-UNRAID.md).
 
 ## Neuanmeldungen
 
@@ -342,6 +350,8 @@ und fehlende Beispiele (z. B. Neuanmeldungen) ergänzt. Checklisten-Vorlagen wer
 | `src/foerderung` | Förderpläne, Nachteilsausgleiche, Elternbestätigung |
 | `src/aufnahme` | Neuanmeldungen: Bewerbungsakte, Checklisten, Unterlagen, Übernahme (`uebernahme.py`), Rechte (`rechte.py`) |
 | `src/locale` | Übersetzungen (Englisch) |
+| `unraid/` | Betrieb auf Unraid: `docker-compose.yml`, `.env.example`, `einrichten.sh` |
+| `docker/` | Startskript des Containers, Sicherungsskript |
 | `src/config/version.py` | Versionsnummer (kleine Änderungen erhöhen die letzte Stelle) |
 
 Alle Änderungen an Personen, Noten, Fehlzeiten und Mitgliedschaften werden

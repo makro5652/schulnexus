@@ -1,0 +1,95 @@
+# Schulverwaltung auf Unraid – Zugriff über das Tailscale des Unraid-Servers
+#
+#   Einrichten / Aktualisieren:  sh unraid/einrichten.sh   (im Projektordner)
+#   Aufruf:                      http://<Tailscale-Name oder -IP des Servers>:<PORT>
+#
+# Aufbau:
+#   web          – Django/Gunicorn, veröffentlicht genau einen Port auf dem Unraid-Server
+#   db           – PostgreSQL im internen Netz ohne Internet und ohne Port
+#   sicherung    – tägliche Datenbanksicherung nach ${APPDATA}/sicherungen
+#   vorbereitung – setzt einmalig die Ordnerrechte (Unraid: nobody:users = 99:100)
+#
+# Tailscale läuft bereits auf dem Unraid-Server selbst; über ihn ist der Port im Tailnet erreichbar.
+# BIND_ADRESSE in unraid/.env legt fest, ob der Port zusätzlich im Heimnetz offen ist (siehe dort).
+
+name: schulverwaltung
+
+services:
+  vorbereitung:
+    image: postgres:16-alpine
+    restart: "no"
+    network_mode: none
+    entrypoint: ["/bin/sh", "-c"]
+    command: >-
+      mkdir -p /daten/dokumente /sicherungen &&
+      chown -R ${PUID:-99}:${PGID:-100} /daten/dokumente /sicherungen &&
+      chmod 750 /daten/dokumente /sicherungen
+    volumes:
+      - ${APPDATA:?Bitte APPDATA in unraid/.env setzen}/dokumente:/daten/dokumente
+      - ${APPDATA}/sicherungen:/sicherungen
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-schulverwaltung}
+      POSTGRES_USER: ${DB_BENUTZER:-schule}
+      POSTGRES_PASSWORD: ${DB_PASSWORT:?Bitte DB_PASSWORT in unraid/.env setzen}
+      TZ: ${TIME_ZONE:-Africa/Nairobi}
+    volumes:
+      - ${APPDATA}/datenbank:/var/lib/postgresql/data
+    networks: [intern]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  web:
+    build:
+      context: ..
+    image: schulverwaltung:lokal
+    restart: unless-stopped
+    user: "${PUID:-99}:${PGID:-100}"
+    networks: [intern, extern]
+    ports:
+      - "${BIND_ADRESSE:-0.0.0.0}:${PORT:-8010}:8000"
+    depends_on:
+      vorbereitung:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://${DB_BENUTZER:-schule}:${DB_PASSWORT}@db:5432/${DB_NAME:-schulverwaltung}
+      MEDIA_ROOT: /daten/dokumente
+      HOME: /tmp
+    volumes:
+      - ${APPDATA}/dokumente:/daten/dokumente
+
+  sicherung:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    user: "${PUID:-99}:${PGID:-100}"
+    depends_on:
+      vorbereitung:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
+    environment:
+      PGHOST: db
+      PGDATABASE: ${DB_NAME:-schulverwaltung}
+      PGUSER: ${DB_BENUTZER:-schule}
+      PGPASSWORD: ${DB_PASSWORT}
+      SICHERUNG_BEHALTEN_TAGE: ${SICHERUNG_BEHALTEN_TAGE:-14}
+      TZ: ${TIME_ZONE:-Africa/Nairobi}
+    entrypoint: ["/bin/sh", "/sicherung.sh"]
+    volumes:
+      - ../docker/sicherung.sh:/sicherung.sh:ro
+      - ${APPDATA}/sicherungen:/sicherungen
+    networks: [intern]
+
+networks:
+  intern:
+    internal: true      # kein Internetzugang, nicht vom Heimnetz erreichbar
+  extern: {}            # nur für den veröffentlichten Port der Anwendung

@@ -7,3 +7,7 @@ src/media
 venv
 .venv
 .DS_Store
+# macOS-Begleitdateien (entstehen beim Kopieren auf Netzlaufwerke) – würden u. a. Migrationen stören
+**/._*
+**/.DS_Store
+unraid/.env
