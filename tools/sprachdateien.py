@@ -31,5 +31,9 @@ if __name__ == "__main__":
         print(f"{len(po) - len(offen)} von {len(po)} Texten übersetzt.")
         sys.exit(1 if offen else 0)
     if befehl == "kompilieren":
+        # Hinweiskommentare früherer Fassungen („#| msgid …“) entfernen – sie stören msgmerge, wenn sie unvollständig sind
+        for e in po:
+            e.previous_msgid = e.previous_msgid_plural = e.previous_msgctxt = None
+        po.save()
         po.save_as_mofile(str(PO.with_suffix(".mo")))
         print(f"{PO.with_suffix('.mo')} geschrieben.")

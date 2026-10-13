@@ -3,7 +3,8 @@
 {% block title %}{% blocktranslate with name=gruppe.name %}Klasse {{ name }}{% endblocktranslate %}{% endblock %}
 {% block inhalt %}
 <p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › {% blocktranslate with name=gruppe.name %}Klasse {{ name }}{% endblocktranslate %}</p>
-<h1>{% blocktranslate with name=gruppe.name %}Klasse {{ name }}{% endblocktranslate %}</h1>
+<div class="akte-kopf"><h1>{% blocktranslate with name=gruppe.name %}Klasse {{ name }}{% endblocktranslate %}</h1>
+{% if darf_zuordnen %}<a class="knopf zweitrangig" href="{% url 'zuordnung' %}?sj={{ gruppe.schuljahr_id }}&amp;gruppe={{ gruppe.pk }}">{% translate "Mitglieder zuordnen" %}</a>{% endif %}</div>
 <p class="unterzeile">{{ gruppe.schuljahr }} · {% blocktranslate with leitung=gruppe.leitung.person.anzeigename|default:"—" %}Klassenleitung {{ leitung }}{% endblocktranslate %} · {% blocktranslate count n=zeilen|length %}{{ n }} Schüler:in{% plural %}{{ n }} Schüler:innen{% endblocktranslate %}</p>
 <div class="tabellenrahmen">
 <table class="liste">

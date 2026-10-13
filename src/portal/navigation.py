@@ -79,6 +79,7 @@ def menueband(request):
                               hinweis=_("Klassenliste %(name)s") % {"name": g.name})
     alle_sehen = verwaltung or foerder
     from .startseite import stufen_fuer
+    from .zuordnung import darf_zuordnen
 
     stufen = Gruppe(_("Stufenkoordination"))
     for st in stufen_fuer(user):
@@ -97,7 +98,9 @@ def menueband(request):
              bedingung=verwaltung and p("stammdaten.view_person"))
         .add(_("Anhänge"), _url("admin:stammdaten_dokument_changelist"), "klammer", bedingung=p("stammdaten.view_dokument")),
         Gruppe(_("Klassen und Gruppen"))
-        .add(_("Klassen und Gruppen"), _url("admin:stammdaten_gruppe_changelist"), "gruppen", gross=True,
+        .add(_("Zuordnen"), _url("zuordnung"), "person_plus", gross=True, bedingung=darf_zuordnen(user),
+             hinweis=_("Schüler:innen Klassen, Lerngruppen und AGs zuordnen"))
+        .add(_("Klassen und Gruppen"), _url("admin:stammdaten_gruppe_changelist"), "gruppen",
              bedingung=verwaltung and p("stammdaten.view_gruppe"))
         .add(_("Mitgliedschaften"), _url("admin:stammdaten_mitgliedschaft_changelist"), "liste",
              bedingung=verwaltung and p("stammdaten.view_mitgliedschaft"))
@@ -241,7 +244,8 @@ def menueband(request):
     return {"karten": karten, "aktiv": aktiv, "rollen": rollen}
 
 
-PFAD_REGELN = [("/klassen/", "schueler"), ("/schueler/", "schueler"), ("/stufe/", "schueler"), ("/noten/", "unterricht"),
+PFAD_REGELN = [("/klassen/", "schueler"), ("/schueler/", "schueler"), ("/stufe/", "schueler"), ("/zuordnung/", "schueler"),
+               ("/noten/", "unterricht"),
                ("/rollen/", "verwaltung"),
                ("/foerderung/", "foerderung"), ("/verwaltung/", "verwaltung")]
 

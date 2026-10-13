@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-13 13:54+0300\n"
+"POT-Creation-Date: 2026-10-13 14:06+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -38,7 +38,7 @@ msgstr "periods %(von)s–%(bis)s"
 msgid "%(n)s Min."
 msgstr "%(n)s min"
 
-#: fehlzeiten/admin.py:41 templates/portal/klassenliste.html:10
+#: fehlzeiten/admin.py:41 templates/portal/klassenliste.html:11
 #: templates/portal/schuelerakte.html:106
 msgid "Fehlstunden"
 msgstr "Missed lessons"
@@ -61,14 +61,15 @@ msgstr "Mark as unexcused"
 msgid "%(n)s Fehlzeiten als unentschuldigt markiert."
 msgstr "%(n)s absences marked as unexcused."
 
-#: fehlzeiten/apps.py:8 fehlzeiten/models.py:70 portal/navigation.py:106
-#: portal/navigation.py:107 portal/rollen.py:127
+#: fehlzeiten/apps.py:8 fehlzeiten/models.py:70 portal/navigation.py:109
+#: portal/navigation.py:110 portal/rollen.py:129
 msgid "Fehlzeiten"
 msgstr "Absences"
 
-#: fehlzeiten/models.py:23 foerderung/models.py:85 portal/navigation.py:216
+#: fehlzeiten/models.py:23 foerderung/models.py:85 portal/navigation.py:219
 #: stammdaten/models.py:28 stammdaten/models.py:50 stammdaten/models.py:546
 #: stammdaten/models.py:791 templates/portal/schuelerakte.html:76
+#: templates/portal/zuordnung.html:12
 msgid "Schuljahr"
 msgstr "School year"
 
@@ -90,7 +91,7 @@ msgstr "End"
 msgid "Unterrichtsstunde (Zeitraster)"
 msgstr "Lesson period (timetable grid)"
 
-#: fehlzeiten/models.py:30 portal/navigation.py:219
+#: fehlzeiten/models.py:30 portal/navigation.py:222
 msgid "Zeitraster"
 msgstr "Timetable grid"
 
@@ -146,7 +147,7 @@ msgstr "School event"
 #: stammdaten/models.py:163 stammdaten/models.py:517 stammdaten/models.py:589
 #: stammdaten/models.py:654 stammdaten/models.py:790 stammdaten/models.py:838
 #: stammdaten/models.py:857 stammdaten/models.py:876 stammdaten/models.py:899
-#: templates/portal/klassenliste.html:10
+#: templates/portal/klassenliste.html:11
 #: templates/portal/notenuebersicht.html:15
 msgid "Schüler:in"
 msgstr "Student"
@@ -285,7 +286,7 @@ msgstr "System"
 msgid "Klasse"
 msgstr "Class"
 
-#: foerderung/admin.py:215 foerderung/admin.py:319 portal/navigation.py:162
+#: foerderung/admin.py:215 foerderung/admin.py:319 portal/navigation.py:165
 #: portal/rollen.py:32 templates/foerderung/_akte.html:16
 #: templates/foerderung/_akte.html:36
 msgid "Eltern"
@@ -321,7 +322,7 @@ msgstr "Measures"
 msgid "Geltung und Beschluss"
 msgstr "Validity and decision"
 
-#: foerderung/admin.py:315 foerderung/models.py:226 portal/navigation.py:140
+#: foerderung/admin.py:315 foerderung/models.py:226 portal/navigation.py:143
 #: stammdaten/models.py:638 templates/foerderung/_akte.html:16
 #: templates/foerderung/nachteilsausgleich.html:32
 msgid "Fächer"
@@ -378,7 +379,7 @@ msgstr "Receipt confirmed by %(person)s."
 msgid "Bitte ein gültiges Datum angeben (nicht vor der Aushändigung)."
 msgstr "Please enter a valid date (not before the hand-out date)."
 
-#: foerderung/apps.py:8 portal/navigation.py:148
+#: foerderung/apps.py:8 portal/navigation.py:151
 #: templates/foerderung/_akte.html:4
 msgid "Förderung"
 msgstr "Learning support"
@@ -415,7 +416,7 @@ msgid "Förderschwerpunkt"
 msgstr "Area of need"
 
 #: foerderung/models.py:30 foerderung/models.py:87 foerderung/models.py:219
-#: portal/navigation.py:166 templates/foerderung/_akte.html:36
+#: portal/navigation.py:169 templates/foerderung/_akte.html:36
 #: templates/foerderung/plan.html:27
 msgid "Förderschwerpunkte"
 msgstr "Areas of need"
@@ -438,7 +439,7 @@ msgstr ""
 msgid "Ausgleichsmaßnahme"
 msgstr "Access arrangement measure"
 
-#: foerderung/models.py:49 portal/navigation.py:168
+#: foerderung/models.py:49 portal/navigation.py:171
 msgid "Ausgleichsmaßnahmen"
 msgstr "Access arrangement measures"
 
@@ -549,8 +550,8 @@ msgstr "Change history: support plan"
 msgid "Förderplan"
 msgstr "Support plan"
 
-#: foerderung/models.py:116 portal/navigation.py:149 portal/navigation.py:150
-#: portal/rollen.py:128 templates/foerderung/_akte.html:33
+#: foerderung/models.py:116 portal/navigation.py:152 portal/navigation.py:153
+#: portal/rollen.py:130 templates/foerderung/_akte.html:33
 #: templates/foerderung/_start.html:7 templates/portal/stufe.html:23
 msgid "Förderpläne"
 msgstr "Support plans"
@@ -566,7 +567,7 @@ msgstr "Only a plan for the same student can be continued."
 #: foerderung/models.py:144 templates/foerderung/_akte.html:22
 #: templates/foerderung/_akte.html:40
 #: templates/foerderung/_aushaendigung.html:25
-#: templates/foerderung/plan.html:26 templates/portal/klassenliste.html:10
+#: templates/foerderung/plan.html:26 templates/portal/klassenliste.html:11
 #: templates/portal/stufe.html:23
 msgid "offen"
 msgstr "open"
@@ -689,7 +690,7 @@ msgstr "Change history: progress entry"
 msgid "Verlaufseintrag"
 msgstr "Progress entry"
 
-#: foerderung/models.py:198 portal/navigation.py:153
+#: foerderung/models.py:198 portal/navigation.py:156
 #: templates/foerderung/plan.html:82
 msgid "Verlaufsdokumentation"
 msgstr "Progress log"
@@ -766,13 +767,13 @@ msgstr "Change history: access arrangements"
 #: stammdaten/models.py:148 templates/foerderung/_start.html:22
 #: templates/foerderung/nachteilsausgleich.html:7
 #: templates/foerderung/nachteilsausgleich.html:11
-#: templates/portal/klassenliste.html:14
+#: templates/portal/klassenliste.html:15
 #: templates/portal/notenuebersicht.html:34
 #: templates/portal/schuelerakte.html:21
 msgid "Nachteilsausgleich"
 msgstr "Access arrangements"
 
-#: foerderung/models.py:243 portal/navigation.py:155 portal/rollen.py:129
+#: foerderung/models.py:243 portal/navigation.py:158 portal/rollen.py:131
 #: templates/foerderung/_akte.html:13 templates/foerderung/_start.html:8
 msgid "Nachteilsausgleiche"
 msgstr "Access arrangements"
@@ -991,7 +992,7 @@ msgstr "Change history: club"
 msgid "AG-Angebot"
 msgstr "Club"
 
-#: nachmittag/models.py:39 portal/navigation.py:134
+#: nachmittag/models.py:39 portal/navigation.py:137
 #: templates/portal/start.html:41
 msgid "AG-Angebote"
 msgstr "Clubs"
@@ -1024,7 +1025,7 @@ msgstr "Priority"
 msgid "AG-Wunsch"
 msgstr "Club choice"
 
-#: nachmittag/models.py:75 portal/navigation.py:135
+#: nachmittag/models.py:75 portal/navigation.py:138
 msgid "AG-Wünsche"
 msgstr "Club choices"
 
@@ -1054,7 +1055,7 @@ msgid "Unterricht"
 msgstr "Course"
 
 #: noten/admin.py:102 noten/admin.py:130 noten/models.py:226
-#: noten/models.py:227 portal/navigation.py:129
+#: noten/models.py:227 portal/navigation.py:132
 msgid "Bewertungsordner"
 msgstr "Assessment folder"
 
@@ -1085,7 +1086,7 @@ msgstr "Folder"
 msgid "Anteil an der Gesamtnote"
 msgstr "Share of the overall grade"
 
-#: noten/admin.py:188 noten/models.py:296 portal/navigation.py:126
+#: noten/admin.py:188 noten/models.py:296 portal/navigation.py:129
 #: templates/portal/notenuebersicht.html:63
 msgid "Leistungsnachweise"
 msgstr "Assessments"
@@ -1148,7 +1149,7 @@ msgstr ""
 msgid "Notenskala"
 msgstr "Grading scale"
 
-#: noten/models.py:42 portal/navigation.py:141
+#: noten/models.py:42 portal/navigation.py:144
 msgid "Notenskalen"
 msgstr "Grading scales"
 
@@ -1221,7 +1222,7 @@ msgstr "Description / department decision"
 msgid "Gewichtungsvorlage"
 msgstr "Weighting template"
 
-#: noten/models.py:123 portal/navigation.py:142
+#: noten/models.py:123 portal/navigation.py:145
 msgid "Gewichtungsvorlagen"
 msgstr "Weighting templates"
 
@@ -1457,7 +1458,7 @@ msgstr "Change history: report grade"
 msgid "Zeugnisnote"
 msgstr "Report grade"
 
-#: noten/models.py:409 portal/navigation.py:132
+#: noten/models.py:409 portal/navigation.py:135
 msgid "Zeugnisnoten"
 msgstr "Report grades"
 
@@ -1585,10 +1586,11 @@ msgstr "Notes"
 #: templates/portal/notenuebersicht.html:6 templates/portal/rollen.html:6
 #: templates/portal/schuelerakte.html:5 templates/portal/start.html:3
 #: templates/portal/stufe.html:5 templates/portal/suche.html:5
+#: templates/portal/zuordnung.html:8
 msgid "Start"
 msgstr "Home"
 
-#: portal/navigation.py:62 portal/navigation.py:214
+#: portal/navigation.py:62 portal/navigation.py:217
 msgid "Übersicht"
 msgstr "Overview"
 
@@ -1631,270 +1633,278 @@ msgstr "My classes"
 msgid "Klassenliste %(name)s"
 msgstr "Class list %(name)s"
 
-#: portal/navigation.py:83
+#: portal/navigation.py:84
 msgid "Stufenkoordination"
 msgstr "Stage coordination"
 
-#: portal/navigation.py:86
+#: portal/navigation.py:87
 #, python-format
 msgid "%(name)s, Jahrgänge %(von)s bis %(bis)s"
 msgstr "%(name)s, years %(von)s to %(bis)s"
 
-#: portal/navigation.py:88 portal/navigation.py:202 stammdaten/admin.py:127
+#: portal/navigation.py:89 portal/navigation.py:205 stammdaten/admin.py:127
 #: stammdaten/models.py:164 stammdaten/models.py:930
 #: templates/portal/stufe.html:11 templates/portal/stufe.html:22
 #: templates/portal/suche.html:17
 msgid "Schüler:innen"
 msgstr "Students"
 
-#: portal/navigation.py:91 portal/rollen.py:125
+#: portal/navigation.py:92 portal/rollen.py:127
 msgid "Schülerakten"
 msgstr "Student records"
 
-#: portal/navigation.py:92
+#: portal/navigation.py:93
 msgid "Alle Schüler:innen"
 msgstr "All students"
 
-#: portal/navigation.py:94
+#: portal/navigation.py:95
 msgid "Aufnehmen"
 msgstr "Admit"
 
-#: portal/navigation.py:96
+#: portal/navigation.py:97
 msgid "Eltern und Kontakte"
 msgstr "Parents and contacts"
 
-#: portal/navigation.py:98 templates/portal/_anhaenge.html:4
+#: portal/navigation.py:99 templates/portal/_anhaenge.html:4
 msgid "Anhänge"
 msgstr "Attachments"
 
-#: portal/navigation.py:99 portal/navigation.py:100 stammdaten/admin.py:187
+#: portal/navigation.py:100 portal/navigation.py:103 stammdaten/admin.py:187
 msgid "Klassen und Gruppen"
 msgstr "Classes and groups"
 
-#: portal/navigation.py:102 stammdaten/models.py:599
+#: portal/navigation.py:101
+msgid "Zuordnen"
+msgstr "Assign"
+
+#: portal/navigation.py:102
+msgid "Schüler:innen Klassen, Lerngruppen und AGs zuordnen"
+msgstr "Assign students to classes, teaching groups and clubs"
+
+#: portal/navigation.py:105 stammdaten/models.py:599
 msgid "Mitgliedschaften"
 msgstr "Memberships"
 
-#: portal/navigation.py:104 stammdaten/admin.py:200 stammdaten/models.py:806
+#: portal/navigation.py:107 stammdaten/admin.py:200 stammdaten/models.py:806
 #: templates/portal/schuelerakte.html:73
 msgid "Schullaufbahn"
 msgstr "School career"
 
-#: portal/navigation.py:108
+#: portal/navigation.py:111
 msgid "Offene Entschuldigungen"
 msgstr "Open excuse notes"
 
-#: portal/navigation.py:110
+#: portal/navigation.py:113
 msgid "Fehlzeit erfassen"
 msgstr "Record absence"
 
-#: portal/navigation.py:114 templates/portal/start.html:28
+#: portal/navigation.py:117 templates/portal/start.html:28
 msgid "Mein Unterricht"
 msgstr "My teaching"
 
-#: portal/navigation.py:120
+#: portal/navigation.py:123
 #, python-format
 msgid "Notenübersicht %(fach)s %(gruppe)s, %(abschnitt)s"
 msgstr "Grade overview %(fach)s %(gruppe)s, %(abschnitt)s"
 
-#: portal/navigation.py:123
+#: portal/navigation.py:126
 msgctxt "Menüband"
 msgid "Unterricht"
 msgstr "Teaching"
 
-#: portal/navigation.py:125 templates/foerderung/plan.html:53
+#: portal/navigation.py:128 templates/foerderung/plan.html:53
 msgid "Bewertung"
 msgstr "Assessment"
 
-#: portal/navigation.py:128
+#: portal/navigation.py:131
 msgid "Neuer Leistungsnachweis"
 msgstr "New assessment"
 
-#: portal/navigation.py:130
+#: portal/navigation.py:133
 msgid "Einzelnoten"
 msgstr "Individual grades"
 
-#: portal/navigation.py:131 stammdaten/models.py:680
+#: portal/navigation.py:134 stammdaten/models.py:680
 msgid "Zeugnis"
 msgstr "Report"
 
-#: portal/navigation.py:133
+#: portal/navigation.py:136
 msgid "Nachmittag"
 msgstr "Afternoon"
 
-#: portal/navigation.py:136
+#: portal/navigation.py:139
 msgid "Zuteilungen"
 msgstr "Allocations"
 
-#: portal/navigation.py:137 portal/navigation.py:187
+#: portal/navigation.py:140 portal/navigation.py:190
 msgid "Einstellungen"
 msgstr "Settings"
 
-#: portal/navigation.py:138
+#: portal/navigation.py:141
 msgid "Unterrichtsverteilung"
 msgstr "Teaching assignments"
 
-#: portal/navigation.py:152 templates/foerderung/_akte.html:7
+#: portal/navigation.py:155 templates/foerderung/_akte.html:7
 msgid "Neuer Förderplan"
 msgstr "New support plan"
 
-#: portal/navigation.py:156
+#: portal/navigation.py:159
 msgid "Gültige"
 msgstr "Valid"
 
-#: portal/navigation.py:157
+#: portal/navigation.py:160
 msgid "Gültige Nachteilsausgleiche"
 msgstr "Valid access arrangements"
 
-#: portal/navigation.py:158
+#: portal/navigation.py:161
 msgid "Beantragt"
 msgstr "Requested"
 
-#: portal/navigation.py:160
+#: portal/navigation.py:163
 msgid "Erfassen"
 msgstr "Record"
 
-#: portal/navigation.py:161 templates/foerderung/_akte.html:8
+#: portal/navigation.py:164 templates/foerderung/_akte.html:8
 msgid "Nachteilsausgleich erfassen"
 msgstr "Record access arrangements"
 
-#: portal/navigation.py:163
+#: portal/navigation.py:166
 msgid "Erhalt offen"
 msgstr "Receipt pending"
 
-#: portal/navigation.py:164
+#: portal/navigation.py:167
 msgid "Elternbestätigung offen"
 msgstr "Parent confirmation pending"
 
-#: portal/navigation.py:165
+#: portal/navigation.py:168
 msgid "Kataloge"
 msgstr "Catalogues"
 
-#: portal/navigation.py:174 portal/rollen.py:131 stammdaten/admin.py:127
+#: portal/navigation.py:177 portal/rollen.py:134 stammdaten/admin.py:127
 #: stammdaten/admin.py:153 stammdaten/models.py:285 stammdaten/models.py:286
 #: stammdaten/models.py:365 stammdaten/models.py:407 stammdaten/models.py:442
 #: stammdaten/models.py:461 stammdaten/models.py:930
 msgid "Personal"
 msgstr "Staff"
 
-#: portal/navigation.py:175
+#: portal/navigation.py:178
 msgid "Beschäftigte"
 msgstr "Employees"
 
-#: portal/navigation.py:176 templates/portal/_start_hr.html:5
+#: portal/navigation.py:179 templates/portal/_start_hr.html:5
 msgid "Personalliste"
 msgstr "Staff list"
 
-#: portal/navigation.py:178
+#: portal/navigation.py:181
 msgid "Einstellen"
 msgstr "Hire"
 
-#: portal/navigation.py:179
+#: portal/navigation.py:182
 msgid "Neue Mitarbeiterin / neuen Mitarbeiter anlegen"
 msgstr "Add a new member of staff"
 
-#: portal/navigation.py:180
+#: portal/navigation.py:183
 msgid "Nachweise offen"
 msgstr "Certificates outstanding"
 
-#: portal/navigation.py:182 portal/navigation.py:183
+#: portal/navigation.py:185 portal/navigation.py:186
 msgid "Abwesenheiten"
 msgstr "Absences"
 
-#: portal/navigation.py:185
+#: portal/navigation.py:188
 msgid "Offene Anträge"
 msgstr "Open requests"
 
-#: portal/navigation.py:188 stammdaten/models.py:199
+#: portal/navigation.py:191 stammdaten/models.py:199
 msgid "Personalbereiche"
 msgstr "Staff areas"
 
-#: portal/navigation.py:189 stammdaten/models.py:359
+#: portal/navigation.py:192 stammdaten/models.py:359
 msgid "Nachweisarten"
 msgstr "Certificate types"
 
-#: portal/navigation.py:190 portal/navigation.py:205
+#: portal/navigation.py:193 portal/navigation.py:208
 msgid "Dienstleister"
 msgstr "Contractors"
 
-#: portal/navigation.py:196 portal/rollen.py:31
+#: portal/navigation.py:199 portal/rollen.py:31
 msgid "Finanzen"
 msgstr "Finance"
 
-#: portal/navigation.py:197
+#: portal/navigation.py:200
 msgid "Schulgeld"
 msgstr "School fees"
 
-#: portal/navigation.py:198
+#: portal/navigation.py:201
 msgid "Rechnungsempfänger"
 msgstr "Invoice recipients"
 
-#: portal/navigation.py:200 stammdaten/models.py:498
+#: portal/navigation.py:203 stammdaten/models.py:498
 msgid "Elternprofile"
 msgstr "Parent profiles"
 
-#: portal/navigation.py:204
+#: portal/navigation.py:207
 msgid "Verträge"
 msgstr "Contracts"
 
-#: portal/navigation.py:207
+#: portal/navigation.py:210
 msgid "Vertragsunterlagen"
 msgstr "Contract documents"
 
-#: portal/navigation.py:213 stammdaten/admin.py:45
+#: portal/navigation.py:216 stammdaten/admin.py:45
 msgid "Verwaltung"
 msgstr "Administration"
 
-#: portal/navigation.py:215
+#: portal/navigation.py:218
 msgid "Alle Bereiche"
 msgstr "All areas"
 
-#: portal/navigation.py:217 stammdaten/models.py:29
+#: portal/navigation.py:220 stammdaten/models.py:29
 msgid "Schuljahre"
 msgstr "School years"
 
-#: portal/navigation.py:220 stammdaten/models.py:768
+#: portal/navigation.py:223 stammdaten/models.py:768
 msgid "Bildungsgänge"
 msgstr "School tracks"
 
-#: portal/navigation.py:221 stammdaten/models.py:832
+#: portal/navigation.py:224 stammdaten/models.py:832
 msgid "Abschlussarten"
 msgstr "Qualification types"
 
-#: portal/navigation.py:222
+#: portal/navigation.py:225
 msgid "Datenfelder"
 msgstr "Data fields"
 
-#: portal/navigation.py:223
+#: portal/navigation.py:226
 msgid "Eigene Felder"
 msgstr "Custom fields"
 
-#: portal/navigation.py:224
+#: portal/navigation.py:227
 msgid "Zusatzfelder für Schüler:innen, Personal und Eltern"
 msgstr "Custom fields for students, staff and parents"
 
-#: portal/navigation.py:225
+#: portal/navigation.py:228
 msgid "Benutzer und Rechte"
 msgstr "Users and permissions"
 
-#: portal/navigation.py:226
+#: portal/navigation.py:229
 msgid "Benutzerkonten"
 msgstr "User accounts"
 
-#: portal/navigation.py:227
+#: portal/navigation.py:230
 msgid "Rollen"
 msgstr "Roles"
 
-#: portal/navigation.py:228 templates/portal/rollen.html:3
+#: portal/navigation.py:231 templates/portal/rollen.html:3
 #: templates/portal/rollen.html:6 templates/portal/rollen.html:7
 msgid "Rollen und Rechte"
 msgstr "Roles and permissions"
 
-#: portal/navigation.py:229
+#: portal/navigation.py:232
 msgid "Übersicht: welche Rolle was darf"
 msgstr "Overview: what each role may do"
 
-#: portal/navigation.py:240
+#: portal/navigation.py:243
 msgid "Vollzugriff"
 msgstr "Full access"
 
@@ -1940,17 +1950,19 @@ msgstr ""
 msgid ""
 "Wie Lehrer:in, zusätzlich für alle Klassen der Mittelstufe: Schülerakten, "
 "Notenübersichten, Fehlzeiten, Gesundheitshinweise, Förderpläne und "
-"Nachteilsausgleiche (bearbeiten), Schullaufbahn und Versetzungsvermerke."
+"Nachteilsausgleiche (bearbeiten), Schullaufbahn und Versetzungsvermerke, "
+"Klassen und Lerngruppen der Stufe bilden und Schüler:innen zuordnen."
 msgstr ""
 "As teacher, plus for all middle school classes: student records, grade "
 "overviews, absences, health notes, support plans and access arrangements "
-"(edit), school career and promotion notes."
+"(edit), school career and promotion notes, forming classes and teaching "
+"groups of the stage and assigning students."
 
-#: portal/rollen.py:40
+#: portal/rollen.py:41
 msgid "Wie Mittelstufenkoordination, bezogen auf die Jahrgänge der Oberstufe."
 msgstr "As middle school coordination, for the upper school years."
 
-#: portal/rollen.py:41
+#: portal/rollen.py:42
 msgid ""
 "Alle Rechte, einschließlich Genehmigung von Nachteilsausgleichen, HR-Daten "
 "und Benutzerverwaltung."
@@ -1958,7 +1970,7 @@ msgstr ""
 "All permissions, including approval of access arrangements, HR data and user"
 " management."
 
-#: portal/rollen.py:42
+#: portal/rollen.py:43
 msgid ""
 "Schüler- und Elternstammdaten, Klassen und Gruppen, Fehlzeiten, AGs, "
 "Einwilligungen, Anhänge, Gesundheitsangaben. Noten, Unterrichtsverteilung, "
@@ -1968,7 +1980,7 @@ msgstr ""
 "consents, attachments, health information. Grades, teaching assignments, "
 "catalogues and staff read-only; no support plans, no HR data."
 
-#: portal/rollen.py:44
+#: portal/rollen.py:45
 msgid ""
 "Wie Sekretariat, zusätzlich Schuljahre, Zeitraster, Fächer, Notenskalen, "
 "Unterrichtsverteilung, eigene Datenfelder, Benutzerkonten und Rollen, "
@@ -1980,7 +1992,7 @@ msgstr ""
 "including HR data, contractors and finance. No grade entry, no support "
 "plans."
 
-#: portal/rollen.py:47
+#: portal/rollen.py:48
 msgid ""
 "Personal aller Bereiche mit Dienstverhältnis, Nachweisen, Abwesenheiten, "
 "Fortbildungen und Notfallkontakten. Keine Noten, keine Gesundheits- oder "
@@ -1990,7 +2002,7 @@ msgstr ""
 " and emergency contacts. No grades, no student health or learning support "
 "data."
 
-#: portal/rollen.py:49
+#: portal/rollen.py:50
 msgid ""
 "Rechnungsempfänger:innen und Elternstammdaten, Schülerstammdaten lesend, "
 "Dienstleister und Verträge, Anhänge der Kategorie Verwaltung. Keine Noten, "
@@ -2000,7 +2012,7 @@ msgstr ""
 "contractors and contracts, administrative attachments. No grades, no "
 "learning support or health data. A finance module will follow."
 
-#: portal/rollen.py:51
+#: portal/rollen.py:52
 msgid ""
 "Alle Förderpläne und Nachteilsausgleiche der Schule, Genehmigung, Kataloge, "
 "Schülerakten lesend."
@@ -2008,60 +2020,65 @@ msgstr ""
 "All support plans and access arrangements of the school, approval, "
 "catalogues, student records read-only."
 
-#: portal/rollen.py:52
+#: portal/rollen.py:53
 msgid ""
 "Vorbereitet für den späteren Stundenplan. Derzeit kein Zugang zum Portal."
 msgstr "Prepared for the future timetable. No portal access yet."
 
-#: portal/rollen.py:53
+#: portal/rollen.py:54
 msgid ""
 "Vorbereitet für die spätere Elternkommunikation. Derzeit kein Zugang zum "
 "Portal."
 msgstr "Prepared for future parent communication. No portal access yet."
 
-#: portal/rollen.py:124
+#: portal/rollen.py:126
 msgid "Noten und Zeugnisnoten"
 msgstr "Grades and report grades"
 
-#: portal/rollen.py:126 stammdaten/models.py:910 stammdaten/models.py:911
+#: portal/rollen.py:128 stammdaten/models.py:910 stammdaten/models.py:911
 #: templates/portal/schuelerakte.html:152
 msgid "Gesundheitsangaben"
 msgstr "Health information"
 
-#: portal/rollen.py:130
+#: portal/rollen.py:132
 msgid "Schüler- und Elternstammdaten"
 msgstr "Student and parent master data"
 
-#: portal/rollen.py:132
+#: portal/rollen.py:133 templates/portal/zuordnung.html:3
+#: templates/portal/zuordnung.html:8 templates/portal/zuordnung.html:9
+msgid "Klassen und Gruppen zuordnen"
+msgstr "Assign classes and groups"
+
+#: portal/rollen.py:135
 msgid "HR-Daten"
 msgstr "HR data"
 
-#: portal/rollen.py:133
+#: portal/rollen.py:136
 msgid "Finanzen / Rechnungsempfänger"
 msgstr "Finance / invoice recipients"
 
-#: portal/rollen.py:134
+#: portal/rollen.py:137
 msgid "Schuljahre, Fächer, Notenskalen"
 msgstr "School years, subjects, grading scales"
 
-#: portal/rollen.py:135
+#: portal/rollen.py:138
 msgid "Benutzerkonten und Rollen"
 msgstr "User accounts and roles"
 
-#: portal/rollen.py:159 stammdaten/models.py:1067
+#: portal/rollen.py:162 stammdaten/models.py:1067
 #: templates/portal/schuelerakte.html:161
 msgid "ja"
 msgstr "yes"
 
-#: portal/rollen.py:159
+#: portal/rollen.py:162
 msgid "lesen"
 msgstr "read"
 
-#: portal/rollen.py:159
+#: portal/rollen.py:162
 msgid "eigene"
 msgstr "own"
 
-#: portal/rollen.py:159
+#: portal/rollen.py:162
 msgid "Stufe"
 msgstr "stage"
 
@@ -2102,6 +2119,57 @@ msgstr "Middle school"
 #: portal/startseite.py:290
 msgid "Oberstufe"
 msgstr "Upper school"
+
+#: portal/zuordnung.py:144
+msgid "Nur Jahrgänge der eigenen Stufe."
+msgstr "Only years of your own stage."
+
+#: portal/zuordnung.py:150
+msgid "Eine Gruppe mit diesem Namen gibt es in diesem Schuljahr schon."
+msgstr "A group with this name already exists in this school year."
+
+#: portal/zuordnung.py:174
+msgid "Bitte zuerst ein Schuljahr anlegen."
+msgstr "Please create a school year first."
+
+#: portal/zuordnung.py:242
+#, python-format
+msgid "%(n)s hinzugefügt"
+msgstr "%(n)s added"
+
+#: portal/zuordnung.py:244
+#, python-format
+msgid "%(n)s waren schon Mitglied"
+msgstr "%(n)s were already members"
+
+#: portal/zuordnung.py:246
+#, python-format
+msgid "Klassenwechsel: %(liste)s"
+msgstr "Class change: %(liste)s"
+
+#: portal/zuordnung.py:252
+#, python-format
+msgid "%(n)s Mitgliedschaft(en) zum %(datum)s beendet."
+msgstr "%(n)s membership(s) ended as of %(datum)s."
+
+#: portal/zuordnung.py:259
+#, python-format
+msgid "%(n)s aus %(gruppe)s übernommen."
+msgstr "%(n)s taken over from %(gruppe)s."
+
+#: portal/zuordnung.py:266
+msgid "Rolle gespeichert."
+msgstr "Role saved."
+
+#: portal/zuordnung.py:281
+#, python-format
+msgid "Gruppe „%(name)s“ angelegt."
+msgstr "Group “%(name)s” created."
+
+#: portal/zuordnung.py:283
+#, python-format
+msgid "Gruppe nicht angelegt: %(fehler)s"
+msgstr "Group not created: %(fehler)s"
 
 #: stammdaten/admin.py:43 stammdaten/admin.py:44
 #: templates/portal/_menueband.html:7 templates/portal/base.html:6
@@ -2145,7 +2213,7 @@ msgid "Anschrift"
 msgstr "Address"
 
 #: stammdaten/admin.py:123 stammdaten/admin.py:147 stammdaten/models.py:592
-#: templates/portal/rollen.html:13
+#: templates/portal/rollen.html:13 templates/portal/zuordnung.html:97
 msgid "Rolle"
 msgstr "Role"
 
@@ -2482,7 +2550,7 @@ msgstr "People"
 msgid "Abgegangen"
 msgstr "Left"
 
-#: stammdaten/models.py:127
+#: stammdaten/models.py:127 templates/portal/zuordnung.html:140
 msgid "Bewerber:in"
 msgstr "Applicant"
 
@@ -2555,6 +2623,7 @@ msgid "Förderbedarf / Förderschwerpunkt"
 msgstr "Special educational needs / focus"
 
 #: stammdaten/models.py:151 templates/portal/schuelerakte.html:36
+#: templates/portal/zuordnung.html:121
 msgid "Religion / Ethik"
 msgstr "Religious education / Ethics"
 
@@ -3053,6 +3122,7 @@ msgid "wie im Stundenplan"
 msgstr "as in the timetable"
 
 #: stammdaten/models.py:550 stammdaten/models.py:792
+#: templates/portal/zuordnung.html:120
 msgid "Jahrgang"
 msgstr "Year"
 
@@ -3593,7 +3663,7 @@ msgid "Bitte Ja oder Nein wählen."
 msgstr "Please choose Yes or No."
 
 #: stammdaten/zusatzfelder.py:90 stammdaten/zusatzfelder.py:139
-#: templates/portal/schuelerakte.html:142
+#: templates/portal/schuelerakte.html:142 templates/portal/zuordnung.html:43
 msgid "Weitere Angaben"
 msgstr "Further information"
 
@@ -3865,7 +3935,7 @@ msgstr "Newest first"
 msgid "Älteste zuerst"
 msgstr "Oldest first"
 
-#: templates/portal/_anhaenge.html:17
+#: templates/portal/_anhaenge.html:17 templates/portal/zuordnung.html:15
 msgid "Anzeigen"
 msgstr "Show"
 
@@ -3990,7 +4060,7 @@ msgstr "Announcements"
 msgid "sichtbar bis %(datum)s"
 msgstr "visible until %(datum)s"
 
-#: templates/portal/_notizen.html:13
+#: templates/portal/_notizen.html:13 templates/portal/zuordnung.html:86
 msgid "Entfernen"
 msgstr "Remove"
 
@@ -4097,44 +4167,48 @@ msgstr ""
 "version)"
 
 #: templates/portal/klassenliste.html:7
+msgid "Mitglieder zuordnen"
+msgstr "Assign members"
+
+#: templates/portal/klassenliste.html:8
 #, python-format
 msgid "Klassenleitung %(leitung)s"
 msgstr "Class teacher %(leitung)s"
 
-#: templates/portal/klassenliste.html:7 templates/portal/start.html:23
+#: templates/portal/klassenliste.html:8 templates/portal/start.html:23
 #, python-format
 msgid "%(n)s Schüler:in"
 msgid_plural "%(n)s Schüler:innen"
 msgstr[0] "%(n)s student"
 msgstr[1] "%(n)s students"
 
-#: templates/portal/klassenliste.html:10
+#: templates/portal/klassenliste.html:11
 msgid "Nr."
 msgstr "No."
 
-#: templates/portal/klassenliste.html:10
+#: templates/portal/klassenliste.html:11
 msgid "davon unentsch."
 msgstr "of which unexc."
 
-#: templates/portal/klassenliste.html:10
+#: templates/portal/klassenliste.html:11
 #: templates/portal/schuelerakte.html:108
 msgid "Verspätungen"
 msgstr "Late arrivals"
 
-#: templates/portal/klassenliste.html:10
+#: templates/portal/klassenliste.html:11
 msgid "Kontakte"
 msgstr "Contacts"
 
-#: templates/portal/klassenliste.html:14
+#: templates/portal/klassenliste.html:15
 #: templates/portal/notenuebersicht.html:34 templates/portal/stufe.html:23
 msgid "NTA"
 msgstr "AA"
 
-#: templates/portal/klassenliste.html:14
+#: templates/portal/klassenliste.html:15
 msgid "aktiver Förderplan"
 msgstr "active support plan"
 
-#: templates/portal/klassenliste.html:14
+#: templates/portal/klassenliste.html:15
 msgid "FP"
 msgstr "SP"
 
@@ -4523,6 +4597,7 @@ msgid "Jahrgänge %(von)s bis %(bis)s · Schuljahr %(sj)s"
 msgstr "Years %(von)s to %(bis)s · school year %(sj)s"
 
 #: templates/portal/stufe.html:10 templates/portal/stufe.html:18
+#: templates/portal/zuordnung.html:115
 msgid "Klassen"
 msgstr "Classes"
 
@@ -4581,3 +4656,140 @@ msgstr "No matches."
 #: templates/portal/suche.html:37
 msgid "von"
 msgstr "of"
+
+#: templates/portal/zuordnung.html:13
+msgid "aktuell"
+msgstr "current"
+
+#: templates/portal/zuordnung.html:21
+msgid "Gruppen"
+msgstr "Groups"
+
+#: templates/portal/zuordnung.html:22
+msgid "Gruppe suchen …"
+msgstr "Search groups …"
+
+#: templates/portal/zuordnung.html:22
+msgid "Gruppe suchen"
+msgstr "Search groups"
+
+#: templates/portal/zuordnung.html:32
+msgid "Keine Gruppen in diesem Schuljahr."
+msgstr "No groups in this school year."
+
+#: templates/portal/zuordnung.html:36
+msgid "Neue Gruppe"
+msgstr "New group"
+
+#: templates/portal/zuordnung.html:47
+msgid "Gruppe anlegen"
+msgstr "Create group"
+
+#: templates/portal/zuordnung.html:55
+msgid "Mitglieder"
+msgstr "Members"
+
+#: templates/portal/zuordnung.html:59
+#, python-format
+msgid "Jahrgang %(jg)s"
+msgstr "Year %(jg)s"
+
+#: templates/portal/zuordnung.html:62
+msgid "Klassenliste"
+msgstr "Class list"
+
+#: templates/portal/zuordnung.html:63
+msgid "Gruppe bearbeiten"
+msgstr "Edit group"
+
+#: templates/portal/zuordnung.html:67
+msgid "Stichtag für Ein- und Austritte"
+msgstr "Effective date for joining and leaving"
+
+#: templates/portal/zuordnung.html:74
+#, python-format
+msgid "%(n)s Schüler:innen aus %(name)s (Vorjahr) sind noch nicht zugeordnet."
+msgstr "%(n)s students from %(name)s (previous year) are not yet assigned."
+
+#: templates/portal/zuordnung.html:75
+msgid "Alle übernehmen"
+msgstr "Take over all"
+
+#: templates/portal/zuordnung.html:84
+#, python-format
+msgid "%(n)s Mitglied"
+msgid_plural "%(n)s Mitglieder"
+msgstr[0] "%(n)s member"
+msgstr[1] "%(n)s members"
+
+#: templates/portal/zuordnung.html:93
+#, python-format
+msgid "seit %(datum)s"
+msgstr "since %(datum)s"
+
+#: templates/portal/zuordnung.html:98
+msgid "Rolle speichern"
+msgstr "Save role"
+
+#: templates/portal/zuordnung.html:103
+msgid ""
+"Noch keine Mitglieder. Rechts auswählen und hinzufügen – oder hierher "
+"ziehen."
+msgstr "No members yet. Select on the right and add them – or drag them here."
+
+#: templates/portal/zuordnung.html:109 templates/portal/zuordnung.html:112
+msgid "Schüler:innen hinzufügen"
+msgstr "Add students"
+
+#: templates/portal/zuordnung.html:114
+msgid "Name suchen … (Taste /)"
+msgstr "Search name … (key /)"
+
+#: templates/portal/zuordnung.html:114
+msgid "Name suchen"
+msgstr "Search name"
+
+#: templates/portal/zuordnung.html:117
+msgid "noch keiner Klasse zugeordnet"
+msgstr "not yet assigned to a class"
+
+#: templates/portal/zuordnung.html:117 templates/portal/zuordnung.html:140
+msgid "ohne Klasse"
+msgstr "no class"
+
+#: templates/portal/zuordnung.html:120
+msgid "alle Jahrgänge"
+msgstr "all years"
+
+#: templates/portal/zuordnung.html:120
+#, python-format
+msgid "Jahrgang %(j)s"
+msgstr "Year %(j)s"
+
+#: templates/portal/zuordnung.html:121
+msgid "Religion / Ethik: alle"
+msgstr "Religion / ethics: all"
+
+#: templates/portal/zuordnung.html:122
+msgid "Mitglieder ausblenden"
+msgstr "Hide members"
+
+#: templates/portal/zuordnung.html:130
+msgid "sichtbar"
+msgstr "visible"
+
+#: templates/portal/zuordnung.html:131
+msgid "Hinzufügen"
+msgstr "Add"
+
+#: templates/portal/zuordnung.html:140
+msgid "bereits Mitglied"
+msgstr "already a member"
+
+#: templates/portal/zuordnung.html:143
+msgid "Keine Treffer – Filter anpassen."
+msgstr "No matches – adjust the filters."
+
+#: templates/portal/zuordnung.html:147
+msgid "Bitte links eine Gruppe wählen oder eine neue Gruppe anlegen."
+msgstr "Please choose a group on the left or create a new one."

@@ -1,4 +1,4 @@
-# Schulverwaltung (Version 0.4.2.3, Entwicklungsstand)
+# Schulverwaltung (Version 0.4.2.4, Entwicklungsstand)
 
 Open-Source-Schulverwaltung für die DSN: Stammdaten, Klassen und Lerngruppen,
 Noten mit Gewichtung, Fehlzeiten, Nachmittagsprogramm, Anhänge zur Schülerakte,
@@ -38,6 +38,31 @@ http://localhost:8000. Die Zugangsdaten stehen in der Datei `.env`
 | `finanzen` | Finanzen | `DEMO_PASSWORT` in `.env` |
 | `foerderung` | Förderkoordination (zugleich Klassenleitung 9b) | `DEMO_PASSWORT` in `.env` |
 | `schueler`, `eltern` | vorbereitet, derzeit **kein** Portalzugang | `DEMO_PASSWORT` in `.env` |
+
+## Klassen und Gruppen zuordnen
+
+**Menüband › Schüler:innen › Zuordnen** (oder in der Klassenliste „Mitglieder zuordnen“) öffnet eine
+Arbeitsseite mit drei Spalten:
+
+1. **Gruppen** des gewählten Schuljahres (Stammklassen, Lerngruppen, AGs) mit Suchfeld und
+   Mitgliederzahl; darunter „Neue Gruppe“ (Name, Typ, Jahrgang, Leitung, Vorjahresgruppe).
+2. **Mitglieder** der gewählten Gruppe: mehrere auf einmal zum Stichtag entfernen; Rolle
+   (z. B. Klassensprecher:in) direkt in der Zeile eintragen und mit ✓ speichern.
+3. **Schüler:innen hinzufügen:** Sofortfilter nach Name (Taste `/`), Klasse(n), Jahrgang,
+   Religion/Ethik, „ohne Klasse“; Häkchen, Umschalt-Klick für Bereiche, „alle sichtbaren“;
+   dann „Hinzufügen“ – oder die Auswahl in die Mitgliederliste ziehen.
+
+- **Stichtag:** gilt für Ein- und Austritte (Standard: heute, innerhalb des Schuljahres).
+  Mitgliedschaften werden nicht gelöscht, sondern zum Vortag beendet – die Historie bleibt.
+  Nur wer am selben Tag wieder entfernt wird (Versehen), wird gelöscht.
+- **Klassenwechsel:** Wer einer Stammklasse zugeordnet wird und schon in einer anderen ist,
+  wechselt automatisch.
+- **Neues Schuljahr:** Ist bei einer Klasse die Vorjahresklasse eingetragen, übernimmt
+  „Alle übernehmen“ deren Schüler:innen mit einem Klick.
+- **Lerngruppen** (z. B. Ethik 9): Der Filter ist auf die Ursprungs-Stammklassen und – wenn der
+  Name es nahelegt – auf Ethik bzw. Religion voreingestellt.
+- **Rechte:** Sekretariat, Verwaltungsleitung, Schulleitung alle Gruppen; Stufenkoordination die
+  Gruppen ihrer Stufe (AGs ohne Jahrgang bleiben bei der Verwaltung).
 
 ## Rollen und Rechte
 

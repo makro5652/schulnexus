@@ -186,7 +186,10 @@ def klassenliste(request, pk):
             "nta_text": nta_kurztext(nta.get(s.pk, [])),
             "foerderplan": s.pk in aktive_plaene,
         })
-    return render(request, "portal/klassenliste.html", {"gruppe": gruppe, "zeilen": zeilen})
+    from .zuordnung import darf_gruppe_bearbeiten
+
+    return render(request, "portal/klassenliste.html", {"gruppe": gruppe, "zeilen": zeilen,
+                                                         "darf_zuordnen": darf_gruppe_bearbeiten(request.user, gruppe)})
 
 
 @login_required

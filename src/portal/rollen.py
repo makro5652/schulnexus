@@ -36,7 +36,8 @@ BESCHREIBUNG = {
     LEHRER: _("Eigener Unterricht mit Leistungsnachweisen, Noten und Zeugnisnoten. Als Klassenleitung: Schülerakte, "
               "Fehlzeiten, Anhänge und Förderung der eigenen Klasse. Nachteilsausgleiche der eigenen Schüler:innen lesen."),
     MITTELSTUFE: _("Wie Lehrer:in, zusätzlich für alle Klassen der Mittelstufe: Schülerakten, Notenübersichten, Fehlzeiten, "
-                   "Gesundheitshinweise, Förderpläne und Nachteilsausgleiche (bearbeiten), Schullaufbahn und Versetzungsvermerke."),
+                   "Gesundheitshinweise, Förderpläne und Nachteilsausgleiche (bearbeiten), Schullaufbahn und Versetzungsvermerke, "
+                   "Klassen und Lerngruppen der Stufe bilden und Schüler:innen zuordnen."),
     OBERSTUFE: _("Wie Mittelstufenkoordination, bezogen auf die Jahrgänge der Oberstufe."),
     SCHULLEITUNG: _("Alle Rechte, einschließlich Genehmigung von Nachteilsausgleichen, HR-Daten und Benutzerverwaltung."),
     SEKRETARIAT: _("Schüler- und Elternstammdaten, Klassen und Gruppen, Fehlzeiten, AGs, Einwilligungen, Anhänge, "
@@ -78,7 +79,8 @@ _LEHRER = (
     | r(("add", "view"), "dokument")
 )
 # Gesundheitshinweise der eigenen Stufe: zeilenweise über view_gesundheit_klasse (siehe portal/rechte.py)
-_STUFE = _LEHRER | r(("add", "change", "view"), "laufbahnabschnitt", "abschluss") | {"view_gesundheit_klasse"}
+_STUFE = (_LEHRER | r(("add", "change", "view"), "laufbahnabschnitt", "abschluss", "gruppe") | r(ALLE, "mitgliedschaft")
+          | {"view_gesundheit_klasse"})
 
 _SCHUELERDATEN = r(ALLE, "person", "schuelerprofil", "elternprofil", "beziehung", "gruppe", "mitgliedschaft", "einwilligung",
                    "dokument", "laufbahnabschnitt", "abschluss", "vorherigeschule", "sprachenfolge", "gesundheitsangaben",
@@ -128,6 +130,7 @@ BEREICHE = [
     ("foerderung", _("Förderpläne")),
     ("nta", _("Nachteilsausgleiche")),
     ("stammdaten", _("Schüler- und Elternstammdaten")),
+    ("zuordnung", _("Klassen und Gruppen zuordnen")),
     ("personal", _("Personal")),
     ("hr", _("HR-Daten")),
     ("finanzen", _("Finanzen / Rechnungsempfänger")),
@@ -136,20 +139,20 @@ BEREICHE = [
 ]
 
 MATRIX = {
-    LEHRER: {"noten": "eigene", "akten": "eigene", "gesundheit": "", "fehlzeiten": "eigene", "foerderung": "eigene",
+    LEHRER: {"zuordnung": "", "noten": "eigene", "akten": "eigene", "gesundheit": "", "fehlzeiten": "eigene", "foerderung": "eigene",
              "nta": "eigene", "stammdaten": "lesen", "personal": "", "hr": "", "finanzen": "", "einstellungen": "lesen", "benutzer": ""},
-    MITTELSTUFE: {"noten": "stufe", "akten": "stufe", "gesundheit": "stufe", "fehlzeiten": "stufe", "foerderung": "stufe",
+    MITTELSTUFE: {"zuordnung": "stufe", "noten": "stufe", "akten": "stufe", "gesundheit": "stufe", "fehlzeiten": "stufe", "foerderung": "stufe",
                   "nta": "stufe", "stammdaten": "lesen", "personal": "", "hr": "", "finanzen": "", "einstellungen": "lesen", "benutzer": ""},
     SCHULLEITUNG: {k: "ja" for k, _n in BEREICHE},
-    SEKRETARIAT: {"noten": "lesen", "akten": "ja", "gesundheit": "ja", "fehlzeiten": "ja", "foerderung": "", "nta": "lesen",
+    SEKRETARIAT: {"zuordnung": "ja", "noten": "lesen", "akten": "ja", "gesundheit": "ja", "fehlzeiten": "ja", "foerderung": "", "nta": "lesen",
                   "stammdaten": "ja", "personal": "lesen", "hr": "", "finanzen": "", "einstellungen": "lesen", "benutzer": ""},
-    VERWALTUNGSLEITUNG: {"noten": "lesen", "akten": "ja", "gesundheit": "ja", "fehlzeiten": "ja", "foerderung": "", "nta": "lesen",
+    VERWALTUNGSLEITUNG: {"zuordnung": "ja", "noten": "lesen", "akten": "ja", "gesundheit": "ja", "fehlzeiten": "ja", "foerderung": "", "nta": "lesen",
                          "stammdaten": "ja", "personal": "ja", "hr": "ja", "finanzen": "ja", "einstellungen": "ja", "benutzer": "ja"},
-    HR: {"noten": "", "akten": "", "gesundheit": "", "fehlzeiten": "", "foerderung": "", "nta": "", "stammdaten": "",
+    HR: {"zuordnung": "", "noten": "", "akten": "", "gesundheit": "", "fehlzeiten": "", "foerderung": "", "nta": "", "stammdaten": "",
          "personal": "ja", "hr": "ja", "finanzen": "", "einstellungen": "", "benutzer": ""},
-    FINANZEN: {"noten": "", "akten": "", "gesundheit": "", "fehlzeiten": "", "foerderung": "", "nta": "", "stammdaten": "lesen",
+    FINANZEN: {"zuordnung": "", "noten": "", "akten": "", "gesundheit": "", "fehlzeiten": "", "foerderung": "", "nta": "", "stammdaten": "lesen",
                "personal": "lesen", "hr": "", "finanzen": "ja", "einstellungen": "", "benutzer": ""},
-    FOERDERKOORDINATION: {"noten": "", "akten": "lesen", "gesundheit": "", "fehlzeiten": "", "foerderung": "ja", "nta": "ja",
+    FOERDERKOORDINATION: {"zuordnung": "", "noten": "", "akten": "lesen", "gesundheit": "", "fehlzeiten": "", "foerderung": "ja", "nta": "ja",
                           "stammdaten": "lesen", "personal": "", "hr": "", "finanzen": "", "einstellungen": "", "benutzer": ""},
     SCHUELER: {k: "" for k, _n in BEREICHE},
     ELTERN: {k: "" for k, _n in BEREICHE},
