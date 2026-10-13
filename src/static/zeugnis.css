@@ -1,0 +1,76 @@
+/* Druckansicht der Zeugnisse nach dem Muster der Sek I-PO (Anlage 11), Format DIN A4 */
+@page { size: A4; margin: 0; }
+:root { --text: #111; --linie: #777; --kasten: #ececec; }
+* { box-sizing: border-box; }
+body { margin: 0; background: #d9dcde; color: var(--text); font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; font-size: 11pt; line-height: 1.35; }
+.werkzeug { position: sticky; top: 0; z-index: 5; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; padding: 0.6rem 1rem; background: #1f5f5b; color: #fff; font-size: 0.9rem; }
+.werkzeug a { color: #fff; }
+.werkzeug button { font: inherit; font-weight: 600; padding: 0.35rem 0.9rem; border: 0; border-radius: 6px; background: #fff; color: #1f5f5b; cursor: pointer; }
+.werkzeug small { opacity: 0.85; }
+.blatt { position: relative; width: 210mm; min-height: 297mm; margin: 1.2rem auto; padding: 18mm 20mm 16mm; background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,.18); overflow: hidden; display: flex; flex-direction: column; }
+.wasserzeichen { position: absolute; top: 42%; left: 50%; transform: translate(-50%, -50%) rotate(-35deg); font-size: 88pt; font-weight: 700; color: rgba(0,0,0,.07); letter-spacing: 0.1em; pointer-events: none; white-space: nowrap; }
+.uebersetzung { margin: 0 0 4mm; padding: 2mm 3mm; border: 1px solid var(--linie); font-size: 9pt; text-align: center; }
+.schule { text-align: center; font-size: 13pt; margin: 0; }
+h1 { text-align: center; font-size: 22pt; letter-spacing: 0.04em; margin: 4mm 0 6mm; }
+h2 { text-align: center; font-size: 15pt; margin: 4mm 0 2mm; }
+.unterzeile { text-align: center; margin: 0 0 6mm; font-size: 10pt; }
+.zeile { display: flex; justify-content: space-between; gap: 8mm; margin: 2.5mm 0; }
+.zeile > span { display: flex; align-items: baseline; gap: 2mm; flex: 1; }
+.zeile > span:last-child { justify-content: flex-end; }
+.feld { display: inline-block; min-width: 38mm; border-bottom: 1px dotted var(--linie); padding: 0 1mm; text-align: center; }
+.feld.kurz { min-width: 16mm; }
+.name { text-align: center; font-size: 15pt; font-weight: 700; margin: 5mm 0 1mm; padding-bottom: 1.5mm; border-bottom: 1px dotted var(--linie); }
+.bildungsgang { text-align: center; margin: 2mm 0 4mm; font-weight: 600; }
+table { border-collapse: collapse; width: 100%; }
+.noten { margin: 3mm 0 4mm; }
+.noten th { text-align: left; font-weight: 700; padding: 1mm 1mm 1.5mm; }
+.noten td { padding: 1.2mm 1mm; vertical-align: middle; }
+.noten .note { width: 33mm; text-align: center; }
+.noten .luecke { width: 8mm; }
+.noten small { font-size: 8.5pt; }
+.kasten { display: inline-block; min-width: 30mm; padding: 0.6mm 1mm; background: var(--kasten); border-bottom: 1px dotted var(--linie); text-align: center; }
+.bemerkungen p { margin: 2mm 0 1mm; }
+.linien { min-height: 16mm; line-height: 8mm; background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(8mm - 1px), var(--linie) calc(8mm - 1px), var(--linie) 8mm); white-space: normal; }
+.fehltage { margin: 3mm 0; }
+.ger-text { font-size: 9.5pt; margin: 4mm 0 1.5mm; text-align: justify; }
+.ger { font-size: 9.5pt; border: 1.5px solid #000; }
+.ger th, .ger td { border: 1px solid #555; padding: 1.2mm 1.5mm; }
+.ger th { font-weight: 400; text-align: center; }
+.ger td:not(:first-child) { text-align: center; width: 22mm; }
+.ger td.gekreuzt { background: linear-gradient(to top right, transparent calc(50% - 0.5px), #555 50%, transparent calc(50% + 0.5px)), linear-gradient(to bottom right, transparent calc(50% - 0.5px), #555 50%, transparent calc(50% + 0.5px)); }
+.vermerk { margin: 4mm 0 2mm; }
+.ortdatum { margin: auto 0 0; padding-top: 6mm; }
+.unterschriften { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8mm; margin-top: 14mm; font-size: 9pt; text-align: center; }
+.unterschriften.zwei { grid-template-columns: repeat(2, 1fr); }
+.unterschriften div { border-top: 1px solid #000; padding-top: 1.5mm; }
+.fussnote { margin: 6mm 0 0; padding-top: 1.5mm; border-top: 1px solid #999; font-size: 7.5pt; color: #333; }
+.beiblatt .kommentar { margin: 4mm 0; text-align: justify; line-height: 1.5; }
+.leer { text-align: center; padding: 3rem; }
+@media print {
+  body { background: #fff; }
+  .werkzeug { display: none; }
+  .blatt { margin: 0; box-shadow: none; page-break-after: always; break-after: page; height: 297mm; }
+  .blatt:last-of-type { page-break-after: auto; break-after: auto; }
+  .kasten { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+/* Protokoll und Briefe */
+.protokoll h3 { font-size: 11pt; margin: 5mm 0 2mm; }
+.protokoll table { font-size: 9pt; margin-bottom: 2mm; }
+.protokoll th, .protokoll td { border: 1px solid #999; padding: 1mm 1.5mm; text-align: left; vertical-align: top; }
+.kopfdaten th { width: 25mm; background: #f2f2f2; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.matrix td, .matrix th { text-align: center !important; }
+.matrix td:first-child { text-align: left !important; white-space: nowrap; }
+.matrix td.kern { text-decoration: underline; font-weight: 700; }
+.beschluesse td:first-child { white-space: nowrap; }
+.protokoll .unterschriften { margin-top: 18mm; }
+.brief { font-size: 11pt; }
+.brief .schule { text-align: right; }
+.brief .briefdatum { text-align: right; margin: 2mm 0 10mm; }
+.brief h2.links { text-align: left; margin: 10mm 0 6mm; font-size: 13pt; }
+.brief .faecher { margin: 3mm 0 3mm 8mm; }
+.brief .klein { font-size: 9pt; color: #333; }
+.brief .unterschriften { margin-top: 16mm; }
+.ruecklauf { margin-top: auto; padding-top: 8mm; font-size: 10pt; }
+.ruecklauf .unterschriften { margin-top: 12mm; }
+.abtrennen { border-top: 1px dashed #000; padding-top: 1.5mm; font-size: 8.5pt; text-align: center; color: #333; }

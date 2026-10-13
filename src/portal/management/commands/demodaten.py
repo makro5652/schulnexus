@@ -5,7 +5,7 @@ Niemals auf einem System mit echten Schülerdaten ausführen.
 import os
 import random
 from datetime import date, time, timedelta
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 
 from django.contrib.auth.models import Group, User
 from django.core.management import call_command
@@ -138,7 +138,12 @@ class Command(BaseCommand):
                 self.startseite_anlegen()
                 self.stdout.write("Beispiele für Notizen und Geburtstage ergänzt.")
             from aufnahme.models import Anmeldung
+            from zeugnisse.models import Zeugnis
 
+            if not Zeugnis.objects.exists():
+                call_command("grundeinrichtung", stdout=self.stdout)
+                self.zeugnisse_anlegen()
+                self.stdout.write("Beispiele für Zeugnisse, Kommentare und Konferenzen ergänzt.")
             if not Anmeldung.objects.exists():
                 call_command("grundeinrichtung", stdout=self.stdout)
                 self.aufnahme_anlegen()
@@ -498,6 +503,7 @@ class Command(BaseCommand):
         self.startseite_anlegen()
         self.rollen_anlegen(pw)
         self.aufnahme_anlegen()
+        self.zeugnisse_anlegen()
 
         self.stdout.write(self.style.SUCCESS(
             f"Demo-Daten angelegt: {len(alle)} Schüler:innen, {Person.objects.count()} Personen, "
@@ -863,6 +869,137 @@ class Command(BaseCommand):
             Anmeldung.objects.filter(pk=a.pk).update(nummer=f"tmp-{a.pk}")
         for i, a in enumerate(alle, start=1):
             Anmeldung.objects.filter(pk=a.pk).update(nummer=f"A{a.eingang.year}-{i:03d}")
+
+
+    # ------------------------------------------------------------ Zeugnisse, Kommentare, Konferenz (ab 0.4.2.7)
+    def zeugnisse_anlegen(self):
+        from noten.berechnung import vorschlagsnote
+        from noten.models import Notenskala, Unterricht, Zeugnisnote
+        from stammdaten.models import Personalbereich, Sprachenfolge
+        from stammdaten.zeugnisfaecher import faecher_einordnen
+        from zeugnisse.ansichten import konferenz_anlegen, zeugnis_fuer
+        from zeugnisse.models import Abzeichnung, Anmerkung, Zeugnis
+
+        rng = random.Random(7)
+        sj = Schuljahr.objects.get(name="2026/27")
+        hj1 = sj.abschnitte.get(nummer=1)
+        kl9a = Gruppe.objects.get(schuljahr=sj, name="9a")
+        sek1 = Notenskala.objects.get(name__startswith="Sek I –")
+        ganz = {int(st.wert): st for st in sek1.stufen.all() if st.wert == st.wert.to_integral_value()}
+        lk = Personalbereich.objects.get(kuerzel="LK")
+
+        # Weitere Fächer und zwei weitere Lehrkräfte, damit das Zeugnis vollständig wirkt
+        weitere = [("G", "Geschichte", "History"), ("EK", "Geographie", "Geography"), ("MU", "Musik", "Music"),
+                   ("KU", "Kunst", "Art"), ("SPO", "Sport", "Physical education")]
+        for i, (k, n, en) in enumerate(weitere):
+            Fach.objects.get_or_create(kuerzel=k, defaults={"name": n, "name_en": en, "reihenfolge": 110 + i * 10})
+        faecher_einordnen(Fach.objects.all())
+        fach = {f.kuerzel: f for f in Fach.objects.all()}
+
+        def lehrkraft(vorname, nachname, kuerzel, stelle, anrede):
+            pp = Personalprofil.objects.filter(kuerzel=kuerzel).first()
+            if pp:
+                return pp
+            p = Person.objects.create(anrede=anrede, vorname=vorname, nachname=nachname, ort="Nairobi",
+                                      email=f"{vorname.lower()}.{nachname.lower()}@privat.example")
+            return Personalprofil.objects.create(person=p, bereich=lk, stellenbezeichnung=stelle, kuerzel=kuerzel,
+                                                 anstellungsart="ortskraft", dienstbeginn=date(2021, 8, 1),
+                                                 dienst_email=f"{kuerzel.lower()}@schule.example")
+
+        fon = lehrkraft("Claire", "Fontaine", "FON", "Lehrkraft Französisch/Kunst/Musik", "Frau")
+        oti = lehrkraft("Daniel", "Otieno", "OTI", "Lehrkraft Geschichte/Geographie/Sport/Physik", "Herr")
+        oko = Personalprofil.objects.get(kuerzel="OKO")
+
+        schueler = list(kl9a.aktuelle_mitglieder().order_by("person__nachname", "person__vorname"))
+        # 2. Fremdsprache als Lerngruppen nach Sprachenfolge
+        fs2 = {}
+        for s in schueler:
+            sf = Sprachenfolge.objects.filter(schueler=s, position=2).select_related("fach").first()
+            if sf:
+                fs2.setdefault(sf.fach.kuerzel, []).append(s)
+        neue_unterrichte = []
+        for kuerzel, lehrer in (("E", oko), ("PH", oti), ("G", oti), ("EK", oti), ("MU", fon), ("KU", fon), ("SPO", oti)):
+            u, _ = Unterricht.objects.get_or_create(abschnitt=hj1, gruppe=kl9a, fach=fach[kuerzel],
+                                                    defaults={"lehrkraft": lehrer, "skala": sek1})
+            neue_unterrichte.append(u)
+        for kuerzel, mitglieder in fs2.items():
+            g, _ = Gruppe.objects.get_or_create(schuljahr=sj, name=f"{fach[kuerzel].name} 9", defaults={
+                "typ": Gruppe.LERNGRUPPE, "jahrgang": 9, "leitung": fon if kuerzel == "F" else oko})
+            for s in mitglieder:
+                Mitgliedschaft.objects.get_or_create(gruppe=g, schueler=s, defaults={"von": sj.beginn})
+            u, _ = Unterricht.objects.get_or_create(abschnitt=hj1, gruppe=g, fach=fach[kuerzel],
+                                                    defaults={"lehrkraft": fon if kuerzel == "F" else oko, "skala": sek1})
+            neue_unterrichte.append(u)
+
+        # Zeugnisnoten: aus dem Vorschlag (wo Noten vorliegen), sonst plausible Werte
+        besonders = {2: {"M": 5}, 4: {"CH": 5, "PH": 5}, 5: {"E": 6}}
+        for u in Unterricht.objects.filter(abschnitt=hj1).select_related("fach", "gruppe"):
+            if u.gruppe.schuljahr_id != sj.pk:
+                continue
+            for s in u.schueler():
+                v = vorschlagsnote(u, s)
+                if v.schnitt is not None:
+                    note = int(v.schnitt.quantize(Decimal(1), rounding=ROUND_HALF_UP))
+                else:
+                    note = rng.choices([1, 2, 3, 4], weights=[2, 4, 4, 2])[0]
+                begruendung = ""
+                if s in schueler:
+                    erzwungen = besonders.get(schueler.index(s), {}).get(u.fach.kuerzel)
+                    if erzwungen:
+                        note, begruendung = erzwungen, "Deutlicher Leistungsabfall seit den Herbstferien; Gespräch mit den Eltern geführt."
+                    if schueler.index(s) == 2 and u.fach.kuerzel == "D":
+                        note = min(note, 3)
+                Zeugnisnote.objects.update_or_create(unterricht=u, schueler=s, defaults={
+                    "stufe": ganz[min(max(note, 1), 6)], "vorschlag": v.schnitt, "begruendung": begruendung})
+        # Eine Lücke, damit „fehlt“ sichtbar wird: Kunst 9a für die letzte Schülerin / den letzten Schüler
+        Zeugnisnote.objects.filter(unterricht__gruppe=kl9a, unterricht__fach=fach["KU"], schueler=schueler[-1]).delete()
+
+        # Kommentare der Klassenleitung (Martin Krause) und Abzeichnungen
+        texte = [
+            "{name} arbeitet im Unterricht konzentriert und zuverlässig mit. Besonders in den naturwissenschaftlichen Fächern "
+            "bringt {pron} eigene Ideen ein und unterstützt Mitschülerinnen und Mitschüler bei Gruppenarbeiten. Für das zweite "
+            "Halbjahr wünschen wir uns, dass {pron} sich auch im Fach Deutsch häufiger mündlich beteiligt.",
+            "{name} hat sich in der Klassengemeinschaft gut eingebracht und übernimmt Verantwortung, etwa als Klassensprecher:in-Vertretung. "
+            "Die Hausaufgaben sind nicht immer vollständig; eine verlässlichere Arbeitsorganisation würde die guten Ansätze stärken.",
+            "{name} zeigt großes Interesse an fächerübergreifenden Fragestellungen und präsentiert Arbeitsergebnisse sicher und anschaulich. "
+            "Im schriftlichen Bereich gelingt es noch nicht durchgängig, das vorhandene Wissen strukturiert darzustellen.",
+            "{name} hat im ersten Halbjahr deutliche Fortschritte in der Selbstständigkeit gemacht. Wir ermutigen {pron2}, Unterstützungsangebote "
+            "wie die Hausaufgabenbetreuung weiterhin zu nutzen, um die Leistungen in den Hauptfächern zu stabilisieren.",
+        ]
+        kl_user = User.objects.get(username="lehrkraft")
+        kro = kl9a.leitung
+        jetzt = timezone.now()
+        for i, s in enumerate(schueler):
+            z = zeugnis_fuer(s, hj1, kl9a)
+            z.bemerkungen = rng.choice(["Teilnahme an der AG Robotik.", "Mitarbeit in der Schülervertretung.",
+                                        "Teilnahme am Mathematikwettbewerb „Känguru“.", ""])
+            if i == len(schueler) - 1:                     # letzter ohne Kommentar
+                z.save()
+                continue
+            pron, pron2 = ("sie", "sie") if s.person.geschlecht == "w" else ("er", "ihn")
+            z.kommentar_setzen(texte[i % len(texte)].format(name=s.person.rufname or s.person.vorname, pron=pron, pron2=pron2), kl_user)
+            z.kommentar_geaendert = jetzt - timedelta(days=6)
+            z.save()
+            lehrer = list(Personalprofil.objects.filter(pk__in={u.lehrkraft_id for u in Unterricht.objects.filter(
+                abschnitt=hj1, gruppe__mitgliedschaften__schueler=s)}).distinct())
+            for p in lehrer:
+                if p == kro or rng.random() < 0.55:
+                    Abzeichnung.objects.create(zeugnis=z, lehrkraft=p, am=jetzt - timedelta(days=rng.randint(1, 5)), stand=z.kommentar_geaendert)
+            if i == 1:                                     # Text nach Abzeichnungen geändert → veraltet
+                z.kommentar += " Die Teilnahme am Vorlesewettbewerb verdient besondere Anerkennung."
+                z.kommentar_geaendert = jetzt - timedelta(hours=3)
+                z.save()
+        z0 = Zeugnis.objects.get(schueler=schueler[0], abschnitt=hj1)
+        mue_user = User.objects.filter(username="mittelstufe").first()
+        Anmerkung.objects.create(zeugnis=z0, autor=mue_user or kl_user,
+                                 text="Bitte ergänzen: Die sehr gute Mitarbeit im Mathematik-Förderkurs sollte erwähnt werden.")
+
+        k = konferenz_anlegen(kl9a, hj1, kl_user)
+        k.datum = hj1.ende - timedelta(days=7)
+        k.ort = "Lehrerzimmer"
+        k.vorsitz = Personalprofil.objects.filter(kuerzel="MUE").first()
+        k.save()
+        return k
 
 
 def beispiel_pdf(titel, name):

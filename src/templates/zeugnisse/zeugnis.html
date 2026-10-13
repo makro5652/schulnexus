@@ -1,0 +1,134 @@
+{% extends "portal/base.html" %}
+{% load i18n static formate %}
+{% block title %}{{ z.get_art_display }} · {{ z.schueler.person.anzeigename }}{% endblock %}
+{% block inhaltsklasse %}breit{% endblock %}
+{% block inhalt %}
+<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › <a href="{% url 'zeugnisse' %}?abschnitt={{ z.abschnitt.pk }}">{% translate "Zeugnisse" %}</a>
+  {% if z.klasse %} › <a href="{% url 'zeugnis_klasse' z.klasse.pk z.abschnitt.pk %}">{{ z.klasse.name }}</a>{% endif %} › {{ z.schueler.person.anzeigename }}</p>
+<div class="akte-kopf">
+  <div>
+    <h1>{{ z.schueler.person.vorname }} {{ z.schueler.person.nachname }} <span class="zg-status zg-status-{{ z.status }} gross">{{ z.get_status_display }}</span></h1>
+    <p class="unterzeile">{{ z.get_art_display }} · {{ z.abschnitt.lokal_name }} {{ z.abschnitt.schuljahr }}{% if z.klasse %} · {% blocktranslate with k=z.klasse.name %}Klasse {{ k }}{% endblocktranslate %}{% endif %}{% if z.jahrgang %} · {% blocktranslate with jg=z.jahrgang %}Jahrgangsstufe {{ jg }}{% endblocktranslate %}{% endif %}{% if z.bildungsgang %} · {{ z.bildungsgang.lokal_name }}{% endif %}</p>
+  </div>
+  <div class="knopfreihe">
+    {% if nachbarn.zurueck %}<a class="knopf zweitrangig klein" href="{% url 'zeugnis' nachbarn.zurueck.pk %}" title="{% translate 'Vorherige Schülerin / vorheriger Schüler' %}">‹</a>{% endif %}
+    {% if nachbarn.weiter %}<a class="knopf zweitrangig klein" href="{% url 'zeugnis' nachbarn.weiter.pk %}" title="{% translate 'Nächste Schülerin / nächster Schüler' %}">›</a>{% endif %}
+    <a class="knopf zweitrangig" href="{% url 'zeugnis_druck' z.pk %}" target="_blank" rel="noopener">{% translate "Druckansicht" %}</a>
+    <a class="knopf zweitrangig" href="{% url 'zeugnis_druck' z.pk %}?sprache=en" target="_blank" rel="noopener">{% translate "Englisch" %}</a>
+    <a class="knopf zweitrangig" href="{% url 'schuelerakte' z.schueler.pk %}">{% translate "Schülerakte" %}</a>
+  </div>
+</div>
+
+{% if z.freigegeben %}
+<div class="an-banner ok"><strong>{% translate "Freigegeben" %}</strong>
+  {% blocktranslate with datum=z.freigegeben_am|date:"SHORT_DATETIME_FORMAT" wer=z.freigegeben_von.get_full_name|default:z.freigegeben_von.get_username %}am {{ datum }} von {{ wer }}{% endblocktranslate %}.
+  {% translate "Die Fachnoten sind festgeschrieben; Änderungen erfordern die Aufhebung der Freigabe." %}
+  {% if darf.freigeben %}<form method="post" class="zg-inline">{% csrf_token %}<button type="submit" name="aktion" value="aufheben" class="link">{% translate "Freigabe aufheben" %}</button></form>{% endif %}
+</div>
+{% else %}
+  {% if hindernisse %}<div class="an-banner warnend"><strong>{% translate "Vor der Freigabe noch offen:" %}</strong><ul class="schlicht">{% for h in hindernisse %}<li>{{ h }}</li>{% endfor %}</ul></div>{% endif %}
+  {% if hinweise %}<div class="an-banner"><strong>{% translate "Hinweise:" %}</strong><ul class="schlicht">{% for h in hinweise %}<li>{{ h }}</li>{% endfor %}</ul></div>{% endif %}
+{% endif %}
+
+<div class="an-raster">
+  <div class="an-hauptspalte">
+    <section class="karte">
+      <div class="karte-kopf"><h2>{% translate "Fachnoten" %}</h2>
+        <span class="leise">{% if schnitt is not None %}Ø {{ schnitt }}{% endif %}</span></div>
+      <div class="rollbar"><table class="liste kompakt">
+        <thead><tr><th>{% translate "Fach" %}</th><th>{% translate "Note" %}</th><th>{% translate "Lehrkraft" %}</th><th></th></tr></thead>
+        <tbody>
+        {% for e in zeilen %}
+          <tr>
+            <td>{{ e.fachname }}{% if e.fach.pk in kern %} <span class="zg-kern" title="{% translate 'Kernfach für die Versetzung' %}">K</span>{% endif %}{% if e.hinweis %} <small class="leise">({{ e.hinweis }})</small>{% endif %}</td>
+            <td>{% if e.fehlt %}<span class="auffaellig">{% translate "fehlt" %}</span>{% else %}<strong class="{% if e.note >= 5 and not e.punkte %}auffaellig{% endif %}">{{ e.text }}</strong>{% if e.zn.stufe and not e.vermerk %} <small class="leise">({{ e.zn.stufe }})</small>{% endif %}{% if e.tendenz %} <span class="warnung" title="{% translate 'Tendenz eingetragen – auf dem Zeugnis erscheint die ganze Note.' %}">!</span>{% endif %}{% endif %}</td>
+            <td><small>{{ e.lehrkraft.kuerzel|default:e.lehrkraft.person.anzeigename }}</small></td>
+            <td class="nowrap"><small><a href="{% url 'zeugnis_unterricht' e.unterricht.pk %}">{% translate "Zeugnisnoten des Kurses" %}</a></small></td>
+          </tr>
+        {% empty %}<tr><td colspan="4" class="leer">{% translate "Kein Unterricht in diesem Halbjahr gefunden." %}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table></div>
+      {% if ergebnis or vhinweis %}
+      <div class="zg-versetzung{% if ergebnis and not ergebnis.versetzt %} warnend{% endif %}">
+        <strong>{% if z.art == "jahr" %}{% translate "Versetzungsvorschlag" %}{% else %}{% translate "Stand zum Halbjahr" %}{% endif %}:</strong>
+        {% if ergebnis %}{{ ergebnis.kurztext }}{% if ergebnis.defizite and z.art != "jahr" %} – {% translate "Gefährdung mitteilen" %}{% endif %}
+          <ul class="schlicht klein">{% for g in ergebnis.gruende %}<li>{{ g }}</li>{% endfor %}</ul>{% endif %}
+        {% if vhinweis %}<small class="leise blockzeile">{{ vhinweis }}</small>{% endif %}
+        {% if konferenz %}<small class="blockzeile"><a href="{% url 'konferenz' konferenz.pk %}">{{ konferenz.get_art_display }} ({{ konferenz.get_status_display }})</a></small>{% endif %}
+      </div>
+      {% endif %}
+    </section>
+
+    <section class="karte" id="kommentar">
+      <div class="karte-kopf"><h2>{% translate "Zeugniskommentar" %}</h2>
+        <span class="leise">{% blocktranslate with a=status.aktuell|length p=status.pflicht|length %}abgezeichnet {{ a }} von {{ p }}{% endblocktranslate %}</span></div>
+      {% if darf.kommentar %}
+      <form method="post" class="zg-kommentarform">
+        {% csrf_token %}<input type="hidden" name="aktion" value="kommentar">
+        <label for="kommentar" class="unsichtbar">{% translate "Zeugniskommentar" %}</label>
+        <textarea id="kommentar" name="kommentar" rows="8" data-zaehler="kommentar-zeichen">{{ z.kommentar }}</textarea>
+        <div class="knopfreihe"><button type="submit" class="knopf">{% translate "Kommentar speichern" %}</button>
+          <small class="leise"><span id="kommentar-zeichen">{{ zeichen }}</span> {% translate "Zeichen" %} · {% translate "Nach einer Änderung müssen alle Lehrkräfte erneut abzeichnen." %}</small></div>
+      </form>
+      {% endif %}
+      {% url 'zeugnis' z.pk as hier %}
+      {% if darf.kommentar %}
+        {% include "zeugnisse/_kommentar.html" with z=z status=status eigene=eigene darf_abzeichnen=darf.abzeichnen darf_anmerken=darf.anmerken darf_erledigen=darf.kommentar anmerkungen=anmerkungen weiter=hier nur_aktionen=True %}
+      {% else %}
+        {% include "zeugnisse/_kommentar.html" with z=z status=status eigene=eigene darf_abzeichnen=darf.abzeichnen darf_anmerken=darf.anmerken darf_erledigen=False anmerkungen=anmerkungen weiter=hier %}
+      {% endif %}
+      <h3>{% translate "Abzeichnungen" %}</h3>
+      <ul class="zg-unterzeichner">
+        {% for u in unterzeichner %}
+        <li><span class="zg-punkt {% if u.a and u.a.aktuell %}ok{% elif u.a %}veraltet{% else %}offen{% endif %}"></span>
+          {{ u.p.person.anzeigename }}{% if u.p.kuerzel %} ({{ u.p.kuerzel }}){% endif %}{% if u.kl %} · {% translate "Klassenleitung" %}{% endif %}
+          <small class="leise">{% if u.a and u.a.aktuell %}{{ u.a.am|date:"SHORT_DATETIME_FORMAT" }}{% elif u.a %}{% translate "veraltet" %}{% else %}{% translate "offen" %}{% endif %}</small></li>
+        {% empty %}<li class="leer">{% translate "Keine unterrichtenden Lehrkräfte gefunden." %}</li>{% endfor %}
+      </ul>
+    </section>
+  </div>
+
+  <div class="an-seitenspalte">
+    <section class="karte">
+      <h2>{% translate "Angaben auf dem Zeugnis" %}</h2>
+      {% if darf.bearbeiten %}
+      <form method="post" class="formular zg-angaben">
+        {% csrf_token %}<input type="hidden" name="aktion" value="speichern">
+        <label>{{ form.bemerkungen.label }} {{ form.bemerkungen }}<small class="leise">{{ form.bemerkungen.help_text }}</small></label>
+        {% if z.art == "jahr" %}<label>{{ form.versetzung.label }} {{ form.versetzung }}<small class="leise">{% translate "Wird beim Abschluss der Versetzungskonferenz eingetragen." %}</small></label>{% endif %}
+        <div class="formzeile zwei"><label>{{ form.zeugnisdatum.label }} {{ form.zeugnisdatum }}</label><label>{{ form.ort.label }} {{ form.ort }}</label></div>
+        <div class="formzeile zwei"><label>{{ form.fehltage_entschuldigt.label }} {{ form.fehltage_entschuldigt }}</label><label>{{ form.fehltage_unentschuldigt.label }} {{ form.fehltage_unentschuldigt }}</label></div>
+        <label class="haken">{{ form.kommentar_drucken }} {{ form.kommentar_drucken.label }}</label>
+        <details class="zg-ger"{% if z.ger_ausgefuellt or z.jahrgang >= 9 %} open{% endif %}>
+          <summary>{% translate "GeR-Niveaustufen (Sprachen)" %}</summary>
+          <div class="rollbar"><table class="liste kompakt">
+            <thead><tr><th></th><th>{% translate "Sprache" %}</th><th>{% translate "von Jg." %}</th><th>{% translate "bis Jg." %}</th><th>{% translate "GeR" %}</th></tr></thead>
+            <tbody>{% for g in z.ger_zeilen %}<tr><td><small>{{ g.name }}</small></td>
+              <td><input name="ger-{{ g.schluessel }}-sprache" value="{{ g.sprache }}" size="9"></td>
+              <td><input name="ger-{{ g.schluessel }}-von" value="{{ g.von }}" size="2"></td>
+              <td><input name="ger-{{ g.schluessel }}-bis" value="{{ g.bis }}" size="2"></td>
+              <td>{% if g.schluessel != "landessprache" %}<input name="ger-{{ g.schluessel }}-niveau" value="{{ g.niveau }}" size="3" placeholder="B1">{% endif %}</td></tr>{% endfor %}</tbody>
+          </table></div>
+        </details>
+        <button type="submit" class="knopf">{% translate "Speichern" %}</button>
+      </form>
+      {% else %}
+      <dl class="daten">
+        <dt>{% translate "Bemerkungen" %}</dt><dd>{{ z.bemerkungen|linebreaksbr|default:"–" }}</dd>
+        {% if z.art == "jahr" %}<dt>{% translate "Vermerk" %}</dt><dd>{{ z.get_versetzung_display|default:"–" }}</dd>{% endif %}
+        <dt>{% translate "Datum" %}</dt><dd>{{ z.ort }}, {{ z.zeugnisdatum|kurzdatum }}</dd>
+      </dl>
+      {% endif %}
+    </section>
+    {% if darf.freigeben and not z.freigegeben %}
+    <section class="karte">
+      <h2>{% translate "Freigabe" %}</h2>
+      <p class="hinweistext">{% translate "Mit der Freigabe werden die Fachnoten festgeschrieben; das Zeugnis kann dann gedruckt und ausgegeben werden." %}</p>
+      <form method="post">{% csrf_token %}<button type="submit" name="aktion" value="freigeben" class="knopf"{% if hindernisse %} disabled{% endif %}>{% translate "Zeugnis freigeben" %}</button></form>
+    </section>
+    {% endif %}
+  </div>
+</div>
+<script src="{% static 'zeugnisse.js' %}" defer></script>
+{% endblock %}

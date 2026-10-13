@@ -33,15 +33,17 @@ ANZEIGE = {
 }
 
 BESCHREIBUNG = {
-    LEHRER: _("Eigener Unterricht mit Leistungsnachweisen, Noten und Zeugnisnoten. Als Klassenleitung: Schülerakte, "
+    LEHRER: _("Eigener Unterricht mit Leistungsnachweisen, Noten und Zeugnisnoten; Zeugniskommentare der eigenen Schüler:innen "
+              "lesen, abzeichnen und kommentieren. Als Klassenleitung: Zeugnisse und Kommentare der Klasse, Schülerakte, "
               "Fehlzeiten, Anhänge und Förderung der eigenen Klasse. Nachteilsausgleiche der eigenen Schüler:innen lesen."),
     MITTELSTUFE: _("Wie Lehrer:in, zusätzlich für alle Klassen der Mittelstufe: Schülerakten, Notenübersichten, Fehlzeiten, "
+                   "Zeugnisse und Konferenzen (leiten, Zeugnisse freigeben), "
                    "Gesundheitshinweise, Förderpläne und Nachteilsausgleiche (bearbeiten), Schullaufbahn und Versetzungsvermerke, "
                    "Klassen und Lerngruppen der Stufe bilden und Schüler:innen zuordnen, Neuanmeldungen der Stufe bearbeiten."),
     OBERSTUFE: _("Wie Mittelstufenkoordination, bezogen auf die Jahrgänge der Oberstufe."),
     SCHULLEITUNG: _("Alle Rechte, einschließlich Genehmigung von Nachteilsausgleichen, HR-Daten und Benutzerverwaltung."),
     SEKRETARIAT: _("Schüler- und Elternstammdaten, Klassen und Gruppen, Fehlzeiten, AGs, Einwilligungen, Anhänge, "
-                   "Gesundheitsangaben, Neuanmeldungen einschließlich Übernahme. Noten, Unterrichtsverteilung, Kataloge und Personal nur lesend; keine Förderpläne, keine HR-Daten."),
+                   "Gesundheitsangaben, Neuanmeldungen einschließlich Übernahme, Zeugnisse vorbereiten und drucken. Noten, Unterrichtsverteilung, Kataloge und Personal nur lesend; keine Förderpläne, keine HR-Daten."),
     VERWALTUNGSLEITUNG: _("Wie Sekretariat, zusätzlich Schuljahre, Zeitraster, Fächer, Notenskalen, Unterrichtsverteilung, "
                           "eigene Datenfelder, Benutzerkonten und Rollen, Personal einschließlich HR-Daten, Dienstleister und Finanzen. "
                           "Keine Noteneingabe, keine Förderpläne."),
@@ -77,10 +79,13 @@ _LEHRER = (
         "nachteilsausgleich", "aushaendigung")
     | r(ALLE, "foerderziel")
     | r(("add", "view"), "dokument")
+    # Zeugnisse: Kommentar lesen/abzeichnen/anmerken; als Klassenleitung Zeugnis bearbeiten (zeilenweise geprüft)
+    | r(("view", "change"), "zeugnis") | r(ALLE, "abzeichnung") | r(("add", "view", "change"), "anmerkung")
+    | r("view", "konferenz", "beschluss", "zeugnisfachnote")
 )
 # Gesundheitshinweise der eigenen Stufe: zeilenweise über view_gesundheit_klasse (siehe portal/rechte.py)
 _STUFE = (_LEHRER | r(("add", "change", "view"), "laufbahnabschnitt", "abschluss", "gruppe") | r(ALLE, "mitgliedschaft")
-          | {"view_gesundheit_klasse"})
+          | {"view_gesundheit_klasse", "freigeben_zeugnis"} | r(ALLE, "konferenz", "beschluss"))
 
 _SCHUELERDATEN = r(ALLE, "person", "schuelerprofil", "elternprofil", "beziehung", "gruppe", "mitgliedschaft", "einwilligung",
                    "dokument", "laufbahnabschnitt", "abschluss", "vorherigeschule", "sprachenfolge", "gesundheitsangaben",
@@ -99,7 +104,9 @@ _AUFNAHME_STUFE = (r(("add", "change", "view"), "anmeldung", "anmeldekontakt") |
 _AUFNAHME_FINANZEN = (r("view", *_AUFNAHME_MODELLE, "checklistenvorlage", "vorlagenpunkt")
                       | r("change", "anmeldekontakt", "anmeldepunkt") | r("add", "anmeldedatei"))
 
-_SEKRETARIAT = (_SCHUELERDATEN | _AUFNAHME_VOLL | r("view", *_KATALOGE) | _NOTEN_LESEN | r("view", "personalprofil", "dienstleister")
+_ZEUGNIS_VERWALTUNG = r(("view", "change"), "zeugnis") | r("view", "zeugnisfachnote", "abzeichnung", "anmerkung", "konferenz", "beschluss")
+
+_SEKRETARIAT = (_SCHUELERDATEN | _AUFNAHME_VOLL | _ZEUGNIS_VERWALTUNG | r("view", *_KATALOGE) | _NOTEN_LESEN | r("view", "personalprofil", "dienstleister")
                 | r("view", "nachteilsausgleich", "foerderschwerpunkt", "ausgleichsmassnahme"))
 
 ROLLEN_RECHTE = {
@@ -122,7 +129,7 @@ FOERDERKOORDINATION_EXTRA = (r("view", "person", "schuelerprofil", "gruppe", "mi
                              | r(ALLE, "dokument"))
 
 # Apps, deren Rechte über Rollen vergeben werden
-APPS = ["stammdaten", "noten", "fehlzeiten", "nachmittag", "foerderung", "aufnahme", "auth"]
+APPS = ["stammdaten", "noten", "fehlzeiten", "nachmittag", "foerderung", "aufnahme", "zeugnisse", "auth"]
 
 # Rollen, die im Portal arbeiten (Beschäftigte). Schüler:innen und Eltern erhalten später eigene Oberflächen.
 PORTAL_ROLLEN = {LEHRER, MITTELSTUFE, OBERSTUFE, SCHULLEITUNG, SEKRETARIAT, VERWALTUNGSLEITUNG, HR, FINANZEN, FOERDERKOORDINATION}
@@ -132,6 +139,7 @@ PORTAL_ROLLEN = {LEHRER, MITTELSTUFE, OBERSTUFE, SCHULLEITUNG, SEKRETARIAT, VERW
 # Werte: "ja" · "lesen" · "eigene" (eigener Unterricht/eigene Klasse) · "stufe" (eigene Stufe) · "" (kein Zugriff)
 BEREICHE = [
     ("noten", _("Noten und Zeugnisnoten")),
+    ("zeugnisse", _("Zeugnisse, Kommentare, Konferenzen")),
     ("akten", _("Schülerakten")),
     ("gesundheit", _("Gesundheitsangaben")),
     ("fehlzeiten", _("Fehlzeiten")),
@@ -148,20 +156,20 @@ BEREICHE = [
 ]
 
 MATRIX = {
-    LEHRER: {"aufnahme": "", "zuordnung": "", "noten": "eigene", "akten": "eigene", "gesundheit": "", "fehlzeiten": "eigene", "foerderung": "eigene",
+    LEHRER: {"zeugnisse": "eigene", "aufnahme": "", "zuordnung": "", "noten": "eigene", "akten": "eigene", "gesundheit": "", "fehlzeiten": "eigene", "foerderung": "eigene",
              "nta": "eigene", "stammdaten": "lesen", "personal": "", "hr": "", "finanzen": "", "einstellungen": "lesen", "benutzer": ""},
-    MITTELSTUFE: {"aufnahme": "stufe", "zuordnung": "stufe", "noten": "stufe", "akten": "stufe", "gesundheit": "stufe", "fehlzeiten": "stufe", "foerderung": "stufe",
+    MITTELSTUFE: {"zeugnisse": "stufe", "aufnahme": "stufe", "zuordnung": "stufe", "noten": "stufe", "akten": "stufe", "gesundheit": "stufe", "fehlzeiten": "stufe", "foerderung": "stufe",
                   "nta": "stufe", "stammdaten": "lesen", "personal": "", "hr": "", "finanzen": "", "einstellungen": "lesen", "benutzer": ""},
     SCHULLEITUNG: {k: "ja" for k, _n in BEREICHE},
-    SEKRETARIAT: {"aufnahme": "ja", "zuordnung": "ja", "noten": "lesen", "akten": "ja", "gesundheit": "ja", "fehlzeiten": "ja", "foerderung": "", "nta": "lesen",
+    SEKRETARIAT: {"zeugnisse": "ja", "aufnahme": "ja", "zuordnung": "ja", "noten": "lesen", "akten": "ja", "gesundheit": "ja", "fehlzeiten": "ja", "foerderung": "", "nta": "lesen",
                   "stammdaten": "ja", "personal": "lesen", "hr": "", "finanzen": "", "einstellungen": "lesen", "benutzer": ""},
-    VERWALTUNGSLEITUNG: {"aufnahme": "ja", "zuordnung": "ja", "noten": "lesen", "akten": "ja", "gesundheit": "ja", "fehlzeiten": "ja", "foerderung": "", "nta": "lesen",
+    VERWALTUNGSLEITUNG: {"zeugnisse": "ja", "aufnahme": "ja", "zuordnung": "ja", "noten": "lesen", "akten": "ja", "gesundheit": "ja", "fehlzeiten": "ja", "foerderung": "", "nta": "lesen",
                          "stammdaten": "ja", "personal": "ja", "hr": "ja", "finanzen": "ja", "einstellungen": "ja", "benutzer": "ja"},
-    HR: {"aufnahme": "", "zuordnung": "", "noten": "", "akten": "", "gesundheit": "", "fehlzeiten": "", "foerderung": "", "nta": "", "stammdaten": "",
+    HR: {"zeugnisse": "", "aufnahme": "", "zuordnung": "", "noten": "", "akten": "", "gesundheit": "", "fehlzeiten": "", "foerderung": "", "nta": "", "stammdaten": "",
          "personal": "ja", "hr": "ja", "finanzen": "", "einstellungen": "", "benutzer": ""},
-    FINANZEN: {"aufnahme": "teils", "zuordnung": "", "noten": "", "akten": "", "gesundheit": "", "fehlzeiten": "", "foerderung": "", "nta": "", "stammdaten": "lesen",
+    FINANZEN: {"zeugnisse": "", "aufnahme": "teils", "zuordnung": "", "noten": "", "akten": "", "gesundheit": "", "fehlzeiten": "", "foerderung": "", "nta": "", "stammdaten": "lesen",
                "personal": "lesen", "hr": "", "finanzen": "ja", "einstellungen": "", "benutzer": ""},
-    FOERDERKOORDINATION: {"aufnahme": "", "zuordnung": "", "noten": "", "akten": "lesen", "gesundheit": "", "fehlzeiten": "", "foerderung": "ja", "nta": "ja",
+    FOERDERKOORDINATION: {"zeugnisse": "", "aufnahme": "", "zuordnung": "", "noten": "", "akten": "lesen", "gesundheit": "", "fehlzeiten": "", "foerderung": "ja", "nta": "ja",
                           "stammdaten": "lesen", "personal": "", "hr": "", "finanzen": "", "einstellungen": "", "benutzer": ""},
     SCHUELER: {k: "" for k, _n in BEREICHE},
     ELTERN: {k: "" for k, _n in BEREICHE},

@@ -1,0 +1,50 @@
+{% load i18n %}
+{# Zeugniskommentar mit Abzeichnung und Anmerkungen. Erwartet: z, status, eigene, darf_abzeichnen, darf_anmerken, anmerkungen, weiter #}
+<div class="zg-kommentar">
+  {% if z.kommentar %}
+    {% if not nur_aktionen %}<blockquote class="zg-kommentartext">{{ z.kommentar|linebreaksbr }}</blockquote>{% endif %}
+    <p class="zg-kommentarmeta leise">
+      {% if z.kommentar_geaendert %}{% blocktranslate with datum=z.kommentar_geaendert|date:"SHORT_DATETIME_FORMAT" wer=z.kommentar_von.person.anzeigename|default:z.kommentar_von.get_username|default:"–" %}Stand {{ datum }} · {{ wer }}{% endblocktranslate %} · {% endif %}
+      {% blocktranslate with a=status.aktuell|length p=status.pflicht|length %}abgezeichnet {{ a }} von {{ p }}{% endblocktranslate %}
+    </p>
+    <div class="zg-kommentaraktionen">
+      {% if darf_abzeichnen %}
+      <form method="post" action="{% url 'zeugnis_kommentar' z.pk %}">
+        {% csrf_token %}<input type="hidden" name="weiter" value="{{ weiter }}">
+        {% if eigene and eigene.aktuell %}
+          <span class="etikett">{% blocktranslate with datum=eigene.am|date:"SHORT_DATE_FORMAT" %}von mir abgezeichnet am {{ datum }}{% endblocktranslate %}</span>
+          <button type="submit" name="aktion" value="zuruecknehmen" class="link">{% translate "zurücknehmen" %}</button>
+        {% else %}
+          {% if eigene %}<span class="etikett warnend">{% translate "Text geändert – bitte erneut abzeichnen" %}</span>{% endif %}
+          <button type="submit" name="aktion" value="abzeichnen" class="knopf klein">{% translate "Abzeichnen" %}</button>
+        {% endif %}
+      </form>
+      {% endif %}
+    </div>
+  {% elif not nur_aktionen %}
+    <p class="leer">{% translate "Noch kein Kommentar der Klassenleitung." %}</p>
+  {% endif %}
+  {% if anmerkungen %}
+  <ul class="zg-anmerkungen">
+    {% for a in anmerkungen %}
+    <li class="{% if a.erledigt %}erledigt{% endif %}">
+      <span class="zg-anmerkung-kopf">{{ a.autor.person.anzeigename|default:a.autor.get_username }} · {{ a.erstellt|date:"SHORT_DATETIME_FORMAT" }}{% if a.erledigt %} · {% translate "erledigt" %}{% endif %}</span>
+      <span class="zg-anmerkung-text">{{ a.text|linebreaksbr }}</span>
+      {% if darf_erledigen or a.autor_id == user.pk %}
+      <form method="post" action="{% url 'zeugnis_kommentar' z.pk %}" class="zg-inline">
+        {% csrf_token %}<input type="hidden" name="weiter" value="{{ weiter }}"><input type="hidden" name="anmerkung" value="{{ a.pk }}">
+        <button type="submit" name="aktion" value="erledigt" class="link">{% if a.erledigt %}{% translate "wieder öffnen" %}{% else %}{% translate "als erledigt markieren" %}{% endif %}</button>
+      </form>{% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  {% if darf_anmerken %}
+  <form method="post" action="{% url 'zeugnis_kommentar' z.pk %}" class="zg-anmerken">
+    {% csrf_token %}<input type="hidden" name="weiter" value="{{ weiter }}"><input type="hidden" name="aktion" value="anmerkung">
+    <label class="unsichtbar" for="anm-{{ z.pk }}">{% translate "Anmerkung" %}</label>
+    <textarea id="anm-{{ z.pk }}" name="text" rows="1" placeholder="{% translate 'Anmerkung oder Vorschlag zum Kommentar …' %}"></textarea>
+    <button type="submit" class="knopf zweitrangig klein">{% translate "Anmerken" %}</button>
+  </form>
+  {% endif %}
+</div>

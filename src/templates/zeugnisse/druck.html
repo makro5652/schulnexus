@@ -1,0 +1,92 @@
+{% load i18n static formate %}<!doctype html>
+<html lang="{{ sprache }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% translate "Zeugnis" %} · {{ titel }}</title>
+  <link rel="stylesheet" href="{% static 'zeugnis.css' %}">
+</head>
+<body>
+<nav class="werkzeug">
+  <a href="javascript:history.back()">‹ {% translate "Zurück" %}</a>
+  <span>{% blocktranslate count n=seiten|length %}{{ n }} Zeugnis{% plural %}{{ n }} Zeugnisse{% endblocktranslate %}</span>
+  <button type="button" onclick="window.print()">{% translate "Drucken / als PDF speichern" %}</button>
+  <small>{% translate "Im Druckdialog Kopf- und Fußzeilen des Browsers ausschalten, Format A4, Skalierung 100 %." %}</small>
+</nav>
+{% for d in seiten %}
+<section class="blatt{% if d.entwurf %} entwurf{% endif %}">
+  {% if d.entwurf %}<div class="wasserzeichen" aria-hidden="true">{% translate "ENTWURF" %}</div>{% endif %}
+  {% if sprache == "en" %}<p class="uebersetzung">{% translate "Translation – only the German original is the official document." %}</p>{% endif %}
+  <p class="schule">{{ SCHULNAME }}</p>
+  <h1>{% if d.z.art == "halbjahr" %}{% translate "HALBJAHRESZEUGNIS" %}{% else %}{% translate "ZEUGNIS" %}{% endif %}</h1>
+  <div class="zeile zwei">
+    <span>{% translate "Schuljahr" %} <span class="feld">{{ d.z.abschnitt.schuljahr }}{% if d.z.art == "halbjahr" %} · {{ d.z.abschnitt.lokal_name }}{% endif %}</span></span>
+    <span>{% translate "Jahrgangsstufe" %} <span class="feld kurz">{{ d.z.jahrgang|default:"" }}</span></span>
+  </div>
+  <p class="name">{{ d.p.vorname }} {{ d.p.nachname }}</p>
+  <div class="zeile zwei">
+    <span>{% translate "geboren am" %} <span class="feld">{{ d.p.geburtsdatum|kurzdatum }}</span></span>
+    <span>{% translate "in" %} <span class="feld">{{ d.p.geburtsort }}{% if d.p.geburtsland and d.p.geburtsland != "Deutschland" %} ({{ d.p.geburtsland }}){% endif %}</span></span>
+  </div>
+  {% if d.bildungsgang %}<p class="bildungsgang">{{ d.bildungsgang }}</p>{% endif %}
+
+  <table class="noten">
+    <thead><tr><th>{% translate "Fach" %}</th><th class="note">{% translate "Note" %}</th><th class="luecke"></th><th>{% translate "Fach" %}</th><th class="note">{% translate "Note" %}</th></tr></thead>
+    <tbody>
+    {% for links, rechts in d.paare %}
+      <tr>
+        <td>{% if links %}{{ links.fachname }}{% if links.hinweis %} <small>({{ links.hinweis }})</small>{% endif %}{% endif %}</td>
+        <td class="note">{% if links %}<span class="kasten">{{ links.text }}</span>{% endif %}</td>
+        <td class="luecke"></td>
+        <td>{% if rechts %}{{ rechts.fachname }}{% if rechts.hinweis %} <small>({{ rechts.hinweis }})</small>{% endif %}{% endif %}</td>
+        <td class="note">{% if rechts %}<span class="kasten">{{ rechts.text }}</span>{% endif %}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="bemerkungen">
+    <p>{% translate "Bemerkungen" %}:</p>
+    <div class="linien">{{ d.z.bemerkungen|linebreaksbr }}{% if d.kommentar %}{% if d.z.bemerkungen %}<br>{% endif %}{% translate "Ein Kommentar zur Lern- und Leistungsentwicklung liegt als Beiblatt bei." %}{% endif %}</div>
+  </div>
+  {% if d.fehlzeiten and d.z.fehltage_entschuldigt is not None or d.fehlzeiten and d.z.fehltage_unentschuldigt is not None %}
+  <p class="fehltage">{% blocktranslate with e=d.z.fehltage_entschuldigt|default:0 u=d.z.fehltage_unentschuldigt|default:0 %}Versäumte Unterrichtstage: {{ e }} entschuldigt, {{ u }} unentschuldigt{% endblocktranslate %}</p>
+  {% endif %}
+
+  {% if d.z.ger_ausgefuellt %}
+  <p class="ger-text">{% translate "Dieses Zeugnis schließt Kompetenzen entsprechend dem Gemeinsamen europäischen Referenzrahmen für Sprachen (GeR) mindestens auf folgenden Niveaustufen ein (die Niveaustufen des GeR sind bei mindestens ausreichenden Leistungen erreicht):" %}</p>
+  <table class="ger">
+    <thead><tr><th></th><th>{% translate "von Jahrgangsstufe" %}</th><th>{% translate "bis Jahrgangsstufe" %}</th><th>{% translate "GeR" %}</th></tr></thead>
+    <tbody>{% for g in d.z.ger_zeilen %}<tr><td>{{ g.name }}:{% if g.sprache %} {{ g.sprache }}{% endif %}</td><td>{{ g.von }}</td><td>{{ g.bis }}</td><td class="{% if g.schluessel == 'landessprache' %}gekreuzt{% endif %}">{{ g.niveau }}</td></tr>{% endfor %}</tbody>
+  </table>
+  {% endif %}
+
+  {% if d.vermerk %}<p class="vermerk">{{ d.vermerk }}</p>{% endif %}
+
+  <p class="ortdatum">{% blocktranslate with ort=d.z.ort datum=d.z.zeugnisdatum|kurzdatum %}<span class="feld">{{ ort }}</span>, den <span class="feld">{{ datum }}</span>{% endblocktranslate %}</p>
+  <div class="unterschriften">
+    <div>{% translate "Schulleiterin oder Schulleiter" %}</div>
+    <div>{% translate "Klassenlehrerin oder Klassenlehrer" %}</div>
+    <div>{% translate "Erziehungsberechtigte oder Erziehungsberechtigter" %}</div>
+  </div>
+  <p class="fussnote">{% translate "Notenstufen (§ 3 Sek I-PO)" %}: {% for w in notenstufen %}{{ w }} ({{ forloop.counter }}){% if not forloop.last %}, {% endif %}{% endfor %}. {% translate "n.b. = nicht bewertet." %}</p>
+</section>
+{% if d.kommentar %}
+<section class="blatt beiblatt{% if d.entwurf %} entwurf{% endif %}">
+  {% if d.entwurf %}<div class="wasserzeichen" aria-hidden="true">{% translate "ENTWURF" %}</div>{% endif %}
+  <p class="schule">{{ SCHULNAME }}</p>
+  <h2>{% translate "Beiblatt zum Zeugnis" %}</h2>
+  <p class="unterzeile">{{ d.p.vorname }} {{ d.p.nachname }} · {% translate "Schuljahr" %} {{ d.z.abschnitt.schuljahr }} · {{ d.z.abschnitt.lokal_name }}{% if d.z.klasse %} · {% translate "Klasse" %} {{ d.z.klasse.name }}{% endif %}</p>
+  <div class="kommentar">{{ d.kommentar|linebreaks }}</div>
+  <p class="ortdatum">{% blocktranslate with ort=d.z.ort datum=d.z.zeugnisdatum|kurzdatum %}<span class="feld">{{ ort }}</span>, den <span class="feld">{{ datum }}</span>{% endblocktranslate %}</p>
+  <div class="unterschriften zwei">
+    <div>{% translate "Klassenlehrerin oder Klassenlehrer" %}</div>
+    <div>{% translate "Erziehungsberechtigte oder Erziehungsberechtigter" %}</div>
+  </div>
+</section>
+{% endif %}
+{% empty %}
+<p class="leer">{% translate "Keine Zeugnisse zum Drucken." %}</p>
+{% endfor %}
+</body>
+</html>

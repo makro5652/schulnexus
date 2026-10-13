@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "nachmittag",
     "foerderung",
     "aufnahme",
+    "zeugnisse",
     "portal",
 ]
 
@@ -165,6 +166,9 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = "same-origin"
 
 SCHULNAME = os.environ.get("SCHULNAME", "Deutsche Schule Nairobi")
+SCHULORT = os.environ.get("SCHULORT", "Nairobi")
+# Fehltage auf dem Zeugnis ausweisen (im KMK-Muster nicht vorgesehen; 1 = ja)
+ZEUGNIS_FEHLZEITEN = env_bool("ZEUGNIS_FEHLZEITEN", False)
 
 LOGGING = {
     "version": 1,

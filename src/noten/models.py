@@ -399,7 +399,13 @@ class Zeugnisnote(models.Model):
     unterricht = models.ForeignKey(Unterricht, on_delete=models.CASCADE, related_name="zeugnisnoten", verbose_name=_("Unterricht"))
     schueler = models.ForeignKey(Schuelerprofil, on_delete=models.CASCADE, related_name="zeugnisnoten", verbose_name=_("Schüler:in"))
     vorschlag = models.DecimalField(_("Berechneter Vorschlag"), max_digits=5, decimal_places=2, null=True, blank=True)
-    stufe = models.ForeignKey(Notenstufe, on_delete=models.PROTECT, verbose_name=_("Festgesetzte Note"))
+    VERMERKE = [("", "—"), ("nb", _("n.b. (nicht bewertet)")), ("befreit", _("befreit"))]
+
+    stufe = models.ForeignKey(Notenstufe, on_delete=models.PROTECT, null=True, blank=True, verbose_name=_("Festgesetzte Note"))
+    vermerk = models.CharField(
+        _("Vermerk statt Note"), max_length=8, choices=VERMERKE, blank=True, default="",
+        help_text=_("n.b., wenn weniger als sechs Wochen am Stück bzw. acht Wochen insgesamt teilgenommen (Rili Sek I, 3.8)"),
+    )
     begruendung = models.TextField(_("Pädagogische Begründung"), blank=True, help_text=_("Pflicht bei Abweichung vom Vorschlag"))
     festgesetzt_am = models.DateTimeField(auto_now=True)
     history = HistoricalRecords(verbose_name=_("Änderungsprotokoll Zeugnisnote"))
@@ -410,16 +416,28 @@ class Zeugnisnote(models.Model):
         unique_together = [("unterricht", "schueler")]
 
     def __str__(self):
-        return f"{self.unterricht.fach.kuerzel} {self.schueler}: {self.stufe}"
+        return f"{self.unterricht.fach.kuerzel} {self.schueler}: {self.stufe or self.get_vermerk_display()}"
 
     def clean(self):
-        if not (self.unterricht_id and self.stufe_id):
+        if self.vermerk:
+            self.stufe = None
+            return
+        if not self.stufe_id:
+            raise ValidationError({"stufe": _("Bitte eine Note oder einen Vermerk angeben.")})
+        if not self.unterricht_id:
             return
         if self.stufe.skala_id != self.unterricht.skala_id:
             raise ValidationError(_("Die Note gehört nicht zur Notenskala des Unterrichts."))
         if self.vorschlag is not None:
             vorgeschlagen = self.unterricht.skala.naechste_stufe(self.vorschlag)
-            if vorgeschlagen and vorgeschlagen.pk != self.stufe_id and not self.begruendung.strip():
+            if not self.unterricht.skala.hoeher_ist_besser and vorgeschlagen:
+                # Zeugnisnoten sind ganze Noten (Rili Sek I 3.5): verglichen wird die gerundete Note, nicht die Tendenz.
+                ganz = self.vorschlag.quantize(Decimal(1), rounding=ROUND_HALF_UP)
+                abweichung = self.stufe.wert.quantize(Decimal(1), rounding=ROUND_HALF_UP) != ganz
+                vorgeschlagen = next((s for s in self.unterricht.skala.stufen.all() if s.wert == ganz), vorgeschlagen)
+            else:
+                abweichung = bool(vorgeschlagen and vorgeschlagen.pk != self.stufe_id)
+            if abweichung and not self.begruendung.strip():
                 raise ValidationError(
                     {"begruendung": gettext("Die Note weicht vom Vorschlag (%(vorschlag)s) ab. Bitte pädagogisch begründen.")
                      % {"vorschlag": vorgeschlagen}}

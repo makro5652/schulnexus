@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 
 from aufnahme.ansichten import start_hinweise as aufnahme_hinweise
+from zeugnisse.ansichten import start_hinweise as zeugnis_hinweise
 from fehlzeiten.models import Fehlzeit
 from foerderung.ansichten import aktive_nta_je_schueler, foerder_hinweise, foerder_kontext, nta_kurztext
 from foerderung.models import Foerderplan
@@ -97,7 +98,7 @@ def start(request):
         {"unterrichte": meine_unterrichte if ist_verwaltung(request.user) else None,
          "klassen": klassen_info, "kennzahlen": kennzahlen, "hr": hr,
          "foerderung": foerder_hinweise(request.user), "ist_verwaltung": ist_verwaltung(request.user),
-         "aufnahme": aufnahme_hinweise(request.user),
+         "aufnahme": aufnahme_hinweise(request.user), "zeugnisse": zeugnis_hinweise(request.user),
          "begruessung": begruessung(jetzt), "heute": jetzt.date(), "kalenderwoche": jetzt.isocalendar()[1],
          "schnellzugriff": schnellzugriff(request.user, sj), "geburtstage": geburtstage(request.user, jetzt.date()),
          "notizen": notizen_fuer(request.user, jetzt.date())},
@@ -190,7 +191,14 @@ def klassenliste(request, pk):
         })
     from .zuordnung import darf_gruppe_bearbeiten
 
-    return render(request, "portal/klassenliste.html", {"gruppe": gruppe, "zeilen": zeilen,
+    from zeugnisse.ansichten import aktueller_abschnitt
+    from zeugnisse.rechte import darf_klasse_sehen
+
+    zeugnis_abschnitt = None
+    if gruppe.typ == Gruppe.STAMMKLASSE and darf_klasse_sehen(request.user, gruppe):
+        a = aktueller_abschnitt()
+        zeugnis_abschnitt = a if a and a.schuljahr_id == gruppe.schuljahr_id else gruppe.schuljahr.abschnitte.order_by("nummer").first()
+    return render(request, "portal/klassenliste.html", {"gruppe": gruppe, "zeilen": zeilen, "zeugnis_abschnitt": zeugnis_abschnitt,
                                                          "darf_zuordnen": darf_gruppe_bearbeiten(request.user, gruppe)})
 
 

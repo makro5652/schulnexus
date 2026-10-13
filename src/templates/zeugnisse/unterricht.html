@@ -1,0 +1,74 @@
+{% extends "portal/base.html" %}
+{% load i18n static %}
+{% block title %}{% translate "Zeugnisnoten und Kommentare" %} · {{ u.fach.kuerzel }} {{ u.gruppe.name }}{% endblock %}
+{% block inhalt %}
+<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › <a href="{% url 'zeugnisse' %}?abschnitt={{ u.abschnitt.pk }}">{% translate "Zeugnisse" %}</a> › {{ u.fach.kuerzel }} {{ u.gruppe.name }}</p>
+<div class="akte-kopf">
+  <div>
+    <h1>{% translate "Zeugnisnoten und Kommentare" %}</h1>
+    <p class="unterzeile">{{ u.fach.lokal_name }} · {{ u.gruppe.name }} · {{ u.abschnitt.lokal_name }} {{ u.abschnitt.schuljahr }} · {{ u.lehrkraft.person.anzeigename }}</p>
+  </div>
+  <a class="knopf zweitrangig" href="{% url 'notenuebersicht' u.pk %}">{% translate "Notenübersicht" %}</a>
+</div>
+
+<p class="hinweistext">{% translate "Die Zeugnisnote ist eine ganze Note (Rili Sek I, 3.5). Vorausgewählt ist der gerundete rechnerische Vorschlag; gespeichert wird erst mit „Zeugnisnoten speichern“. Weicht die Note vom Vorschlag ab, ist eine pädagogische Begründung Pflicht. Den Zeugniskommentar schreibt die Klassenleitung; bitte lesen, abzeichnen und bei Bedarf anmerken." %}</p>
+
+<form method="post" id="noten-form">{% csrf_token %}<input type="hidden" name="aktion" value="noten"></form>
+<div class="tabellenrahmen">
+<table class="liste zg-noten">
+  <thead><tr>
+    <th>{% translate "Schüler:in" %}</th><th>{% translate "Vorschlag" %}</th><th>{% translate "Zeugnisnote" %}</th>
+    <th>{% translate "Begründung bei Abweichung" %}</th><th>{% translate "Kommentar" %}</th>
+  </tr></thead>
+  {% for r in zeilen %}
+  <tbody class="zg-schueler{% if r.fehler %} fehlerhaft{% endif %}">
+    <tr>
+      <th scope="row"><a href="{% url 'zeugnis' r.z.pk %}">{{ r.s.person.nachname }}, {{ r.s.person.rufname|default:r.s.person.vorname }}</a>
+        {% if r.gesperrt %}<span class="etikett">{% translate "freigegeben" %}</span>{% endif %}</th>
+      <td class="nowrap">{% if r.vorschlag.schnitt is not None %}<strong>{{ r.vorschlag.stufe }}</strong> <small class="leise">Ø {{ r.vorschlag.schnitt }}</small>{% else %}<span class="leer">–</span>{% endif %}</td>
+      <td>
+        {% if darf_noten and not r.gesperrt %}
+        <select name="note-{{ r.s.pk }}" form="noten-form" class="zg-wahl{% if r.vorgeschlagen %} vorschlag{% endif %}" aria-label="{% translate 'Zeugnisnote' %} {{ r.s.person.anzeigename }}" data-vorschlag="{% if r.vorgeschlagen %}1{% endif %}">
+          <option value="">{% translate "— offen —" %}</option>
+          {% for wert, text in optionen %}<option value="{{ wert }}"{% if wert == r.gewaehlt %} selected{% endif %}>{{ text }}</option>{% endfor %}
+          <option value="nb"{% if r.gewaehlt == "nb" %} selected{% endif %}>{% translate "n.b. (nicht bewertet)" %}</option>
+          <option value="befreit"{% if r.gewaehlt == "befreit" %} selected{% endif %}>{% translate "befreit" %}</option>
+        </select>
+        {% if r.vorgeschlagen %}<small class="leise blockzeile">{% translate "Vorschlag – noch nicht gespeichert" %}</small>{% endif %}
+        {% else %}
+          {% if r.zn %}<strong>{% if r.zn.vermerk %}{{ r.zn.get_vermerk_display }}{% else %}{{ r.zn.stufe }}{% endif %}</strong>{% else %}<span class="leer">–</span>{% endif %}
+        {% endif %}
+        {% if r.fehler %}<small class="fehler blockzeile">{{ r.fehler }}</small>{% endif %}
+      </td>
+      <td>{% if darf_noten and not r.gesperrt %}<input type="text" name="begruendung-{{ r.s.pk }}" form="noten-form" value="{{ r.begruendung }}" class="zg-begruendung" maxlength="500" aria-label="{% translate 'Begründung' %}">{% else %}<small>{{ r.begruendung }}</small>{% endif %}</td>
+      <td class="nowrap">
+        {% if r.z.kommentar %}
+          {% if r.eigene and r.eigene.aktuell %}<span class="zg-punkt ok" title="{% translate 'von mir abgezeichnet' %}"></span>{% else %}<span class="zg-punkt offen" title="{% translate 'noch nicht von mir abgezeichnet' %}"></span>{% endif %}
+          {{ r.status.aktuell|length }}/{{ r.status.pflicht|length }}
+          {% if r.anmerkungen %}<span class="etikett">{% blocktranslate count n=r.anmerkungen|length %}{{ n }} Anmerkung{% plural %}{{ n }} Anmerkungen{% endblocktranslate %}</span>{% endif %}
+        {% else %}<span class="leer">{% translate "noch keiner" %}</span>{% endif %}
+      </td>
+    </tr>
+    <tr class="zg-kommentarzeile">
+      <td colspan="5">
+        <details{% if r.z.kommentar and not r.eigene.aktuell and r.darf_abzeichnen %} open{% endif %}>
+          <summary>{% if r.z.kommentar %}{% translate "Kommentar lesen und abzeichnen" %}{% else %}{% translate "Kommentar" %}{% endif %}</summary>
+          {% url 'zeugnis_unterricht' u.pk as hier %}
+          {% include "zeugnisse/_kommentar.html" with z=r.z status=r.status eigene=r.eigene darf_abzeichnen=r.darf_abzeichnen darf_anmerken=r.darf_anmerken darf_erledigen=r.darf_erledigen anmerkungen=r.anmerkungen weiter=hier %}
+        </details>
+      </td>
+    </tr>
+  </tbody>
+  {% empty %}
+  <tbody><tr><td colspan="5" class="leer">{% translate "Keine Schüler:innen in dieser Gruppe." %}</td></tr></tbody>
+  {% endfor %}
+</table>
+</div>
+{% if darf_noten %}
+<div class="knopfreihe zg-speichern">
+  <button type="submit" form="noten-form" class="knopf">{% translate "Zeugnisnoten speichern" %}</button>
+  <span class="leise">{% blocktranslate with n=gesetzt g=zeilen|length %}{{ n }} von {{ g }} gespeichert{% endblocktranslate %}</span>
+</div>
+{% endif %}
+<script src="{% static 'zeugnisse.js' %}" defer></script>
+{% endblock %}

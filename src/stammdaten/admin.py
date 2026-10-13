@@ -452,8 +452,16 @@ class MitgliedschaftAdmin(SimpleHistoryAdmin):
 
 @admin.register(Fach)
 class FachAdmin(admin.ModelAdmin):
-    list_display = ["kuerzel", "name", "name_en", "reihenfolge"]
-    list_editable = ["reihenfolge"]
+    list_display = ["kuerzel", "name", "name_en", "reihenfolge", "zeugnisrolle", "zeugnisspalte", "auf_zeugnis"]
+    list_editable = ["reihenfolge", "zeugnisrolle", "zeugnisspalte", "auf_zeugnis"]
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        if not change:
+            # Rolle und Zeugnisspalte anhand des Namens vorschlagen, solange die Voreinstellung gewählt ist
+            from .zeugnisfaecher import faecher_einordnen
+
+            faecher_einordnen([obj])
     search_fields = ["kuerzel", "name", "name_en"]
 
 

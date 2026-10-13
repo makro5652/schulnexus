@@ -1,0 +1,104 @@
+{% extends "portal/base.html" %}
+{% load i18n static formate %}
+{% block title %}{{ k.get_art_display }} {{ k.klasse.name }}{% endblock %}
+{% block inhaltsklasse %}breit{% endblock %}
+{% block inhalt %}
+<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › <a href="{% url 'zeugnisse' %}?abschnitt={{ k.abschnitt.pk }}">{% translate "Zeugnisse" %}</a> › <a href="{% url 'zeugnis_klasse' k.klasse.pk k.abschnitt.pk %}">{{ k.klasse.name }}</a> › {% translate "Konferenz" %}</p>
+<div class="akte-kopf">
+  <div>
+    <h1>{{ k.get_art_display }} · {{ k.klasse.name }} <span class="zg-status zg-status-{{ k.status }} gross">{{ k.get_status_display }}</span></h1>
+    <p class="unterzeile">{{ k.abschnitt.lokal_name }} {{ k.abschnitt.schuljahr }}{% if k.datum %} · {{ k.datum|langdatum }}{% if k.beginn %}, {{ k.beginn|time:"H:i" }}{% endif %}{% endif %}{% if k.ort %} · {{ k.ort }}{% endif %}</p>
+  </div>
+  <div class="knopfreihe">
+    <a class="knopf zweitrangig" href="{% url 'konferenz_protokoll' k.pk %}" target="_blank" rel="noopener">{% translate "Protokoll drucken" %}</a>
+    {% if k.art == "halbjahr" %}<a class="knopf zweitrangig" href="{% url 'konferenz_gefaehrdung' k.pk %}" target="_blank" rel="noopener">{% blocktranslate count n=gefaehrdet %}Gefährdungsmitteilung ({{ n }}){% plural %}Gefährdungsmitteilungen ({{ n }}){% endblocktranslate %}</a>{% endif %}
+    {% if darf_wiedereroeffnen %}<form method="post">{% csrf_token %}<button type="submit" name="aktion" value="wiedereroeffnen" class="knopf zweitrangig">{% translate "Wieder öffnen" %}</button></form>{% endif %}
+  </div>
+</div>
+
+{% if hindernisse %}<div class="an-banner warnend"><strong>{% translate "Die Konferenz kann noch nicht abgeschlossen werden:" %}</strong><ul class="schlicht">{% for h in hindernisse %}<li>{{ h }}</li>{% endfor %}</ul></div>{% endif %}
+{% if k.abgeschlossen %}<div class="an-banner ok">{% if k.art == "versetzung" %}{% translate "Abgeschlossen. Die Versetzungsentscheidungen sind in die Jahreszeugnisse übernommen." %}{% else %}{% translate "Abgeschlossen." %}{% endif %}</div>{% endif %}
+
+<form method="post" id="konferenz-form">
+{% csrf_token %}
+<details class="karte zg-kopfdaten"{% if not k.datum %} open{% endif %}>
+  <summary><h2>{% translate "Konferenzdaten" %}</h2>
+    <span class="leise">{% translate "Vorsitz" %}: {{ k.vorsitz.person.anzeigename|default:"–" }} · {% translate "Protokoll" %}: {{ k.protokoll.person.anzeigename|default:"–" }} · {% blocktranslate count n=k.teilnehmende.count %}{{ n }} anwesend{% plural %}{{ n }} anwesend{% endblocktranslate %}</span></summary>
+  <fieldset class="formular"{% if not darf_leiten %} disabled{% endif %}>
+    <div class="formzeile vier">
+      <label>{{ form.art.label }} {{ form.art }}</label>
+      <label>{{ form.datum.label }} {{ form.datum }}</label>
+      <label>{{ form.beginn.label }} {{ form.beginn }}</label>
+      <label>{{ form.ende.label }} {{ form.ende }}</label>
+    </div>
+    <div class="formzeile">
+      <label>{{ form.ort.label }} {{ form.ort }}</label>
+      <label>{{ form.vorsitz.label }} {{ form.vorsitz }}</label>
+      <label>{{ form.protokoll.label }} {{ form.protokoll }}</label>
+    </div>
+    <fieldset class="zg-teilnehmende"><legend>{{ form.teilnehmende.label }} <small class="leise">({% translate "stimmberechtigt sind alle Lehrkräfte, die die jeweilige Schülerin bzw. den jeweiligen Schüler unterrichtet haben" %})</small></legend>{{ form.teilnehmende }}</fieldset>
+    <label>{{ form.notizen.label }} {{ form.notizen }}</label>
+    {% for f, e in form.errors.items %}<p class="fehler">{{ e|join:" " }}</p>{% endfor %}
+  </fieldset>
+</details>
+
+<section class="karte zg-konferenzliste">
+  <div class="karte-kopf"><h2>{% translate "Notenliste und Beschlüsse" %}</h2>
+    <span class="leise"><span class="zg-kern">K</span> {% translate "Kernfach" %} · <span class="zg-n5">5</span>/<span class="zg-n6">6</span> {% translate "nicht ausreichend" %}</span></div>
+  <div class="tabellenrahmen">
+  <table class="zg-matrix">
+    <thead><tr>
+      <th class="links">{% translate "Schüler:in" %}</th>
+      {% for f in spalten %}<th title="{{ f.lokal_name }}">{{ f.kuerzel }}</th>{% endfor %}
+      <th>Ø</th><th class="links">{% translate "Vorschlag" %}</th>
+    </tr></thead>
+    <tbody>
+    {% for zl in zeilen %}
+      <tr class="zg-matrixzeile">
+        <th class="links"><a href="{% url 'zeugnis' zl.z.pk %}">{{ zl.s.person.nachname }}, {{ zl.s.person.rufname|default:zl.s.person.vorname }}</a>
+          <small class="leise blockzeile">{{ zl.z.bildungsgang.kuerzel|default:"" }}{% if zl.z.jahrgang %} · {% translate "Jg." %} {{ zl.z.jahrgang }}{% endif %}</small></th>
+        {% for c in zl.zellen %}
+          <td class="{% if c.kern %}kern {% endif %}{% if c.e.note == 5 and not c.e.punkte %}zg-n5{% elif c.e.note == 6 and not c.e.punkte %}zg-n6{% endif %}"
+              title="{% if c.e %}{{ c.e.fachname }}: {{ c.e.text|default:'–' }}{% endif %}">{% if c.e %}{% if c.e.fehlt %}<span class="auffaellig">?</span>{% elif c.e.vermerk %}{{ c.e.text }}{% else %}{{ c.e.note }}{% endif %}{% else %}<span class="leer">·</span>{% endif %}</td>
+        {% endfor %}
+        <td>{{ zl.schnitt|default_if_none:"–" }}</td>
+        <td class="links zg-vorschlag"><small class="{% if zl.ergebnis and not zl.ergebnis.versetzt %}auffaellig{% endif %}">{% if zl.ergebnis %}{% if k.art == "halbjahr" %}{% if zl.ergebnis.gefaehrdet %}{% translate "Versetzung gefährdet" %}{% else %}{% translate "keine Gefährdung" %}{% endif %}{% else %}{{ zl.ergebnis.kurztext }}{% endif %}{% else %}{{ zl.hinweis }}{% endif %}</small></td>
+      </tr>
+      <tr class="zg-beschlusszeile">
+        <td colspan="{{ spalten|length|add:3 }}">
+          <fieldset class="zg-beschluss"{% if not darf_leiten %} disabled{% endif %}>
+            <label>{% translate "Entscheidung" %}
+              <select name="b-{{ zl.s.pk }}-entscheidung" form="konferenz-form">
+                {% for wert, name in entscheidungen %}<option value="{{ wert }}"{% if zl.b.entscheidung %}{% if wert == zl.b.entscheidung %} selected{% endif %}{% elif wert == zl.vorschlag_entscheidung %} selected{% endif %}>{{ name }}{% if wert and wert == zl.vorschlag_entscheidung %} ✓{% endif %}</option>{% endfor %}
+              </select></label>
+            {% if k.art == "halbjahr" %}
+            <label class="breit">{% translate "Versetzung gefährdet in" %}<input name="b-{{ zl.s.pk }}-gefaehrdung" form="konferenz-form" value="{{ zl.b.gefaehrdung|default:zl.defizite }}"></label>
+            <label>{% translate "schriftlich mitgeteilt am" %}<input type="date" name="b-{{ zl.s.pk }}-gefaehrdung_mitgeteilt" form="konferenz-form" value="{{ zl.b.gefaehrdung_mitgeteilt|date:'Y-m-d' }}"></label>
+            {% else %}
+            <label class="breit">{% translate "Notenausgleich durch" %}<input name="b-{{ zl.s.pk }}-ausgleich" form="konferenz-form" value="{% if zl.b.ausgleich %}{{ zl.b.ausgleich }}{% elif zl.ergebnis.ausgleich %}{{ zl.ergebnis.ausgleich|join:', ' }}{% endif %}"></label>
+            <label class="zahl">{% translate "dafür" %}<input type="number" min="0" name="b-{{ zl.s.pk }}-stimmen_ja" form="konferenz-form" value="{{ zl.b.stimmen_ja|default_if_none:'' }}"></label>
+            <label class="zahl">{% translate "dagegen" %}<input type="number" min="0" name="b-{{ zl.s.pk }}-stimmen_nein" form="konferenz-form" value="{{ zl.b.stimmen_nein|default_if_none:'' }}"></label>
+            <small class="leise">{% blocktranslate count n=zl.stimmberechtigt %}{{ n }} stimmberechtigt{% plural %}{{ n }} stimmberechtigt{% endblocktranslate %}</small>
+            {% endif %}
+            <label class="breit">{% translate "Begründung / Protokollvermerk" %}<textarea rows="1" name="b-{{ zl.s.pk }}-begruendung" form="konferenz-form">{{ zl.b.begruendung }}</textarea></label>
+            <label>{% translate "Nicht mitwirkend" %}<input name="b-{{ zl.s.pk }}-nicht_mitwirkend" form="konferenz-form" value="{{ zl.b.nicht_mitwirkend }}" placeholder="{% translate 'Name, Grund' %}"></label>
+          </fieldset>
+          {% if zl.ergebnis.gruende and k.art == "versetzung" %}<small class="leise zg-gruende">{{ zl.ergebnis.gruende|join:" " }}{% if zl.hinweis %} {{ zl.hinweis }}{% endif %}</small>{% endif %}
+        </td>
+      </tr>
+    {% empty %}<tr><td class="leer">{% translate "Keine Schüler:innen in dieser Klasse." %}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</section>
+</form>
+
+{% if darf_leiten %}
+<div class="knopfreihe zg-speichern">
+  <button type="submit" form="konferenz-form" name="aktion" value="speichern" class="knopf">{% translate "Speichern" %}</button>
+  <button type="submit" form="konferenz-form" name="aktion" value="abschliessen" class="knopf zweitrangig">{% translate "Speichern und abschließen" %}</button>
+  <span class="leise">{% translate "Beim Abschluss der Versetzungskonferenz werden die Entscheidungen als Vermerk in die Jahreszeugnisse übernommen. Vorausgewählt (✓) ist der Vorschlag nach Ziffer 5.3 der Richtlinie." %}</span>
+</div>
+{% endif %}
+{% endblock %}

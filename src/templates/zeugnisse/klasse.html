@@ -1,0 +1,51 @@
+{% extends "portal/base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Zeugnisse" %} {{ klasse.name }}{% endblock %}
+{% block inhaltsklasse %}breit{% endblock %}
+{% block inhalt %}
+<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › <a href="{% url 'zeugnisse' %}?abschnitt={{ abschnitt.pk }}">{% translate "Zeugnisse" %}</a> › {{ klasse.name }}</p>
+<div class="akte-kopf">
+  <div>
+    <h1>{% blocktranslate with k=klasse.name %}Zeugnisse Klasse {{ k }}{% endblocktranslate %}</h1>
+    <p class="unterzeile">{{ abschnitt.lokal_name }} {{ abschnitt.schuljahr }}{% if klasse.leitung %} · {% blocktranslate with kl=klasse.leitung.person.anzeigename %}Klassenleitung {{ kl }}{% endblocktranslate %}{% endif %}
+      · {% blocktranslate with f=freigegeben g=zeilen|length %}{{ f }} von {{ g }} freigegeben{% endblocktranslate %}</p>
+  </div>
+  <div class="knopfreihe">
+    {% for a in abschnitte %}<a class="knopf {% if a.pk != abschnitt.pk %}zweitrangig {% endif %}klein" href="{% url 'zeugnis_klasse' klasse.pk a.pk %}">{{ a.lokal_name }}</a>{% endfor %}
+  </div>
+</div>
+
+<div class="knopfreihe zg-leiste">
+  <a class="knopf zweitrangig" href="{% url 'zeugnis_klasse_druck' klasse.pk abschnitt.pk %}" target="_blank" rel="noopener">{% translate "Alle Zeugnisse drucken" %}</a>
+  <a class="knopf zweitrangig" href="{% url 'zeugnis_klasse_druck' klasse.pk abschnitt.pk %}?sprache=en" target="_blank" rel="noopener">{% translate "Englische Übersetzung" %}</a>
+  {% if konferenz %}<a class="knopf zweitrangig" href="{% url 'konferenz' konferenz.pk %}">{{ konferenz.get_art_display }} · {{ konferenz.get_status_display }}</a>
+  {% elif darf_konferenz %}<form method="post">{% csrf_token %}<button type="submit" name="aktion" value="konferenz" class="knopf zweitrangig">{% translate "Konferenz anlegen" %}</button></form>{% endif %}
+  {% if darf_freigeben %}<form method="post" onsubmit="return confirm('{% translate "Alle vollständigen Zeugnisse freigeben? Danach sind sie schreibgeschützt." as frage %}{{ frage|escapejs }}')">{% csrf_token %}<button type="submit" name="aktion" value="freigeben" class="knopf">{% translate "Vollständige freigeben" %}</button></form>{% endif %}
+</div>
+
+<div class="tabellenrahmen">
+<table class="liste">
+  <thead><tr>
+    <th>{% translate "Schüler:in" %}</th><th>{% translate "Bildungsgang" %}</th><th class="zahl">{% translate "Noten" %}</th><th class="zahl">Ø</th>
+    <th>{% translate "Versetzung (Vorschlag)" %}</th><th>{% translate "Kommentar" %}</th><th>{% translate "Vermerk" %}</th><th>{% translate "Status" %}</th><th></th>
+  </tr></thead>
+  <tbody>
+  {% for r in zeilen %}
+    <tr>
+      <th scope="row"><a href="{% url 'zeugnis' r.z.pk %}">{{ r.s.person.nachname }}, {{ r.s.person.rufname|default:r.s.person.vorname }}</a></th>
+      <td><small>{{ r.z.bildungsgang.kuerzel|default:"–" }}{% if r.z.jahrgang %} · {% translate "Jg." %} {{ r.z.jahrgang }}{% endif %}</small></td>
+      <td class="zahl">{% if r.fehlen %}<span class="auffaellig">{% blocktranslate count n=r.fehlen %}{{ n }} fehlt{% plural %}{{ n }} fehlen{% endblocktranslate %}</span>{% else %}{% translate "vollständig" %}{% endif %}</td>
+      <td class="zahl">{{ r.schnitt|default_if_none:"–" }}</td>
+      <td><small class="{% if r.ergebnis and not r.ergebnis.versetzt %}auffaellig{% endif %}">{% if r.ergebnis %}{{ r.ergebnis.kurztext }}{% else %}{{ r.hinweis }}{% endif %}</small></td>
+      <td>{% if r.kommentar %}<small>{% blocktranslate with a=r.kommentar.aktuell|length p=r.kommentar.pflicht|length %}{{ a }}/{{ p }} abgezeichnet{% endblocktranslate %}</small>{% if r.anmerkungen_offen %} <span class="etikett warnend">{{ r.anmerkungen_offen }}</span>{% endif %}{% else %}<span class="leer">{% translate "fehlt" %}</span>{% endif %}</td>
+      <td><small>{{ r.z.get_versetzung_display|default:"–" }}</small></td>
+      <td><span class="zg-status zg-status-{{ r.z.status }}">{{ r.z.get_status_display }}</span></td>
+      <td class="nowrap"><a href="{% url 'zeugnis_druck' r.z.pk %}" target="_blank" rel="noopener">{% translate "Druck" %}</a></td>
+    </tr>
+  {% empty %}<tr><td colspan="9" class="leer">{% translate "Keine Schüler:innen in dieser Klasse." %}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+<p class="hinweistext">{% translate "Der Versetzungsvorschlag folgt Ziffer 5.3 der Richtlinie Sek I für Deutsche Schulen im Ausland; die Entscheidung trifft die Klassenkonferenz als Versetzungskonferenz." %}</p>
+{% endblock %}

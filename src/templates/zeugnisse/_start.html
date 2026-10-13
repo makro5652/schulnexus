@@ -1,0 +1,10 @@
+{% load i18n %}
+<section class="karte hr" id="zeugnisse">
+  <div class="karte-kopf">
+    <h2>{% translate "Zeugnisse" %} <span class="leise">· {{ zeugnisse.abschnitt.lokal_name }} {{ zeugnisse.abschnitt.schuljahr }}</span></h2>
+    <a class="knopf zweitrangig klein" href="{% url 'zeugnisse' %}">{% translate "Zur Übersicht" %}</a>
+  </div>
+  {% if zeugnisse.abzeichnen %}<p><a href="{% url 'zeugnisse' %}">{% blocktranslate count n=zeugnisse.abzeichnen %}{{ n }} Zeugniskommentar wartet auf Ihre Abzeichnung.{% plural %}{{ n }} Zeugniskommentare warten auf Ihre Abzeichnung.{% endblocktranslate %}</a></p>{% endif %}
+  {% if zeugnisse.ohne_kommentar %}<p>{% blocktranslate count n=zeugnisse.ohne_kommentar %}In Ihrer Klasse fehlt noch {{ n }} Zeugniskommentar.{% plural %}In Ihrer Klasse fehlen noch {{ n }} Zeugniskommentare.{% endblocktranslate %}
+    {% for g in zeugnisse.klassen %}<a href="{% url 'zeugnis_klasse' g.pk zeugnisse.abschnitt.pk %}">{{ g.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</p>{% endif %}
+</section>

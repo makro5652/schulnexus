@@ -1,0 +1,41 @@
+{% load i18n static formate %}<!doctype html>
+<html lang="{{ sprache }}">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% translate "Gefährdungsmitteilungen" %} · {{ k.klasse.name }}</title>
+  <link rel="stylesheet" href="{% static 'zeugnis.css' %}">
+</head>
+<body>
+<nav class="werkzeug">
+  <a href="{% url 'konferenz' k.pk %}">‹ {% translate "Zurück zur Konferenz" %}</a>
+  <span>{% blocktranslate count n=briefe|length %}{{ n }} Mitteilung{% plural %}{{ n }} Mitteilungen{% endblocktranslate %}</span>
+  <a href="?sprache={% if sprache == 'en' %}de{% else %}en{% endif %}">{% if sprache == "en" %}Deutsch{% else %}English{% endif %}</a>
+  <button type="button" onclick="window.print()">{% translate "Drucken / als PDF speichern" %}</button>
+</nav>
+{% for zl in briefe %}
+<section class="blatt brief">
+  <p class="schule">{{ SCHULNAME }}</p>
+  <p class="briefdatum">{{ SCHULORT }}, {{ heute|kurzdatum }}</p>
+  <p>{% translate "An die Erziehungsberechtigten von" %}<br><strong>{{ zl.s.person.vorname }} {{ zl.s.person.nachname }}</strong>, {% blocktranslate with k=k.klasse.name %}Klasse {{ k }}{% endblocktranslate %}</p>
+  <h2 class="links">{% translate "Mitteilung über die Gefährdung der Versetzung" %}</h2>
+  <p>{% translate "Sehr geehrte Erziehungsberechtigte," %}</p>
+  <p>{% blocktranslate with datum=k.datum|kurzdatum|default:"…" name=zl.s.person.rufname|default:zl.s.person.vorname %}die Halbjahreskonferenz hat am {{ datum }} festgestellt, dass die Versetzung von {{ name }} am Ende des Schuljahres gefährdet ist. Die Leistungen sind zu diesem Zeitpunkt in folgenden Fächern nicht ausreichend:{% endblocktranslate %}</p>
+  <p class="faecher"><strong>{{ zl.b.gefaehrdung|default:zl.defizite }}</strong></p>
+  <p>{% translate "Wir möchten gemeinsam mit Ihnen und Ihrem Kind beraten, wie die Leistungen verbessert werden können, und bitten Sie, zeitnah einen Gesprächstermin mit der Klassenleitung zu vereinbaren." %}</p>
+  <p class="klein">{% translate "Hinweis: Wird diese Mitteilung nicht gegeben, kann daraus kein Anspruch auf Versetzung hergeleitet werden (Richtlinie Sek I an Deutschen Schulen im Ausland, Ziffer 5.2)." %}</p>
+  <p>{% translate "Mit freundlichen Grüßen" %}</p>
+  <div class="unterschriften zwei">
+    <div>{% translate "Klassenlehrerin oder Klassenlehrer" %}{% if k.klasse.leitung %}<br>{{ k.klasse.leitung.person.anzeigename }}{% endif %}</div>
+    <div>{% translate "Schulleiterin oder Schulleiter" %}</div>
+  </div>
+  <div class="ruecklauf">
+    <p class="abtrennen">{% translate "Bitte abtrennen und an die Klassenleitung zurückgeben" %}</p>
+    <p>{% blocktranslate with name=zl.s.person.anzeigename k=k.klasse.name %}Die Mitteilung über die Gefährdung der Versetzung von {{ name }} (Klasse {{ k }}) habe ich zur Kenntnis genommen.{% endblocktranslate %}</p>
+    <div class="unterschriften zwei"><div>{% translate "Ort, Datum" %}</div><div>{% translate "Unterschrift der Erziehungsberechtigten" %}</div></div>
+  </div>
+</section>
+{% empty %}
+<p class="leer">{% translate "Keine Gefährdungen festgestellt." %}</p>
+{% endfor %}
+</body>
+</html>

@@ -265,7 +265,7 @@ class NoteAdmin(EigeneDatenMixin, SimpleHistoryAdmin):
 
 @admin.register(Zeugnisnote)
 class ZeugnisnoteAdmin(EigeneDatenMixin, SimpleHistoryAdmin):
-    list_display = ["schueler", "unterricht", "vorschlag", "stufe"]
+    list_display = ["schueler", "unterricht", "vorschlag", "stufe", "vermerk"]
     list_filter = ["unterricht__abschnitt", "unterricht__fach", "unterricht__gruppe"]
     search_fields = ["schueler__person__nachname"]
     autocomplete_fields = ["schueler", "unterricht"]

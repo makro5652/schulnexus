@@ -1,0 +1,51 @@
+{% load i18n static formate %}<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% translate "Protokoll" %} · {{ k.klasse.name }}</title>
+  <link rel="stylesheet" href="{% static 'zeugnis.css' %}">
+</head>
+<body>
+<nav class="werkzeug">
+  <a href="{% url 'konferenz' k.pk %}">‹ {% translate "Zurück zur Konferenz" %}</a>
+  <button type="button" onclick="window.print()">{% translate "Drucken / als PDF speichern" %}</button>
+</nav>
+<section class="blatt protokoll">
+  <p class="schule">{{ SCHULNAME }}</p>
+  <h2>{% translate "Niederschrift" %}: {{ k.get_art_display }}</h2>
+  <p class="unterzeile">{% blocktranslate with k=k.klasse.name %}Klasse {{ k }}{% endblocktranslate %} · {{ k.abschnitt.lokal_name }} {{ k.abschnitt.schuljahr }}{% if k.abgeschlossen %}{% else %} · {% translate "nicht abgeschlossen" %}{% endif %}</p>
+  <table class="kopfdaten">
+    <tr><th>{% translate "Datum" %}</th><td>{{ k.datum|langdatum|default:"–" }}</td><th>{% translate "Zeit" %}</th><td>{{ k.beginn|time:"H:i"|default:"–" }}{% if k.ende %}–{{ k.ende|time:"H:i" }}{% endif %}</td></tr>
+    <tr><th>{% translate "Ort" %}</th><td>{{ k.ort|default:"–" }}</td><th>{% translate "Klassenleitung" %}</th><td>{{ k.klasse.leitung.person.anzeigename|default:"–" }}</td></tr>
+    <tr><th>{% translate "Vorsitz" %}</th><td>{{ k.vorsitz.person.anzeigename|default:"–" }}</td><th>{% translate "Protokoll" %}</th><td>{{ k.protokoll.person.anzeigename|default:"–" }}</td></tr>
+    <tr><th>{% translate "Anwesend" %}</th><td colspan="3">{% for p in teilnehmende %}{{ p.person.anzeigename }}{% if not forloop.last %}, {% endif %}{% empty %}–{% endfor %}</td></tr>
+  </table>
+  {% if k.notizen %}<h3>{% translate "Allgemeine Beratungspunkte" %}</h3><div class="text">{{ k.notizen|linebreaks }}</div>{% endif %}
+  <h3>{% translate "Notenübersicht" %}</h3>
+  <table class="matrix">
+    <thead><tr><th>{% translate "Name" %}</th>{% for f in spalten %}<th>{{ f.kuerzel }}</th>{% endfor %}<th>Ø</th></tr></thead>
+    <tbody>{% for zl in zeilen %}<tr><td>{{ zl.s.person.nachname }}, {{ zl.s.person.vorname }}</td>{% for c in zl.zellen %}<td class="{% if c.kern %}kern{% endif %}">{% if c.e %}{% if c.e.vermerk %}{{ c.e.text }}{% else %}{{ c.e.note|default:"?" }}{% endif %}{% endif %}</td>{% endfor %}<td>{{ zl.schnitt|default_if_none:"" }}</td></tr>{% endfor %}</tbody>
+  </table>
+  <p class="fussnote">{% translate "Kernfächer für die Versetzung sind unterstrichen." %}</p>
+  <h3>{% translate "Beschlüsse" %}</h3>
+  <table class="beschluesse">
+    <thead><tr><th>{% translate "Name" %}</th><th>{% translate "Entscheidung" %}</th><th>{% if k.art == "halbjahr" %}{% translate "Gefährdung / Mitteilung" %}{% else %}{% translate "Notenausgleich / Abstimmung" %}{% endif %}</th><th>{% translate "Begründung / Vermerk" %}</th></tr></thead>
+    <tbody>
+    {% for zl in zeilen %}
+      <tr>
+        <td>{{ zl.s.person.nachname }}, {{ zl.s.person.vorname }}</td>
+        <td>{{ zl.b.get_entscheidung_display|default:"–" }}</td>
+        <td>{% if k.art == "halbjahr" %}{{ zl.b.gefaehrdung|default:"–" }}{% if zl.b.gefaehrdung_mitgeteilt %}<br><small>{% translate "mitgeteilt am" %} {{ zl.b.gefaehrdung_mitgeteilt|kurzdatum }}</small>{% endif %}
+            {% else %}{{ zl.b.ausgleich }}{% if zl.b.stimmen_ja is not None or zl.b.stimmen_nein is not None %}<br><small>{% blocktranslate with j=zl.b.stimmen_ja|default:0 n=zl.b.stimmen_nein|default:0 %}{{ j }} dafür, {{ n }} dagegen{% endblocktranslate %}</small>{% endif %}{% endif %}</td>
+        <td>{{ zl.b.begruendung|linebreaksbr }}{% if zl.b.nicht_mitwirkend %}<br><small>{% translate "Nicht mitwirkend" %}: {{ zl.b.nicht_mitwirkend }}</small>{% endif %}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <div class="unterschriften zwei">
+    <div>{% translate "Vorsitz" %}</div>
+    <div>{% translate "Protokoll" %}</div>
+  </div>
+</section>
+</body>
+</html>

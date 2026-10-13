@@ -1,8 +1,8 @@
-# Schulverwaltung (Version 0.4.2.6, Entwicklungsstand)
+# Schulverwaltung (Version 0.4.2.7, Entwicklungsstand)
 
 Open-Source-Schulverwaltung für die DSN: Stammdaten, Klassen und Lerngruppen,
 Noten mit Gewichtung, Fehlzeiten, Nachmittagsprogramm, Anhänge zur Schülerakte,
-Förderpläne und Nachteilsausgleiche, Neuanmeldungen. Läuft im Browser,
+Förderpläne und Nachteilsausgleiche, Neuanmeldungen, Zeugnisse und Konferenzen. Läuft im Browser,
 betrieben mit Docker.
 
 > Nur mit **erfundenen Testdaten** verwenden. Für echte Schülerdaten fehlen noch
@@ -71,6 +71,40 @@ ein veröffentlichter Port (voreingestellt 8010), erreichbar über das Tailscale
 Daten unter `/mnt/user/appdata/schulverwaltung-daten`, tägliche Datenbanksicherung.
 Einrichtung im Unraid-Terminal mit `sh unraid/einrichten.sh` – Schritt für Schritt in
 [ANLEITUNG-UNRAID.md](ANLEITUNG-UNRAID.md).
+
+## Zeugnisse, Zeugniskommentare und Konferenzen
+
+Grundlage: Ordnung für den Abschluss der Sekundarstufe I an Deutschen Schulen im Ausland (Sek I-PO, KMK 16.03.2017;
+Zeugnismuster Anlage 11) und Richtlinie zur Gestaltung von Bildungsgängen und Abschlüssen in der Sekundarstufe I an
+Deutschen Schulen im Ausland (Beschluss vom 18.03.2026). **Menüband › Unterricht › Zeugnisse.**
+
+1. **Zeugnisnoten** (je Kurs, auch über „Zeugnisnoten und Kommentare“ in der Notenübersicht): ganze Noten,
+   vorausgewählt ist der gerundete Vorschlag; Abweichung nur mit pädagogischer Begründung; Vermerke „n.b.“ und „befreit“.
+2. **Zeugniskommentar:** schreibt die Klassenleitung. Alle Lehrkräfte, die die Schülerin oder den Schüler unterrichten,
+   sehen ihn bei ihren Noten, **zeichnen digital ab** und können **Anmerkungen** hinterlassen. Ändert sich der Text,
+   werden Abzeichnungen als veraltet markiert. Der Kommentar wird als Beiblatt gedruckt.
+3. **Zeugnis je Schüler:in:** Fachnoten (Kernfächer markiert), Bemerkungen, GeR-Niveaustufen, Datum und Ort,
+   Versetzungs- bzw. Berechtigungsvermerk; **Freigabe** schreibt die Noten fest. Druckansicht nach Anlage 11
+   (Halbjahreszeugnis / Zeugnis, Noten in Worten, epochale Fächer mit Halbjahresangabe, Bildungsgang, Unterschriftsfelder),
+   einzeln oder für die ganze Klasse, Entwürfe mit Aufdruck; nicht amtliche englische Übersetzung.
+   Drucken über den Browser (A4, Kopf- und Fußzeilen ausschalten) – auch als PDF.
+4. **Konferenz** je Klasse und Halbjahr: Notenliste mit Kernfächern, automatischer Vorschlag nach Ziffer 5.3
+   (Ausgleichsregeln, Nachprüfung ab Jahrgang 7, „ungenügend“ im Kernfach schließt aus), im Halbjahr die
+   Gefährdungen mit Mitteilungsschreiben an die Eltern; Beschluss je Schüler:in mit Abstimmung, Notenausgleich und
+   Begründung (Pflicht bei Nichtversetzung); druckbare Niederschrift. Beim Abschluss der Versetzungskonferenz werden
+   die Entscheidungen in die Jahreszeugnisse übernommen.
+
+Je Fach legt die Verwaltung unter **Fächer** fest, welche Rolle es für Versetzung und Zeugnis hat (Deutsch, Mathematik,
+Fremdsprache, Kunst/Musik/Sport, Religion/Ethik, weiteres Fach) und in welcher Zeugnisspalte es steht; bekannte
+Fachnamen werden automatisch eingeordnet. Welche Fremdsprache die erste bzw. zweite ist, steht in der Sprachenfolge.
+Fehltage erscheinen auf dem Zeugnis nur mit `ZEUGNIS_FEHLZEITEN=1` (im KMK-Muster nicht vorgesehen); der Ort kommt aus `SCHULORT`.
+
+| Rolle | Zeugnisse |
+| --- | --- |
+| Lehrer:in | Zeugnisnoten der eigenen Kurse; Kommentare der eigenen Schüler:innen lesen, abzeichnen, anmerken; als Klassenleitung Kommentare schreiben und Zeugnisse der Klasse bearbeiten |
+| Stufenkoordination | Zeugnisse der Stufe bearbeiten und freigeben, Konferenzen leiten |
+| Schulleitung | alles |
+| Sekretariat, Verwaltungsleitung | Zeugnisse vorbereiten (Bemerkungen, Datum, GeR) und drucken, Konferenzen lesen |
 
 ## Neuanmeldungen
 
@@ -348,6 +382,7 @@ und fehlende Beispiele (z. B. Neuanmeldungen) ergänzt. Checklisten-Vorlagen wer
 | `src/nachmittag` | AG-Angebote, Wünsche, Losverfahren in `zuteilung.py` |
 | `src/portal` | Startseite, Menüband, Notenübersicht, Klassenliste, Schülerakte, Stufenübersicht, Rollen (`rollen.py`) und Rechteprüfung (`rechte.py`), Sprachwahl, Demo-Daten |
 | `src/foerderung` | Förderpläne, Nachteilsausgleiche, Elternbestätigung |
+| `src/zeugnisse` | Zeugnisse, Kommentare mit Abzeichnung, Konferenzen; Versetzungsregeln in `versetzung.py` |
 | `src/aufnahme` | Neuanmeldungen: Bewerbungsakte, Checklisten, Unterlagen, Übernahme (`uebernahme.py`), Rechte (`rechte.py`) |
 | `src/locale` | Übersetzungen (Englisch) |
 | `unraid/` | Betrieb auf Unraid: `docker-compose.yml`, `.env.example`, `einrichten.sh` |

@@ -147,7 +147,12 @@ def menueband(request):
         .add(_("Bewertungsordner"), _url("admin:noten_bewertungsordner_changelist"), "ordner", bedingung=p("noten.view_bewertungsordner"))
         .add(_("Einzelnoten"), _url("admin:noten_note_changelist"), "liste", bedingung=p("noten.view_note")),
         Gruppe(_("Zeugnis"))
-        .add(_("Zeugnisnoten"), _url("admin:noten_zeugnisnote_changelist"), "zeugnis", gross=True, bedingung=p("noten.view_zeugnisnote")),
+        .add(_("Zeugnisse"), _url("zeugnisse"), "zeugnis", gross=True, bedingung=p("zeugnisse.view_zeugnis"),
+             hinweis=_("Zeugnisnoten, Kommentare, Zeugnisse und Konferenzen"))
+        .add(_("Zeugnisnoten (Liste)"), _url("admin:noten_zeugnisnote_changelist"), "liste",
+             bedingung=admin and p("noten.view_zeugnisnote"))
+        .add(_("Konferenzen"), _url("admin:zeugnisse_konferenz_changelist"), "gruppen",
+             bedingung=admin and p("zeugnisse.change_konferenz")),
         Gruppe(_("Nachmittag"))
         .add(_("AG-Angebote"), _url("admin:nachmittag_agangebot_changelist"), "ball", gross=True, bedingung=p("nachmittag.view_agangebot"))
         .add(_("AG-Wünsche"), _url("admin:nachmittag_agwahl_changelist"), "liste", bedingung=p("nachmittag.view_agwahl"))
@@ -260,7 +265,7 @@ def menueband(request):
 
 
 PFAD_REGELN = [("/klassen/", "schueler"), ("/schueler/", "schueler"), ("/stufe/", "schueler"), ("/zuordnung/", "schueler"), ("/aufnahme/", "schueler"),
-               ("/noten/", "unterricht"),
+               ("/noten/", "unterricht"), ("/zeugnisse/", "unterricht"),
                ("/rollen/", "verwaltung"),
                ("/foerderung/", "foerderung"), ("/verwaltung/", "verwaltung")]
 

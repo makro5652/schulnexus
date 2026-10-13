@@ -633,6 +633,25 @@ class Fach(LokalerNameMixin, models.Model):
     name_en = models.CharField(_("Bezeichnung (Englisch)"), max_length=60, blank=True)
     reihenfolge = models.PositiveSmallIntegerField(_("Reihenfolge auf dem Zeugnis"), default=100)
 
+    # Zeugnis und Versetzung (Richtlinie Sek I an DAS, Ziffer 5.3)
+    ZEUGNISROLLEN = [
+        ("deutsch", _("Deutsch")),
+        ("mathematik", _("Mathematik")),
+        ("fremdsprache", _("Fremdsprache / Landessprache")),
+        ("musisch", _("Kunst, Musik, Sport (Ausgleich höchstens ein Fach)")),
+        ("religion", _("Religion / Ethik / Philosophie")),
+        ("sonstiges", _("Weiteres Fach")),
+    ]
+    zeugnisrolle = models.CharField(
+        _("Rolle für Zeugnis und Versetzung"), max_length=14, choices=ZEUGNISROLLEN, default="sonstiges",
+        help_text=_("Bestimmt Kernfächer und Ausgleichsregeln. Welche Fremdsprache die erste ist, steht in der Sprachenfolge."),
+    )
+    zeugnisspalte = models.PositiveSmallIntegerField(
+        _("Spalte auf dem Zeugnis"), choices=[(1, _("links")), (2, _("rechts"))], default=1,
+        help_text=_("Muster: links Sprachen, Gesellschaftswissenschaften, Religion; rechts Mathematik, Naturwissenschaften, Kunst, Musik, Sport."),
+    )
+    auf_zeugnis = models.BooleanField(_("Auf dem Zeugnis ausweisen"), default=True)
+
     class Meta:
         verbose_name = _("Fach")
         verbose_name_plural = _("Fächer")
