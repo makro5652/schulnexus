@@ -112,7 +112,7 @@ class DokumentInline(admin.TabularInline):
 
 PERSON_FIELDSETS = [
     (_("Name"), {"fields": [("anrede", "titel"), ("vorname", "rufname", "nachname"), "geschlecht"]}),
-    (_("Geburt und Herkunft"), {"fields": [("geburtsdatum", "geburtsort", "geburtsland"), "staatsangehoerigkeiten"]}),
+    (_("Geburt und Herkunft"), {"fields": [("geburtsdatum", "geburtsort", "geburtsland"), "geburtstag_anzeigen", "staatsangehoerigkeiten"]}),
     (_("Kontakt"), {"fields": [("email", "sprache"), ("telefon", "mobil", "telefon_dienstlich")]}),
     (_("Anschrift"), {"fields": ["strasse", ("postfach", "plz"), ("ort", "land")]}),
     (_("System"), {"fields": ["benutzer", "notizen"], "classes": ["collapse"]}),

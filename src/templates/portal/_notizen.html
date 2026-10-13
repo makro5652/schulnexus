@@ -1,0 +1,65 @@
+{% load i18n formate %}
+{% with nz=notizen %}
+{% if nur != "notizen" and nz.mitteilungen %}
+<section class="karte mitteilungen" id="mitteilungen">
+  <h2><svg class="symbol" viewBox="0 0 24 24" aria-hidden="true"><use href="#s-nadel"/></svg> {% translate "Mitteilungen" %}</h2>
+  {% for n in nz.mitteilungen %}
+  <article class="notiz farbe-{{ n.farbe }}">
+    <div class="notiz-text">{{ n.text|linebreaksbr }}</div>
+    <p class="notiz-meta">{{ n.besitzer.person.anzeigename|default:n.besitzer.get_username }}, {{ n.erstellt_am|date:"SHORT_DATE_FORMAT" }}{% if n.datum %} · {% blocktranslate with datum=n.datum|kurzdatum %}sichtbar bis {{ datum }}{% endblocktranslate %}{% endif %}</p>
+    {% if n.darf_bearbeiten %}
+    <div class="notiz-aktionen">
+      <details><summary>{% translate "Bearbeiten" %}</summary>{% include "portal/_notiz_form.html" with form=n.form ziel=n %}</details>
+      <form method="post" action="{% url 'notiz_aktion' n.pk %}">{% csrf_token %}<button name="aktion" value="loeschen" class="link gefahr">{% translate "Entfernen" %}</button></form>
+    </div>
+    {% endif %}
+  </article>
+  {% endfor %}
+</section>
+{% endif %}
+
+{% if nur != "mitteilungen" %}
+<section class="karte notizen" id="notizen">
+  <div class="karte-kopf"><h2>{% translate "Notizen" %}</h2><span class="leise klein">{% translate "nur für Sie sichtbar" %}</span></div>
+  {% include "portal/_notiz_form.html" with form=nz.form ziel=None %}
+
+  <div class="notizliste">
+  {% for n in nz.offen %}
+  <article class="notiz farbe-{{ n.farbe }}{% if n.angeheftet %} angeheftet{% endif %}{% if n.faellig %} faellig{% endif %}">
+    {% if n.angeheftet %}<svg class="symbol nadel" viewBox="0 0 24 24" aria-label="{% translate 'angeheftet' %}"><use href="#s-nadel"/></svg>{% endif %}
+    <div class="notiz-text">{{ n.text|linebreaksbr }}</div>
+    <p class="notiz-meta">
+      {% if n.datum %}<span class="{% if n.faellig %}auffaellig{% endif %}">{% if n.faellig %}{% blocktranslate with datum=n.datum|kurzdatum %}fällig seit {{ datum }}{% endblocktranslate %}{% else %}{% blocktranslate with datum=n.datum|kurzdatum %}fällig am {{ datum }}{% endblocktranslate %}{% endif %}</span>{% else %}{{ n.erstellt_am|date:"SHORT_DATE_FORMAT" }}{% endif %}
+    </p>
+    <div class="notiz-aktionen">
+      <form method="post" action="{% url 'notiz_aktion' n.pk %}">{% csrf_token %}
+        <button name="aktion" value="erledigt" class="link">{% translate "Erledigt" %}</button>
+        <button name="aktion" value="anheften" class="link">{% if n.angeheftet %}{% translate "Lösen" %}{% else %}{% translate "Anheften" %}{% endif %}</button>
+      </form>
+      <details><summary>{% translate "Bearbeiten" %}</summary>{% include "portal/_notiz_form.html" with form=n.form ziel=n %}</details>
+      <form method="post" action="{% url 'notiz_aktion' n.pk %}">{% csrf_token %}<button name="aktion" value="loeschen" class="link gefahr">{% translate "Löschen" %}</button></form>
+    </div>
+  </article>
+  {% empty %}
+    <p class="leer">{% translate "Keine offenen Notizen." %}</p>
+  {% endfor %}
+  </div>
+
+  {% if nz.erledigt %}
+  <details class="erledigt-liste">
+    <summary>{% blocktranslate count n=nz.erledigt|length %}{{ n }} erledigte Notiz{% plural %}{{ n }} erledigte Notizen{% endblocktranslate %}</summary>
+    {% for n in nz.erledigt %}
+      <div class="notiz-erledigt">
+        <span>{{ n.text|truncatechars:80 }}</span>
+        <form method="post" action="{% url 'notiz_aktion' n.pk %}">{% csrf_token %}
+          <button name="aktion" value="erledigt" class="link">{% translate "Wieder öffnen" %}</button>
+          <button name="aktion" value="loeschen" class="link gefahr">{% translate "Löschen" %}</button>
+        </form>
+      </div>
+    {% endfor %}
+    <form method="post" action="{% url 'notizen_erledigte_loeschen' %}">{% csrf_token %}<button class="link gefahr">{% translate "Alle erledigten löschen" %}</button></form>
+  </details>
+  {% endif %}
+</section>
+{% endif %}
+{% endwith %}

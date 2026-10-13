@@ -1,0 +1,44 @@
+{% extends "portal/base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Suche" %}{% endblock %}
+{% block inhalt %}
+{% include "portal/_symbole.html" %}
+<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › {% translate "Suche" %}</p>
+<form class="suchfeld gross" method="get" action="{% url 'suche' %}" role="search">
+  <label for="suche-q" class="unsichtbar">{% translate "Person suchen" %}</label>
+  <svg class="symbol" viewBox="0 0 24 24" aria-hidden="true"><use href="#s-lupe"/></svg>
+  <input id="suche-q" type="search" name="q" value="{{ q }}" placeholder="{% translate 'Person suchen …' %}" autofocus>
+  <button type="submit" class="knopf klein">{% translate "Suchen" %}</button>
+</form>
+
+{% if zu_kurz %}<p class="leer">{% translate "Bitte mindestens zwei Buchstaben eingeben." %}</p>
+{% elif q %}
+<div class="raster">
+  <section class="karte">
+    <h2>{% translate "Schüler:innen" %} <span class="leise">({{ schueler|length }})</span></h2>
+    {% for e in schueler %}
+      <p>{% if e.akte %}<a href="{% url 'schuelerakte' e.s.pk %}">{{ e.s.person }}</a>{% else %}{{ e.s.person }}{% endif %}
+        <span class="leise">{% if e.klasse %}· {% blocktranslate with name=e.klasse.name %}Klasse {{ name }}{% endblocktranslate %}{% endif %}</span></p>
+    {% empty %}<p class="leer">{% translate "Keine Treffer unter den Schüler:innen, die Sie sehen dürfen." %}</p>{% endfor %}
+  </section>
+  {% if user.is_staff %}
+  <section class="karte">
+    <h2>{% translate "Kollegium und Personal" %} <span class="leise">({{ personal|length }})</span></h2>
+    {% for e in personal %}
+      <p>{% if e.link %}<a href="{% url 'admin:stammdaten_personalprofil_change' e.pp.pk %}">{{ e.pp.person }}</a>{% else %}{{ e.pp.person }}{% endif %}
+        <span class="leise">· {{ e.pp.stellenbezeichnung|default:e.pp.bereich.lokal_name|default:"" }}{% if e.pp.dienst_email %} · <a href="mailto:{{ e.pp.dienst_email }}">{{ e.pp.dienst_email }}</a>{% endif %}</span></p>
+    {% empty %}<p class="leer">{% translate "Keine Treffer." %}</p>{% endfor %}
+  </section>
+  {% endif %}
+  {% if eltern %}
+  <section class="karte">
+    <h2>{% translate "Eltern und Kontaktpersonen" %} <span class="leise">({{ eltern|length }})</span></h2>
+    {% for p in eltern %}
+      <p><a href="{% url 'admin:stammdaten_person_change' p.pk %}">{{ p }}</a>
+        <span class="leise">· {% for b in p.kinder_beziehungen.all %}{{ b.get_art_display }} {% translate "von" %} {{ b.schueler.person.anzeigename }}{% if not forloop.last %}, {% endif %}{% endfor %}</span></p>
+    {% endfor %}
+  </section>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

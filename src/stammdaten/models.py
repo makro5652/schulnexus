@@ -102,6 +102,10 @@ class Person(models.Model):
         related_name="person", verbose_name=_("Benutzerkonto"),
     )
     notizen = models.TextField(_("Interne Notizen"), blank=True)
+    geburtstag_anzeigen = models.BooleanField(
+        _("Geburtstag auf der Startseite anzeigen"), default=True,
+        help_text=_("Tag und Monat erscheinen in der Geburtstagsübersicht; das Alter nur bei Schüler:innen."),
+    )
     erstellt = models.DateTimeField(auto_now_add=True)
     geaendert = models.DateTimeField(auto_now=True)
     history = HistoricalRecords(verbose_name=_("Änderungsprotokoll Person"))

@@ -1,4 +1,4 @@
-# Schulverwaltung (Version 0.4.2.0, Entwicklungsstand)
+# Schulverwaltung (Version 0.4.2.1, Entwicklungsstand)
 
 Open-Source-Schulverwaltung für die DSN: Stammdaten, Klassen und Lerngruppen,
 Noten mit Gewichtung, Fehlzeiten, Nachmittagsprogramm, Anhänge zur Schülerakte,
@@ -122,6 +122,22 @@ Personal und Eltern anlegen – ohne Programmierung:
 Die Felder erscheinen automatisch in den Formularen und (bei Schüler:innen) in der Schülerakte.
 Werte unsichtbarer Felder bleiben beim Speichern durch andere Rollen unverändert. Alle Änderungen
 stehen im Änderungsprotokoll.
+
+## Startseite
+
+- **Kopf:** Begrüßung, Kalenderblatt mit Datum und Kalenderwoche, Suche nach Schüler:innen,
+  Kolleg:innen und (für die Verwaltung) Eltern. Gefunden werden nur Personen, die man sehen darf.
+- **Schnellzugriff:** eigene Klassen und Gruppen, eigener Unterricht (direkt zur Notenübersicht)
+  und die Bereiche der eigenen Rolle (z. B. Förderpläne, Personal, Fehlzeiten).
+- **Notizen:** nur für die eigene Person sichtbar; Farbe, optionales Fälligkeitsdatum
+  (ab diesem Tag hervorgehoben), anheften, abhaken, bearbeiten, löschen.
+  Verwaltung und Schulleitung können eine Notiz als **Mitteilung an alle** veröffentlichen;
+  mit Datum verschwindet sie nach diesem Tag automatisch.
+- **Geburtstage:** heute und die nächsten 7 Tage. Lehrkräfte sehen die Schüler:innen ihrer
+  Klassen, Gruppen und Kurse, Verwaltung, Leitung und Förderkoordination alle aktiven
+  Schüler:innen; dazu alle aktiven Kolleg:innen (ohne Alter). Wer nicht erscheinen soll:
+  in der Personenakte „Geburtstag auf der Startseite anzeigen“ abwählen.
+  Am 29. Februar Geborene erscheinen in Nicht-Schaltjahren am 28. Februar.
 
 ## Anhänge zur Schülerakte
 

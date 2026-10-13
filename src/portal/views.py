@@ -21,6 +21,7 @@ from stammdaten.zusatzfelder import anzeige as zusatz_anzeige
 
 from .anhaenge import KATEGORIE_FILTER, anhaenge_fuer, anhang_form
 from .rechte import darf_akte_sehen, darf_nachteilsausgleich_sehen, darf_unterricht_sehen, ist_personalverwaltung, ist_verwaltung
+from .startseite import begruessung, geburtstage, notizen_fuer, schnellzugriff
 
 
 def gesundheit(request):
@@ -85,11 +86,16 @@ def start(request):
             "vertragsende": aktiv.filter(vertragsende__gte=heute, vertragsende__lte=heute + timedelta(days=180)).order_by("vertragsende"),
         }
 
+    jetzt = timezone.localtime()
     return render(
         request,
         "portal/start.html",
-        {"unterrichte": meine_unterrichte, "klassen": klassen_info, "kennzahlen": kennzahlen, "hr": hr,
-         "foerderung": foerder_hinweise(request.user), "ist_verwaltung": ist_verwaltung(request.user)},
+        {"unterrichte": meine_unterrichte if ist_verwaltung(request.user) else None,
+         "klassen": klassen_info, "kennzahlen": kennzahlen, "hr": hr,
+         "foerderung": foerder_hinweise(request.user), "ist_verwaltung": ist_verwaltung(request.user),
+         "begruessung": begruessung(jetzt), "heute": jetzt.date(), "kalenderwoche": jetzt.isocalendar()[1],
+         "schnellzugriff": schnellzugriff(request.user, sj), "geburtstage": geburtstage(request.user, jetzt.date()),
+         "notizen": notizen_fuer(request.user, jetzt.date())},
     )
 
 

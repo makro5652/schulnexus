@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
 
-from portal import anhaenge, views
+from portal import anhaenge, startseite, views
 
 urlpatterns = [
     path("", views.start, name="start"),
@@ -16,6 +16,11 @@ urlpatterns = [
     path("anhang/<int:pk>/loeschen/", anhaenge.anhang_loeschen, name="anhang_loeschen"),
     path("anhang/datei/<path:name>", anhaenge.anhang_pfad, name="anhang_pfad"),
     path("foerderung/", include("foerderung.urls")),
+    path("suche/", startseite.suche, name="suche"),
+    path("notizen/neu/", startseite.notiz_anlegen, name="notiz_anlegen"),
+    path("notizen/<int:pk>/", startseite.notiz_aendern, name="notiz_aendern"),
+    path("notizen/<int:pk>/aktion/", startseite.notiz_aktion, name="notiz_aktion"),
+    path("notizen/erledigte-loeschen/", startseite.erledigte_loeschen, name="notizen_erledigte_loeschen"),
     path("gesundheit/", views.gesundheit, name="gesundheit"),
     path("sprache/", views.sprache_wechseln, name="sprache_wechseln"),
     path("verwaltung/", admin.site.urls),

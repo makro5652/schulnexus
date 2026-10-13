@@ -1,0 +1,26 @@
+{% load i18n formate %}
+<section class="karte geburtstage" id="geburtstage">
+  <div class="karte-kopf">
+    <h2><svg class="symbol" viewBox="0 0 24 24" aria-hidden="true"><use href="#s-kerze"/></svg> {% translate "Geburtstage" %}</h2>
+    <span class="leise klein">{% translate "heute und die nächsten 7 Tage" %}</span>
+  </div>
+  {% for g in geburtstage %}
+    <div class="gb-tag{% if g.abstand == 0 %} heute{% endif %}">
+      <h3>{% if g.abstand == 0 %}{% translate "Heute" %}{% elif g.abstand == 1 %}{% translate "Morgen" %}{% else %}{{ g.tag|wochentag_datum }}{% endif %}</h3>
+      <ul>
+      {% for e in g.eintraege %}
+        <li>
+          {% if e.url %}<a href="{{ e.url }}">{{ e.name }}</a>{% else %}<span class="gb-name">{{ e.name }}</span>{% endif %}
+          <small class="leise">
+            {% if e.art == "schueler" %}{{ e.zusatz }}{% if e.zusatz %}, {% endif %}{% if g.abstand == 0 %}{% blocktranslate with n=e.alter %}wird heute {{ n }}{% endblocktranslate %}{% else %}{% blocktranslate with n=e.alter %}wird {{ n }}{% endblocktranslate %}{% endif %}
+            {% else %}{{ e.zusatz|default:_("Kollegium") }}{% endif %}
+          </small>
+          {% if e.ich and g.abstand == 0 %}<p class="gb-gruss">{% translate "Alles Gute zum Geburtstag!" %}</p>{% endif %}
+        </li>
+      {% endfor %}
+      </ul>
+    </div>
+  {% empty %}
+    <p class="leer">{% translate "In den nächsten sieben Tagen hat niemand Geburtstag." %}</p>
+  {% endfor %}
+</section>

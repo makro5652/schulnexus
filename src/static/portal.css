@@ -200,3 +200,119 @@ select, .formular input, .formular textarea { font: inherit; padding: 0.4rem 0.5
   a { color: #000; text-decoration: none; }
   .ziel { break-inside: avoid; }
 }
+
+/* ---------------------------------------------------------------- Startseite */
+:root {
+  --papier-gelb: #fbf3d3; --papier-gruen: #e1efe9; --papier-blau: #e3ebf5; --papier-rosa: #f6e4e4; --papier-grau: #ecebe7;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --papier-gelb: #3a3522; --papier-gruen: #233530; --papier-blau: #232f3d; --papier-rosa: #3b2829; --papier-grau: #2c2f31; }
+}
+.unsichtbar { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.symbol { width: 1.15em; height: 1.15em; vertical-align: -0.2em; flex: none; }
+.klein { font-size: 0.82rem; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--akzent); outline-offset: 2px;
+}
+
+.startkopf { display: grid; grid-template-columns: auto 1fr minmax(280px, 400px); gap: 1.2rem; align-items: center; margin-bottom: 1.4rem; }
+.startgruss h1 { margin: 0; font-size: 1.75rem; letter-spacing: -0.01em; }
+.startgruss .unterzeile { margin: 0.15rem 0 0; }
+@media (max-width: 820px) { .startkopf { grid-template-columns: auto 1fr; } .startkopf .suchfeld { grid-column: 1 / -1; } }
+
+/* Das Kalenderblatt ist das eine markante Element der Seite */
+.kalenderblatt { display: grid; grid-template-rows: auto 1fr auto; width: 4.6rem; text-align: center; border-radius: 10px; overflow: hidden;
+  background: var(--flaeche); border: 1px solid var(--linie); box-shadow: 0 2px 0 var(--linie); font-variant-numeric: lining-nums; }
+.kb-tag { background: var(--akzent); color: var(--flaeche); font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0; }
+.kb-zahl { font-size: 2.1rem; font-weight: 700; line-height: 1.05; padding-top: 0.25rem; color: var(--text); }
+.kb-monat { font-size: 0.75rem; color: var(--leise); padding-bottom: 0.35rem; }
+
+.suchfeld { display: flex; align-items: center; gap: 0.4rem; background: var(--flaeche); border: 1px solid var(--linie); border-radius: 999px; padding: 0.25rem 0.3rem 0.25rem 0.8rem; }
+.suchfeld:focus-within { border-color: var(--akzent); }
+.suchfeld .symbol { color: var(--leise); }
+.suchfeld input { flex: 1; min-width: 0; border: 0; background: transparent; font: inherit; color: var(--text); padding: 0.35rem 0; }
+.suchfeld input:focus-visible { outline: none; }
+.suchfeld .knopf { border-radius: 999px; }
+.suchfeld.gross { max-width: 640px; margin: 0.6rem 0 1.2rem; }
+
+.schnellzugriff { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem 1.6rem; margin-bottom: 1.4rem; }
+.sz-gruppe h2 { font-size: 0.85rem; color: var(--leise); font-weight: 600; margin: 0 0 0.45rem; }
+.sz-gruppe ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.sz-gruppe a { display: flex; flex-direction: column; padding: 0.5rem 0.8rem; min-width: 7.5rem; background: var(--flaeche); border: 1px solid var(--linie);
+  border-radius: 8px; text-decoration: none; color: var(--text); }
+.sz-gruppe a:hover { border-color: var(--akzent); }
+.sz-gruppe a span { color: var(--leise); font-size: 0.78rem; }
+.sz-bereiche a { flex-direction: row; align-items: center; gap: 0.45rem; min-width: 0; }
+.sz-bereiche a strong { font-weight: 500; font-size: 0.92rem; }
+.sz-bereiche .symbol { color: var(--akzent); }
+
+.startraster { display: grid; grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr); gap: 1.2rem; align-items: start; }
+.hauptspalte, .seitenspalte { display: grid; gap: 1.2rem; min-width: 0; }
+.hauptspalte .karte.hr { margin: 0; }
+.hauptspalte .spalten.drei { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+.hauptspalte .spalten.drei > div { min-width: 0; }
+.hauptspalte .hr .spalten.drei { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.hauptspalte .hr .spalten.drei > div:first-child { grid-column: 1 / -1; }
+@media (max-width: 600px) { .hauptspalte .hr .spalten.drei { grid-template-columns: 1fr; } }
+@media (max-width: 980px) { .startraster { grid-template-columns: 1fr; } }
+.kennzahlen { margin-top: 0; }
+
+/* Geburtstage */
+.geburtstage h2 { display: flex; align-items: center; gap: 0.4rem; }
+.geburtstage h2 .symbol { color: var(--akzent); }
+.gb-tag { padding: 0.55rem 0 0.35rem; border-top: 1px solid var(--linie); }
+.gb-tag:first-of-type { border-top: 0; }
+.gb-tag h3 { font-size: 0.8rem; color: var(--leise); margin: 0 0 0.2rem; font-weight: 600; }
+.gb-tag ul { list-style: none; margin: 0; padding: 0; }
+.gb-tag li { padding: 0.15rem 0; }
+.gb-tag small { display: block; font-size: 0.8rem; }
+.gb-tag.heute { background: var(--akzent-hell); margin: 0.3rem -0.7rem 0.2rem; padding: 0.55rem 0.7rem; border-radius: 8px; border-top: 0; }
+.gb-tag.heute h3 { color: var(--akzent); }
+.gb-tag.heute li { font-weight: 600; }
+.gb-tag.heute small { font-weight: 400; }
+.gb-gruss { margin: 0.2rem 0 0; color: var(--akzent); font-weight: 600; }
+
+/* Notizen */
+.notizen h2, .mitteilungen h2 { display: flex; align-items: center; gap: 0.4rem; }
+.notizen .karte-kopf { margin-bottom: 0.7rem; }
+.notizform { display: grid; gap: 0.45rem; margin-bottom: 0.9rem; }
+.notizliste .notizform { margin-bottom: 0.2rem; }
+.notizform textarea { width: 100%; font: inherit; padding: 0.5rem 0.6rem; border: 1px solid var(--linie); border-radius: 8px; background: var(--grund); color: var(--text); resize: vertical; }
+.notizform-zeile { display: flex; flex-wrap: wrap; gap: 0.5rem 0.8rem; align-items: center; }
+.notizform-zeile label.klein { display: flex; align-items: center; gap: 0.3rem; color: var(--leise); }
+.notizform-zeile input[type=date], .notizform-zeile select { font: inherit; font-size: 0.82rem; padding: 0.2rem 0.35rem; border: 1px solid var(--linie); border-radius: 6px; background: var(--grund); color: var(--text); }
+.notizform-zeile .knopf { margin-left: auto; }
+.farbwahl { border: 0; margin: 0; padding: 0; display: flex; gap: 0.3rem; }
+.farbpunkt { position: relative; width: 1.25rem; height: 1.25rem; border-radius: 50%; border: 1px solid var(--linie); cursor: pointer; }
+.farbpunkt input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.farbpunkt:has(input:checked) { outline: 2px solid var(--akzent); outline-offset: 1px; }
+.farbpunkt:has(input:focus-visible) { outline: 2px solid var(--text); outline-offset: 1px; }
+.farbe-gelb { background: var(--papier-gelb); } .farbe-gruen { background: var(--papier-gruen); } .farbe-blau { background: var(--papier-blau); }
+.farbe-rosa { background: var(--papier-rosa); } .farbe-grau { background: var(--papier-grau); }
+
+.notizliste { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 0.6rem; align-items: start; }
+.notizliste .leer { grid-column: 1 / -1; }
+.notiz { position: relative; border-radius: 6px 6px 6px 14px; padding: 0.65rem 0.8rem 0.5rem; }
+.mitteilungen .notiz + .notiz { margin-top: 0.55rem; }
+.notiz.angeheftet { box-shadow: inset 3px 0 0 var(--akzent); }
+.notiz.faellig { box-shadow: inset 3px 0 0 var(--warnung); }
+.notiz .nadel { position: absolute; top: 0.5rem; right: 0.55rem; color: var(--akzent); }
+.notiz-text { overflow-wrap: anywhere; padding-right: 1.2rem; }
+.notiz-meta { margin: 0.3rem 0 0; font-size: 0.75rem; color: var(--leise); }
+.notiz-aktionen { display: flex; flex-wrap: wrap; gap: 0.2rem 0.8rem; align-items: start; margin-top: 0.25rem; font-size: 0.8rem; }
+.notiz-aktionen form { margin: 0; display: flex; gap: 0.8rem; }
+.notiz-aktionen .link { font-size: 0.8rem; color: var(--leise); }
+.notiz-aktionen .link:hover { color: var(--akzent); }
+.notiz-aktionen .link.gefahr { color: var(--warnung); }
+.notiz-aktionen summary { cursor: pointer; color: var(--leise); list-style: none; }
+.notiz-aktionen summary::-webkit-details-marker { display: none; }
+.notiz-aktionen details[open] { flex-basis: 100%; order: 5; }
+.notiz-aktionen details[open] .notizform { margin-top: 0.4rem; }
+.erledigt-liste { margin-top: 0.9rem; font-size: 0.85rem; }
+.erledigt-liste summary { cursor: pointer; color: var(--leise); }
+.notiz-erledigt { display: flex; justify-content: space-between; gap: 0.6rem; padding: 0.35rem 0; border-bottom: 1px solid var(--linie); }
+.notiz-erledigt span { text-decoration: line-through; color: var(--leise); }
+.notiz-erledigt form { display: flex; gap: 0.6rem; margin: 0; white-space: nowrap; }
+.erledigt-liste > form { margin-top: 0.5rem; }
+@media (prefers-reduced-motion: no-preference) { .notiz-aktionen details[open] .notizform { animation: aufklappen 0.15s ease-out; } }
+@keyframes aufklappen { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: none; } }

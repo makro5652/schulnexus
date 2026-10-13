@@ -2,7 +2,50 @@
 {% load i18n formate %}
 {% block title %}{% translate "Start" %}{% endblock %}
 {% block inhalt %}
-<h1>{% blocktranslate with name=user.person.anzeigename|default:user.username %}Guten Tag, {{ name }}{% endblocktranslate %}</h1>
+{% include "portal/_symbole.html" %}
+
+<header class="startkopf">
+  <div class="kalenderblatt" aria-hidden="true">
+    <span class="kb-tag">{{ heute|date:"D" }}</span>
+    <span class="kb-zahl">{{ heute|date:"j" }}</span>
+    <span class="kb-monat">{{ heute|date:"M" }}</span>
+  </div>
+  <div class="startgruss">
+    <h1>{{ begruessung }}, {{ user.person.rufname|default:user.person.vorname|default:user.get_username }}</h1>
+    <p class="unterzeile">{{ heute|langdatum }}, {% blocktranslate with kw=kalenderwoche %}Kalenderwoche {{ kw }}{% endblocktranslate %}</p>
+  </div>
+  <form class="suchfeld" method="get" action="{% url 'suche' %}" role="search">
+    <label for="suche-q" class="unsichtbar">{% translate "Person suchen" %}</label>
+    <svg class="symbol" viewBox="0 0 24 24" aria-hidden="true"><use href="#s-lupe"/></svg>
+    <input id="suche-q" type="search" name="q" placeholder="{% translate 'Person suchen …' %}" minlength="2" required>
+    <button type="submit" class="knopf klein">{% translate "Suchen" %}</button>
+  </form>
+</header>
+
+{% with sz=schnellzugriff %}
+{% if sz.klassen or sz.kurse or sz.bereiche %}
+<nav class="schnellzugriff" aria-label="{% translate 'Schnellzugriff' %}">
+  {% if sz.klassen %}
+  <div class="sz-gruppe">
+    <h2>{% translate "Meine Klassen und Gruppen" %}</h2>
+    <ul>{% for k in sz.klassen %}<li><a href="{{ k.url }}"><strong>{{ k.titel }}</strong><span>{% blocktranslate count n=k.anzahl %}{{ n }} Schüler:in{% plural %}{{ n }} Schüler:innen{% endblocktranslate %}</span></a></li>{% endfor %}</ul>
+  </div>
+  {% endif %}
+  {% if sz.kurse %}
+  <div class="sz-gruppe">
+    <h2>{% translate "Mein Unterricht" %}</h2>
+    <ul>{% for k in sz.kurse %}<li><a href="{{ k.url }}"><strong>{{ k.titel }}</strong><span>{% translate "Noten" %} · {{ k.unter }}</span></a></li>{% endfor %}</ul>
+  </div>
+  {% endif %}
+  {% if sz.bereiche %}
+  <div class="sz-gruppe">
+    <h2>{% translate "Bereiche" %}</h2>
+    <ul class="sz-bereiche">{% for b in sz.bereiche %}<li><a href="{{ b.url }}"><svg class="symbol" viewBox="0 0 24 24" aria-hidden="true"><use href="#s-{{ b.symbol }}"/></svg><strong>{{ b.titel }}</strong></a></li>{% endfor %}</ul>
+  </div>
+  {% endif %}
+</nav>
+{% endif %}
+{% endwith %}
 
 {% if kennzahlen %}
 <section class="kennzahlen" aria-label="{% translate 'Kennzahlen' %}">
@@ -15,73 +58,41 @@
 </section>
 {% endif %}
 
-{% if hr %}
-<section class="karte hr">
-  <div class="karte-kopf">
-    <h2>{% blocktranslate with n=hr.aktiv %}Personal · {{ n }} aktive Beschäftigte{% endblocktranslate %}</h2>
-    <a class="knopf zweitrangig" href="{% url 'admin:stammdaten_personalprofil_changelist' %}">{% translate "Personalliste" %}</a>
-  </div>
-  <p class="bereiche">{% for b in hr.bereiche %}<a class="etikett" href="{% url 'admin:stammdaten_personalprofil_changelist' %}?bereich__id__exact={{ b.pk }}">{{ b.lokal_name }} {{ b.anzahl }}</a>{% endfor %}</p>
-  <div class="spalten drei">
-    <div>
-      <h3>{% blocktranslate with n=hr.offen|length %}Nachweise mit Handlungsbedarf ({{ n }}){% endblocktranslate %}</h3>
-      {% if hr.offen %}
-      <table class="liste kompakt">
+<div class="startraster">
+  <div class="hauptspalte">
+    {% if foerderung %}{% include "foerderung/_start.html" %}{% endif %}
+    {% if hr %}{% include "portal/_start_hr.html" %}{% endif %}
+
+    {% include "portal/_notizen.html" with nur="notizen" %}
+
+    {% if unterrichte is not None %}
+    <section class="karte">
+      <h2>{% translate "Unterrichte im Schuljahr" %}</h2>
+      {% if unterrichte %}
+      <div class="rollbar"><table class="liste">
+        <thead><tr><th>{% translate "Fach" %}</th><th>{% translate "Gruppe" %}</th><th>{% translate "Halbjahr" %}</th><th>{% translate "Lehrkraft" %}</th><th></th></tr></thead>
         <tbody>
-        {% for e in hr.offen|slice:":12" %}
-          <tr>
-            <td><a href="{% url 'admin:stammdaten_personalprofil_change' e.personal.pk %}">{{ e.personal.person.anzeigename }}</a><br><span class="leise">{{ e.personal.bereich.lokal_name|default:"" }}</span></td>
-            <td>{{ e.art.lokal_name }}</td>
-            <td class="{% if e.status != 'laeuft_ab' %}auffaellig{% endif %}">{% if e.status == "fehlt" %}{% translate "fehlt" %}{% elif e.status == "abgelaufen" %}{% blocktranslate with datum=e.nachweis.gueltig_bis|kurzdatum %}abgelaufen {{ datum }}{% endblocktranslate %}{% else %}{% blocktranslate with datum=e.nachweis.gueltig_bis|kurzdatum %}bis {{ datum }}{% endblocktranslate %}{% endif %}</td>
-          </tr>
+        {% for u in unterrichte %}
+          <tr><td>{{ u.fach.lokal_name }}</td><td>{{ u.gruppe.name }}</td><td>{{ u.abschnitt.lokal_name }}</td><td>{{ u.lehrkraft.kuerzel }}</td>
+          <td><a href="{% url 'notenuebersicht' u.pk %}">{% translate "Noten" %}</a></td></tr>
         {% endfor %}
         </tbody>
-      </table>
-      {% if hr.offen|length > 12 %}<p><a href="{% url 'admin:stammdaten_personalprofil_changelist' %}?nachweise=offen">{% blocktranslate with n=hr.offen|length %}alle {{ n }} anzeigen{% endblocktranslate %}</a></p>{% endif %}
-      {% else %}<p class="leer">{% translate "Alle Pflichtnachweise sind vorhanden und gültig." %}</p>{% endif %}
-    </div>
-    <div>
-      <h3>{% translate "Heute abwesend" %}</h3>
-      {% for a in hr.abwesend %}<p>{{ a.personal.person.anzeigename }} <span class="leise">· {% blocktranslate with art=a.get_art_display datum=a.bis|tagmonat %}{{ art }} bis {{ datum }}{% endblocktranslate %}</span></p>{% empty %}<p class="leer">{% translate "Niemand." %}</p>{% endfor %}
-      {% if hr.beantragt %}<p><a href="{% url 'admin:stammdaten_personalabwesenheit_changelist' %}?status__exact=beantragt">{% blocktranslate with n=hr.beantragt %}Offene Abwesenheitsanträge: {{ n }}{% endblocktranslate %}</a></p>{% endif %}
-    </div>
-    <div>
-      <h3>{% translate "Vertragsenden (6 Monate)" %}</h3>
-      {% for p in hr.vertragsende %}<p>{{ p.person.anzeigename }} <span class="leise">· {{ p.vertragsende|kurzdatum }}</span></p>{% empty %}<p class="leer">{% translate "Keine." %}</p>{% endfor %}
-    </div>
+      </table></div>
+      {% else %}<p class="leer">{% translate "Keine Unterrichte zugeordnet." %}</p>{% endif %}
+    </section>
+    {% endif %}
+
+    {% if not foerderung and not hr and unterrichte is None and not schnellzugriff.klassen and not schnellzugriff.kurse %}
+    <section class="karte">
+      <h2>{% translate "Willkommen" %}</h2>
+      <p class="leer">{% translate "Ihrem Konto sind noch keine Klassen oder Unterrichte zugeordnet. Die Verwaltung kann das unter Personal und Klassen nachtragen." %}</p>
+    </section>
+    {% endif %}
   </div>
-</section>
-{% endif %}
 
-{% if foerderung %}{% include "foerderung/_start.html" %}{% endif %}
-
-<div class="spalten">
-  <section class="karte">
-    <h2>{% if ist_verwaltung %}{% translate "Unterrichte im Schuljahr" %}{% else %}{% translate "Meine Unterrichte" %}{% endif %}</h2>
-    {% if unterrichte %}
-    <table class="liste">
-      <thead><tr><th>{% translate "Fach" %}</th><th>{% translate "Gruppe" %}</th><th>{% translate "Halbjahr" %}</th>{% if ist_verwaltung %}<th>{% translate "Lehrkraft" %}</th>{% endif %}<th></th></tr></thead>
-      <tbody>
-      {% for u in unterrichte %}
-        <tr>
-          <td>{{ u.fach.lokal_name }}</td><td>{{ u.gruppe.name }}</td><td>{{ u.abschnitt.lokal_name }}</td>
-          {% if ist_verwaltung %}<td>{{ u.lehrkraft.kuerzel }}</td>{% endif %}
-          <td><a href="{% url 'notenuebersicht' u.pk %}">{% translate "Noten" %}</a></td>
-        </tr>
-      {% endfor %}
-      </tbody>
-    </table>
-    {% else %}<p class="leer">{% translate "Keine Unterrichte zugeordnet." %}</p>{% endif %}
-  </section>
-
-  <section class="karte">
-    <h2>{% translate "Meine Klassen und Gruppen" %}</h2>
-    {% if klassen %}
-    <ul class="kacheln">
-      {% for k in klassen %}<li><a href="{% url 'klassenliste' k.gruppe.pk %}"><strong>{{ k.gruppe.name }}</strong><span>{% blocktranslate count n=k.anzahl %}{{ n }} Schüler:in{% plural %}{{ n }} Schüler:innen{% endblocktranslate %}</span></a></li>{% endfor %}
-    </ul>
-    {% else %}<p class="leer">{% translate "Keine Klassenleitung." %}</p>{% endif %}
-    {% if user.is_staff %}<p><a class="knopf zweitrangig" href="{% url 'admin:index' %}">{% translate "Zur Verwaltungsoberfläche" %}</a></p>{% endif %}
-  </section>
+  <aside class="seitenspalte">
+    {% include "portal/_geburtstage.html" %}
+    {% include "portal/_notizen.html" with nur="mitteilungen" %}
+  </aside>
 </div>
 {% endblock %}

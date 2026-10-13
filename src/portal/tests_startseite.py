@@ -1,0 +1,193 @@
+"""Tests für die Startseite: Geburtstage, Notizen, Mitteilungen, Suche (seit Version 0.4.2.1)."""
+from datetime import date, timedelta
+
+from django.contrib.auth.models import Group, User
+from django.core.management import call_command
+from django.test import SimpleTestCase, TestCase
+from django.urls import reverse
+from django.utils import timezone
+
+from stammdaten.models import Gruppe, Personalprofil, Schuelerprofil
+
+from .models import Notiz
+from .startseite import _naechster_geburtstag, geburtstage
+
+PW = "Test-Passwort-123"
+
+
+class NaechsterGeburtstagTest(SimpleTestCase):
+    def test_heute_und_spaeter(self):
+        self.assertEqual(_naechster_geburtstag(date(2011, 10, 13), date(2026, 10, 13)), date(2026, 10, 13))
+        self.assertEqual(_naechster_geburtstag(date(2011, 10, 12), date(2026, 10, 13)), date(2027, 10, 12))
+
+    def test_jahreswechsel(self):
+        self.assertEqual(_naechster_geburtstag(date(2010, 1, 2), date(2026, 12, 30)), date(2027, 1, 2))
+
+    def test_29_februar(self):
+        self.assertEqual(_naechster_geburtstag(date(2012, 2, 29), date(2027, 2, 20)), date(2027, 2, 28))
+        self.assertEqual(_naechster_geburtstag(date(2012, 2, 29), date(2028, 2, 20)), date(2028, 2, 29))
+
+
+class StartseiteTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        call_command("demodaten", passwort=PW, stdout=open("/dev/null", "w"))
+        cls.fremd = User.objects.create_user("fremd", password=PW, is_staff=True)
+        cls.fremd.groups.add(Group.objects.get(name="Lehrkraft"))
+        cls.heute = timezone.localdate()
+        cls.s9a = Gruppe.objects.get(name="9a").aktuelle_mitglieder().order_by("person__nachname").first()
+
+    def anmelden(self, name):
+        self.client.logout()
+        self.assertTrue(self.client.login(username=name, password=PW))
+
+    def namen(self, user):
+        return {e["name"] for g in geburtstage(user, self.heute) for e in g["eintraege"]}
+
+    # --------------------------------------------------------------- Geburtstage
+    def test_geburtstag_heute_mit_alter(self):
+        gruppen = geburtstage(User.objects.get(username="lehrkraft"), self.heute)
+        self.assertEqual(gruppen[0]["abstand"], 0)
+        eintrag = next(e for e in gruppen[0]["eintraege"] if e["name"] == self.s9a.person.anzeigename)
+        self.assertEqual(eintrag["alter"], self.heute.year - self.s9a.person.geburtsdatum.year)
+        self.assertTrue(eintrag["url"])  # Klassenleitung darf die Akte öffnen
+
+    def test_nur_sieben_tage(self):
+        for g in geburtstage(User.objects.get(username="verwaltung"), self.heute):
+            self.assertTrue(0 <= g["abstand"] <= 7)
+
+    def test_sichtbarkeit_schueler(self):
+        alle = self.namen(User.objects.get(username="verwaltung"))
+        fremd = self.namen(self.fremd)
+        schueler_namen = {s.person.anzeigename for s in Schuelerprofil.objects.all()}
+        self.assertTrue(alle & schueler_namen)
+        self.assertFalse(fremd & schueler_namen)  # Lehrkraft ohne Klassen und Kurse sieht keine Schüler:innen
+        # Kolleg:innen sieht jedes Personal-Konto, aber ohne Altersangabe
+        kollegen = [e for g in geburtstage(self.fremd, self.heute) for e in g["eintraege"]]
+        self.assertTrue(kollegen)
+        self.assertTrue(all(e["alter"] is None for e in kollegen))
+
+    def test_widerspruch_blendet_aus(self):
+        p = self.s9a.person
+        p.geburtstag_anzeigen = False
+        p.save()
+        self.assertNotIn(p.anzeigename, self.namen(User.objects.get(username="verwaltung")))
+
+    def test_abgegangene_und_inaktive_nicht(self):
+        Schuelerprofil.objects.filter(pk=self.s9a.pk).update(status="abgang")
+        self.assertNotIn(self.s9a.person.anzeigename, self.namen(User.objects.get(username="verwaltung")))
+        pp = Personalprofil.objects.get(kuerzel="MUE")
+        pp.aktiv = False
+        pp.save()
+        self.assertNotIn(pp.person.anzeigename, self.namen(User.objects.get(username="verwaltung")))
+
+    def test_karte_auf_startseite(self):
+        self.anmelden("lehrkraft")
+        r = self.client.get(reverse("start"))
+        self.assertContains(r, 'id="geburtstage"')
+        self.assertContains(r, "Heute")
+        self.assertContains(r, self.s9a.person.anzeigename)
+
+    # --------------------------------------------------------------- Notizen
+    def test_notiz_anlegen_und_privat(self):
+        self.anmelden("lehrkraft")
+        self.client.post(reverse("notiz_anlegen"), {"notiz-text": "Kreide kaufen", "notiz-farbe": "blau"})
+        n = Notiz.objects.get(text="Kreide kaufen")
+        self.assertEqual(n.besitzer.username, "lehrkraft")
+        self.assertEqual(n.sichtbarkeit, Notiz.PRIVAT)
+        self.assertContains(self.client.get(reverse("start")), "Kreide kaufen")
+        self.anmelden("verwaltung")
+        self.assertNotContains(self.client.get(reverse("start")), "Kreide kaufen")
+        self.assertEqual(self.client.post(reverse("notiz_aktion", args=[n.pk]), {"aktion": "loeschen"}).status_code, 403)
+        self.assertTrue(Notiz.objects.filter(pk=n.pk).exists())
+
+    def test_leere_notiz_wird_abgelehnt(self):
+        self.anmelden("lehrkraft")
+        vorher = Notiz.objects.count()
+        self.client.post(reverse("notiz_anlegen"), {"notiz-text": "", "notiz-farbe": "gelb"})
+        self.assertEqual(Notiz.objects.count(), vorher)
+
+    def test_erledigt_anheften_bearbeiten_loeschen(self):
+        self.anmelden("lehrkraft")
+        n = Notiz.objects.create(besitzer=User.objects.get(username="lehrkraft"), text="Test")
+        url = reverse("notiz_aktion", args=[n.pk])
+        self.client.post(url, {"aktion": "anheften"})
+        n.refresh_from_db()
+        self.assertTrue(n.angeheftet)
+        self.client.post(url, {"aktion": "erledigt"})
+        n.refresh_from_db()
+        self.assertTrue(n.erledigt)
+        self.assertFalse(n.angeheftet)
+        self.client.post(reverse("notiz_aendern", args=[n.pk]), {f"n{n.pk}-text": "Geändert", f"n{n.pk}-farbe": "rosa",
+                                                                 f"n{n.pk}-datum": self.heute.isoformat()})
+        n.refresh_from_db()
+        self.assertEqual((n.text, n.farbe, n.datum), ("Geändert", "rosa", self.heute))
+        self.client.post(reverse("notizen_erledigte_loeschen"))
+        self.assertFalse(Notiz.objects.filter(pk=n.pk).exists())
+
+    def test_faellige_notiz(self):
+        n = Notiz.objects.create(besitzer=User.objects.get(username="lehrkraft"), text="x", datum=self.heute - timedelta(days=1))
+        self.assertTrue(n.faellig)
+        n.datum = self.heute + timedelta(days=1)
+        self.assertFalse(n.faellig)
+
+    def test_mitteilung_nur_durch_verwaltung(self):
+        self.anmelden("lehrkraft")
+        self.client.post(reverse("notiz_anlegen"), {"notiz-text": "An alle?", "notiz-farbe": "gelb", "notiz-sichtbarkeit": "alle"})
+        self.assertEqual(Notiz.objects.get(text="An alle?").sichtbarkeit, Notiz.PRIVAT)
+        self.anmelden("verwaltung")
+        self.client.post(reverse("notiz_anlegen"), {"notiz-text": "Schulfest am Samstag", "notiz-farbe": "gruen",
+                                                    "notiz-sichtbarkeit": "alle"})
+        m = Notiz.objects.get(text="Schulfest am Samstag")
+        self.assertEqual(m.sichtbarkeit, Notiz.ALLE)
+        self.anmelden("fremd")
+        r = self.client.get(reverse("start"))
+        self.assertContains(r, "Schulfest am Samstag")
+        self.assertEqual(self.client.post(reverse("notiz_aktion", args=[m.pk]), {"aktion": "loeschen"}).status_code, 403)
+
+    def test_abgelaufene_mitteilung_verschwindet(self):
+        Notiz.objects.create(besitzer=User.objects.get(username="verwaltung"), text="Alte Mitteilung",
+                             sichtbarkeit=Notiz.ALLE, datum=self.heute - timedelta(days=1))
+        self.anmelden("lehrkraft")
+        self.assertNotContains(self.client.get(reverse("start")), "Alte Mitteilung")
+
+    # --------------------------------------------------------------- Suche
+    def test_suche_klassenleitung(self):
+        self.anmelden("lehrkraft")
+        r = self.client.get(reverse("suche"), {"q": self.s9a.person.nachname})
+        self.assertIn(self.s9a.pk, [e["s"].pk for e in r.context["schueler"]])
+        self.assertTrue(all(e["akte"] or e["s"].pk != self.s9a.pk for e in r.context["schueler"]))
+
+    def test_suche_fremde_lehrkraft_findet_keine_schueler(self):
+        self.anmelden("fremd")
+        r = self.client.get(reverse("suche"), {"q": self.s9a.person.nachname})
+        self.assertEqual(r.context["schueler"], [])
+
+    def test_suche_kollegium_und_mindestlaenge(self):
+        self.anmelden("lehrkraft")
+        r = self.client.get(reverse("suche"), {"q": "Müller"})
+        self.assertTrue(any(e["pp"].kuerzel == "MUE" for e in r.context["personal"]))
+        self.assertTrue(self.client.get(reverse("suche"), {"q": "M"}).context["zu_kurz"])
+
+    # --------------------------------------------------------------- Darstellung
+    def test_startseite_fuer_alle_rollen_und_sprachen(self):
+        for name in ("lehrkraft", "verwaltung", "personal", "foerderung", "fremd"):
+            for sprache in ("de", "en"):
+                self.anmelden(name)
+                self.client.post(reverse("sprache_wechseln"), {"sprache": sprache, "next": "/"})
+                r = self.client.get(reverse("start"))
+                self.assertEqual(r.status_code, 200, (name, sprache))
+                self.assertContains(r, "kalenderblatt")
+        r = self.client.get(reverse("start"))
+        self.assertContains(r, "Birthdays")
+        self.assertContains(r, "Notes")
+
+    def test_schnellzugriff_rollenabhaengig(self):
+        self.anmelden("lehrkraft")
+        sz = self.client.get(reverse("start")).context["schnellzugriff"]
+        self.assertIn("9a", [k["titel"] for k in sz["klassen"]])
+        self.assertTrue(any(k["titel"].startswith("Chemie") for k in sz["kurse"]))
+        self.assertNotIn(reverse("admin:stammdaten_personalprofil_changelist"), [b["url"] for b in sz["bereiche"]])
+        self.anmelden("personal")
+        sz = self.client.get(reverse("start")).context["schnellzugriff"]
+        self.assertIn(reverse("admin:stammdaten_personalprofil_changelist"), [b["url"] for b in sz["bereiche"]])

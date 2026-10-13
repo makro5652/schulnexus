@@ -17,3 +17,23 @@ def tagmonat(wert):
     if not wert:
         return ""
     return formats.date_format(wert, TAG_MONAT.get((translation.get_language() or "de")[:2], "d.m."))
+
+
+LANGDATUM = {"de": "l, j. F Y", "en": "l j F Y"}
+WOCHENTAG_DATUM = {"de": "l, j. F", "en": "l j F"}
+
+
+def _sprache():
+    return (translation.get_language() or "de")[:2]
+
+
+@register.filter
+def langdatum(wert):
+    """Dienstag, 13. Oktober 2026 / Tuesday 13 October 2026"""
+    return formats.date_format(wert, LANGDATUM.get(_sprache(), LANGDATUM["de"])) if wert else ""
+
+
+@register.filter
+def wochentag_datum(wert):
+    """Donnerstag, 15. Oktober / Thursday 15 October"""
+    return formats.date_format(wert, WOCHENTAG_DATUM.get(_sprache(), WOCHENTAG_DATUM["de"])) if wert else ""

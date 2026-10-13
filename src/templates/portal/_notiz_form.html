@@ -1,0 +1,16 @@
+{% load i18n %}
+<form method="post" action="{% if ziel %}{% url 'notiz_aendern' ziel.pk %}{% else %}{% url 'notiz_anlegen' %}{% endif %}" class="notizform">
+  {% csrf_token %}
+  <label class="unsichtbar" for="{{ form.text.id_for_label }}">{{ form.text.label }}</label>
+  {{ form.text }}
+  <div class="notizform-zeile">
+    <fieldset class="farbwahl">
+      <legend class="unsichtbar">{{ form.farbe.label }}</legend>
+      {% for r in form.farbe %}<label class="farbpunkt farbe-{{ r.data.value }}" title="{{ r.choice_label }}">{{ r.tag }}<span class="unsichtbar">{{ r.choice_label }}</span></label>{% endfor %}
+    </fieldset>
+    <label class="klein">{{ form.datum.label }} {{ form.datum }}</label>
+    <label class="klein haken">{{ form.angeheftet }} {{ form.angeheftet.label }}</label>
+    {% if form.sichtbarkeit %}<label class="klein">{{ form.sichtbarkeit.label }} {{ form.sichtbarkeit }}</label>{% endif %}
+    <button type="submit" class="knopf klein">{% if ziel %}{% translate "Änderung speichern" %}{% else %}{% translate "Notiz speichern" %}{% endif %}</button>
+  </div>
+</form>

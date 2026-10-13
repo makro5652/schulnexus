@@ -128,6 +128,11 @@ class Command(BaseCommand):
                 call_command("grundeinrichtung", stdout=self.stdout)
                 self.foerderung_anlegen(opts["passwort"])
                 self.stdout.write("Beispiele für Förderung und Anhänge ergänzt.")
+            from portal.models import Notiz
+
+            if not Notiz.objects.exists():
+                self.startseite_anlegen()
+                self.stdout.write("Beispiele für Notizen und Geburtstage ergänzt.")
             return
 
         call_command("grundeinrichtung", stdout=self.stdout)
@@ -480,6 +485,7 @@ class Command(BaseCommand):
             s_.save(update_fields=["zusatzfelder"])
 
         self.foerderung_anlegen(pw)
+        self.startseite_anlegen()
 
         self.stdout.write(self.style.SUCCESS(
             f"Demo-Daten angelegt: {len(alle)} Schüler:innen, {Person.objects.count()} Personen, "
@@ -632,6 +638,46 @@ class Command(BaseCommand):
                            "bittet um Rückmeldung zur nächsten Klassenarbeit.")
             d.save()
             Dokument.objects.filter(pk=d.pk).update(hochgeladen_am=jetzt - timedelta(days=tage))
+
+    # ------------------------------------------------------------ Startseite: Geburtstage und Notizen (ab 0.4.2.1)
+    def startseite_anlegen(self):
+        from portal.models import Notiz
+
+        heute = timezone.localdate()
+        sj = Schuljahr.objects.get(name="2026/27")
+
+        def geburtstag_in(person, tage):
+            ziel = heute + timedelta(days=tage)
+            g = person.geburtsdatum or date(1985, 1, 1)
+            tag = 28 if (ziel.month == 2 and ziel.day == 29) else ziel.day
+            person.geburtsdatum = g.replace(month=ziel.month, day=tag)
+            person.save(update_fields=["geburtsdatum"])
+
+        s9a = list(Gruppe.objects.get(schuljahr=sj, name="9a").aktuelle_mitglieder().order_by("person__nachname"))
+        s8a = list(Gruppe.objects.get(schuljahr=sj, name="8a").aktuelle_mitglieder().order_by("person__nachname"))
+        geburtstag_in(s9a[0].person, 0)
+        geburtstag_in(s9a[6].person, 2)
+        geburtstag_in(s8a[1].person, 1)
+        for kuerzel, tage in (("MUE", 3), ("BRA", 0)):
+            pp = Personalprofil.objects.filter(kuerzel=kuerzel).select_related("person").first()
+            if pp:
+                geburtstag_in(pp.person, tage)
+        fm = Personalprofil.objects.filter(stellenbezeichnung="Facility Manager").select_related("person").first()
+        if fm:
+            geburtstag_in(fm.person, 6)
+
+        lehrkraft = User.objects.get(username="lehrkraft")
+        verwaltung = User.objects.get(username="verwaltung")
+        Notiz.objects.create(besitzer=lehrkraft, text="Elternabend 9a vorbereiten: Einladung an alle Eltern bis Freitag verschicken.",
+                             farbe="gelb", angeheftet=True, datum=heute + timedelta(days=3))
+        Notiz.objects.create(besitzer=lehrkraft, text="Chemikalienbestellung an die Fachleitung: Kupfer(II)-sulfat, Magnesiumband, Universalindikator.",
+                             farbe="gruen")
+        Notiz.objects.create(besitzer=lehrkraft, text="Förderplan Arbeitsorganisation: Evaluationstermin mit den Eltern abstimmen.",
+                             farbe="blau", datum=heute)
+        Notiz.objects.create(besitzer=lehrkraft, text="Protokolle Flammenfärbung 9b einsammeln.", farbe="grau", erledigt=True)
+        Notiz.objects.create(besitzer=verwaltung, sichtbarkeit=Notiz.ALLE, farbe="rosa", angeheftet=True,
+                             text="Am Freitag entfällt die 7. Stunde wegen der Gesamtkonferenz (Aula, 13:45 Uhr).",
+                             datum=heute + timedelta(days=4))
 
 
 def beispiel_pdf(titel, name):

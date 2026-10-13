@@ -1,0 +1,36 @@
+{% load i18n formate %}
+<section class="karte hr">
+  <div class="karte-kopf">
+    <h2>{% blocktranslate with n=hr.aktiv %}Personal · {{ n }} aktive Beschäftigte{% endblocktranslate %}</h2>
+    <a class="knopf zweitrangig" href="{% url 'admin:stammdaten_personalprofil_changelist' %}">{% translate "Personalliste" %}</a>
+  </div>
+  <p class="bereiche">{% for b in hr.bereiche %}<a class="etikett" href="{% url 'admin:stammdaten_personalprofil_changelist' %}?bereich__id__exact={{ b.pk }}">{{ b.lokal_name }} {{ b.anzahl }}</a>{% endfor %}</p>
+  <div class="spalten drei">
+    <div>
+      <h3>{% blocktranslate with n=hr.offen|length %}Nachweise mit Handlungsbedarf ({{ n }}){% endblocktranslate %}</h3>
+      {% if hr.offen %}
+      <table class="liste kompakt">
+        <tbody>
+        {% for e in hr.offen|slice:":12" %}
+          <tr>
+            <td><a href="{% url 'admin:stammdaten_personalprofil_change' e.personal.pk %}">{{ e.personal.person.anzeigename }}</a><br><span class="leise">{{ e.personal.bereich.lokal_name|default:"" }}</span></td>
+            <td>{{ e.art.lokal_name }}</td>
+            <td class="{% if e.status != 'laeuft_ab' %}auffaellig{% endif %}">{% if e.status == "fehlt" %}{% translate "fehlt" %}{% elif e.status == "abgelaufen" %}{% blocktranslate with datum=e.nachweis.gueltig_bis|kurzdatum %}abgelaufen {{ datum }}{% endblocktranslate %}{% else %}{% blocktranslate with datum=e.nachweis.gueltig_bis|kurzdatum %}bis {{ datum }}{% endblocktranslate %}{% endif %}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      {% if hr.offen|length > 12 %}<p><a href="{% url 'admin:stammdaten_personalprofil_changelist' %}?nachweise=offen">{% blocktranslate with n=hr.offen|length %}alle {{ n }} anzeigen{% endblocktranslate %}</a></p>{% endif %}
+      {% else %}<p class="leer">{% translate "Alle Pflichtnachweise sind vorhanden und gültig." %}</p>{% endif %}
+    </div>
+    <div>
+      <h3>{% translate "Heute abwesend" %}</h3>
+      {% for a in hr.abwesend %}<p>{{ a.personal.person.anzeigename }} <span class="leise">· {% blocktranslate with art=a.get_art_display datum=a.bis|tagmonat %}{{ art }} bis {{ datum }}{% endblocktranslate %}</span></p>{% empty %}<p class="leer">{% translate "Niemand." %}</p>{% endfor %}
+      {% if hr.beantragt %}<p><a href="{% url 'admin:stammdaten_personalabwesenheit_changelist' %}?status__exact=beantragt">{% blocktranslate with n=hr.beantragt %}Offene Abwesenheitsanträge: {{ n }}{% endblocktranslate %}</a></p>{% endif %}
+    </div>
+    <div>
+      <h3>{% translate "Vertragsenden (6 Monate)" %}</h3>
+      {% for p in hr.vertragsende %}<p>{{ p.person.anzeigename }} <span class="leise">· {{ p.vertragsende|kurzdatum }}</span></p>{% empty %}<p class="leer">{% translate "Keine." %}</p>{% endfor %}
+    </div>
+  </div>
+</section>
