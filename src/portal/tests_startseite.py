@@ -33,7 +33,7 @@ class StartseiteTest(TestCase):
     def setUpTestData(cls):
         call_command("demodaten", passwort=PW, stdout=open("/dev/null", "w"))
         cls.fremd = User.objects.create_user("fremd", password=PW, is_staff=True)
-        cls.fremd.groups.add(Group.objects.get(name="Lehrkraft"))
+        cls.fremd.groups.add(Group.objects.get(name="Lehrer:in"))
         cls.heute = timezone.localdate()
         cls.s9a = Gruppe.objects.get(name="9a").aktuelle_mitglieder().order_by("person__nachname").first()
 

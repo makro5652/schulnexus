@@ -48,7 +48,8 @@ echo "Verwaltungsoberfläche:  http://localhost:${PORT}/verwaltung/"
 echo ""
 echo "Zugangsdaten stehen in der Datei .env:"
 grep -E '^(ADMIN_BENUTZER|ADMIN_PASSWORT|DEMO_PASSWORT)=' .env | sed 's/^/  /'
-echo "  Demo-Konten (Passwort = DEMO_PASSWORT): lehrkraft, verwaltung, personal, foerderung"
+echo "  Demo-Konten (Passwort = DEMO_PASSWORT): lehrkraft, mittelstufe, oberstufe, schulleitung, verwaltung,"
+echo "  verwaltungsleitung, personal, finanzen, foerderung"
 echo ""
 echo "Stoppen mit:  docker compose down"
 

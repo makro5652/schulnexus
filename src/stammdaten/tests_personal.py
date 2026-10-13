@@ -80,13 +80,13 @@ class PersonalTest(Grundlage):
 
 class RechteTest(Grundlage):
     def test_verwaltung_hat_keine_hr_rechte(self):
-        u = self.benutzer("sek", "Verwaltung")
+        u = self.benutzer("sek", "Sekretariat")
         self.assertTrue(u.has_perm("stammdaten.view_personalprofil"))
         self.assertFalse(u.has_perm("stammdaten.view_hr_daten"))
         self.assertFalse(u.has_perm("stammdaten.view_nachweis"))
 
     def test_hr_hat_hr_rechte_aber_keine_noten(self):
-        u = self.benutzer("hr", "Personalverwaltung")
+        u = self.benutzer("hr", "HR-Management")
         self.assertTrue(u.has_perm("stammdaten.view_hr_daten"))
         self.assertTrue(u.has_perm("stammdaten.change_nachweis"))
         self.assertFalse(u.has_perm("noten.view_note"))
@@ -95,7 +95,7 @@ class RechteTest(Grundlage):
     def test_grundeinrichtung_entfernt_keine_angepassten_rechte(self):
         from django.contrib.auth.models import Permission
 
-        g = Group.objects.get(name="Lehrkraft")
+        g = Group.objects.get(name="Lehrer:in")
         extra = Permission.objects.get(codename="view_gesundheit_klasse")
         g.permissions.add(extra)
         call_command("grundeinrichtung", stdout=open("/dev/null", "w"))
@@ -104,11 +104,11 @@ class RechteTest(Grundlage):
     def test_hr_abschnitt_nur_fuer_hr(self):
         pp = Personalprofil.objects.create(person=Person.objects.create(vorname="A", nachname="B"), bereich=self.sich)
         url = reverse("admin:stammdaten_personalprofil_change", args=[pp.pk])
-        self.client.force_login(self.benutzer("sek", "Verwaltung"))
+        self.client.force_login(self.benutzer("sek", "Sekretariat"))
         r = self.client.get(url)
         self.assertEqual(r.status_code, 200)
         self.assertNotContains(r, "Dienstverhältnis (HR)")
-        self.client.force_login(self.benutzer("hr", "Personalverwaltung"))
+        self.client.force_login(self.benutzer("hr", "HR-Management"))
         r = self.client.get(url)
         self.assertContains(r, "Dienstverhältnis (HR)")
         self.assertContains(r, "Nachweise")
@@ -147,7 +147,7 @@ class ZusatzfeldTest(Grundlage):
         self.assertEqual(self.haus.anzeigewert(None), "—")
 
     def test_sichtbarkeit(self):
-        lk, sek, hr = self.benutzer("lk", "Lehrkraft"), self.benutzer("sek", "Verwaltung"), self.benutzer("hr", "Personalverwaltung")
+        lk, sek, hr = self.benutzer("lk", "Lehrer:in"), self.benutzer("sek", "Sekretariat"), self.benutzer("hr", "HR-Management")
         self.assertTrue(darf_sehen(lk, self.haus))
         self.assertFalse(darf_sehen(lk, self.datum))
         self.assertTrue(darf_sehen(sek, self.datum))
@@ -187,7 +187,7 @@ class ZusatzfeldTest(Grundlage):
         self.s.save()
         from django.contrib.auth.models import Permission
 
-        lk = self.benutzer("lk", "Lehrkraft")  # darf hier ausnahmsweise bearbeiten, sieht aber kein Verwaltungsfeld
+        lk = self.benutzer("lk", "Lehrer:in")  # darf hier ausnahmsweise bearbeiten, sieht aber kein Verwaltungsfeld
         lk.user_permissions.add(Permission.objects.get(codename="change_schuelerprofil"))
         lk = User.objects.get(pk=lk.pk)
         form = self._formular(lk, {"zusatz__schulhaus_house": "Kenya"})

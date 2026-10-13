@@ -9,7 +9,7 @@ from django import forms
 from django.contrib.admin.widgets import AdminDateWidget
 from django.utils.translation import gettext
 
-from portal.rechte import ist_personalverwaltung, ist_verwaltung
+from portal.rechte import ist_finanzen, ist_personalverwaltung, ist_verwaltung
 
 from .models import Zusatzfeld
 
@@ -20,7 +20,7 @@ def darf_sehen(user, feld) -> bool:
     if user.is_superuser or feld.sichtbarkeit == "alle":
         return True
     if feld.sichtbarkeit == "verwaltung":
-        return ist_verwaltung(user) or ist_personalverwaltung(user)
+        return ist_verwaltung(user) or ist_personalverwaltung(user) or ist_finanzen(user)
     return ist_personalverwaltung(user)  # "hr"
 
 

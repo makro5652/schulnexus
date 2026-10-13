@@ -1,4 +1,4 @@
-# Schulverwaltung (Version 0.4.2.2, Entwicklungsstand)
+# Schulverwaltung (Version 0.4.2.3, Entwicklungsstand)
 
 Open-Source-Schulverwaltung für die DSN: Stammdaten, Klassen und Lerngruppen,
 Noten mit Gewichtung, Fehlzeiten, Nachmittagsprogramm, Anhänge zur Schülerakte,
@@ -28,10 +28,44 @@ http://localhost:8000. Die Zugangsdaten stehen in der Datei `.env`
 | Konto | Rolle | Passwort |
 | --- | --- | --- |
 | `admin` | Vollzugriff | `ADMIN_PASSWORT` in `.env` |
-| `lehrkraft` | Demo-Lehrkraft, Klassenleitung 9a, Chemie 9a/9b, Biologie 9a | `DEMO_PASSWORT` in `.env` |
-| `verwaltung` | Demo-Sekretariat | `DEMO_PASSWORT` in `.env` |
-| `personal` | Demo-Personalverwaltung (HR) | `DEMO_PASSWORT` in `.env` |
-| `foerderung` | Demo-Förderkoordination (zugleich Klassenleitung 9b, Deutsch 9a) | `DEMO_PASSWORT` in `.env` |
+| `lehrkraft` | Lehrer:in, Klassenleitung 9a, Chemie 9a/9b, Biologie 9a | `DEMO_PASSWORT` in `.env` |
+| `mittelstufe` | Lehrer:in und Mittelstufenkoordination (Klassenleitung 8a) | `DEMO_PASSWORT` in `.env` |
+| `oberstufe` | Lehrer:in und Oberstufenkoordination | `DEMO_PASSWORT` in `.env` |
+| `schulleitung` | Schulleitung | `DEMO_PASSWORT` in `.env` |
+| `verwaltung` | Sekretariat | `DEMO_PASSWORT` in `.env` |
+| `verwaltungsleitung` | Verwaltungsleitung | `DEMO_PASSWORT` in `.env` |
+| `personal` | HR-Management | `DEMO_PASSWORT` in `.env` |
+| `finanzen` | Finanzen | `DEMO_PASSWORT` in `.env` |
+| `foerderung` | Förderkoordination (zugleich Klassenleitung 9b) | `DEMO_PASSWORT` in `.env` |
+| `schueler`, `eltern` | vorbereitet, derzeit **kein** Portalzugang | `DEMO_PASSWORT` in `.env` |
+
+## Rollen und Rechte
+
+Rollen sind Benutzergruppen; eine Person kann mehrere haben (z. B. Lehrer:in + Mittelstufenkoordination).
+Zugewiesen werden sie unter **Verwaltung › Benutzerkonten**; die vollständige Rechtetabelle steht im Portal
+unter **Verwaltung › Rollen und Rechte** (für Verwaltungsleitung und Schulleitung).
+
+| Rolle | Rechte |
+| --- | --- |
+| Lehrer:in | eigener Unterricht (Leistungsnachweise, Noten, Zeugnisnoten); als Klassenleitung Akte, Fehlzeiten, Anhänge, Förderung der eigenen Klasse |
+| Mittelstufenkoordination | wie Lehrer:in, zusätzlich alle Klassen der Mittelstufe: Akten, Notenübersichten, Fehlzeiten, Gesundheitshinweise, Förderpläne/Nachteilsausgleiche bearbeiten, Schullaufbahn; Stufenübersicht |
+| Oberstufenkoordination | dasselbe für die Oberstufe |
+| Schulleitung | alles |
+| Sekretariat | Schüler- und Elternstammdaten, Klassen, Fehlzeiten, AGs, Anhänge, Gesundheitsangaben; Noten und Einstellungen lesend; keine Förderpläne, keine HR-Daten |
+| Verwaltungsleitung | wie Sekretariat, dazu Schuljahre, Fächer, Notenskalen, Unterrichtsverteilung, eigene Felder, Benutzerkonten und Rollen, Personal inkl. HR, Finanzen |
+| HR-Management | Personal aller Bereiche inkl. Dienstverhältnis, Nachweise, Abwesenheiten |
+| Finanzen | Rechnungsempfänger, Eltern- und Schülerstammdaten (lesend), Dienstleister, Vertragsunterlagen |
+| Förderkoordination | alle Förderpläne und Nachteilsausgleiche, Genehmigung, Kataloge |
+| Schüler:in, Eltern | vorbereitet für Stundenplan bzw. Elternkommunikation; derzeit kein Zugang |
+
+Die Jahrgänge der Stufen stehen in der `.env` (`MITTELSTUFE=5-10`, `OBERSTUFE=11-12`).
+Rechte werden beim Start nur ergänzt, nie entfernt – eigene Anpassungen bleiben erhalten.
+Auf die Standardrechte zurücksetzen:
+`docker compose exec web python manage.py grundeinrichtung --rechte-zuruecksetzen`.
+
+Beim Update von älteren Versionen werden die Gruppen umbenannt (Lehrkraft → Lehrer:in,
+Verwaltung → Sekretariat, Personalverwaltung → HR-Management); die Mitglieder bleiben erhalten.
+Das Sekretariat erhält dabei die neuen, engeren Standardrechte.
 
 ## Noten mit Bewertungsordnern
 
@@ -243,7 +277,8 @@ Bei eingeschalteten Demo-Daten werden die englischen Bezeichnungen der Beispield
 | `src/noten` | Notenskalen, Notenschlüssel (BE → Note), Gewichtungsvorlagen, Unterricht, Leistungsnachweise, Noten, Zeugnisnoten; Berechnung in `berechnung.py` |
 | `src/fehlzeiten` | Zeitraster, Fehlzeiten (ganztägig, stundenweise, Verspätung) |
 | `src/nachmittag` | AG-Angebote, Wünsche, Losverfahren in `zuteilung.py` |
-| `src/portal` | Startseite, Notenübersicht, Klassenliste, Schülerakte, Rechteprüfung, Sprachwahl, Demo-Daten |
+| `src/portal` | Startseite, Menüband, Notenübersicht, Klassenliste, Schülerakte, Stufenübersicht, Rollen (`rollen.py`) und Rechteprüfung (`rechte.py`), Sprachwahl, Demo-Daten |
+| `src/foerderung` | Förderpläne, Nachteilsausgleiche, Elternbestätigung |
 | `src/locale` | Übersetzungen (Englisch) |
 | `src/config/version.py` | Versionsnummer (kleine Änderungen erhöhen die letzte Stelle) |
 

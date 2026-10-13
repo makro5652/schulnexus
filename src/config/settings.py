@@ -134,6 +134,14 @@ if TESTLAUF:  # Tests schreiben Anhänge in ein Wegwerf-Verzeichnis
     import tempfile
 
     MEDIA_ROOT = Path(tempfile.mkdtemp(prefix="sv-test-medien-"))
+# Jahrgänge der Stufen (für Mittel- und Oberstufenkoordination), z. B. MITTELSTUFE=5-10, OBERSTUFE=11-12
+def _jahrgaenge(name, standard):
+    von, _, bis = os.environ.get(name, standard).partition("-")
+    return tuple(range(int(von), int(bis or von) + 1))
+
+
+STUFEN = {"mittelstufe": _jahrgaenge("MITTELSTUFE", "5-10"), "oberstufe": _jahrgaenge("OBERSTUFE", "11-12")}
+
 # Höchstgröße je Anhang in Megabyte (in .env änderbar).
 DOKUMENT_MAX_MB = int(os.environ.get("DOKUMENT_MAX_MB", "25"))
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024

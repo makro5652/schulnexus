@@ -459,8 +459,8 @@ class FachAdmin(admin.ModelAdmin):
 
 @admin.register(Beziehung)
 class BeziehungAdmin(SimpleHistoryAdmin):
-    list_display = ["schueler", "person", "art", "sorgerecht", "notfallkontakt"]
-    list_filter = ["art", "sorgerecht", "notfallkontakt"]
+    list_display = ["schueler", "person", "art", "sorgerecht", "notfallkontakt", "rechnungsempfaenger"]
+    list_filter = ["art", "sorgerecht", "notfallkontakt", "rechnungsempfaenger"]
     search_fields = ["schueler__person__nachname", "person__nachname"]
     autocomplete_fields = ["schueler", "person"]
 

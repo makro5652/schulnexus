@@ -1,0 +1,49 @@
+{% extends "portal/base.html" %}
+{% load i18n %}
+{% block title %}{{ info.name }}{% endblock %}
+{% block inhalt %}
+<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › {{ info.name }}</p>
+<h1>{{ info.name }}</h1>
+<p class="unterzeile">{% blocktranslate with von=info.von bis=info.bis sj=AKTUELLES_SCHULJAHR %}Jahrgänge {{ von }} bis {{ bis }} · Schuljahr {{ sj }}{% endblocktranslate %}</p>
+
+<section class="kennzahlen" aria-label="{% translate 'Kennzahlen' %}">
+  <div><strong>{{ zeilen|length }}</strong><span>{% translate "Klassen" %}</span></div>
+  <div><strong>{{ gesamt.schueler }}</strong><span>{% translate "Schüler:innen" %}</span></div>
+  <div><strong>{{ gesamt.plaene }}</strong><span>{% translate "aktive Förderpläne" %}</span></div>
+  <div><strong>{{ gesamt.nta }}</strong><span>{% translate "gültige Nachteilsausgleiche" %}</span></div>
+  <div class="{% if gesamt.offen %}hinweis{% endif %}"><strong>{{ gesamt.offen }}</strong><span>{% translate "offene Entschuldigungen" %}</span></div>
+</section>
+
+<section class="karte">
+  <h2>{% translate "Klassen" %}</h2>
+  {% if zeilen %}
+  <div class="rollbar"><table class="liste">
+    <thead><tr>
+      <th>{% translate "Klasse" %}</th><th>{% translate "Klassenleitung" %}</th><th class="zahl">{% translate "Schüler:innen" %}</th>
+      <th class="zahl">{% translate "Förderpläne" %}</th><th class="zahl">{% translate "NTA" %}</th><th class="zahl">{% translate "offen" %}</th>
+      <th>{% translate "Notenübersichten" %}</th>
+    </tr></thead>
+    <tbody>
+    {% for z in zeilen %}
+      <tr>
+        <td><a href="{% url 'klassenliste' z.klasse.pk %}"><strong>{{ z.klasse.name }}</strong></a></td>
+        <td>{{ z.klasse.leitung.person.anzeigename|default:"—" }}</td>
+        <td class="zahl">{{ z.anzahl }}</td>
+        <td class="zahl">{{ z.plaene|default:"–" }}</td>
+        <td class="zahl">{{ z.nta|default:"–" }}</td>
+        <td class="zahl {% if z.offen %}auffaellig{% endif %}">{{ z.offen }}</td>
+        <td class="kurschips">{% for u in z.kurse %}<a href="{% url 'notenuebersicht' u.pk %}" title="{{ u.fach.lokal_name }} · {{ u.lehrkraft.kuerzel|default:'' }} · {{ u.abschnitt.lokal_name }}">{{ u.fach.kuerzel }}</a>{% empty %}<span class="leer">–</span>{% endfor %}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  {% else %}<p class="leer">{% translate "In diesen Jahrgängen gibt es im aktuellen Schuljahr keine Klassen." %}</p>{% endif %}
+</section>
+
+{% if weitere %}
+<section class="karte" style="margin-top:1.2rem">
+  <h2>{% translate "Lerngruppen und Kurse" %}</h2>
+  <p class="kurschips">{% for u in weitere %}<a href="{% url 'notenuebersicht' u.pk %}" title="{{ u.lehrkraft.kuerzel|default:'' }}">{{ u.fach.kuerzel }} · {{ u.gruppe.name }}</a>{% endfor %}</p>
+</section>
+{% endif %}
+{% endblock %}

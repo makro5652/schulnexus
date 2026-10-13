@@ -8,7 +8,8 @@ from django.urls import NoReverseMatch, reverse
 from django.utils.translation import gettext as _, pgettext
 
 from .rechte import (
-    ist_foerderkoordination, ist_personalverwaltung, ist_schulleitung, ist_verwaltung, personal_von,
+    ist_finanzen, ist_foerderkoordination, ist_personalverwaltung, ist_schulleitung, ist_systemverwaltung, ist_verwaltung,
+    personal_von,
 )
 
 
@@ -77,9 +78,16 @@ def menueband(request):
                               gross=g.typ == Lerngruppe.STAMMKLASSE,
                               hinweis=_("Klassenliste %(name)s") % {"name": g.name})
     alle_sehen = verwaltung or foerder
+    from .startseite import stufen_fuer
+
+    stufen = Gruppe(_("Stufenkoordination"))
+    for st in stufen_fuer(user):
+        stufen.add(str(st["name"]), st["url"], "treppe", gross=True,
+                   hinweis=_("%(name)s, Jahrgänge %(von)s bis %(bis)s") % {"name": st["name"], "von": st["von"], "bis": st["bis"]})
     schueler = _karte(
         "schueler", _("Schüler:innen"),
         meine_klassen,
+        stufen,
         Gruppe(_("Schülerakten"))
         .add(_("Alle Schüler:innen"), _url("admin:stammdaten_schuelerprofil_changelist"), "personen", gross=True,
              bedingung=alle_sehen and p("stammdaten.view_schuelerprofil"))
@@ -182,6 +190,24 @@ def menueband(request):
         .add(_("Dienstleister"), _url("admin:stammdaten_dienstleister_changelist"), "gebaeude", bedingung=hr and p("stammdaten.view_dienstleister")),
     )
 
+    # ------------------------------------------------------------ Finanzen
+    finanzen = ist_finanzen(user)
+    finanzen_karte = _karte(
+        "finanzen", _("Finanzen"),
+        Gruppe(_("Schulgeld"))
+        .add(_("Rechnungsempfänger"), _url("admin:stammdaten_beziehung_changelist", query="?rechnungsempfaenger__exact=1"),
+             "personen", gross=True, bedingung=finanzen and p("stammdaten.view_beziehung"))
+        .add(_("Elternprofile"), _url("admin:stammdaten_elternprofil_changelist"), "liste",
+             bedingung=finanzen and p("stammdaten.view_elternprofil"))
+        .add(_("Schüler:innen"), _url("admin:stammdaten_schuelerprofil_changelist"), "personen",
+             bedingung=finanzen and not verwaltung and p("stammdaten.view_schuelerprofil")),
+        Gruppe(_("Verträge"))
+        .add(_("Dienstleister"), _url("admin:stammdaten_dienstleister_changelist"), "gebaeude", gross=True,
+             bedingung=finanzen and p("stammdaten.view_dienstleister"))
+        .add(_("Vertragsunterlagen"), _url("admin:stammdaten_dokument_changelist", query="?kategorie__exact=vertrag"), "klammer",
+             bedingung=finanzen and p("stammdaten.view_dokument")),
+    )
+
     # ------------------------------------------------------------ Verwaltung
     verwaltung_karte = _karte(
         "verwaltung", _("Verwaltung"),
@@ -198,21 +224,25 @@ def menueband(request):
              bedingung=p("stammdaten.view_zusatzfeld"), hinweis=_("Zusatzfelder für Schüler:innen, Personal und Eltern")),
         Gruppe(_("Benutzer und Rechte"))
         .add(_("Benutzerkonten"), _url("admin:auth_user_changelist"), "schluessel", gross=True, bedingung=p("auth.view_user"))
-        .add(_("Rollen"), _url("admin:auth_group_changelist"), "schild", bedingung=p("auth.view_group")),
+        .add(_("Rollen"), _url("admin:auth_group_changelist"), "schild", bedingung=p("auth.view_group"))
+        .add(_("Rollen und Rechte"), _url("rollen"), "liste", bedingung=ist_systemverwaltung(user),
+             hinweis=_("Übersicht: welche Rolle was darf")),
     )
 
-    karten = [k for k in (start, schueler, unterricht, foerderung, personal_karte, verwaltung_karte) if k]
+    karten = [k for k in (start, schueler, unterricht, foerderung, personal_karte, finanzen_karte, verwaltung_karte) if k]
     aktiv = _aktive_karte(request.path, karten)
     _aktiven_befehl_markieren(request.get_full_path(), karten)
-    rollen_namen = {"Verwaltung": _("Verwaltung"), "Schulleitung": _("Schulleitung"), "Lehrkraft": _("Lehrkraft"),
-                    "Personalverwaltung": _("Personalverwaltung"), "Förderkoordination": _("Förderkoordination")}
-    rollen = [rollen_namen.get(n, n) for n in user.groups.order_by("name").values_list("name", flat=True)]
+    from . import rollen as R
+
+    namen = set(user.groups.values_list("name", flat=True))
+    rollen = [str(R.ANZEIGE[n]) for n in R.REIHENFOLGE if n in namen] + sorted(n for n in namen if n not in R.ANZEIGE)
     if user.is_superuser:
         rollen.insert(0, _("Vollzugriff"))
     return {"karten": karten, "aktiv": aktiv, "rollen": rollen}
 
 
-PFAD_REGELN = [("/klassen/", "schueler"), ("/schueler/", "schueler"), ("/noten/", "unterricht"),
+PFAD_REGELN = [("/klassen/", "schueler"), ("/schueler/", "schueler"), ("/stufe/", "schueler"), ("/noten/", "unterricht"),
+               ("/rollen/", "verwaltung"),
                ("/foerderung/", "foerderung"), ("/verwaltung/", "verwaltung")]
 
 

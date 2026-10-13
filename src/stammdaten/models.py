@@ -939,7 +939,7 @@ class Zusatzfeld(models.Model):
     ]
     SICHTBARKEIT = [
         ("alle", _("Alle mit Aktenzugriff")),
-        ("verwaltung", _("Verwaltung, Leitung, HR")),
+        ("verwaltung", _("Verwaltung, Leitung, HR, Finanzen")),
         ("hr", _("Nur HR und Leitung")),
     ]
 

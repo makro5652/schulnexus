@@ -20,7 +20,7 @@
   {% if sz.klassen %}
   <div class="sz-gruppe">
     <h2>{% translate "Meine Klassen und Gruppen" %}</h2>
-    <ul>{% for k in sz.klassen %}<li><a href="{{ k.url }}"><strong>{{ k.titel }}</strong><span>{% blocktranslate count n=k.anzahl %}{{ n }} Schüler:in{% plural %}{{ n }} Schüler:innen{% endblocktranslate %}</span></a></li>{% endfor %}</ul>
+    <ul>{% for k in sz.klassen %}<li><a href="{{ k.url }}"><strong>{{ k.titel }}</strong><span>{% if k.anzahl is None %}{{ k.unter }}{% else %}{% blocktranslate count n=k.anzahl %}{{ n }} Schüler:in{% plural %}{{ n }} Schüler:innen{% endblocktranslate %}{% endif %}</span></a></li>{% endfor %}</ul>
   </div>
   {% endif %}
   {% if sz.kurse %}

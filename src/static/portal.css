@@ -320,3 +320,16 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 /* Kennzahlen kompakter */
 .kennzahlen div { padding: 0.65rem 0.9rem; }
 .kennzahlen strong { font-size: 1.35rem; }
+
+/* Stufenübersicht und Rollenmatrix */
+.kurschips { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.kurschips a { display: inline-block; padding: 0.1rem 0.45rem; border-radius: 5px; background: var(--akzent-hell); color: var(--akzent); font-size: 0.8rem; font-weight: 600; text-decoration: none; }
+.kurschips a:hover { background: var(--akzent); color: var(--flaeche); }
+.rollenmatrix th[scope=row] { min-width: 18rem; max-width: 26rem; font-weight: 400; }
+.rollenmatrix th.senkrecht { vertical-align: bottom; height: 10rem; padding-bottom: 0.6rem; }
+.rollenmatrix th.senkrecht span { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; }
+.rollenmatrix td.recht { text-align: center; font-size: 0.82rem; white-space: nowrap; }
+.recht-ja { background: var(--akzent-hell); color: var(--akzent); font-weight: 700; }
+.recht-lesen { color: var(--text); }
+.recht-eigene, .recht-stufe { color: var(--akzent); font-weight: 600; }
+.recht-nein { color: var(--leise); }

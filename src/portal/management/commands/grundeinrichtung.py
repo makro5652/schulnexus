@@ -11,6 +11,7 @@ from django.db.models import Q
 
 from foerderung.models import Ausgleichsmassnahme, Foerderschwerpunkt
 from noten.models import Notenskala, Notenstufe
+from portal import rollen as R
 from stammdaten.models import Abschlussart, Bildungsgang, Nachweisart, Personalbereich
 
 # Voreinstellungen – in der Verwaltung frei änderbar (Stammdaten › Bildungsgänge / Abschlussarten).
@@ -110,54 +111,7 @@ AUSGLEICHSMASSNAHMEN = [
     ("Stärkere Gewichtung mündlicher Leistungen", "Greater weighting of oral work", True),
 ]
 
-# Förderunterlagen sind vertraulich: das Sekretariat sieht nur Nachteilsausgleiche (Prüfungsorganisation).
-VERWALTUNG_FOERDERRECHTE = {"view_nachteilsausgleich", "view_foerderschwerpunkt", "view_ausgleichsmassnahme"}
-
-# Rechte, die NUR Personalverwaltung und Schulleitung erhalten (nicht das Sekretariat)
-HR_RECHTE = {"view_hr_daten"} | {f"{a}_{m}" for a in ("add", "change", "delete", "view")
-                                  for m in ("nachweis", "nachweisart", "personalabwesenheit")}
-
-ROLLEN = {
-    "Verwaltung": "__alle_ausser_hr__",
-    "Schulleitung": "__alle__",
-    "Personalverwaltung": [
-        f"{a}_{m}" for a in ("add", "change", "view", "delete")
-        for m in ("personalprofil", "personalbereich", "dienstleister", "nachweisart", "nachweis",
-                  "personalabwesenheit", "fortbildung", "notfallkontakt", "dokument")
-    ] + ["add_person", "change_person", "view_person", "view_fach", "view_hr_daten",
-         "add_zusatzfeld", "change_zusatzfeld", "view_zusatzfeld"],
-    "Lehrkraft": [
-        "view_person", "view_schuelerprofil", "view_gruppe", "view_mitgliedschaft", "view_fach", "view_beziehung",
-        "view_unterricht", "view_notenskala", "view_notenstufe", "view_notenschluessel", "view_gewichtungsvorlage",
-        "view_leistungskategorie",
-        "view_laufbahnabschnitt", "view_abschluss", "view_sprachenfolge", "view_vorherigeschule",
-        "view_elternprofil", "view_bildungsgang", "view_abschlussart", "view_einwilligung",
-        "add_bewertungsordner", "change_bewertungsordner", "view_bewertungsordner", "delete_bewertungsordner",
-        "add_leistungsnachweis", "change_leistungsnachweis", "view_leistungsnachweis", "delete_leistungsnachweis",
-        "add_note", "change_note", "view_note",
-        "add_zeugnisnote", "change_zeugnisnote", "view_zeugnisnote",
-        "add_fehlzeit", "change_fehlzeit", "view_fehlzeit", "view_stunde",
-        "view_agangebot", "view_agwahl", "view_agzuteilung",
-        # Anhänge (sichtbar nur nach Zugriffsstufe) und Förderung (zeilenweise: eigene Klasse / eigene Schüler:innen)
-        "add_dokument", "view_dokument",
-        "add_foerderplan", "change_foerderplan", "view_foerderplan",
-        "add_foerderziel", "change_foerderziel", "view_foerderziel", "delete_foerderziel",
-        "add_foerdereintrag", "change_foerdereintrag", "view_foerdereintrag",
-        "add_nachteilsausgleich", "change_nachteilsausgleich", "view_nachteilsausgleich",
-        "add_aushaendigung", "change_aushaendigung", "view_aushaendigung",
-        "view_foerderschwerpunkt", "view_ausgleichsmassnahme",
-    ],
-    "Förderkoordination": "__foerderung__",
-}
-
-FACH_APPS = ["stammdaten", "noten", "fehlzeiten", "nachmittag", "foerderung"]
-
-# Grundlegende Leserechte der Förderkoordination außerhalb des Förderbereichs
-FOERDERKOORDINATION_EXTRA = [
-    "view_person", "view_schuelerprofil", "view_gruppe", "view_mitgliedschaft", "view_fach", "view_beziehung",
-    "view_elternprofil", "view_laufbahnabschnitt", "view_bildungsgang", "view_sprachenfolge", "view_personalprofil",
-    "view_unterricht", "add_dokument", "change_dokument", "view_dokument", "delete_dokument",
-]
+# Rollen und ihre Standardrechte stehen in portal/rollen.py.
 
 
 def englisch_ergaenzen(obj, **felder):
@@ -172,21 +126,29 @@ def englisch_ergaenzen(obj, **felder):
 class Command(BaseCommand):
     help = "Legt Rollen und Standard-Notenskalen an (idempotent)."
 
+    def add_arguments(self, parser):
+        parser.add_argument("--rechte-zuruecksetzen", action="store_true",
+                            help="Rechte aller Standardrollen auf die Vorgaben aus portal/rollen.py zurücksetzen")
+
     @transaction.atomic
     def handle(self, *args, **options):
-        # Rechte werden nur ERGÄNZT, nie entfernt: Anpassungen in der Verwaltung bleiben erhalten.
-        for rolle, rechte in ROLLEN.items():
+        # Rechte werden nur ERGÄNZT, nie entfernt: Anpassungen in der Verwaltung bleiben erhalten –
+        # außer bei --rechte-zuruecksetzen.
+        alle = Permission.objects.filter(content_type__app_label__in=R.APPS)
+        for rolle in R.REIHENFOLGE:
+            rechte = R.ROLLEN_RECHTE[rolle]
             gruppe, _ = Group.objects.get_or_create(name=rolle)
-            perms = Permission.objects.filter(content_type__app_label__in=FACH_APPS)
-            if rechte == "__alle_ausser_hr__":
-                perms = perms.exclude(codename__in=HR_RECHTE).exclude(
-                    Q(content_type__app_label="foerderung") & ~Q(codename__in=VERWALTUNG_FOERDERRECHTE))
+            if rechte == "__alle__":
+                perms = alle
             elif rechte == "__foerderung__":
-                perms = perms.filter(Q(content_type__app_label="foerderung") | Q(codename__in=FOERDERKOORDINATION_EXTRA))
-            elif rechte != "__alle__":
-                perms = perms.filter(codename__in=rechte)
-            gruppe.permissions.add(*perms)
-        self.stdout.write("Rollen eingerichtet: " + ", ".join(ROLLEN))
+                perms = alle.filter(Q(content_type__app_label="foerderung") | Q(codename__in=R.FOERDERKOORDINATION_EXTRA))
+            else:
+                perms = alle.filter(codename__in=rechte)
+            if options.get("rechte_zuruecksetzen"):
+                gruppe.permissions.set(perms)
+            else:
+                gruppe.permissions.add(*perms)
+        self.stdout.write("Rollen eingerichtet: " + ", ".join(R.REIHENFOLGE))
 
         sek1, neu = Notenskala.objects.get_or_create(
             name="Sek I – Noten 1 bis 6 mit Tendenzen",

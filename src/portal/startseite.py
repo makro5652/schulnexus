@@ -6,7 +6,7 @@ from django import forms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -17,7 +17,8 @@ from stammdaten.models import Gruppe, Mitgliedschaft, Person, Personalprofil, Sc
 
 from .models import Notiz
 from .rechte import (
-    darf_akte_sehen, ist_foerderkoordination, ist_personalverwaltung, ist_verwaltung, klassenleitung_schueler_ids,
+    darf_akte_sehen, ist_finanzen, ist_foerderkoordination, ist_personalverwaltung, ist_verwaltung, klassenleitung_schueler_ids,
+    koordinierte_schueler_ids,
     personal_von, unterrichtete_schueler_ids,
 )
 
@@ -53,6 +54,8 @@ def schnellzugriff(user, sj):
                           "url": reverse("notenuebersicht", args=[u.pk])})
 
 
+    for st in stufen_fuer(user) if not ist_verwaltung(user) else []:
+        klassen.insert(0, {"titel": str(st["name"]), "unter": gettext("Jahrgänge %(von)s–%(bis)s") % st, "url": st["url"], "anzahl": None})
     return {"klassen": klassen, "kurse": kurse}
 
 
@@ -90,7 +93,7 @@ def sichtbare_schueler_fuer_geburtstage(user):
         return qs.none()
     sj = Schuljahr.aktuelles()
     geleitet = Mitgliedschaft.objects.aktiv().filter(gruppe__leitung=personal, gruppe__schuljahr=sj).values("schueler")
-    ids = unterrichtete_schueler_ids(user) | klassenleitung_schueler_ids(user)
+    ids = unterrichtete_schueler_ids(user) | klassenleitung_schueler_ids(user) | koordinierte_schueler_ids(user)
     return qs.filter(Q(pk__in=ids) | Q(pk__in=geleitet))
 
 
@@ -274,9 +277,84 @@ def suche(request):
         if request.user.is_staff:
             for pp in Personalprofil.objects.filter(aktiv=True, person__in=personen).select_related("person", "bereich")[:50]:
                 personal.append({"pp": pp, "link": ist_personalverwaltung(request.user) or ist_verwaltung(request.user)})
-        if ist_verwaltung(request.user):
+        if ist_verwaltung(request.user) or ist_finanzen(request.user):
             eltern = list(personen.filter(kinder_beziehungen__isnull=False).distinct()
                           .prefetch_related("kinder_beziehungen__schueler__person")[:50])
     return render(request, "portal/suche.html", {
         "q": q, "schueler": schueler, "personal": personal, "eltern": eltern, "zu_kurz": 0 < len(q) < 2,
     })
+
+
+# ---------------------------------------------------------------- Stufenübersicht und Rollen
+
+STUFEN_NAMEN = {"mittelstufe": _("Mittelstufe"), "oberstufe": _("Oberstufe")}
+
+
+def stufen_fuer(user):
+    """Stufen, deren Übersicht die Person öffnen darf: koordinierte Stufen; Verwaltung und Leitung alle."""
+    from django.conf import settings
+
+    from .rechte import koordinierte_stufen
+
+    schluessel = list(settings.STUFEN) if ist_verwaltung(user) else koordinierte_stufen(user)
+    return [{"schluessel": k, "name": STUFEN_NAMEN.get(k, k), "von": min(settings.STUFEN[k]), "bis": max(settings.STUFEN[k]),
+             "url": reverse("stufe", args=[k])} for k in schluessel if settings.STUFEN.get(k)]
+
+
+@login_required
+def stufe(request, schluessel):
+    from django.conf import settings
+
+    from fehlzeiten.models import Fehlzeit
+    from foerderung.models import Foerderplan, Nachteilsausgleich
+    from noten.models import Unterricht
+
+    erlaubt = {s["schluessel"]: s for s in stufen_fuer(request.user)}
+    if schluessel not in erlaubt:
+        raise PermissionDenied
+    info = erlaubt[schluessel]
+    sj = Schuljahr.aktuelles()
+    jahrgaenge = settings.STUFEN[schluessel]
+    klassen = list(Gruppe.objects.filter(schuljahr=sj, typ=Gruppe.STAMMKLASSE, jahrgang__in=jahrgaenge)
+                   .select_related("leitung__person").order_by("jahrgang", "name"))
+    nta = set(Nachteilsausgleich.aktive().values_list("schueler_id", flat=True))
+    plaene = set(Foerderplan.objects.filter(status=Foerderplan.AKTIV).values_list("schueler_id", flat=True))
+    zeilen, gesamt = [], {"schueler": 0, "nta": 0, "plaene": 0, "offen": 0}
+    kurse = (Unterricht.objects.filter(abschnitt__schuljahr=sj, gruppe__in=klassen)
+             .select_related("fach", "lehrkraft", "abschnitt").order_by("abschnitt__nummer", "fach__reihenfolge"))
+    kurse_je_klasse = {}
+    for u in kurse:
+        kurse_je_klasse.setdefault(u.gruppe_id, []).append(u)
+    for k in klassen:
+        ids = set(Mitgliedschaft.objects.aktiv().filter(gruppe=k).values_list("schueler_id", flat=True))
+        offen = Fehlzeit.objects.filter(schueler_id__in=ids, status="offen").count()
+        zeile = {"klasse": k, "anzahl": len(ids), "nta": len(ids & nta), "plaene": len(ids & plaene), "offen": offen,
+                 "kurse": kurse_je_klasse.get(k.pk, [])}
+        zeilen.append(zeile)
+        for schl in ("nta", "plaene", "offen"):
+            gesamt[schl] += zeile[schl]
+        gesamt["schueler"] += len(ids)
+    weitere = (Unterricht.objects.filter(abschnitt__schuljahr=sj, gruppe__typ=Gruppe.LERNGRUPPE, gruppe__jahrgang__in=jahrgaenge)
+               .select_related("fach", "gruppe", "lehrkraft").order_by("gruppe__name"))
+    return render(request, "portal/stufe.html", {"info": info, "zeilen": zeilen, "gesamt": gesamt, "weitere": weitere})
+
+
+@login_required
+def rollenuebersicht(request):
+    from django.contrib.auth.models import Group
+
+    from . import rollen as R
+    from .rechte import ist_systemverwaltung
+
+    if not ist_systemverwaltung(request.user):
+        raise PermissionDenied
+    gruppen = {g.name: g for g in Group.objects.annotate(anzahl=Count("user")).all()}
+    zeilen = []
+    for name in R.REIHENFOLGE:
+        g = gruppen.get(name)
+        zeilen.append({
+            "name": R.ANZEIGE[name], "beschreibung": R.BESCHREIBUNG[name], "gruppe": g, "anzahl": g.anzahl if g else 0,
+            "werte": [(R.MATRIX[name].get(k, ""), R.WERTE[R.MATRIX[name].get(k, "")]) for k, _n in R.BEREICHE],
+            "portal": name in R.PORTAL_ROLLEN,
+        })
+    return render(request, "portal/rollen.html", {"zeilen": zeilen, "bereiche": [n for _k, n in R.BEREICHE]})

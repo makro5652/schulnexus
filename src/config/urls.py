@@ -18,6 +18,8 @@ urlpatterns = [
     path("anhang/datei/<path:name>", anhaenge.anhang_pfad, name="anhang_pfad"),
     path("foerderung/", include("foerderung.urls")),
     path("suche/", startseite.suche, name="suche"),
+    path("stufe/<slug:schluessel>/", startseite.stufe, name="stufe"),
+    path("rollen/", startseite.rollenuebersicht, name="rollen"),
     path("notizen/neu/", startseite.notiz_anlegen, name="notiz_anlegen"),
     path("notizen/<int:pk>/", startseite.notiz_aendern, name="notiz_aendern"),
     path("notizen/<int:pk>/aktion/", startseite.notiz_aktion, name="notiz_aktion"),

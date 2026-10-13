@@ -128,6 +128,10 @@ class Command(BaseCommand):
                 call_command("grundeinrichtung", stdout=self.stdout)
                 self.foerderung_anlegen(opts["passwort"])
                 self.stdout.write("Beispiele für Förderung und Anhänge ergänzt.")
+            if not User.objects.filter(username="schulleitung").exists():
+                call_command("grundeinrichtung", stdout=self.stdout)
+                self.rollen_anlegen(opts["passwort"])
+                self.stdout.write("Demo-Konten für alle Rollen ergänzt.")
             from portal.models import Notiz
 
             if not Notiz.objects.exists():
@@ -172,7 +176,7 @@ class Command(BaseCommand):
             name="CleanPro Kenya", leistung="Gebäudereinigung", ansprechperson="Agnes Wairimu",
             telefon="+254 722 000 222", vertrag_bis=date(2026, 12, 31))
 
-        def personal(vorname, nachname, bereich_k, stelle="", kuerzel=None, benutzername=None, rolle="Lehrkraft",
+        def personal(vorname, nachname, bereich_k, stelle="", kuerzel=None, benutzername=None, rolle="Lehrer:in",
                      anstellung="ortskraft", faecher_k=(), stunden=None, beginn=2022, funktionen="", anrede="Frau",
                      firma=None, schicht="", nachweise="vollstaendig"):
             user = None
@@ -221,9 +225,9 @@ class Command(BaseCommand):
                        stunden=Decimal(20), beginn=2019)
         bra = personal("Peter", "Brandt", "LK", "Lehrkraft Religion/Deutsch", "BRA", anstellung="lplk", faecher_k=("REL", "D"),
                        stunden=Decimal(26), beginn=2025, anrede="Herr")
-        personal("Mercy", "Wambui", "VERW", "Schulsekretärin", benutzername="verwaltung", rolle="Verwaltung",
+        personal("Mercy", "Wambui", "VERW", "Schulsekretärin", benutzername="verwaltung", rolle="Sekretariat",
                  stunden=Decimal(40), beginn=2018, schicht="Mo–Fr 7:00–15:30")
-        hr_leitung = personal("Esther", "Njeri", "HR", "HR-Managerin", benutzername="personal", rolle="Personalverwaltung",
+        hr_leitung = personal("Esther", "Njeri", "HR", "HR-Managerin", benutzername="personal", rolle="HR-Management",
                               stunden=Decimal(40), beginn=2020)
         fm = personal("Joseph", "Ochieng", "FAC", "Facility Manager", stunden=Decimal(45), beginn=2017, anrede="Herr",
                       schicht="Mo–Fr 6:30–15:30")
@@ -486,6 +490,7 @@ class Command(BaseCommand):
 
         self.foerderung_anlegen(pw)
         self.startseite_anlegen()
+        self.rollen_anlegen(pw)
 
         self.stdout.write(self.style.SUCCESS(
             f"Demo-Daten angelegt: {len(alle)} Schüler:innen, {Person.objects.count()} Personen, "
@@ -493,7 +498,8 @@ class Command(BaseCommand):
             f"({len(ergebnis.ohne_platz)} ohne Platz)."
         ))
         self.stdout.write(f"Demo-Konten: 'lehrkraft' (Klassenleitung 9a, Chemie), 'verwaltung' (Sekretariat), "
-                          f"'personal' (HR), 'foerderung' (Förderkoordination, Klassenleitung 9b) – Passwort: {pw}")
+                          f"'personal' (HR), 'foerderung' (Förderkoordination), 'mittelstufe', 'oberstufe', 'schulleitung', "
+                          f"'verwaltungsleitung', 'finanzen' – Passwort: {pw}")
 
     # ------------------------------------------------------------ Förderung und Anhänge (ab Version 0.4.2.0)
     def foerderung_anlegen(self, pw):
@@ -513,7 +519,7 @@ class Command(BaseCommand):
 
         # Förderkoordination: Thomas Schwarz (zugleich Klassenleitung 9b)
         konto = User.objects.create_user("foerderung", password=pw, is_staff=True, first_name="Thomas", last_name="Schwarz")
-        konto.groups.add(Group.objects.get(name="Förderkoordination"), Group.objects.get(name="Lehrkraft"))
+        konto.groups.add(Group.objects.get(name="Förderkoordination"), Group.objects.get(name="Lehrer:in"))
         sch.person.benutzer = konto
         sch.person.save(update_fields=["benutzer"])
         sch.weitere_funktionen = "Förderkoordination"
@@ -678,6 +684,55 @@ class Command(BaseCommand):
         Notiz.objects.create(besitzer=verwaltung, sichtbarkeit=Notiz.ALLE, farbe="rosa", angeheftet=True,
                              text="Am Freitag entfällt die 7. Stunde wegen der Gesamtkonferenz (Aula, 13:45 Uhr).",
                              datum=heute + timedelta(days=4))
+
+    # ------------------------------------------------------------ Demo-Konten für alle Rollen (ab 0.4.2.3)
+    def rollen_anlegen(self, pw):
+        from portal import rollen as R
+        from stammdaten.models import Personalbereich
+
+        heute = timezone.localdate()
+
+        def konto(name, person, *rollen, personal=True):
+            user = User.objects.create_user(name, password=pw, is_staff=personal, first_name=person.vorname,
+                                            last_name=person.nachname)
+            user.groups.add(*[Group.objects.get(name=r) for r in rollen])
+            person.benutzer = user
+            person.save(update_fields=["benutzer"])
+            return user
+
+        def neues_personal(vorname, nachname, bereich, stelle, anrede, beginn):
+            p = Person.objects.create(anrede=anrede, vorname=vorname, nachname=nachname, ort="Nairobi",
+                                      email=f"{vorname.lower()}.{nachname.lower()}@privat.example",
+                                      geburtsdatum=date(1975, 3, 14))
+            return Personalprofil.objects.create(
+                person=p, bereich=Personalbereich.objects.get(kuerzel=bereich), stellenbezeichnung=stelle,
+                anstellungsart="adlk" if bereich == "SL" else "ortskraft", dienstbeginn=date(beginn, 8, 1),
+                dienst_email=f"{vorname.lower()}.{nachname.lower()}@schule.example", personalnummer=f"P-{beginn}{len(nachname)}",
+                kuerzel=nachname[:3].upper() if bereich == "SL" else None,
+            )
+
+        for kuerzel, name, rolle in (("MUE", "mittelstufe", R.MITTELSTUFE), ("BRA", "oberstufe", R.OBERSTUFE)):
+            pp = Personalprofil.objects.filter(kuerzel=kuerzel).select_related("person").first()
+            if pp and not pp.person.benutzer_id:
+                konto(name, pp.person, R.LEHRER, rolle)
+                pp.weitere_funktionen = ", ".join(filter(None, [pp.weitere_funktionen, str(R.ANZEIGE[rolle])]))
+                pp.save(update_fields=["weitere_funktionen"])
+        sl = neues_personal("Katharina", "Vogt", "SL", "Schulleiterin", "Frau", 2023)
+        konto("schulleitung", sl.person, R.SCHULLEITUNG)
+        vl = neues_personal("James", "Mwangi", "VERW", "Verwaltungsleiter", "Herr", 2019)
+        konto("verwaltungsleitung", vl.person, R.VERWALTUNGSLEITUNG)
+        fin = Personalprofil.objects.filter(stellenbezeichnung="Buchhalterin").select_related("person").first()
+        if fin and not fin.person.benutzer_id:
+            konto("finanzen", fin.person, R.FINANZEN)
+
+        # Vorbereitete Konten ohne Portalzugang (Stundenplan bzw. Elternkommunikation folgen später)
+        s = Schuelerprofil.objects.filter(status="aktiv").select_related("person").order_by("person__nachname").first()
+        if s:
+            konto("schueler", s.person, R.SCHUELER, personal=False)
+            eltern = s.beziehungen.select_related("person").first()
+            if eltern:
+                konto("eltern", eltern.person, R.ELTERN, personal=False)
+        Personalprofil.objects.filter(person__in=[sl.person, vl.person]).update(arbeitserlaubnis_bis=heute.replace(year=heute.year + 2))
 
 
 def beispiel_pdf(titel, name):

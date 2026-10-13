@@ -28,7 +28,7 @@ class Grundlage(TestCase):
         cls.plan_9b = Foerderplan.objects.get(schueler=cls.s9b)
         # zusätzliche Lehrkraft ohne Bezug zu 9a/9b
         cls.fremd = User.objects.create_user("fremd", password=PW, is_staff=True)
-        cls.fremd.groups.add(Group.objects.get(name="Lehrkraft"))
+        cls.fremd.groups.add(Group.objects.get(name="Lehrer:in"))
 
     def anmelden(self, name):
         self.client.logout()
@@ -227,7 +227,7 @@ class FoerderRechteTest(Grundlage):
         self.assertContains(r, 'name="status"')
 
     def test_rolle_verwaltung_ohne_foerderplanrechte(self):
-        verwaltung = Group.objects.get(name="Verwaltung")
+        verwaltung = Group.objects.get(name="Sekretariat")
         codes = set(verwaltung.permissions.filter(content_type__app_label="foerderung").values_list("codename", flat=True))
         self.assertEqual(codes, {"view_nachteilsausgleich", "view_foerderschwerpunkt", "view_ausgleichsmassnahme"})
 

@@ -20,7 +20,10 @@ from stammdaten.zusatzfelder import anzeige as zusatz_anzeige
 
 
 from .anhaenge import KATEGORIE_FILTER, anhaenge_fuer, anhang_form
-from .rechte import darf_akte_sehen, darf_nachteilsausgleich_sehen, darf_unterricht_sehen, ist_personalverwaltung, ist_verwaltung
+from .rechte import (
+    darf_akte_sehen, darf_nachteilsausgleich_sehen, darf_unterricht_sehen, ist_personalverwaltung, ist_stufenkoordination_von,
+    ist_verwaltung, koordinierte_jahrgaenge,
+)
 from .startseite import begruessung, geburtstage, notizen_fuer, schnellzugriff
 
 
@@ -158,7 +161,8 @@ def klassenliste(request, pk):
     gruppe = get_object_or_404(Gruppe.objects.select_related("leitung__person", "schuljahr"), pk=pk)
     person = getattr(request.user, "person", None)
     ist_leitung = person and gruppe.leitung and gruppe.leitung.person_id == person.pk
-    if not (ist_verwaltung(request.user) or ist_leitung):
+    stufe = gruppe.jahrgang is not None and gruppe.jahrgang in koordinierte_jahrgaenge(request.user)
+    if not (ist_verwaltung(request.user) or ist_leitung or stufe):
         raise PermissionDenied
 
     schueler = gruppe.aktuelle_mitglieder().annotate(
@@ -195,7 +199,8 @@ def schuelerakte(request, pk):
         raise PermissionDenied
 
     darf_gesundheit = request.user.has_perm("stammdaten.view_gesundheitsangaben") or (
-        ist_klassenleitung and request.user.has_perm("stammdaten.view_gesundheit_klasse")
+        (ist_klassenleitung or ist_stufenkoordination_von(request.user, schueler))
+        and request.user.has_perm("stammdaten.view_gesundheit_klasse")
     )
     gesundheit = getattr(schueler, "gesundheit", None) if darf_gesundheit else None
 
