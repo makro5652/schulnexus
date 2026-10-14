@@ -104,7 +104,7 @@ class RollenTest(TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(r.context["zeilen"]), len(R.REIHENFOLGE))
         mb = r.context["MENUEBAND"]
-        self.assertIn("finanzen", [k["schluessel"] for k in mb["karten"]])
+        self.assertIn("verwaltung", [k["schluessel"] for k in mb["karten"]])
 
     def test_finanzen(self):
         self.anmelden("finanzen")
@@ -115,7 +115,7 @@ class RollenTest(TestCase):
         self.assertEqual(self.status(reverse("admin:stammdaten_beziehung_changelist") + "?rechnungsempfaenger__exact=1"), 200)
         self.assertEqual(self.status(reverse("admin:foerderung_foerderplan_changelist")), 403)
         mb = self.client.get("/").context["MENUEBAND"]
-        self.assertIn("finanzen", [k["schluessel"] for k in mb["karten"]])
+        self.assertIn("verwaltung", [k["schluessel"] for k in mb["karten"]])
         self.assertNotIn("unterricht", [k["schluessel"] for k in mb["karten"]])
         from stammdaten.zusatzfelder import darf_sehen
 

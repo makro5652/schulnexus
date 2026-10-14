@@ -1,4 +1,4 @@
-# Schulverwaltung (Version 0.4.4.0, Entwicklungsstand)
+# Schulverwaltung (Version 0.4.4.1, Entwicklungsstand)
 
 Open-Source-Schulverwaltung für die DSN: Stammdaten, Klassen und Lerngruppen,
 Noten mit Gewichtung, Fehlzeiten, Nachmittagsprogramm, Anhänge zur Schülerakte,
@@ -188,8 +188,8 @@ entfernt auch alle Dateien.
 ## Rollen und Rechte
 
 Rollen sind Benutzergruppen; eine Person kann mehrere haben (z. B. Lehrer:in + Mittelstufenkoordination).
-Zugewiesen werden sie unter **Verwaltung › Benutzerkonten**; die vollständige Rechtetabelle steht im Portal
-unter **Verwaltung › Rollen und Rechte** (für Verwaltungsleitung und Schulleitung).
+Zugewiesen werden sie unter **System › Benutzerkonten**; die vollständige Rechtetabelle steht im Portal
+unter **System › Rollen und Rechte** (für Verwaltungsleitung und Schulleitung).
 
 | Rolle | Rechte |
 | --- | --- |
@@ -205,7 +205,7 @@ unter **Verwaltung › Rollen und Rechte** (für Verwaltungsleitung und Schullei
 | IT-Administration | Vollzugriff (Superuser): alle Daten, Benutzerkonten, Rollen und Einzelrechte, Sicherung, Wiederherstellung, PDF-Export |
 | Schüler:in, Eltern | vorbereitet für Stundenplan bzw. Elternportal; derzeit kein Zugang |
 
-**Einzelrechte (ab 0.4.3.0):** Unter **Verwaltung › System › Benutzer und Rechte** (nur IT) lassen sich je Konto
+**Einzelrechte (ab 0.4.3.0):** Unter **System › Benutzer und Rechte › Einzelrechte** (nur IT) lassen sich je Konto
 Rollen setzen, das Konto sperren, ein vorläufiges Passwort erzeugen und einzelne Rechte zusätzlich **erteilen** oder trotz
 Rolle **entziehen** (je Bereich: ansehen, anlegen, ändern, löschen, dazu Sonderrechte). Die Vergabe der Rolle
 IT-Administration macht das Konto zum Administrator; man kann sie sich nicht selbst entziehen und das eigene Konto nicht
@@ -224,7 +224,7 @@ Das Sekretariat erhält dabei die neuen, engeren Standardrechte.
 
 ## Sicherung, Wiederherstellung und PDF-Export
 
-**Menüband › Verwaltung › System** – nur Schulleitung und IT-Administration.
+**Menüband › System › Sicherung** – nur Schulleitung und IT-Administration.
 
 - **Sicherung je Modul:** Stammdaten, Unterricht und Noten, Fehlzeiten, Nachmittag/AGs, Förderung, Neuanmeldungen,
   Zeugnisse und Konferenzen, Elternkommunikation, Schuljahreswechsel/Abgänge/Löschfristen, Startseite/Einstellungen,
@@ -255,8 +255,7 @@ Das Sekretariat erhält dabei die neuen, engeren Standardrechte.
 
 Ablauf der Schullaufbahn: **Aufnahme → Klasse → Versetzung → Schuljahreswechsel → Abgang mit Abgangszeugnis → Archiv.**
 
-- **Schuljahre** (Menüband › Verwaltung › Schuljahr › Schuljahreswechsel; Sekretariat, Verwaltungsleitung,
-  Schulleitung): neues Schuljahr anlegen (Vorschlag: gleiche Lage ein Jahr später, Halbjahre werden verschoben
+- **Schuljahre** (Menüband › Schulleitung › Schuljahr › Schuljahreswechsel; nur Schulleitung und IT): neues Schuljahr anlegen (Vorschlag: gleiche Lage ein Jahr später, Halbjahre werden verschoben
   übernommen), ein Schuljahr als **aktuelles** setzen.
 - **Schuljahreswechsel in drei Schritten:**
   1. *Klassen planen:* Für jede Stammklasse wird eine Nachfolgeklasse vorgeschlagen (9a → 10a, Klassenleitung bleibt,
@@ -279,7 +278,7 @@ Ablauf der Schullaufbahn: **Aufnahme → Klasse → Versetzung → Schuljahreswe
   enden, ein Schülerkonto wird gesperrt, die Akte geht ins **Archiv**. Das **Abgangszeugnis** entsteht als Entwurf im
   Zeugnismodul (Noten des laufenden Halbjahres, im 2. Halbjahr einschließlich epochaler Fächer des 1. Halbjahres,
   Abgangsvermerk) und wird dort wie jedes Zeugnis freigegeben und gedruckt. Rücknahme = Wiederaufnahme.
-- **Archiv** (Schüler:innen › Schülerakten › Archiv): abgegangene Schüler:innen mit letzter Klasse, Austritt,
+- **Archiv** (Schulleitung › Archiv bzw. Verwaltung › Sekretariat › Archiv): abgegangene Schüler:innen mit letzter Klasse, Austritt,
   Abgangszeugnis und nächster Löschung. Archivierte Akten sind nur lesbar (Änderungen in der Verwaltungsoberfläche nur
   durch Schulleitung und IT) und erscheinen in keiner Klassenliste.
 - **Schuljahre beachten:** Die Schülerakte zeigt Fehlzeiten, Noten und Klasse für ein wählbares Schuljahr der Laufbahn;
@@ -289,7 +288,7 @@ Ablauf der Schullaufbahn: **Aufnahme → Klasse → Versetzung → Schuljahreswe
 
 ## Löschfristen
 
-**Menüband › Verwaltung › System › Löschfristen** – festlegen und löschen: Schulleitung und IT; lesen: Verwaltungsleitung.
+**Menüband › Schulleitung › Archiv › Löschfristen** – festlegen und löschen: Schulleitung und IT; lesen: Verwaltungsleitung.
 
 - Aufbewahrungsfristen je Datenkategorie für **abgegangene** Schüler:innen (Fehlzeiten und AG-Teilnahme,
   Elternnachrichten, Gesundheitsangaben, Förderung, Noten, Anhänge, Anmeldeunterlagen, Halbjahres-/Jahreszeugnisse,
@@ -400,9 +399,14 @@ Portal und Verwaltungsoberfläche haben oben dasselbe **Menüband** (wie in Word
 
 - **Titelleiste:** Schulname und Schuljahr, Personensuche, Sprache, Benutzermenü
   (Passwort ändern, Abmelden).
-- **Registerkarten:** Start · Schüler:innen · Unterricht · Förderung · Personal · Verwaltung,
-  jeweils mit beschrifteten Befehlsgruppen (z. B. Unterricht: Mein Unterricht, Bewertung,
-  Zeugnis, Nachmittag, Einstellungen).
+- **Registerkarten:** Start · Schüler:innen · Unterricht · Förderung · Schulleitung · Verwaltung · Personal · System,
+  jeweils mit beschrifteten Befehlsgruppen. Getrennt sind die **akademische Verwaltung** und die **Administration**:
+  - *Schulleitung* (akademisch): Schuljahr (Schuljahreswechsel, Schuljahre, Zeitraster, Bildungsgänge, Abschlussarten),
+    Unterrichtsorganisation (Unterrichtsverteilung, Fächer, Notenskalen, Gewichtungsvorlagen), Archiv und Löschfristen.
+  - *Verwaltung* (Administration): Sekretariat (Schüler:in anlegen, Eltern und Kontakte, Klassen und Gruppen,
+    Mitgliedschaften, Schullaufbahn, Archiv), Nachmittag (AG-Angebote, Wünsche, Zuteilungen), Finanzen
+    (Rechnungsempfänger, Elternprofile, Dienstleister, Vertragsunterlagen).
+  - *System* (IT): Benutzerkonten, Rollen und Einzelrechte, eigene Datenfelder, Sicherung, PDF-Export, Protokoll.
 - Jede Rolle sieht nur die Karten und Befehle, für die sie Rechte hat. Beim Öffnen einer Seite
   ist die passende Karte aktiv und der aktuelle Befehl hervorgehoben.
 - Mit dem Pfeil rechts neben den Registerkarten lässt sich das Band einklappen; der Browser
@@ -446,7 +450,7 @@ sehen ausschließlich Personalverwaltung und Schulleitung.
 
 ## Förderung: Förderpläne und Nachteilsausgleiche
 
-**Förderpläne** (Verwaltung › Förderung › Förderpläne oder aus der Schülerakte):
+**Förderpläne** (Menüband › Förderung › Förderpläne oder aus der Schülerakte):
 Förderschwerpunkte, Lernausgangslage, Stärken, Förderziele mit Maßnahmen, Zuständigkeit und
 Evaluation, Verlaufsdokumentation, Fortschreibung des Vorjahresplans. Eine Druckansicht
 („Drucken / PDF“) enthält Unterschriftsfelder für die Aushändigung.
@@ -469,7 +473,7 @@ Nachteilsausgleiche. Sobald es ein Elternportal gibt, können Eltern dort selbst
 | Fachlehrkraft | Förderpläne und Nachteilsausgleiche der eigenen Schüler:innen lesen, Verlaufseinträge ergänzen |
 | Sekretariat | nur gültige Nachteilsausgleiche (für die Prüfungsorganisation), keine Förderpläne |
 
-Die Rolle *Förderkoordination* wird unter Verwaltung › Benutzer zugewiesen.
+Die Rolle *Förderkoordination* wird unter System › Benutzerkonten zugewiesen.
 
 ## Sprache: Deutsch und Englisch
 

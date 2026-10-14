@@ -208,10 +208,12 @@ class MenuebandTest(TestCase):
 
     def test_karten_je_rolle(self):
         erwartet = {
-            "lehrkraft": {"start", "schueler", "unterricht", "foerderung", "verwaltung"},
+            "lehrkraft": {"start", "schueler", "unterricht", "foerderung"},
             "verwaltung": {"start", "schueler", "unterricht", "foerderung", "personal", "verwaltung"},
-            "personal": {"start", "schueler", "personal", "verwaltung"},
-            "foerderung": {"start", "schueler", "unterricht", "foerderung", "verwaltung"},
+            "personal": {"start", "schueler", "personal", "verwaltung", "system"},
+            "foerderung": {"start", "schueler", "unterricht", "foerderung"},
+            "schulleitung": {"start", "schueler", "unterricht", "foerderung", "schulleitung", "verwaltung", "personal", "system"},
+            "finanzen": {"start", "schueler", "verwaltung"},
         }
         for name, karten in erwartet.items():
             self.anmelden(name)
@@ -229,10 +231,21 @@ class MenuebandTest(TestCase):
         self.assertNotIn("Unterrichtsverteilung", b)
         self.assertContains(r, 'role="tablist"')
         self.anmelden("verwaltung")
-        b = self.befehle(self.band()[0])
-        for titel in ("Alle Schüler:innen", "Unterrichtsverteilung", "Personalliste", "Schuljahre"):
+        mb = self.band()[0]
+        b = self.befehle(mb)
+        for titel in ("Alle Schüler:innen", "Schüler:in anlegen", "AG-Angebote", "Personalliste", "Archiv"):
             self.assertIn(titel, b)
         self.assertNotIn("Förderpläne", b)    # Förderpläne sind dem Förderteam vorbehalten
+        # Sekretariat: Verwaltung (Administration), aber nicht die akademische Verwaltung der Schulleitung
+        self.assertNotIn("schulleitung", {k["schluessel"] for k in mb["karten"]})
+        for titel in ("Schuljahreswechsel", "Unterrichtsverteilung", "Löschfristen"):
+            self.assertNotIn(titel, b)
+        self.anmelden("schulleitung")
+        mb = self.band()[0]
+        karten = {k["schluessel"]: {bf["titel"] for g in k["gruppen"] for bf in g.befehle} for k in mb["karten"]}
+        self.assertTrue({"Schuljahreswechsel", "Schuljahre", "Unterrichtsverteilung", "Archiv", "Löschfristen"} <= karten["schulleitung"])
+        self.assertTrue({"Schüler:in anlegen", "AG-Angebote", "Rechnungsempfänger"} <= karten["verwaltung"])
+        self.assertTrue({"Benutzerkonten", "Sicherung"} <= karten["system"])
 
     def test_aktive_karte_nach_seite(self):
         from noten.models import Unterricht

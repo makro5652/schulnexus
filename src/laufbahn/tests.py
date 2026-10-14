@@ -66,7 +66,7 @@ class SchuljahrTest(Grundlage):
         self.assertEqual(Schuljahr.objects.filter(aktiv=True).count(), 1)
 
     def test_seite_und_anlegen(self):
-        self.anmelden("verwaltung")
+        self.anmelden("schulleitung")
         r = self.client.get(reverse("schuljahre"))
         self.assertContains(r, "2027/28")
         self.assertContains(r, "2028/29")                     # Vorschlag für das nächste Schuljahr
@@ -83,8 +83,9 @@ class SchuljahrTest(Grundlage):
             self.assertEqual(self.client.get(reverse("schuljahre")).status_code, 403, name)
             self.assertEqual(self.client.get(reverse("archiv")).status_code, 403, name)
             self.assertEqual(self.client.get(reverse("loeschfristen")).status_code, 403, name)
-        self.anmelden("verwaltung")
+        self.anmelden("verwaltung")                         # Sekretariat: Archiv ja, Schuljahreswechsel und Löschfristen nein
         self.assertEqual(self.client.get(reverse("archiv")).status_code, 200)
+        self.assertEqual(self.client.get(reverse("schuljahre")).status_code, 403)
         self.assertEqual(self.client.get(reverse("loeschfristen")).status_code, 403)
         self.anmelden("verwaltungsleitung")
         r = self.client.get(reverse("loeschfristen"))
@@ -199,6 +200,8 @@ class WechselTest(Grundlage):
 
     def test_assistent_ueber_oberflaeche(self):
         self.anmelden("verwaltung")
+        self.assertEqual(self.client.get(reverse("schuljahreswechsel", args=[self.w.pk])).status_code, 403)
+        self.anmelden("schulleitung")
         url = reverse("schuljahreswechsel", args=[self.w.pk])
         for schritt in ("klassen", "schueler", "durchfuehren"):
             self.assertEqual(self.client.get(url + "?schritt=" + schritt).status_code, 200, schritt)
@@ -419,4 +422,15 @@ class SchuljahrAnzeigeTest(Grundlage):
             self.assertContains(r, reverse(name))
         self.anmelden("lehrkraft")
         r = self.client.get(reverse("start"))
-        self.assertNotContains(r, reverse("schuljahre"))
+        self.assertNotContains(r, f'href="{reverse("schuljahre")}"')
+        self.anmelden("verwaltung")
+        r = self.client.get(reverse("start"))
+        self.assertNotContains(r, f'href="{reverse("schuljahre")}"')
+        self.assertContains(r, reverse("archiv"))
+        self.assertEqual(r.context["MENUEBAND"]["aktiv"], "start")
+        r = self.client.get(reverse("archiv"))
+        self.assertEqual(r.context["MENUEBAND"]["aktiv"], "verwaltung")
+        self.anmelden("schulleitung")
+        self.assertEqual(self.client.get(reverse("archiv")).context["MENUEBAND"]["aktiv"], "schulleitung")
+        self.assertEqual(self.client.get(reverse("loeschfristen")).context["MENUEBAND"]["aktiv"], "schulleitung")
+        self.assertEqual(self.client.get(reverse("sicherungen")).context["MENUEBAND"]["aktiv"], "system")

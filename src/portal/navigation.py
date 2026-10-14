@@ -109,14 +109,7 @@ def menueband(request):
         Gruppe(_("Schülerakten"))
         .add(_("Alle Schüler:innen"), _url("admin:stammdaten_schuelerprofil_changelist", query="?status__exact=aktiv"), "personen", gross=True,
              bedingung=alle_sehen and p("stammdaten.view_schuelerprofil"))
-        .add(_("Direkt anlegen"), _url("admin:stammdaten_schuelerprofil_add"), "plus",
-             bedingung=verwaltung and p("stammdaten.add_schuelerprofil"),
-             hinweis=_("Schüler:in ohne Anmeldeverfahren direkt anlegen"))
-        .add(_("Eltern und Kontakte"), _url("admin:stammdaten_person_changelist", query="?rolle=eltern"), "personen",
-             bedingung=verwaltung and p("stammdaten.view_person"))
-        .add(_("Anhänge"), _url("admin:stammdaten_dokument_changelist"), "klammer", bedingung=p("stammdaten.view_dokument"))
-        .add(_("Archiv"), _url("archiv"), "archiv", bedingung=darf_archiv(user),
-             hinweis=_("Abgegangene Schüler:innen, Abgangszeugnisse, Löschfristen")),
+        .add(_("Anhänge"), _url("admin:stammdaten_dokument_changelist"), "klammer", bedingung=p("stammdaten.view_dokument")),
         Gruppe(_("Eltern"))
         .add(_("Elternnachrichten"), _url("elternkontakt"), "brief", gross=True, bedingung=p("elternkontakt.view_gespraech"),
              hinweis=_("Nachrichten an Eltern, Antworten und Bestätigungen"))
@@ -125,13 +118,7 @@ def menueband(request):
              hinweis=_("Automatische Benachrichtigung bei Fehlzeiten und Verspätungen")),
         Gruppe(_("Klassen und Gruppen"))
         .add(_("Zuordnen"), _url("zuordnung"), "person_plus", gross=True, bedingung=darf_zuordnen(user),
-             hinweis=_("Schüler:innen Klassen, Lerngruppen und AGs zuordnen"))
-        .add(_("Klassen und Gruppen"), _url("admin:stammdaten_gruppe_changelist"), "gruppen",
-             bedingung=verwaltung and p("stammdaten.view_gruppe"))
-        .add(_("Mitgliedschaften"), _url("admin:stammdaten_mitgliedschaft_changelist"), "liste",
-             bedingung=verwaltung and p("stammdaten.view_mitgliedschaft"))
-        .add(_("Schullaufbahn"), _url("admin:stammdaten_laufbahnabschnitt_changelist"), "treppe",
-             bedingung=verwaltung and p("stammdaten.view_laufbahnabschnitt")),
+             hinweis=_("Schüler:innen Klassen, Lerngruppen und AGs zuordnen")),
         Gruppe(_("Fehlzeiten"))
         .add(_("Fehlzeiten"), _url("admin:fehlzeiten_fehlzeit_changelist"), "uhr", gross=True, bedingung=p("fehlzeiten.view_fehlzeit"))
         .add(_("Offene Entschuldigungen"), _url("admin:fehlzeiten_fehlzeit_changelist", query="?status__exact=offen"), "warnung",
@@ -164,17 +151,6 @@ def menueband(request):
              bedingung=admin and p("noten.view_zeugnisnote"))
         .add(_("Konferenzen"), _url("admin:zeugnisse_konferenz_changelist"), "gruppen",
              bedingung=admin and p("zeugnisse.change_konferenz")),
-        Gruppe(_("Nachmittag"))
-        .add(_("AG-Angebote"), _url("admin:nachmittag_agangebot_changelist"), "ball", gross=True, bedingung=p("nachmittag.view_agangebot"))
-        .add(_("AG-Wünsche"), _url("admin:nachmittag_agwahl_changelist"), "liste", bedingung=p("nachmittag.view_agwahl"))
-        .add(_("Zuteilungen"), _url("admin:nachmittag_agzuteilung_changelist"), "haken", bedingung=p("nachmittag.view_agzuteilung")),
-        Gruppe(_("Einstellungen"))
-        .add(_("Unterrichtsverteilung"), _url("admin:noten_unterricht_changelist"), "tafel", gross=True,
-             bedingung=verwaltung and p("noten.view_unterricht"))
-        .add(_("Fächer"), _url("admin:stammdaten_fach_changelist"), "buch", bedingung=verwaltung and p("stammdaten.view_fach"))
-        .add(_("Notenskalen"), _url("admin:noten_notenskala_changelist"), "lineal", bedingung=verwaltung and p("noten.view_notenskala"))
-        .add(_("Gewichtungsvorlagen"), _url("admin:noten_gewichtungsvorlage_changelist"), "regler",
-             bedingung=verwaltung and p("noten.view_gewichtungsvorlage")),
     )
 
     # ------------------------------------------------------------ Förderung
@@ -224,40 +200,72 @@ def menueband(request):
         .add(_("Dienstleister"), _url("admin:stammdaten_dienstleister_changelist"), "gebaeude", bedingung=hr and p("stammdaten.view_dienstleister")),
     )
 
-    # ------------------------------------------------------------ Finanzen
+    # ------------------------------------------------------------ Schulleitung (akademische Verwaltung)
+    schulleitung_karte = _karte(
+        "schulleitung", _("Schulleitung"),
+        Gruppe(_("Schuljahr"))
+        .add(_("Schuljahreswechsel"), _url("schuljahre"), "kalender", gross=True, bedingung=darf_schuljahre(user),
+             hinweis=_("Schuljahre anlegen, Schüler:innen versetzen, Wechsel zurücknehmen"))
+        .add(_("Schuljahre"), _url("admin:stammdaten_schuljahr_changelist"), "liste", bedingung=leitung and p("stammdaten.view_schuljahr"))
+        .add(_("Zeitraster"), _url("admin:fehlzeiten_stunde_changelist"), "uhr", bedingung=leitung and p("fehlzeiten.view_stunde"))
+        .add(_("Bildungsgänge"), _url("admin:stammdaten_bildungsgang_changelist"), "treppe", bedingung=leitung and p("stammdaten.view_bildungsgang"))
+        .add(_("Abschlussarten"), _url("admin:stammdaten_abschlussart_changelist"), "zeugnis", bedingung=leitung and p("stammdaten.view_abschlussart")),
+        Gruppe(_("Unterrichtsorganisation"))
+        .add(_("Unterrichtsverteilung"), _url("admin:noten_unterricht_changelist"), "tafel", gross=True,
+             bedingung=leitung and p("noten.view_unterricht"))
+        .add(_("Fächer"), _url("admin:stammdaten_fach_changelist"), "buch", bedingung=leitung and p("stammdaten.view_fach"))
+        .add(_("Notenskalen"), _url("admin:noten_notenskala_changelist"), "lineal", bedingung=leitung and p("noten.view_notenskala"))
+        .add(_("Gewichtungsvorlagen"), _url("admin:noten_gewichtungsvorlage_changelist"), "regler",
+             bedingung=leitung and p("noten.view_gewichtungsvorlage")),
+        Gruppe(_("Archiv"))
+        .add(_("Archiv"), _url("archiv"), "archiv", gross=True, bedingung=leitung and darf_archiv(user),
+             hinweis=_("Abgegangene Schüler:innen, Abgangszeugnisse, Löschfristen"))
+        .add(_("Löschfristen"), _url("loeschfristen"), "glocke", bedingung=leitung and darf_fristen_sehen(user),
+             hinweis=_("Aufbewahrungsfristen für das Archiv und fällige Löschungen")),
+    )
+
+    # ------------------------------------------------------------ Verwaltung (Administration)
     finanzen = ist_finanzen(user)
-    finanzen_karte = _karte(
-        "finanzen", _("Finanzen"),
-        Gruppe(_("Schulgeld"))
+    verwaltung_karte = _karte(
+        "verwaltung", _("Verwaltung"),
+        Gruppe(_("Übersicht"))
+        .add(_("Alle Bereiche"), _url("admin:index"), "zahnrad", gross=True,
+             bedingung=admin and (verwaltung or finanzen or hr or ist_it(user))),
+        Gruppe(_("Sekretariat"))
+        .add(_("Schüler:in anlegen"), _url("admin:stammdaten_schuelerprofil_add"), "plus", gross=True,
+             bedingung=verwaltung and p("stammdaten.add_schuelerprofil"),
+             hinweis=_("Schüler:in ohne Anmeldeverfahren direkt anlegen"))
+        .add(_("Eltern und Kontakte"), _url("admin:stammdaten_person_changelist", query="?rolle=eltern"), "personen",
+             bedingung=verwaltung and p("stammdaten.view_person"))
+        .add(_("Klassen und Gruppen"), _url("admin:stammdaten_gruppe_changelist"), "gruppen",
+             bedingung=verwaltung and p("stammdaten.view_gruppe"))
+        .add(_("Mitgliedschaften"), _url("admin:stammdaten_mitgliedschaft_changelist"), "liste",
+             bedingung=verwaltung and p("stammdaten.view_mitgliedschaft"))
+        .add(_("Schullaufbahn"), _url("admin:stammdaten_laufbahnabschnitt_changelist"), "treppe",
+             bedingung=verwaltung and p("stammdaten.view_laufbahnabschnitt"))
+        .add(_("Archiv"), _url("archiv"), "archiv", bedingung=darf_archiv(user) and not leitung,
+             hinweis=_("Abgegangene Schüler:innen, Abgangszeugnisse, Löschfristen")),
+        Gruppe(_("Nachmittag"))
+        .add(_("AG-Angebote"), _url("admin:nachmittag_agangebot_changelist"), "ball", gross=True,
+             bedingung=p("nachmittag.change_agangebot"))
+        .add(_("AG-Wünsche"), _url("admin:nachmittag_agwahl_changelist"), "liste", bedingung=p("nachmittag.change_agwahl"))
+        .add(_("Zuteilungen"), _url("admin:nachmittag_agzuteilung_changelist"), "haken", bedingung=p("nachmittag.change_agzuteilung")),
+        Gruppe(_("Finanzen"))
         .add(_("Rechnungsempfänger"), _url("admin:stammdaten_beziehung_changelist", query="?rechnungsempfaenger__exact=1"),
              "personen", gross=True, bedingung=finanzen and p("stammdaten.view_beziehung"))
         .add(_("Elternprofile"), _url("admin:stammdaten_elternprofil_changelist"), "liste",
              bedingung=finanzen and p("stammdaten.view_elternprofil"))
         .add(_("Schüler:innen"), _url("admin:stammdaten_schuelerprofil_changelist"), "personen",
-             bedingung=finanzen and not verwaltung and p("stammdaten.view_schuelerprofil")),
-        Gruppe(_("Verträge"))
-        .add(_("Dienstleister"), _url("admin:stammdaten_dienstleister_changelist"), "gebaeude", gross=True,
+             bedingung=finanzen and not verwaltung and p("stammdaten.view_schuelerprofil"))
+        .add(_("Dienstleister"), _url("admin:stammdaten_dienstleister_changelist"), "gebaeude",
              bedingung=finanzen and p("stammdaten.view_dienstleister"))
         .add(_("Vertragsunterlagen"), _url("admin:stammdaten_dokument_changelist", query="?kategorie__exact=vertrag"), "klammer",
              bedingung=finanzen and p("stammdaten.view_dokument")),
     )
 
-    # ------------------------------------------------------------ Verwaltung
-    verwaltung_karte = _karte(
-        "verwaltung", _("Verwaltung"),
-        Gruppe(_("Übersicht"))
-        .add(_("Alle Bereiche"), _url("admin:index"), "zahnrad", gross=True, bedingung=admin),
-        Gruppe(_("Schuljahr"))
-        .add(_("Schuljahreswechsel"), _url("schuljahre"), "kalender", gross=True, bedingung=darf_schuljahre(user),
-             hinweis=_("Schuljahre anlegen, Schüler:innen versetzen, Wechsel zurücknehmen"))
-        .add(_("Schuljahre"), _url("admin:stammdaten_schuljahr_changelist"), "liste",
-             bedingung=verwaltung and p("stammdaten.view_schuljahr"))
-        .add(_("Zeitraster"), _url("admin:fehlzeiten_stunde_changelist"), "uhr", bedingung=verwaltung and p("fehlzeiten.view_stunde"))
-        .add(_("Bildungsgänge"), _url("admin:stammdaten_bildungsgang_changelist"), "treppe", bedingung=verwaltung and p("stammdaten.view_bildungsgang"))
-        .add(_("Abschlussarten"), _url("admin:stammdaten_abschlussart_changelist"), "zeugnis", bedingung=verwaltung and p("stammdaten.view_abschlussart")),
-        Gruppe(_("Datenfelder"))
-        .add(_("Eigene Felder"), _url("admin:stammdaten_zusatzfeld_changelist"), "regler", gross=True,
-             bedingung=p("stammdaten.view_zusatzfeld"), hinweis=_("Zusatzfelder für Schüler:innen, Personal und Eltern")),
+    # ------------------------------------------------------------ System (IT)
+    system_karte = _karte(
+        "system", _("System"),
         Gruppe(_("Benutzer und Rechte"))
         .add(_("Benutzerkonten"), _url("admin:auth_user_changelist"), "schluessel", gross=True, bedingung=p("auth.view_user"))
         .add(_("Rollen"), _url("admin:auth_group_changelist"), "schild", bedingung=p("auth.view_group"))
@@ -265,16 +273,17 @@ def menueband(request):
              hinweis=_("Übersicht: welche Rolle was darf"))
         .add(_("Einzelrechte"), _url("benutzerverwaltung"), "person_plus", bedingung=ist_it(user),
              hinweis=_("Rollen und Einzelrechte je Konto erteilen oder entziehen")),
-        Gruppe(_("System"))
+        Gruppe(_("Datenfelder"))
+        .add(_("Eigene Felder"), _url("admin:stammdaten_zusatzfeld_changelist"), "regler", gross=True,
+             bedingung=p("stammdaten.change_zusatzfeld"), hinweis=_("Zusatzfelder für Schüler:innen, Personal und Eltern")),
+        Gruppe(_("Sicherung"))
         .add(_("Sicherung"), _url("sicherungen"), "archiv", gross=True, bedingung=darf_sichern(user),
              hinweis=_("Module sichern und wiederherstellen"))
         .add(_("PDF-Export"), _url("pdf_export"), "pdf", bedingung=darf_sichern(user), hinweis=_("Daten eines Zeitraums als PDF"))
-        .add(pgettext("System", "Protokoll"), _url("systemprotokoll"), "liste", bedingung=darf_sichern(user) or ist_it(user))
-        .add(_("Löschfristen"), _url("loeschfristen"), "glocke", bedingung=darf_fristen_sehen(user),
-             hinweis=_("Aufbewahrungsfristen für das Archiv und fällige Löschungen")),
+        .add(pgettext("System", "Protokoll"), _url("systemprotokoll"), "liste", bedingung=darf_sichern(user) or ist_it(user)),
     )
 
-    karten = [k for k in (start, schueler, unterricht, foerderung, personal_karte, finanzen_karte, verwaltung_karte) if k]
+    karten = [k for k in (start, schueler, unterricht, foerderung, schulleitung_karte, verwaltung_karte, personal_karte, system_karte) if k]
     aktiv = _aktive_karte(request.path, karten)
     _aktiven_befehl_markieren(request.get_full_path(), karten)
     from . import rollen as R
@@ -286,10 +295,12 @@ def menueband(request):
     return {"karten": karten, "aktiv": aktiv, "rollen": rollen}
 
 
-PFAD_REGELN = [("/laufbahn/schueler/", "schueler"), ("/laufbahn/archiv/", "schueler"), ("/klassen/", "schueler"), ("/schueler/", "schueler"), ("/stufe/", "schueler"), ("/zuordnung/", "schueler"), ("/aufnahme/", "schueler"), ("/elternkontakt/", "schueler"),
+PFAD_REGELN = [("/laufbahn/archiv/", "schulleitung"), ("/laufbahn/archiv/", "verwaltung"), ("/laufbahn/schueler/", "schueler"),
+               ("/klassen/", "schueler"), ("/schueler/", "schueler"), ("/stufe/", "schueler"), ("/zuordnung/", "schueler"),
+               ("/aufnahme/", "schueler"), ("/elternkontakt/", "schueler"),
                ("/noten/", "unterricht"), ("/zeugnisse/", "unterricht"),
-               ("/rollen/", "verwaltung"), ("/system/", "verwaltung"), ("/laufbahn/", "verwaltung"),
-               ("/foerderung/", "foerderung"), ("/verwaltung/", "verwaltung")]
+               ("/laufbahn/", "schulleitung"), ("/rollen/", "system"), ("/system/", "system"),
+               ("/foerderung/", "foerderung"), ("/verwaltung/", "verwaltung"), ("/verwaltung/", "system")]
 
 
 def _aktive_karte(pfad, karten):

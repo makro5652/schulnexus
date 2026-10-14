@@ -117,8 +117,9 @@ _AUFNAHME_FINANZEN = (r("view", *_AUFNAHME_MODELLE, "checklistenvorlage", "vorla
 
 _ZEUGNIS_VERWALTUNG = r(("view", "change"), "zeugnis") | r("view", "zeugnisfachnote", "abzeichnung", "anmerkung", "konferenz", "beschluss")
 
-# Schuljahreswechsel, Abgänge und Archiv (App laufbahn); Löschfristen ändern nur Schulleitung und IT
-_LAUFBAHN = r(ALLE, "schuljahreswechsel", "klassenplan", "wechselposten", "laufbahnereignis")
+# Abgänge, Klassenwechsel und Archiv (App laufbahn). Den Schuljahreswechsel macht die Schulleitung
+# (akademische Verwaltung), Löschfristen ändern nur Schulleitung und IT.
+_LAUFBAHN = r(ALLE, "laufbahnereignis") | r("view", "schuljahreswechsel", "wechselposten")
 
 _SEKRETARIAT = (_SCHUELERDATEN | _LAUFBAHN | _AUFNAHME_VOLL | _ZEUGNIS_VERWALTUNG | _ELTERNKONTAKT_VERWALTUNG | r("view", *_KATALOGE) | _NOTEN_LESEN | r("view", "personalprofil", "dienstleister")
                 | r("view", "nachteilsausgleich", "foerderschwerpunkt", "ausgleichsmassnahme"))
@@ -173,7 +174,8 @@ BEREICHE = [
     ("benutzer", _("Benutzerkonten und Rollen")),
     ("einzelrechte", _("Einzelrechte erteilen und entziehen")),
     ("sicherung", _("Sicherung, Wiederherstellung, PDF-Export")),
-    ("laufbahn", _("Schuljahreswechsel, Abgänge, Archiv")),
+    ("laufbahn", _("Schuljahreswechsel")),
+    ("abgang", _("Abgänge, Klassenwechsel, Archiv")),
     ("loeschfristen", _("Löschfristen und Löschung")),
 ]
 
@@ -200,7 +202,8 @@ MATRIX[IT] = {k: "ja" for k, _n in BEREICHE}
 for _rolle, _werte in MATRIX.items():          # neue Bereiche: nur Schulleitung (Sicherung) und IT
     _werte.setdefault("einzelrechte", "ja" if _rolle == IT else "")
     _werte.setdefault("sicherung", "ja" if _rolle in (SCHULLEITUNG, IT) else "")
-    _werte.setdefault("laufbahn", "ja" if _rolle in (SCHULLEITUNG, IT, SEKRETARIAT, VERWALTUNGSLEITUNG) else "")
+    _werte.setdefault("laufbahn", "ja" if _rolle in (SCHULLEITUNG, IT) else "")
+    _werte.setdefault("abgang", "ja" if _rolle in (SCHULLEITUNG, IT, SEKRETARIAT, VERWALTUNGSLEITUNG) else "")
     _werte.setdefault("loeschfristen", "ja" if _rolle in (SCHULLEITUNG, IT) else "lesen" if _rolle == VERWALTUNGSLEITUNG else "")
 MATRIX[OBERSTUFE] = dict(MATRIX[MITTELSTUFE])
 

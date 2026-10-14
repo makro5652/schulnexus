@@ -1,14 +1,15 @@
-"""Wer darf was: Schuljahreswechsel und Abgänge (Verwaltung), Löschfristen (Schulleitung und IT)."""
+"""Wer darf was: Schuljahreswechsel (Schulleitung), Abgänge und Archiv (Verwaltung), Löschfristen (Schulleitung und IT)."""
 from portal.rechte import _in_gruppen, ist_it, ist_schulleitung, ist_verwaltung
 from portal import rollen as R
 
 
 def darf_schuljahre(user) -> bool:
-    """Schuljahre anlegen, Schuljahreswechsel vorbereiten und durchführen, Abgänge erfassen."""
-    return ist_verwaltung(user) and user.has_perm("laufbahn.change_schuljahreswechsel")
+    """Schuljahre anlegen, Schuljahreswechsel vorbereiten und durchführen: akademische Verwaltung (Schulleitung) und IT."""
+    return (ist_schulleitung(user) or ist_it(user)) and user.has_perm("laufbahn.change_schuljahreswechsel")
 
 
 def darf_abgang(user) -> bool:
+    """Abgang erfassen, Klassenwechsel im laufenden Schuljahr: Sekretariat, Verwaltungsleitung, Schulleitung."""
     return ist_verwaltung(user) and user.has_perm("laufbahn.add_laufbahnereignis")
 
 

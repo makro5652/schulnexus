@@ -384,7 +384,7 @@ def archiv(request):
         s.naechste_loeschung = naechste[0] if naechste else None
         s.loeschung_faellig = bool(naechste and naechste[0][0] <= heute)
     return render(request, "laufbahn/archiv.html", {
-        "titel": _("Archiv"), "reiter": _reiter("archiv", user), "eintraege": eintraege, "q": q, "jahre": jahre, "jahr": jahr,
+        "titel": _("Archiv"), "reiter": _reiter("archiv", user), "bereich": "schulleitung" if ist_schulleitung(user) else "verwaltung", "eintraege": eintraege, "q": q, "jahre": jahre, "jahr": jahr,
         "gesamt": qs.count(), "darf_fristen": rechte.darf_fristen_sehen(user),
     })
 
