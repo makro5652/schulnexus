@@ -82,10 +82,17 @@ _LEHRER = (
     # Zeugnisse: Kommentar lesen/abzeichnen/anmerken; als Klassenleitung Zeugnis bearbeiten (zeilenweise geprüft)
     | r(("view", "change"), "zeugnis") | r(ALLE, "abzeichnung") | r(("add", "view", "change"), "anmerkung")
     | r("view", "konferenz", "beschluss", "zeugnisfachnote")
+    # Elternkommunikation: an Eltern der eigenen Schüler:innen schreiben (zeilenweise geprüft, elternkontakt/rechte.py)
+    | r(("add", "view"), "gespraech", "beitrag") | r("view", "empfaenger")
 )
+# Benachrichtigungsregeln für Fehlzeiten: erweiterte Schulleitung (Koordinationen nur für ihre Jahrgänge)
+_REGELN = r(ALLE, "benachrichtigungsregel") | r("view", "ausloesung")
+_ELTERNKONTAKT_VERWALTUNG = r(ALLE, "gespraech", "beitrag", "empfaenger") | r("view", "benachrichtigungsregel", "ausloesung")
+
 # Gesundheitshinweise der eigenen Stufe: zeilenweise über view_gesundheit_klasse (siehe portal/rechte.py)
 _STUFE = (_LEHRER | r(("add", "change", "view"), "laufbahnabschnitt", "abschluss", "gruppe") | r(ALLE, "mitgliedschaft")
-          | {"view_gesundheit_klasse", "freigeben_zeugnis"} | r(ALLE, "konferenz", "beschluss"))
+          | {"view_gesundheit_klasse", "freigeben_zeugnis"} | r(ALLE, "konferenz", "beschluss")
+          | r(("view", "change"), "gespraech", "empfaenger") | _REGELN)
 
 _SCHUELERDATEN = r(ALLE, "person", "schuelerprofil", "elternprofil", "beziehung", "gruppe", "mitgliedschaft", "einwilligung",
                    "dokument", "laufbahnabschnitt", "abschluss", "vorherigeschule", "sprachenfolge", "gesundheitsangaben",
@@ -106,7 +113,7 @@ _AUFNAHME_FINANZEN = (r("view", *_AUFNAHME_MODELLE, "checklistenvorlage", "vorla
 
 _ZEUGNIS_VERWALTUNG = r(("view", "change"), "zeugnis") | r("view", "zeugnisfachnote", "abzeichnung", "anmerkung", "konferenz", "beschluss")
 
-_SEKRETARIAT = (_SCHUELERDATEN | _AUFNAHME_VOLL | _ZEUGNIS_VERWALTUNG | r("view", *_KATALOGE) | _NOTEN_LESEN | r("view", "personalprofil", "dienstleister")
+_SEKRETARIAT = (_SCHUELERDATEN | _AUFNAHME_VOLL | _ZEUGNIS_VERWALTUNG | _ELTERNKONTAKT_VERWALTUNG | r("view", *_KATALOGE) | _NOTEN_LESEN | r("view", "personalprofil", "dienstleister")
                 | r("view", "nachteilsausgleich", "foerderschwerpunkt", "ausgleichsmassnahme"))
 
 ROLLEN_RECHTE = {
@@ -115,7 +122,7 @@ ROLLEN_RECHTE = {
     OBERSTUFE: _STUFE | _AUFNAHME_STUFE,
     SCHULLEITUNG: "__alle__",
     SEKRETARIAT: _SEKRETARIAT,
-    VERWALTUNGSLEITUNG: _SEKRETARIAT | r(ALLE, *_KATALOGE) | _HR | r(ALLE, "user", "group") | {"view_permission"},
+    VERWALTUNGSLEITUNG: _SEKRETARIAT | _REGELN | r(ALLE, *_KATALOGE) | _HR | r(ALLE, "user", "group") | {"view_permission"},
     HR: _HR,
     FINANZEN: (r("view", "person", "schuelerprofil", "gruppe", "mitgliedschaft", "personalprofil", "personalbereich", "zusatzfeld")
                | r(("view", "change"), "beziehung", "elternprofil") | r(ALLE, "dienstleister") | r(("add", "view"), "dokument") | _AUFNAHME_FINANZEN),
@@ -129,7 +136,7 @@ FOERDERKOORDINATION_EXTRA = (r("view", "person", "schuelerprofil", "gruppe", "mi
                              | r(ALLE, "dokument"))
 
 # Apps, deren Rechte über Rollen vergeben werden
-APPS = ["stammdaten", "noten", "fehlzeiten", "nachmittag", "foerderung", "aufnahme", "zeugnisse", "auth"]
+APPS = ["stammdaten", "noten", "fehlzeiten", "nachmittag", "foerderung", "aufnahme", "zeugnisse", "elternkontakt", "auth"]
 
 # Rollen, die im Portal arbeiten (Beschäftigte). Schüler:innen und Eltern erhalten später eigene Oberflächen.
 PORTAL_ROLLEN = {LEHRER, MITTELSTUFE, OBERSTUFE, SCHULLEITUNG, SEKRETARIAT, VERWALTUNGSLEITUNG, HR, FINANZEN, FOERDERKOORDINATION}
@@ -140,6 +147,8 @@ PORTAL_ROLLEN = {LEHRER, MITTELSTUFE, OBERSTUFE, SCHULLEITUNG, SEKRETARIAT, VERW
 BEREICHE = [
     ("noten", _("Noten und Zeugnisnoten")),
     ("zeugnisse", _("Zeugnisse, Kommentare, Konferenzen")),
+    ("elternkontakt", _("Elternkommunikation")),
+    ("regeln", _("Benachrichtigungsregeln (Fehlzeiten)")),
     ("akten", _("Schülerakten")),
     ("gesundheit", _("Gesundheitsangaben")),
     ("fehlzeiten", _("Fehlzeiten")),
@@ -156,24 +165,24 @@ BEREICHE = [
 ]
 
 MATRIX = {
-    LEHRER: {"zeugnisse": "eigene", "aufnahme": "", "zuordnung": "", "noten": "eigene", "akten": "eigene", "gesundheit": "", "fehlzeiten": "eigene", "foerderung": "eigene",
+    LEHRER: {"elternkontakt": "eigene", "regeln": "", "zeugnisse": "eigene", "aufnahme": "", "zuordnung": "", "noten": "eigene", "akten": "eigene", "gesundheit": "", "fehlzeiten": "eigene", "foerderung": "eigene",
              "nta": "eigene", "stammdaten": "lesen", "personal": "", "hr": "", "finanzen": "", "einstellungen": "lesen", "benutzer": ""},
-    MITTELSTUFE: {"zeugnisse": "stufe", "aufnahme": "stufe", "zuordnung": "stufe", "noten": "stufe", "akten": "stufe", "gesundheit": "stufe", "fehlzeiten": "stufe", "foerderung": "stufe",
+    MITTELSTUFE: {"elternkontakt": "stufe", "regeln": "stufe", "zeugnisse": "stufe", "aufnahme": "stufe", "zuordnung": "stufe", "noten": "stufe", "akten": "stufe", "gesundheit": "stufe", "fehlzeiten": "stufe", "foerderung": "stufe",
                   "nta": "stufe", "stammdaten": "lesen", "personal": "", "hr": "", "finanzen": "", "einstellungen": "lesen", "benutzer": ""},
     SCHULLEITUNG: {k: "ja" for k, _n in BEREICHE},
-    SEKRETARIAT: {"zeugnisse": "ja", "aufnahme": "ja", "zuordnung": "ja", "noten": "lesen", "akten": "ja", "gesundheit": "ja", "fehlzeiten": "ja", "foerderung": "", "nta": "lesen",
+    SEKRETARIAT: {"elternkontakt": "teils_ek", "regeln": "lesen", "zeugnisse": "ja", "aufnahme": "ja", "zuordnung": "ja", "noten": "lesen", "akten": "ja", "gesundheit": "ja", "fehlzeiten": "ja", "foerderung": "", "nta": "lesen",
                   "stammdaten": "ja", "personal": "lesen", "hr": "", "finanzen": "", "einstellungen": "lesen", "benutzer": ""},
-    VERWALTUNGSLEITUNG: {"zeugnisse": "ja", "aufnahme": "ja", "zuordnung": "ja", "noten": "lesen", "akten": "ja", "gesundheit": "ja", "fehlzeiten": "ja", "foerderung": "", "nta": "lesen",
+    VERWALTUNGSLEITUNG: {"elternkontakt": "teils_ek", "regeln": "ja", "zeugnisse": "ja", "aufnahme": "ja", "zuordnung": "ja", "noten": "lesen", "akten": "ja", "gesundheit": "ja", "fehlzeiten": "ja", "foerderung": "", "nta": "lesen",
                          "stammdaten": "ja", "personal": "ja", "hr": "ja", "finanzen": "ja", "einstellungen": "ja", "benutzer": "ja"},
-    HR: {"zeugnisse": "", "aufnahme": "", "zuordnung": "", "noten": "", "akten": "", "gesundheit": "", "fehlzeiten": "", "foerderung": "", "nta": "", "stammdaten": "",
+    HR: {"elternkontakt": "", "regeln": "", "zeugnisse": "", "aufnahme": "", "zuordnung": "", "noten": "", "akten": "", "gesundheit": "", "fehlzeiten": "", "foerderung": "", "nta": "", "stammdaten": "",
          "personal": "ja", "hr": "ja", "finanzen": "", "einstellungen": "", "benutzer": ""},
-    FINANZEN: {"zeugnisse": "", "aufnahme": "teils", "zuordnung": "", "noten": "", "akten": "", "gesundheit": "", "fehlzeiten": "", "foerderung": "", "nta": "", "stammdaten": "lesen",
+    FINANZEN: {"elternkontakt": "", "regeln": "", "zeugnisse": "", "aufnahme": "teils", "zuordnung": "", "noten": "", "akten": "", "gesundheit": "", "fehlzeiten": "", "foerderung": "", "nta": "", "stammdaten": "lesen",
                "personal": "lesen", "hr": "", "finanzen": "ja", "einstellungen": "", "benutzer": ""},
-    FOERDERKOORDINATION: {"zeugnisse": "", "aufnahme": "", "zuordnung": "", "noten": "", "akten": "lesen", "gesundheit": "", "fehlzeiten": "", "foerderung": "ja", "nta": "ja",
+    FOERDERKOORDINATION: {"elternkontakt": "", "regeln": "", "zeugnisse": "", "aufnahme": "", "zuordnung": "", "noten": "", "akten": "lesen", "gesundheit": "", "fehlzeiten": "", "foerderung": "ja", "nta": "ja",
                           "stammdaten": "lesen", "personal": "", "hr": "", "finanzen": "", "einstellungen": "", "benutzer": ""},
     SCHUELER: {k: "" for k, _n in BEREICHE},
     ELTERN: {k: "" for k, _n in BEREICHE},
 }
 MATRIX[OBERSTUFE] = dict(MATRIX[MITTELSTUFE])
 
-WERTE = {"ja": _("ja"), "teils": _("Checkliste"), "lesen": _("lesen"), "eigene": _("eigene"), "stufe": _("Stufe"), "": "–"}
+WERTE = {"ja": _("ja"), "teils": _("Checkliste"), "teils_ek": _("Zeugnis/Fehlzeiten"), "lesen": _("lesen"), "eigene": _("eigene"), "stufe": _("Stufe"), "": "–"}

@@ -26,10 +26,18 @@ class NurPersonalMiddleware:
     Andere angemeldete Konten – etwa spätere Eltern- oder Schülerkonten – werden abgemeldet.
     """
 
-    FREI = ("/anmelden/", "/abmelden/", "/sprache/", "/design/", "/gesundheit/", "/static/")
+    FREI = ("/anmelden/", "/abmelden/", "/sprache/", "/design/", "/gesundheit/", "/static/", "/eltern/n/")
 
     def __init__(self, get_response):
         self.get_response = get_response
+
+    @staticmethod
+    def elternkonto(user):
+        from django.conf import settings
+
+        from . import rollen
+
+        return settings.ELTERNPORTAL_AKTIV and user.groups.filter(name=rollen.ELTERN).exists()
 
     def __call__(self, request):
         from django.contrib import messages
@@ -40,6 +48,11 @@ class NurPersonalMiddleware:
         from .context import darf_portal_nutzen
 
         user = getattr(request, "user", None)
+        if user is not None and user.is_authenticated and not darf_portal_nutzen(user) and self.elternkonto(user):
+            # Vorbereitetes Elternportal (ELTERNPORTAL_AKTIV): Eltern bleiben auf ihren eigenen Seiten.
+            if request.path.startswith(self.FREI + ("/eltern/",)):
+                return self.get_response(request)
+            return redirect("elternportal")
         if user is not None and user.is_authenticated and not darf_portal_nutzen(user) \
                 and not request.path.startswith(self.FREI):
             logout(request)

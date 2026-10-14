@@ -148,6 +148,12 @@ class Command(BaseCommand):
                 call_command("grundeinrichtung", stdout=self.stdout)
                 self.aufnahme_anlegen()
                 self.stdout.write("Beispiele für Neuanmeldungen ergänzt.")
+            from elternkontakt.models import Gespraech
+
+            if not Gespraech.objects.exists():
+                call_command("grundeinrichtung", stdout=self.stdout)
+                self.elternkontakt_anlegen()
+                self.stdout.write("Beispiele für Elternnachrichten und Benachrichtigungsregeln ergänzt.")
             return
 
         call_command("grundeinrichtung", stdout=self.stdout)
@@ -504,6 +510,7 @@ class Command(BaseCommand):
         self.rollen_anlegen(pw)
         self.aufnahme_anlegen()
         self.zeugnisse_anlegen()
+        self.elternkontakt_anlegen()
 
         self.stdout.write(self.style.SUCCESS(
             f"Demo-Daten angelegt: {len(alle)} Schüler:innen, {Person.objects.count()} Personen, "
@@ -1000,6 +1007,103 @@ class Command(BaseCommand):
         k.vorsitz = Personalprofil.objects.filter(kuerzel="MUE").first()
         k.save()
         return k
+
+
+    # ------------------------------------------------------------ Elternkommunikation (ab 0.4.2.9)
+    def elternkontakt_anlegen(self):
+        from elternkontakt.models import Benachrichtigungsregel, Beitrag, Empfaenger, Gespraech
+        from elternkontakt.pruefung import regel_anwenden
+        from elternkontakt.versand import antwort_der_eltern, gespraech_anlegen, standard_empfaenger
+
+        rng = random.Random(11)
+        sj = Schuljahr.objects.get(name="2026/27")
+        kl9a = Gruppe.objects.get(schuljahr=sj, name="9a")
+        lehrkraft = User.objects.get(username="lehrkraft")
+        sekretariat = User.objects.get(username="verwaltung")
+        schulleitung = User.objects.filter(username="schulleitung").first() or sekretariat
+        mittelstufe = User.objects.filter(username="mittelstufe").first() or schulleitung
+        jetzt = timezone.now()
+        schueler = list(kl9a.aktuelle_mitglieder().order_by("person__nachname", "person__vorname"))
+
+        def zurueckdatieren(g, tage, stunden=0):
+            t = jetzt - timedelta(days=tage, hours=stunden)
+            Gespraech.objects.filter(pk=g.pk).update(erstellt_am=t, letzte_aktivitaet=t, schule_gelesen_am=t)
+            Beitrag.objects.filter(gespraech=g).update(erstellt_am=t)
+            return t
+
+        # 1) Klassenleitung schreibt an alle Eltern der 9a (je Familie ein eigenes Gespräch)
+        wandertag = (
+            "Liebe Eltern,\n\nam Freitag, 23. Oktober, findet unser Wandertag zum Ngong Hills Forest statt. Treffpunkt ist um "
+            "7:30 Uhr am Haupttor, Rückkehr gegen 15:00 Uhr. Bitte geben Sie Ihrem Kind festes Schuhwerk, Sonnenschutz, "
+            "ausreichend Wasser und ein Lunchpaket mit.\n\nBitte bestätigen Sie kurz, dass Sie die Information erhalten haben.\n\n"
+            "Viele Grüße\nMartin Krause")
+        for i, s in enumerate(schueler):
+            personen = [b.person for b in standard_empfaenger(s)]
+            if not personen:
+                continue
+            g = gespraech_anlegen(s, personen, betreff="Wandertag am 23. Oktober", text=wandertag, von=lehrkraft,
+                                  bestaetigung=True, antworten=True)
+            t = zurueckdatieren(g, 3)
+            # Demo: so tun, als sei die E-Mail versendet worden (im Echtbetrieb nur mit ELTERN_EMAIL_VERSAND=1)
+            g.empfaenger.exclude(versand_status=Empfaenger.OHNE_EMAIL).update(versand_status=Empfaenger.VERSENDET, versendet_am=t)
+            for e in g.empfaenger.all():
+                if rng.random() < 0.6:
+                    Empfaenger.objects.filter(pk=e.pk).update(gelesen_am=t + timedelta(hours=rng.randint(1, 30)),
+                                                              bestaetigt_am=t + timedelta(hours=rng.randint(2, 40)), bestaetigt_ueber="link")
+                elif rng.random() < 0.4:
+                    Empfaenger.objects.filter(pk=e.pk).update(gelesen_am=t + timedelta(hours=rng.randint(1, 30)))
+            if i == 2:
+                e = g.empfaenger.select_related("person").first()
+                e.refresh_from_db()
+                b = antwort_der_eltern(e, "Vielen Dank für die Information. Dürfen wir unser Kind nach dem Wandertag direkt "
+                                          "am Parkplatz Ngong Road abholen?")
+                Beitrag.objects.filter(pk=b.pk).update(erstellt_am=t + timedelta(hours=20))
+                Gespraech.objects.filter(pk=g.pk).update(eltern_antwort_am=t + timedelta(hours=20), letzte_aktivitaet=t + timedelta(hours=20))
+
+        # 2) Ein persönliches Gespräch mit Antwort und Rückantwort
+        if len(schueler) > 4:
+            s = schueler[4]
+            personen = [b.person for b in standard_empfaenger(s)]
+            if personen:
+                g = gespraech_anlegen(
+                    s, personen[:1], von=lehrkraft, betreff="Gesprächstermin zur Lernentwicklung",
+                    text=("Sehr geehrte Familie,\n\nich würde gern mit Ihnen über die Lernentwicklung im Fach Chemie sprechen. "
+                          "Passt Ihnen Dienstag, 20. Oktober, 14:15 Uhr in der Schule oder per Videoanruf?\n\nMit freundlichen Grüßen\nMartin Krause"))
+                t = zurueckdatieren(g, 6)
+                g.empfaenger.update(versand_status=Empfaenger.VERSENDET, versendet_am=t)
+                e = g.empfaenger.select_related("person").first()
+                Empfaenger.objects.filter(pk=e.pk).update(gelesen_am=t + timedelta(hours=5))
+                e.refresh_from_db()
+                b = antwort_der_eltern(e, "Guten Tag Herr Krause, Dienstag um 14:15 Uhr passt gut. Wir kommen gern in die Schule.")
+                Beitrag.objects.filter(pk=b.pk).update(erstellt_am=t + timedelta(hours=6))
+                b2 = Beitrag.objects.create(gespraech=g, von_benutzer=lehrkraft, ueber="schule", erstellt_am=t + timedelta(hours=9),
+                                            text="Vielen Dank, dann bis Dienstag im Raum C 12.")
+                Gespraech.objects.filter(pk=g.pk).update(eltern_antwort_am=t + timedelta(hours=6), letzte_aktivitaet=b2.erstellt_am,
+                                                         schule_gelesen_am=b2.erstellt_am)
+
+        # 3) Benachrichtigungsregeln; zusätzliche Verspätungen, damit eine Regel sichtbar auslöst
+        hj1 = sj.abschnitte.get(nummer=1)
+        if len(schueler) > 6:
+            s = schueler[6]
+            for tage in (30, 16, 9, 2):
+                tag = max(hj1.beginn, timezone.localdate() - timedelta(days=tage))
+                while tag.weekday() >= 5:
+                    tag -= timedelta(days=1)
+                Fehlzeit.objects.create(schueler=s, art=Fehlzeit.VERSPAETUNG, datum_von=tag, minuten=rng.choice([10, 15, 20]),
+                                        status="unentschuldigt", quelle="lehrkraft", erfasst_von=lehrkraft, grund="")
+        r1 = Benachrichtigungsregel.objects.create(
+            name="Verspätungen Mittelstufe", merkmal="verspaetungen", zaehlung="alle", schwelle=3, zeitraum="halbjahr",
+            jahrgang_von=5, jahrgang_bis=10, wiederholen=True, bestaetigung_erbeten=True, erstellt_von=mittelstufe,
+            zusatztext="Nach § 4 der Schulordnung ist pünktliches Erscheinen verpflichtend. Ab sechs Verspätungen laden wir "
+                       "Sie zu einem Gespräch mit der Klassenleitung ein.")
+        r2 = Benachrichtigungsregel.objects.create(
+            name="Unentschuldigte Fehlstunden", merkmal="fehlstunden", zaehlung="unentschuldigt", schwelle=8, zeitraum="halbjahr",
+            bestaetigung_erbeten=True, erstellt_von=schulleitung)
+        Benachrichtigungsregel.objects.create(
+            name="Fehltage Schuljahr (Hinweis)", merkmal="fehltage", zaehlung="alle", schwelle=15, zeitraum="schuljahr",
+            bestaetigung_erbeten=False, aktiv=False, erstellt_von=schulleitung)
+        for r in (r1, r2):
+            regel_anwenden(r, benachrichtigen=True)
 
 
 def beispiel_pdf(titel, name):

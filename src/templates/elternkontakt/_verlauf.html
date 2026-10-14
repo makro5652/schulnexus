@@ -1,0 +1,10 @@
+{% load i18n %}
+<ol class="ek-verlauf">
+  {% for b in beitraege %}
+  <li class="ek-beitrag {% if b.von_eltern %}ek-von-eltern{% elif b.ueber == 'system' %}ek-von-system{% endif %}">
+    <div class="ek-beitrag-kopf"><strong>{{ b.absender }}</strong>
+      <span class="leise">· {{ b.erstellt_am|date:"SHORT_DATETIME_FORMAT" }}{% if b.von_eltern and not eltern %} · {{ b.get_ueber_display }}{% endif %}</span></div>
+    <div class="ek-text">{{ b.anzeigetext|linebreaks }}</div>
+  </li>
+  {% endfor %}
+</ol>

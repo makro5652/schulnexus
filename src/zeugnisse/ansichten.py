@@ -325,7 +325,15 @@ def klasse(request, gruppe, abschnitt):
             return redirect("zeugnis_klasse", gruppe=klasse.pk, abschnitt=abschnitt.pk)
         raise Http404
     zeilen = _klassen_zeilen(klasse, abschnitt)
+    from elternkontakt.ansichten import zeugnisempfang_status
+    from elternkontakt.rechte import darf_zeugnisempfang
+
+    empfang = zeugnisempfang_status(klasse, abschnitt)
+    for zeile in zeilen:
+        zeile["empfang"] = empfang.get(zeile["z"].pk)
     return render(request, "zeugnisse/klasse.html", {
+        "empfang_offen": sum(1 for z in zeilen if z["z"].freigegeben and not z["empfang"]),
+        "darf_empfang": darf_zeugnisempfang(user, klasse),
         "klasse": klasse, "abschnitt": abschnitt, "zeilen": zeilen,
         "abschnitte": klasse.schuljahr.abschnitte.order_by("nummer"),
         "konferenz": Konferenz.objects.filter(klasse=klasse, abschnitt=abschnitt).first(),

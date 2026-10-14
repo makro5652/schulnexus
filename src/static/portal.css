@@ -337,7 +337,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .rollenmatrix td.recht { text-align: center; font-size: 0.82rem; white-space: nowrap; }
 .recht-ja { background: var(--akzent-hell); color: var(--akzent); font-weight: 700; }
 .recht-lesen { color: var(--text); }
-.recht-eigene, .recht-stufe, .recht-teils { color: var(--akzent); font-weight: 600; }
+.recht-eigene, .recht-stufe, .recht-teils, .recht-teils_ek { color: var(--akzent); font-weight: 600; }
 .recht-nein { color: var(--leise); }
 
 /* ---------------------------------------------------------------- Zuordnung */
@@ -619,3 +619,57 @@ a.klein, .klein { font-size: 0.85rem; }
   --lila-flaeche: #3a3350; --lila-text: #cba6f7; --ok: #a6e3a1;
   --papier-gelb: #38343b; --papier-gruen: #2b3539; --papier-blau: #2a3048; --papier-rosa: #383147; --papier-grau: #2a2b3c;
 }
+
+/* ---------------------------------------------------------------- Elternkommunikation */
+.ek-ok { color: var(--ok); font-weight: 600; }
+.ek-offen { color: var(--hinweis-text); font-weight: 600; }
+.ek-neu td:first-child { box-shadow: inset 3px 0 0 var(--akzent); }
+.ek-etikett-neu { background: var(--info-flaeche); color: var(--info-text); }
+.ek-art { display: inline-block; padding: 0.05rem 0.5rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; white-space: nowrap; background: var(--linie); color: var(--text); }
+.ek-art-zeugnis { background: var(--lila-flaeche); color: var(--lila-text); }
+.ek-art-fehlzeiten { background: var(--hinweis-flaeche); color: var(--hinweis-text); }
+.ek-schreiben { margin-left: 0.5rem; font-size: 0.82rem; }
+.ek-neu-raster { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 1.2rem; margin-bottom: 1rem; align-items: start; }
+.ek-felder { grid-template-columns: 1fr 1fr; }
+.ek-felder textarea { min-height: 12rem; }
+.ek-empf { display: flex; gap: 0.6rem; align-items: flex-start; padding: 0.5rem 0; border-bottom: 1px solid var(--linie); cursor: pointer; }
+.ek-empf input { margin-top: 0.3rem; }
+.ek-schuelerliste { max-height: 32rem; overflow-y: auto; }
+.ek-spalten { grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr); margin-top: 0.8rem; }
+.ek-verlauf { list-style: none; margin: 0 0 1rem; padding: 0; display: grid; gap: 0.8rem; }
+.ek-beitrag { border: 1px solid var(--linie); border-radius: 10px; padding: 0.7rem 0.9rem; background: var(--flaeche); max-width: 75ch; }
+.ek-von-eltern { background: var(--info-flaeche); border-color: transparent; margin-left: auto; }
+.ek-von-system { background: var(--grund); }
+.ek-beitrag-kopf { font-size: 0.85rem; margin-bottom: 0.3rem; }
+.ek-text p { margin: 0 0 0.6rem; overflow-wrap: anywhere; }
+.ek-text p:last-child { margin-bottom: 0; }
+.ek-antwort { display: grid; gap: 0.5rem; border-top: 1px solid var(--linie); padding-top: 0.8rem; }
+.ek-antwort .an-feld { max-width: none; }
+.ek-antwort textarea { width: 100%; }
+.ek-antwort .knopf { justify-self: start; }
+.ek-zusammenfassung { font-weight: 600; margin-top: 0; }
+.ek-empfaenger { padding: 0.6rem 0; border-top: 1px solid var(--linie); font-size: 0.9rem; }
+.ek-status { list-style: none; margin: 0.25rem 0; padding: 0; font-size: 0.82rem; display: grid; gap: 0.1rem; }
+.ek-zustellung-fehler, .ek-zustellung-ohne_email { color: var(--warnung); font-weight: 600; }
+.ek-zustellung-wartet { color: var(--hinweis-text); }
+.ek-aktionen { display: flex; flex-wrap: wrap; gap: 0.3rem 0.9rem; align-items: center; font-size: 0.82rem; }
+.ek-aktionen form { margin: 0; }
+.ek-vermerk summary { cursor: pointer; color: var(--akzent); }
+.ek-vermerk form { display: flex; gap: 0.4rem; margin-top: 0.4rem; flex-wrap: wrap; }
+.ek-vermerk input[type=text] { flex: 1; min-width: 10rem; font: inherit; padding: 0.3rem 0.5rem; border: 1px solid var(--linie); border-radius: 6px; background: var(--grund); color: var(--text); }
+.ek-vorschau-liste p { margin: 0.2rem 0; }
+@media (max-width: 860px) { .ek-neu-raster, .ek-spalten, .ek-felder { grid-template-columns: 1fr; } }
+
+/* Elternseite (Link / Portal) */
+.ek-eltern-kopf { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; padding: 0.8rem 1.2rem; background: var(--flaeche); border-bottom: 1px solid var(--linie); }
+.ek-eltern-marke { display: flex; align-items: center; gap: 0.7rem; }
+.ek-eltern-marke small { display: block; color: var(--leise); font-size: 0.8rem; }
+.ek-eltern-inhalt { max-width: 760px; margin: 0 auto; padding: 1.2rem; display: grid; gap: 1rem; }
+.ek-eltern-inhalt h1 { margin-bottom: 0; }
+.ek-eltern .ek-von-eltern { margin-left: 2rem; }
+.ek-sprachwahl { display: flex; gap: 0.8rem; font-size: 0.9rem; }
+.ek-sprachwahl a[aria-current] { font-weight: 700; text-decoration: none; color: var(--text); }
+.ek-meldung { padding: 0.7rem 0.9rem; border-radius: 8px; background: var(--akzent-hell); color: var(--akzent); font-weight: 600; margin: 0; }
+.ek-vorschau { padding: 0.6rem 0.9rem; border-radius: 8px; background: var(--hinweis-flaeche); color: var(--hinweis-text); margin: 0; }
+.ek-bestaetigung p { margin-top: 0; }
+.ek-portalzeile { padding: 0.4rem 0; border-bottom: 1px solid var(--linie); margin: 0; }

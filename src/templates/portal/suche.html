@@ -17,7 +17,8 @@
     <h2>{% translate "Schüler:innen" %} <span class="leise">({{ schueler|length }})</span></h2>
     {% for e in schueler %}
       <p>{% if e.akte %}<a href="{% url 'schuelerakte' e.s.pk %}">{{ e.s.person }}</a>{% else %}{{ e.s.person }}{% endif %}
-        <span class="leise">{% if e.klasse %}· {% blocktranslate with name=e.klasse.name %}Klasse {{ name }}{% endblocktranslate %}{% endif %}</span></p>
+        <span class="leise">{% if e.klasse %}· {% blocktranslate with name=e.klasse.name %}Klasse {{ name }}{% endblocktranslate %}{% endif %}</span>
+        {% if e.schreiben %}<a class="ek-schreiben" href="{% url 'elternnachricht_neu' %}?schueler={{ e.s.pk }}">{% translate "Eltern schreiben" %}</a>{% endif %}</p>
     {% empty %}<p class="leer">{% translate "Keine Treffer unter den Schüler:innen, die Sie sehen dürfen." %}</p>{% endfor %}
   </section>
   {% if user.is_staff %}

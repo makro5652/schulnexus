@@ -10,6 +10,8 @@ from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 
 from aufnahme.ansichten import start_hinweise as aufnahme_hinweise
+from elternkontakt.ansichten import akte_kontext as eltern_akte, gruppe_erlaubt as eltern_gruppe_erlaubt
+from elternkontakt.ansichten import start_hinweise as eltern_hinweise
 from zeugnisse.ansichten import start_hinweise as zeugnis_hinweise
 from fehlzeiten.models import Fehlzeit
 from foerderung.ansichten import aktive_nta_je_schueler, foerder_hinweise, foerder_kontext, nta_kurztext
@@ -99,6 +101,7 @@ def start(request):
          "klassen": klassen_info, "kennzahlen": kennzahlen, "hr": hr,
          "foerderung": foerder_hinweise(request.user), "ist_verwaltung": ist_verwaltung(request.user),
          "aufnahme": aufnahme_hinweise(request.user), "zeugnisse": zeugnis_hinweise(request.user),
+         "elternkontakt": eltern_hinweise(request.user),
          "begruessung": begruessung(jetzt), "heute": jetzt.date(), "kalenderwoche": jetzt.isocalendar()[1],
          "schnellzugriff": schnellzugriff(request.user, sj), "geburtstage": geburtstage(request.user, jetzt.date()),
          "notizen": notizen_fuer(request.user, jetzt.date())},
@@ -199,7 +202,8 @@ def klassenliste(request, pk):
         a = aktueller_abschnitt()
         zeugnis_abschnitt = a if a and a.schuljahr_id == gruppe.schuljahr_id else gruppe.schuljahr.abschnitte.order_by("nummer").first()
     return render(request, "portal/klassenliste.html", {"gruppe": gruppe, "zeilen": zeilen, "zeugnis_abschnitt": zeugnis_abschnitt,
-                                                         "darf_zuordnen": darf_gruppe_bearbeiten(request.user, gruppe)})
+                                                         "darf_zuordnen": darf_gruppe_bearbeiten(request.user, gruppe),
+                                                         "darf_eltern": eltern_gruppe_erlaubt(request.user, gruppe)})
 
 
 @login_required
@@ -268,6 +272,7 @@ def schuelerakte(request, pk):
         "sprachen": schueler.sprachenfolge.select_related("fach"),
         "vorherige": schueler.vorherige_schulen.all(),
         "einwilligungen": schueler.einwilligungen.all(),
+        "elternkontakt": eltern_akte(request.user, schueler),
         "gesundheit": gesundheit,
         "darf_gesundheit": darf_gesundheit,
         "fz": fz,

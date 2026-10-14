@@ -1,0 +1,9 @@
+{% load i18n %}
+<section class="karte" id="elternnachrichten">
+  <div class="karte-kopf"><h2>{% translate "Elternnachrichten" %}</h2>
+    {% if elternkontakt.darf_schreiben %}<a class="knopf klein" href="{% url 'elternnachricht_neu' %}?schueler={{ s.pk }}">{% translate "Eltern schreiben" %}</a>{% endif %}</div>
+  {% for g in elternkontakt.gespraeche %}<p><a href="{% url 'elterngespraech' g.pk %}">{{ g.titel }}</a>
+    <span class="leise">· {{ g.letzte_aktivitaet|date:"SHORT_DATE_FORMAT" }} · {% if g.bestaetigung_erbeten %}{% blocktranslate with b=g.n_best e=g.n_empf %}{{ b }}/{{ e }} bestätigt{% endblocktranslate %}{% else %}{{ g.get_art_display }}{% endif %}</span>
+    {% if g.ungelesen %}<span class="etikett ek-etikett-neu">{% translate "neue Antwort" %}</span>{% endif %}</p>
+  {% empty %}<p class="leer">{% translate "Keine Nachrichten." %}</p>{% endfor %}
+</section>

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-13 22:00+0300\n"
+"POT-Creation-Date: 2026-10-14 13:45+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: aufnahme/admin.py:25
+#: aufnahme/admin.py:25 templates/elternkontakt/regeln.html:18
 msgid "Jahrgänge"
 msgstr "Year groups"
 
@@ -26,12 +26,13 @@ msgstr "Year groups"
 msgid "Punkte"
 msgstr "Items"
 
-#: aufnahme/admin.py:76 portal/apps.py:8 zeugnisse/admin.py:42
-#: zeugnisse/admin.py:69
+#: aufnahme/admin.py:76 elternkontakt/admin.py:44 portal/apps.py:8
+#: zeugnisse/admin.py:42 zeugnisse/admin.py:69
 msgid "Portal"
 msgstr "Portal"
 
-#: aufnahme/admin.py:78 zeugnisse/admin.py:44 zeugnisse/admin.py:71
+#: aufnahme/admin.py:78 elternkontakt/admin.py:46 zeugnisse/admin.py:44
+#: zeugnisse/admin.py:71
 msgid "öffnen"
 msgstr "open"
 
@@ -81,7 +82,7 @@ msgstr "New item"
 msgid "Offen"
 msgstr "Open"
 
-#: aufnahme/ansichten.py:161
+#: aufnahme/ansichten.py:161 elternkontakt/ansichten.py:127
 msgid "Alle"
 msgstr "All"
 
@@ -174,7 +175,7 @@ msgstr ""
 msgid "%(name)s wurde als Schüler:in übernommen (Schülernummer %(nr)s)."
 msgstr "%(name)s has been enrolled as a student (student number %(nr)s)."
 
-#: aufnahme/apps.py:8 portal/navigation.py:93 portal/rollen.py:150
+#: aufnahme/apps.py:8 portal/navigation.py:95 portal/rollen.py:159
 #: templates/aufnahme/_start.html:4 templates/aufnahme/anmeldung.html:6
 #: templates/aufnahme/formular.html:5 templates/aufnahme/liste.html:3
 #: templates/aufnahme/liste.html:8 templates/aufnahme/liste.html:9
@@ -186,11 +187,11 @@ msgstr "Admissions"
 msgid "Sekretariat"
 msgstr "School office"
 
-#: aufnahme/models.py:30 portal/navigation.py:219 portal/rollen.py:31
+#: aufnahme/models.py:30 portal/navigation.py:227 portal/rollen.py:31
 msgid "Finanzen"
 msgstr "Finance"
 
-#: aufnahme/models.py:31 portal/navigation.py:84
+#: aufnahme/models.py:31 portal/navigation.py:86
 msgid "Stufenkoordination"
 msgstr "Stage coordination"
 
@@ -198,12 +199,13 @@ msgstr "Stage coordination"
 msgid "Schulleitung"
 msgstr "School management"
 
-#: aufnahme/models.py:69 foerderung/models.py:23 foerderung/models.py:37
-#: noten/models.py:27 noten/models.py:78 noten/models.py:118
-#: noten/models.py:279 stammdaten/models.py:22 stammdaten/models.py:51
-#: stammdaten/models.py:189 stammdaten/models.py:346 stammdaten/models.py:548
-#: stammdaten/models.py:632 stammdaten/models.py:777 stammdaten/models.py:845
-#: stammdaten/models.py:966
+#: aufnahme/models.py:69 elternkontakt/models.py:197 foerderung/models.py:23
+#: foerderung/models.py:37 noten/models.py:27 noten/models.py:78
+#: noten/models.py:118 noten/models.py:279 stammdaten/models.py:22
+#: stammdaten/models.py:51 stammdaten/models.py:189 stammdaten/models.py:346
+#: stammdaten/models.py:548 stammdaten/models.py:632 stammdaten/models.py:777
+#: stammdaten/models.py:845 stammdaten/models.py:966
+#: templates/elternkontakt/regeln.html:18
 msgid "Bezeichnung"
 msgstr "Name"
 
@@ -242,9 +244,9 @@ msgstr "Always suggest"
 msgid "Wird bei jeder neuen Anmeldung vorausgewählt."
 msgstr "Preselected for every new application."
 
-#: aufnahme/models.py:77 foerderung/models.py:26 foerderung/models.py:45
-#: foerderung/models.py:82 stammdaten/models.py:127 stammdaten/models.py:250
-#: stammdaten/models.py:990
+#: aufnahme/models.py:77 elternkontakt/models.py:210 foerderung/models.py:26
+#: foerderung/models.py:45 foerderung/models.py:82 stammdaten/models.py:127
+#: stammdaten/models.py:250 stammdaten/models.py:990
 msgid "Aktiv"
 msgstr "Active"
 
@@ -261,7 +263,7 @@ msgstr "Order"
 msgid "Checklisten-Vorlage"
 msgstr "Checklist template"
 
-#: aufnahme/models.py:82 portal/navigation.py:98
+#: aufnahme/models.py:82 portal/navigation.py:100
 msgid "Checklisten-Vorlagen"
 msgstr "Checklist templates"
 
@@ -306,7 +308,7 @@ msgstr "Under review"
 msgid "Warteliste"
 msgstr "Waiting list"
 
-#: aufnahme/models.py:119 portal/navigation.py:96
+#: aufnahme/models.py:119 portal/navigation.py:98
 msgid "Zugesagt"
 msgstr "Offer made"
 
@@ -329,10 +331,10 @@ msgstr "Application number"
 #: aufnahme/models.py:128 fehlzeiten/models.py:59 foerderung/models.py:88
 #: foerderung/models.py:229 stammdaten/admin.py:316 stammdaten/models.py:141
 #: stammdaten/models.py:412 templates/aufnahme/liste.html:15
-#: templates/aufnahme/liste.html:38 templates/foerderung/_akte.html:16
-#: templates/foerderung/_akte.html:36 templates/foerderung/plan.html:25
-#: templates/zeugnisse/klasse.html:30 zeugnisse/models.py:70
-#: zeugnisse/models.py:191
+#: templates/aufnahme/liste.html:38 templates/elternkontakt/regeln.html:19
+#: templates/foerderung/_akte.html:16 templates/foerderung/_akte.html:36
+#: templates/foerderung/plan.html:25 templates/zeugnisse/klasse.html:31
+#: zeugnisse/models.py:70 zeugnisse/models.py:191
 msgid "Status"
 msgstr "Status"
 
@@ -351,7 +353,7 @@ msgstr "Year"
 
 #: aufnahme/models.py:134 stammdaten/admin.py:288 stammdaten/models.py:786
 #: stammdaten/models.py:812 templates/aufnahme/anmeldung.html:215
-#: templates/portal/schuelerakte.html:77 templates/zeugnisse/klasse.html:29
+#: templates/portal/schuelerakte.html:77 templates/zeugnisse/klasse.html:30
 #: zeugnisse/models.py:52
 msgid "Bildungsgang"
 msgstr "School track"
@@ -782,11 +784,718 @@ msgstr ""
 "Student, parents/guardians, class assignment and documents are transferred "
 "to the student records."
 
+#: elternkontakt/admin.py:40 elternkontakt/ansichten.py:35
+#: elternkontakt/models.py:35 templates/elternkontakt/uebersicht.html:39
+msgid "Betreff"
+msgstr "Subject"
+
+#: elternkontakt/ansichten.py:36 elternkontakt/models.py:30
+#: elternkontakt/models.py:260 templates/elternkontakt/neu.html:14
+msgid "Nachricht"
+msgstr "Message"
+
+#: elternkontakt/ansichten.py:37
+msgid "Lesebestätigung erbitten"
+msgstr "Request read confirmation"
+
+#: elternkontakt/ansichten.py:38 elternkontakt/models.py:40
+msgid "Eltern dürfen antworten"
+msgstr "Parents may reply"
+
+#: elternkontakt/ansichten.py:42
+msgid "Antwort"
+msgstr "Reply"
+
+#: elternkontakt/ansichten.py:47
+msgid "Bereits erreichte Schwellen jetzt benachrichtigen"
+msgstr "Notify thresholds already reached now"
+
+#: elternkontakt/ansichten.py:48
+msgid ""
+"Sonst werden Schüler:innen, die die Schwelle schon erreicht haben, still "
+"vorgemerkt und erst bei der nächsten Stufe benachrichtigt."
+msgstr ""
+"Otherwise students who have already reached the threshold are recorded "
+"silently and only notified at the next level."
+
+#: elternkontakt/ansichten.py:61 elternkontakt/models.py:191
+#: templates/aufnahme/liste.html:22 templates/aufnahme/liste.html:25
+#: templates/elternkontakt/uebersicht.html:25
+#: templates/elternkontakt/uebersicht.html:28
+msgid "alle"
+msgstr "all"
+
+#: elternkontakt/ansichten.py:73
+msgid "„Jahrgang bis“ darf nicht vor „Jahrgang von“ liegen."
+msgstr "“Year to” must not be before “Year from”."
+
+#: elternkontakt/ansichten.py:76
+msgid "Sie können Regeln nur für die Jahrgänge Ihrer Stufe anlegen."
+msgstr "You can only create rules for the years of your section."
+
+#: elternkontakt/ansichten.py:127
+msgid "Neue Antworten"
+msgstr "New replies"
+
+#: elternkontakt/ansichten.py:128 templates/elternkontakt/gespraech.html:47
+msgid "Bestätigung offen"
+msgstr "Confirmation pending"
+
+#: elternkontakt/ansichten.py:128
+msgid "Von mir begonnen"
+msgstr "Started by me"
+
+#: elternkontakt/ansichten.py:194
+msgid "Bitte mindestens eine Empfängerin oder einen Empfänger wählen."
+msgstr "Please select at least one recipient."
+
+#: elternkontakt/ansichten.py:202
+msgid ""
+"Bitte mindestens eine Schülerin oder einen Schüler mit Kontaktperson wählen."
+msgstr "Please select at least one student with a contact person."
+
+#: elternkontakt/ansichten.py:209
+#, python-format
+msgid ""
+"Nachricht an die Eltern von %(s)d Schüler:in angelegt (%(n)d "
+"Empfänger:innen)."
+msgid_plural ""
+"Nachricht an die Eltern von %(s)d Schüler:innen angelegt (%(n)d "
+"Empfänger:innen)."
+msgstr[0] ""
+"Message to the parents of %(s)d student created (%(n)d recipients)."
+msgstr[1] ""
+"Message to the parents of %(s)d students created (%(n)d recipients)."
+
+#: elternkontakt/ansichten.py:220
+#, python-format
+msgid "Nachricht an %(n)d Empfänger:in versendet."
+msgid_plural "Nachricht an %(n)d Empfänger:innen versendet."
+msgstr[0] "Message sent to %(n)d recipient."
+msgstr[1] "Message sent to %(n)d recipients."
+
+#: elternkontakt/ansichten.py:221
+#, python-format
+msgid ""
+"Nachricht für %(n)d Empfänger:in gespeichert (E-Mail-Versand ist "
+"ausgeschaltet – Postausgang)."
+msgid_plural ""
+"Nachricht für %(n)d Empfänger:innen gespeichert (E-Mail-Versand ist "
+"ausgeschaltet – Postausgang)."
+msgstr[0] ""
+"Message saved for %(n)d recipient (email sending is switched off – outbox)."
+msgstr[1] ""
+"Message saved for %(n)d recipients (email sending is switched off – outbox)."
+
+#: elternkontakt/ansichten.py:247
+msgid "Antwort gespeichert; die Eltern werden benachrichtigt."
+msgstr "Reply saved; the parents will be notified."
+
+#: elternkontakt/ansichten.py:255
+#, python-format
+msgid "Bestätigung für %(name)s vermerkt."
+msgstr "Confirmation recorded for %(name)s."
+
+#: elternkontakt/ansichten.py:259
+#, python-format
+msgid "Zustellung: %(status)s"
+msgstr "Delivery: %(status)s"
+
+#: elternkontakt/ansichten.py:330
+#, python-format
+msgid "Regel gespeichert; %(n)d Benachrichtigung ausgelöst."
+msgid_plural "Regel gespeichert; %(n)d Benachrichtigungen ausgelöst."
+msgstr[0] "Rule saved; %(n)d notification triggered."
+msgstr[1] "Rule saved; %(n)d notifications triggered."
+
+#: elternkontakt/ansichten.py:334
+#, python-format
+msgid ""
+"Regel gespeichert; %(n)d Schüler:in hat die Schwelle bereits erreicht und "
+"wurde still vorgemerkt."
+msgid_plural ""
+"Regel gespeichert; %(n)d Schüler:innen haben die Schwelle bereits erreicht "
+"und wurden still vorgemerkt."
+msgstr[0] ""
+"Rule saved; %(n)d student has already reached the threshold and was recorded"
+" silently."
+msgstr[1] ""
+"Rule saved; %(n)d students have already reached the threshold and were "
+"recorded silently."
+
+#: elternkontakt/ansichten.py:338
+msgid "Regel gespeichert."
+msgstr "Rule saved."
+
+#: elternkontakt/ansichten.py:353
+msgid "Regel gelöscht. Bereits versendete Nachrichten bleiben erhalten."
+msgstr "Rule deleted. Messages already sent are kept."
+
+#: elternkontakt/ansichten.py:392
+#, python-format
+msgid "Empfangsbestätigung für %(n)d Zeugnis angefordert."
+msgid_plural "Empfangsbestätigung für %(n)d Zeugnisse angefordert."
+msgstr[0] "Receipt confirmation requested for %(n)d report."
+msgstr[1] "Receipt confirmation requested for %(n)d reports."
+
+#: elternkontakt/ansichten.py:395
+msgid "Keine freigegebenen Zeugnisse ohne Anfrage."
+msgstr "No released reports without a request."
+
+#: elternkontakt/ansichten.py:397
+#, python-format
+msgid ""
+"%(n)d Schüler:in ohne sorgeberechtigte Kontaktperson – bitte direkt klären."
+msgid_plural ""
+"%(n)d Schüler:innen ohne sorgeberechtigte Kontaktperson – bitte direkt "
+"klären."
+msgstr[0] ""
+"%(n)d student without a contact person with custody – please clarify "
+"directly."
+msgstr[1] ""
+"%(n)d students without a contact person with custody – please clarify "
+"directly."
+
+#: elternkontakt/apps.py:8 portal/rollen.py:150
+msgid "Elternkommunikation"
+msgstr "Parent communication"
+
+#: elternkontakt/eltern.py:22
+msgid "Ihre Antwort an die Schule"
+msgstr "Your reply to the school"
+
+#: elternkontakt/models.py:30
+msgid "Zeugnisempfang"
+msgstr "Report receipt"
+
+#: elternkontakt/models.py:30
+msgid "Fehlzeiten (automatisch)"
+msgstr "Absences (automatic)"
+
+#: elternkontakt/models.py:33 elternkontakt/models.py:252
+#: fehlzeiten/models.py:52 foerderung/admin.py:397 foerderung/models.py:84
+#: foerderung/models.py:185 foerderung/models.py:218 nachmittag/models.py:68
+#: nachmittag/models.py:93 noten/models.py:333 noten/models.py:400
+#: portal/rollen.py:32 stammdaten/admin.py:151 stammdaten/admin.py:269
+#: stammdaten/models.py:163 stammdaten/models.py:517 stammdaten/models.py:589
+#: stammdaten/models.py:673 stammdaten/models.py:809 stammdaten/models.py:857
+#: stammdaten/models.py:876 stammdaten/models.py:895 stammdaten/models.py:918
+#: templates/aufnahme/uebernahme.html:24 templates/aufnahme/uebernahme.html:41
+#: templates/elternkontakt/uebersicht.html:39
+#: templates/portal/klassenliste.html:13
+#: templates/portal/notenuebersicht.html:16 templates/zeugnisse/klasse.html:30
+#: templates/zeugnisse/konferenz.html:51
+#: templates/zeugnisse/unterricht.html:20 zeugnisse/models.py:46
+#: zeugnisse/models.py:227
+msgid "Schüler:in"
+msgstr "Student"
+
+#: elternkontakt/models.py:34 fehlzeiten/models.py:53 foerderung/models.py:189
+#: stammdaten/models.py:408 stammdaten/models.py:519
+#: templates/elternkontakt/uebersicht.html:27
+#: templates/elternkontakt/uebersicht.html:39 zeugnisse/models.py:48
+#: zeugnisse/models.py:180
+msgid "Art"
+msgstr "Type"
+
+#: elternkontakt/models.py:37 elternkontakt/models.py:139
+msgid "Textvorlage"
+msgstr "Text template"
+
+#: elternkontakt/models.py:38 elternkontakt/models.py:140
+msgid "Daten der Vorlage"
+msgstr "Template data"
+
+#: elternkontakt/models.py:39
+msgid "Lese-/Empfangsbestätigung erbeten"
+msgstr "Read/receipt confirmation requested"
+
+#: elternkontakt/models.py:41 zeugnisse/models.py:176
+msgid "Abgeschlossen"
+msgstr "Closed"
+
+#: elternkontakt/models.py:42
+msgid "Abgeschlossene Gespräche nehmen keine Antworten mehr an."
+msgstr "Closed conversations no longer accept replies."
+
+#: elternkontakt/models.py:44 portal/navigation.py:157
+#: stammdaten/models.py:699 templates/zeugnisse/druck.html:6
+#: zeugnisse/models.py:77 zeugnisse/models.py:116 zeugnisse/models.py:135
+#: zeugnisse/models.py:156
+msgid "Zeugnis"
+msgstr "Report"
+
+#: elternkontakt/models.py:46 templates/elternkontakt/uebersicht.html:40
+msgid "Begonnen von"
+msgstr "Started by"
+
+#: elternkontakt/models.py:47
+msgid "Begonnen am"
+msgstr "Started on"
+
+#: elternkontakt/models.py:48 templates/elternkontakt/uebersicht.html:40
+msgid "Letzte Aktivität"
+msgstr "Last activity"
+
+#: elternkontakt/models.py:49
+msgid "Letzte Elternantwort"
+msgstr "Last parent reply"
+
+#: elternkontakt/models.py:50
+msgid "Von der Schule zuletzt gelesen"
+msgstr "Last read by the school"
+
+#: elternkontakt/models.py:51
+msgid "Änderungsprotokoll Elterngespräch"
+msgstr "Change history: parent conversation"
+
+#: elternkontakt/models.py:54
+msgid "Elternnachricht"
+msgstr "Parent message"
+
+#: elternkontakt/models.py:55 portal/navigation.py:118
+#: templates/elternkontakt/_akte.html:3 templates/elternkontakt/_start.html:4
+#: templates/elternkontakt/gespraech.html:5 templates/elternkontakt/neu.html:5
+#: templates/elternkontakt/neu_auswahl.html:5
+#: templates/elternkontakt/regeln.html:8
+#: templates/elternkontakt/uebersicht.html:3
+#: templates/elternkontakt/uebersicht.html:8
+#: templates/elternkontakt/uebersicht.html:9
+msgid "Elternnachrichten"
+msgstr "Parent messages"
+
+#: elternkontakt/models.py:85
+msgid "im Postausgang"
+msgstr "in the outbox"
+
+#: elternkontakt/models.py:85
+msgid "per E-Mail versendet"
+msgstr "sent by email"
+
+#: elternkontakt/models.py:85
+msgid "Versand fehlgeschlagen"
+msgstr "sending failed"
+
+#: elternkontakt/models.py:86 templates/elternkontakt/neu.html:31
+msgid "keine E-Mail-Adresse"
+msgstr "no email address"
+
+#: elternkontakt/models.py:87
+msgid "über den Link"
+msgstr "via the link"
+
+#: elternkontakt/models.py:87
+msgid "im Elternportal"
+msgstr "in the parent portal"
+
+#: elternkontakt/models.py:87
+msgid "von der Schule vermerkt"
+msgstr "recorded by the school"
+
+#: elternkontakt/models.py:89 elternkontakt/models.py:137
+msgid "Gespräch"
+msgstr "Conversation"
+
+#: elternkontakt/models.py:90 elternkontakt/models.py:106
+#: foerderung/models.py:308 templates/foerderung/_aushaendigung.html:9
+msgid "Empfänger:in"
+msgstr "Recipient"
+
+#: elternkontakt/models.py:91 stammdaten/models.py:463
+#: stammdaten/models.py:528
+msgid "Beziehung"
+msgstr "Relationship"
+
+#: elternkontakt/models.py:92
+msgid "E-Mail (beim Versand)"
+msgstr "Email (when sent)"
+
+#: elternkontakt/models.py:93
+msgid "Schlüssel des Links"
+msgstr "Link key"
+
+#: elternkontakt/models.py:94
+msgid "Zustellung"
+msgstr "Delivery"
+
+#: elternkontakt/models.py:95
+msgid "Zuletzt versendet"
+msgstr "Last sent"
+
+#: elternkontakt/models.py:96
+msgid "Fehlermeldung"
+msgstr "Error message"
+
+#: elternkontakt/models.py:97
+msgid "Geöffnet am"
+msgstr "Opened on"
+
+#: elternkontakt/models.py:98
+msgid "Bestätigt am"
+msgstr "Confirmed on"
+
+#: elternkontakt/models.py:99
+msgid "Bestätigt"
+msgstr "Confirmed"
+
+#: elternkontakt/models.py:101
+msgid "Vermerkt von"
+msgstr "Recorded by"
+
+#: elternkontakt/models.py:102 templates/elternkontakt/gespraech.html:56
+#: templates/zeugnisse/klasse.html:31 templates/zeugnisse/zeugnis.html:119
+#: zeugnisse/models.py:121
+msgid "Vermerk"
+msgstr "Endorsement"
+
+#: elternkontakt/models.py:103
+msgid "Änderungsprotokoll Empfänger:in"
+msgstr "Change history: recipient"
+
+#: elternkontakt/models.py:107 templates/elternkontakt/neu.html:25
+msgid "Empfänger:innen"
+msgstr "Recipients"
+
+#: elternkontakt/models.py:135 stammdaten/models.py:877
+msgid "Schule"
+msgstr "School"
+
+#: elternkontakt/models.py:135
+msgid "Eltern (Link)"
+msgstr "Parents (link)"
+
+#: elternkontakt/models.py:135
+msgid "Eltern (Portal)"
+msgstr "Parents (portal)"
+
+#: elternkontakt/models.py:135 templates/elternkontakt/uebersicht.html:53
+msgid "automatisch"
+msgstr "automatic"
+
+#: elternkontakt/models.py:138
+msgid "Text"
+msgstr "Text"
+
+#: elternkontakt/models.py:142
+msgid "Von (Schule)"
+msgstr "From (school)"
+
+#: elternkontakt/models.py:144
+msgid "Von (Eltern)"
+msgstr "From (parents)"
+
+#: elternkontakt/models.py:145 foerderung/models.py:310
+msgid "Weg"
+msgstr "Method"
+
+#: elternkontakt/models.py:146
+msgid "Geschrieben am"
+msgstr "Written on"
+
+#: elternkontakt/models.py:149
+msgid "Beitrag"
+msgstr "Post"
+
+#: elternkontakt/models.py:150
+msgid "Beiträge"
+msgstr "Posts"
+
+#: elternkontakt/models.py:172
+msgid "Schulverwaltung (automatisch)"
+msgstr "School administration (automatic)"
+
+#: elternkontakt/models.py:185
+msgid "Fehltage (ganztägig)"
+msgstr "Days absent (full days)"
+
+#: elternkontakt/models.py:186
+msgid "Fehlstunden (einschließlich ganzer Tage)"
+msgstr "Lessons missed (including full days)"
+
+#: elternkontakt/models.py:187
+msgid "Verspätungen (Anzahl)"
+msgstr "Late arrivals (number)"
+
+#: elternkontakt/models.py:188
+msgid "Verspätungen (Minuten insgesamt)"
+msgstr "Late arrivals (total minutes)"
+
+#: elternkontakt/models.py:192
+msgid "nicht entschuldigte (offen oder unentschuldigt)"
+msgstr "not excused (pending or unexcused)"
+
+#: elternkontakt/models.py:193
+msgid "nur unentschuldigte"
+msgstr "unexcused only"
+
+#: elternkontakt/models.py:195
+msgid "je Halbjahr"
+msgstr "per semester"
+
+#: elternkontakt/models.py:195
+msgid "je Schuljahr"
+msgstr "per school year"
+
+#: elternkontakt/models.py:198
+msgid "Was wird gezählt?"
+msgstr "What is counted?"
+
+#: elternkontakt/models.py:199
+msgid "Welche Einträge?"
+msgstr "Which entries?"
+
+#: elternkontakt/models.py:200
+msgid "Ab (Schwelle)"
+msgstr "From (threshold)"
+
+#: elternkontakt/models.py:201 elternkontakt/models.py:253
 #: fehlzeiten/admin.py:26 fehlzeiten/admin.py:30
 #: templates/foerderung/_akte.html:36 templates/foerderung/plan.html:26
 #: templates/portal/schuelerakte.html:77
 msgid "Zeitraum"
 msgstr "Period"
+
+#: elternkontakt/models.py:202
+msgid "Jahrgang von"
+msgstr "Year from"
+
+#: elternkontakt/models.py:203
+msgid "Jahrgang bis"
+msgstr "Year to"
+
+#: elternkontakt/models.py:205
+msgid "Bei jedem weiteren Vielfachen erneut benachrichtigen"
+msgstr "Notify again at every further multiple"
+
+#: elternkontakt/models.py:206
+msgid ""
+"z. B. Schwelle 5: Nachricht bei 5, 10, 15 … – sonst nur einmal je Zeitraum."
+msgstr ""
+"e.g. threshold 5: message at 5, 10, 15 … – otherwise only once per period."
+
+#: elternkontakt/models.py:207
+msgid "Kenntnisnahme durch die Eltern erbitten"
+msgstr "Ask parents to acknowledge"
+
+#: elternkontakt/models.py:208
+msgid "Ergänzender Text der Schule"
+msgstr "Additional text from the school"
+
+#: elternkontakt/models.py:209
+msgid ""
+"Wird unter die automatische Nachricht gesetzt, z. B. Hinweis auf die "
+"Schulordnung."
+msgstr ""
+"Added below the automatic message, e.g. a reference to the school rules."
+
+#: elternkontakt/models.py:212
+msgid "Angelegt von"
+msgstr "Created by"
+
+#: elternkontakt/models.py:213 portal/models.py:52
+msgid "Geändert am"
+msgstr "Changed on"
+
+#: elternkontakt/models.py:214
+msgid "Änderungsprotokoll Benachrichtigungsregel"
+msgstr "Change history: notification rule"
+
+#: elternkontakt/models.py:217
+msgid "Benachrichtigungsregel"
+msgstr "Notification rule"
+
+#: elternkontakt/models.py:218 portal/rollen.py:151
+msgid "Benachrichtigungsregeln (Fehlzeiten)"
+msgstr "Notification rules (absences)"
+
+#: elternkontakt/models.py:241 templates/portal/zuordnung.html:120
+msgid "alle Jahrgänge"
+msgstr "all years"
+
+#: elternkontakt/models.py:243 templates/portal/zuordnung.html:120
+#, python-format
+msgid "Jahrgang %(j)s"
+msgstr "Year %(j)s"
+
+#: elternkontakt/models.py:244 portal/startseite.py:59
+#, python-format
+msgid "Jahrgänge %(von)s–%(bis)s"
+msgstr "Years %(von)s–%(bis)s"
+
+#: elternkontakt/models.py:250
+msgid "Regel"
+msgstr "Rule"
+
+#: elternkontakt/models.py:254 portal/rollen.py:188
+msgid "Stufe"
+msgstr "stage"
+
+#: elternkontakt/models.py:254
+msgid "1 = Schwelle erreicht, 2 = doppelte Schwelle …"
+msgstr "1 = threshold reached, 2 = twice the threshold …"
+
+#: elternkontakt/models.py:255
+msgid "Wert beim Auslösen"
+msgstr "Value when triggered"
+
+#: elternkontakt/models.py:256
+msgid "Ausgelöst am"
+msgstr "Triggered on"
+
+#: elternkontakt/models.py:257
+msgid "Ohne Nachricht"
+msgstr "Without message"
+
+#: elternkontakt/models.py:258
+msgid ""
+"Schwelle war beim Anlegen der Regel bereits überschritten; es wurde nichts "
+"versendet."
+msgstr ""
+"The threshold had already been exceeded when the rule was created; nothing "
+"was sent."
+
+#: elternkontakt/models.py:263
+msgid "Auslösung"
+msgstr "Trigger"
+
+#: elternkontakt/models.py:264
+msgid "Auslösungen"
+msgstr "Triggers"
+
+#: elternkontakt/texte.py:5
+msgid "Fehltag"
+msgid_plural "Fehltage"
+msgstr[0] "day absent"
+msgstr[1] "days absent"
+
+#: elternkontakt/texte.py:6
+msgid "Fehlstunde"
+msgid_plural "Fehlstunden"
+msgstr[0] "lesson missed"
+msgstr[1] "lessons missed"
+
+#: elternkontakt/texte.py:7 fehlzeiten/models.py:42
+msgid "Verspätung"
+msgid_plural "Verspätungen"
+msgstr[0] "late arrival"
+msgstr[1] "late arrivals"
+
+#: elternkontakt/texte.py:8
+msgid "Minute Verspätung"
+msgid_plural "Minuten Verspätung"
+msgstr[0] "minute late"
+msgstr[1] "minutes late"
+
+#: elternkontakt/texte.py:19 templates/aufnahme/anmeldung.html:11
+#, python-format
+msgid "Schuljahr %(sj)s"
+msgstr "School year %(sj)s"
+
+#: elternkontakt/texte.py:23
+msgid ""
+"Gezählt werden nicht entschuldigte Einträge (offen oder unentschuldigt)."
+msgstr "Entries that are not excused (pending or unexcused) are counted."
+
+#: elternkontakt/texte.py:24
+msgid "Gezählt werden nur unentschuldigte Einträge."
+msgstr "Only unexcused entries are counted."
+
+#: elternkontakt/texte.py:29
+#, python-format
+msgid "Zeugnis %(zeitraum)s – bitte Erhalt bestätigen"
+msgstr "Report %(zeitraum)s – please confirm receipt"
+
+#: elternkontakt/texte.py:32
+#, python-format
+msgid "Verspätungen von %(vorname)s"
+msgstr "Late arrivals of %(vorname)s"
+
+#: elternkontakt/texte.py:33
+#, python-format
+msgid "Fehlzeiten von %(vorname)s"
+msgstr "Absences of %(vorname)s"
+
+#: elternkontakt/texte.py:39 zeugnisse/models.py:35
+msgid "Jahreszeugnis"
+msgstr "End-of-year report"
+
+#: elternkontakt/texte.py:39 zeugnisse/models.py:35
+msgid "Halbjahreszeugnis"
+msgstr "Half-year report"
+
+#: elternkontakt/texte.py:41
+#, python-format
+msgid ""
+"Sehr geehrte Eltern und Erziehungsberechtigte,\n"
+"\n"
+"%(vorname)s hat das %(art)s für %(zeitraum)s erhalten. Bitte bestätigen Sie mit dem Knopf unten, dass Ihnen das Zeugnis vorgelegt wurde.\n"
+"\n"
+"Bei Fragen können Sie direkt auf diese Nachricht antworten."
+msgstr ""
+"Dear parents and guardians,\n"
+"\n"
+"%(vorname)s has received the %(art)s for %(zeitraum)s. Please use the button below to confirm that you have seen the report.\n"
+"\n"
+"If you have any questions, you can reply directly to this message."
+
+#: elternkontakt/texte.py:51
+msgid "Sehr geehrte Eltern und Erziehungsberechtigte,"
+msgstr "Dear parents and guardians,"
+
+#: elternkontakt/texte.py:52
+#, python-format
+msgid ""
+"für %(vorname)s wurden bisher %(wert)s %(einheit)s erfasst (Zeitraum: "
+"%(zeitraum)s). Damit ist die Schwelle von %(schwelle)s %(einheit_schwelle)s "
+"erreicht, ab der die Schule die Eltern automatisch informiert."
+msgstr ""
+"so far %(wert)s %(einheit)s have been recorded for %(vorname)s (period: "
+"%(zeitraum)s). This reaches the threshold of %(schwelle)s "
+"%(einheit_schwelle)s at which the school informs parents automatically."
+
+#: elternkontakt/texte.py:60
+msgid ""
+"Bitte sprechen Sie mit Ihrem Kind darüber. Bei Fragen wenden Sie sich an die"
+" Klassenleitung oder antworten Sie direkt auf diese Nachricht."
+msgstr ""
+"Please talk to your child about this. If you have any questions, please "
+"contact the form tutor or reply directly to this message."
+
+#: elternkontakt/versand.py:70
+#, python-format
+msgid "%(schule)s: Neue Nachricht zu %(kind)s"
+msgstr "%(schule)s: New message about %(kind)s"
+
+#: elternkontakt/versand.py:72
+#, python-format
+msgid "Guten Tag %(name)s,"
+msgstr "Dear %(name)s,"
+
+#: elternkontakt/versand.py:73
+#, python-format
+msgid ""
+"die Schule hat Ihnen eine Nachricht zu %(kind)s geschickt. Bitte öffnen Sie "
+"sie über Ihren persönlichen Link:"
+msgstr ""
+"the school has sent you a message about %(kind)s. Please open it using your "
+"personal link:"
+
+#: elternkontakt/versand.py:76
+#, python-format
+msgid ""
+"Der Link ist bis %(datum)s gültig und nur für Sie bestimmt. Bitte leiten Sie"
+" ihn nicht weiter."
+msgstr ""
+"The link is valid until %(datum)s and is intended for you only. Please do "
+"not forward it."
+
+#: elternkontakt/versand.py:79
+msgid "Die Schule bittet um eine Bestätigung über diesen Link."
+msgstr "The school asks you to confirm via this link."
+
+#: elternkontakt/versand.py:84
+msgid "Diese E-Mail wurde automatisch versendet."
+msgstr "This email was sent automatically."
 
 #: fehlzeiten/admin.py:27
 msgid "Details"
@@ -802,8 +1511,8 @@ msgstr "periods %(von)s–%(bis)s"
 msgid "%(n)s Min."
 msgstr "%(n)s min"
 
-#: fehlzeiten/admin.py:41 templates/portal/klassenliste.html:12
-#: templates/portal/schuelerakte.html:107
+#: fehlzeiten/admin.py:41 templates/portal/klassenliste.html:13
+#: templates/portal/schuelerakte.html:109
 msgid "Fehlstunden"
 msgstr "Missed lessons"
 
@@ -825,12 +1534,12 @@ msgstr "Mark as unexcused"
 msgid "%(n)s Fehlzeiten als unentschuldigt markiert."
 msgstr "%(n)s absences marked as unexcused."
 
-#: fehlzeiten/apps.py:8 fehlzeiten/models.py:70 portal/navigation.py:124
-#: portal/navigation.py:125 portal/rollen.py:145
+#: fehlzeiten/apps.py:8 fehlzeiten/models.py:70 portal/navigation.py:132
+#: portal/navigation.py:133 portal/rollen.py:154
 msgid "Fehlzeiten"
 msgstr "Absences"
 
-#: fehlzeiten/models.py:23 foerderung/models.py:85 portal/navigation.py:239
+#: fehlzeiten/models.py:23 foerderung/models.py:85 portal/navigation.py:247
 #: stammdaten/models.py:28 stammdaten/models.py:50 stammdaten/models.py:546
 #: stammdaten/models.py:810 templates/aufnahme/liste.html:21
 #: templates/portal/schuelerakte.html:77 templates/portal/zuordnung.html:12
@@ -856,7 +1565,7 @@ msgstr "End"
 msgid "Unterrichtsstunde (Zeitraster)"
 msgstr "Lesson period (timetable grid)"
 
-#: fehlzeiten/models.py:30 portal/navigation.py:242
+#: fehlzeiten/models.py:30 portal/navigation.py:250
 msgid "Zeitraster"
 msgstr "Timetable grid"
 
@@ -873,10 +1582,6 @@ msgstr "Full day"
 msgid "Einzelne Stunden"
 msgstr "Individual periods"
 
-#: fehlzeiten/models.py:42
-msgid "Verspätung"
-msgstr "Late arrival"
-
 #: fehlzeiten/models.py:44
 msgid "Entschuldigt"
 msgstr "Excused"
@@ -885,7 +1590,7 @@ msgstr "Excused"
 msgid "Unentschuldigt"
 msgstr "Unexcused"
 
-#: fehlzeiten/models.py:46 noten/models.py:154 templates/portal/start.html:61
+#: fehlzeiten/models.py:46 noten/models.py:154 templates/portal/start.html:62
 #: templates/zeugnisse/zeugnis.html:39 zeugnisse/models.py:136
 msgid "Lehrkraft"
 msgstr "Teacher"
@@ -897,27 +1602,6 @@ msgstr "Parents (sick note)"
 #: fehlzeiten/models.py:49
 msgid "Schulische Veranstaltung"
 msgstr "School event"
-
-#: fehlzeiten/models.py:52 foerderung/admin.py:397 foerderung/models.py:84
-#: foerderung/models.py:185 foerderung/models.py:218 nachmittag/models.py:68
-#: nachmittag/models.py:93 noten/models.py:333 noten/models.py:400
-#: portal/rollen.py:32 stammdaten/admin.py:151 stammdaten/admin.py:269
-#: stammdaten/models.py:163 stammdaten/models.py:517 stammdaten/models.py:589
-#: stammdaten/models.py:673 stammdaten/models.py:809 stammdaten/models.py:857
-#: stammdaten/models.py:876 stammdaten/models.py:895 stammdaten/models.py:918
-#: templates/aufnahme/uebernahme.html:24 templates/aufnahme/uebernahme.html:41
-#: templates/portal/klassenliste.html:12
-#: templates/portal/notenuebersicht.html:16 templates/zeugnisse/klasse.html:29
-#: templates/zeugnisse/konferenz.html:51
-#: templates/zeugnisse/unterricht.html:20 zeugnisse/models.py:46
-#: zeugnisse/models.py:227
-msgid "Schüler:in"
-msgstr "Student"
-
-#: fehlzeiten/models.py:53 foerderung/models.py:189 stammdaten/models.py:408
-#: stammdaten/models.py:519 zeugnisse/models.py:48 zeugnisse/models.py:180
-msgid "Art"
-msgstr "Type"
 
 #: fehlzeiten/models.py:54
 msgid "Datum (von)"
@@ -1034,15 +1718,18 @@ msgstr "System"
 
 #: foerderung/admin.py:210 foerderung/admin.py:306
 #: templates/aufnahme/anmeldung.html:193 templates/aufnahme/uebernahme.html:27
+#: templates/elternkontakt/uebersicht.html:24
 #: templates/portal/schuelerakte.html:77 templates/portal/stufe.html:22
 #: templates/zeugnisse/druck.html:79 templates/zeugnisse/uebersicht.html:36
 #: zeugnisse/models.py:50 zeugnisse/models.py:178
 msgid "Klasse"
 msgstr "Class"
 
-#: foerderung/admin.py:215 foerderung/admin.py:319 portal/navigation.py:185
-#: portal/rollen.py:32 templates/foerderung/_akte.html:16
-#: templates/foerderung/_akte.html:36
+#: foerderung/admin.py:215 foerderung/admin.py:319 portal/navigation.py:117
+#: portal/navigation.py:193 portal/rollen.py:32
+#: templates/elternkontakt/gespraech.html:36
+#: templates/elternkontakt/uebersicht.html:40
+#: templates/foerderung/_akte.html:16 templates/foerderung/_akte.html:36
 msgid "Eltern"
 msgstr "Parents"
 
@@ -1076,7 +1763,7 @@ msgstr "Measures"
 msgid "Geltung und Beschluss"
 msgstr "Validity and decision"
 
-#: foerderung/admin.py:315 foerderung/models.py:226 portal/navigation.py:163
+#: foerderung/admin.py:315 foerderung/models.py:226 portal/navigation.py:171
 #: stammdaten/models.py:657 templates/foerderung/_akte.html:16
 #: templates/foerderung/nachteilsausgleich.html:32
 msgid "Fächer"
@@ -1133,7 +1820,7 @@ msgstr "Receipt confirmed by %(person)s."
 msgid "Bitte ein gültiges Datum angeben (nicht vor der Aushändigung)."
 msgstr "Please enter a valid date (not before the hand-out date)."
 
-#: foerderung/apps.py:8 portal/navigation.py:171
+#: foerderung/apps.py:8 portal/navigation.py:179
 #: templates/foerderung/_akte.html:4
 msgid "Förderung"
 msgstr "Learning support"
@@ -1143,7 +1830,7 @@ msgid "Förderschwerpunkt"
 msgstr "Area of need"
 
 #: foerderung/models.py:30 foerderung/models.py:87 foerderung/models.py:219
-#: portal/navigation.py:189 templates/foerderung/_akte.html:36
+#: portal/navigation.py:197 templates/foerderung/_akte.html:36
 #: templates/foerderung/plan.html:27
 msgid "Förderschwerpunkte"
 msgstr "Areas of need"
@@ -1166,7 +1853,7 @@ msgstr ""
 msgid "Ausgleichsmaßnahme"
 msgstr "Access arrangement measure"
 
-#: foerderung/models.py:49 portal/navigation.py:191
+#: foerderung/models.py:49 portal/navigation.py:199
 msgid "Ausgleichsmaßnahmen"
 msgstr "Access arrangement measures"
 
@@ -1271,8 +1958,8 @@ msgstr "Change history: support plan"
 msgid "Förderplan"
 msgstr "Support plan"
 
-#: foerderung/models.py:116 portal/navigation.py:172 portal/navigation.py:173
-#: portal/rollen.py:146 templates/foerderung/_akte.html:33
+#: foerderung/models.py:116 portal/navigation.py:180 portal/navigation.py:181
+#: portal/rollen.py:155 templates/foerderung/_akte.html:33
 #: templates/foerderung/_start.html:7 templates/portal/stufe.html:23
 msgid "Förderpläne"
 msgstr "Support plans"
@@ -1288,7 +1975,7 @@ msgstr "Only a plan for the same student can be continued."
 #: foerderung/models.py:144 templates/foerderung/_akte.html:22
 #: templates/foerderung/_akte.html:40
 #: templates/foerderung/_aushaendigung.html:25
-#: templates/foerderung/plan.html:26 templates/portal/klassenliste.html:12
+#: templates/foerderung/plan.html:26 templates/portal/klassenliste.html:13
 #: templates/portal/stufe.html:23 templates/zeugnisse/zeugnis.html:86
 msgid "offen"
 msgstr "open"
@@ -1306,7 +1993,7 @@ msgid "nicht erreicht"
 msgstr "not achieved"
 
 #: foerderung/models.py:147 noten/models.py:153 stammdaten/models.py:656
-#: templates/portal/schuelerakte.html:119 templates/portal/start.html:61
+#: templates/portal/schuelerakte.html:121 templates/portal/start.html:62
 #: templates/zeugnisse/druck.html:34 templates/zeugnisse/zeugnis.html:39
 #: zeugnisse/models.py:117
 msgid "Fach"
@@ -1411,7 +2098,7 @@ msgstr "Change history: progress entry"
 msgid "Verlaufseintrag"
 msgstr "Progress entry"
 
-#: foerderung/models.py:198 portal/navigation.py:176
+#: foerderung/models.py:198 portal/navigation.py:184
 #: templates/foerderung/plan.html:82
 msgid "Verlaufsdokumentation"
 msgstr "Progress log"
@@ -1488,13 +2175,13 @@ msgstr "Change history: access arrangements"
 #: stammdaten/models.py:148 templates/foerderung/_start.html:22
 #: templates/foerderung/nachteilsausgleich.html:7
 #: templates/foerderung/nachteilsausgleich.html:11
-#: templates/portal/klassenliste.html:16
+#: templates/portal/klassenliste.html:17
 #: templates/portal/notenuebersicht.html:35
 #: templates/portal/schuelerakte.html:22
 msgid "Nachteilsausgleich"
 msgstr "Access arrangements"
 
-#: foerderung/models.py:243 portal/navigation.py:178 portal/rollen.py:147
+#: foerderung/models.py:243 portal/navigation.py:186 portal/rollen.py:156
 #: templates/foerderung/_akte.html:13 templates/foerderung/_start.html:8
 msgid "Nachteilsausgleiche"
 msgstr "Access arrangements"
@@ -1554,17 +2241,9 @@ msgstr "verbally / in a meeting"
 msgid "im Elternportal abgehakt"
 msgstr "ticked in the parent portal"
 
-#: foerderung/models.py:308 templates/foerderung/_aushaendigung.html:9
-msgid "Empfänger:in"
-msgstr "Recipient"
-
 #: foerderung/models.py:309
 msgid "Ausgehändigt am"
 msgstr "Handed out on"
-
-#: foerderung/models.py:310
-msgid "Weg"
-msgstr "Method"
 
 #: foerderung/models.py:311
 msgid "Stand des Dokuments"
@@ -1658,7 +2337,7 @@ msgid "Samstag"
 msgstr "Saturday"
 
 #: nachmittag/models.py:19 noten/models.py:151
-#: templates/portal/schuelerakte.html:119 templates/portal/start.html:61
+#: templates/portal/schuelerakte.html:121 templates/portal/start.html:62
 #: templates/zeugnisse/uebersicht.html:11 zeugnisse/models.py:47
 #: zeugnisse/models.py:179
 msgid "Halbjahr"
@@ -1696,7 +2375,7 @@ msgstr "Change history: club"
 msgid "AG-Angebot"
 msgstr "Club"
 
-#: nachmittag/models.py:39 portal/navigation.py:157
+#: nachmittag/models.py:39 portal/navigation.py:165
 #: templates/portal/start.html:41
 msgid "AG-Angebote"
 msgstr "Clubs"
@@ -1729,7 +2408,7 @@ msgstr "Priority"
 msgid "AG-Wunsch"
 msgstr "Club choice"
 
-#: nachmittag/models.py:75 portal/navigation.py:158
+#: nachmittag/models.py:75 portal/navigation.py:166
 msgid "AG-Wünsche"
 msgstr "Club choices"
 
@@ -1759,13 +2438,13 @@ msgid "Unterricht"
 msgstr "Course"
 
 #: noten/admin.py:102 noten/admin.py:130 noten/models.py:226
-#: noten/models.py:227 portal/navigation.py:147
+#: noten/models.py:227 portal/navigation.py:155
 msgid "Bewertungsordner"
 msgstr "Assessment folder"
 
 #: noten/admin.py:125 noten/apps.py:8 noten/models.py:349
-#: templates/portal/notenuebersicht.html:3 templates/portal/start.html:65
-#: templates/zeugnisse/klasse.html:29
+#: templates/portal/notenuebersicht.html:3 templates/portal/start.html:66
+#: templates/zeugnisse/klasse.html:30
 msgid "Noten"
 msgstr "Grades"
 
@@ -1792,7 +2471,7 @@ msgstr "Folder"
 msgid "Anteil an der Gesamtnote"
 msgstr "Share of the overall grade"
 
-#: noten/admin.py:188 noten/models.py:296 portal/navigation.py:144
+#: noten/admin.py:188 noten/models.py:296 portal/navigation.py:152
 #: templates/portal/notenuebersicht.html:64
 msgid "Leistungsnachweise"
 msgstr "Assessments"
@@ -1855,7 +2534,7 @@ msgstr ""
 msgid "Notenskala"
 msgstr "Grading scale"
 
-#: noten/models.py:42 portal/navigation.py:164
+#: noten/models.py:42 portal/navigation.py:172
 msgid "Notenskalen"
 msgstr "Grading scales"
 
@@ -1928,7 +2607,7 @@ msgstr "Description / department decision"
 msgid "Gewichtungsvorlage"
 msgstr "Weighting template"
 
-#: noten/models.py:123 portal/navigation.py:165
+#: noten/models.py:123 portal/navigation.py:173
 msgid "Gewichtungsvorlagen"
 msgstr "Weighting templates"
 
@@ -2098,7 +2777,7 @@ msgstr ""
 msgid "Begründung für abweichendes Gewicht"
 msgstr "Reason for the different weight"
 
-#: noten/models.py:344 templates/zeugnisse/klasse.html:30
+#: noten/models.py:344 templates/zeugnisse/klasse.html:31
 #: templates/zeugnisse/unterricht.html:21
 #: templates/zeugnisse/unterricht.html:55
 msgid "Kommentar"
@@ -2214,7 +2893,7 @@ msgstr "Attachment “%(titel)s” deleted."
 msgid "Alle Kategorien"
 msgstr "All categories"
 
-#: portal/formulare.py:14 portal/middleware.py:46
+#: portal/formulare.py:16 portal/middleware.py:59
 msgid "Dieses Portal ist nur für Beschäftigte der Schule zugänglich."
 msgstr "This portal is only available to school staff."
 
@@ -2299,18 +2978,18 @@ msgstr "Visible to"
 msgid "Angeheftet"
 msgstr "Pinned"
 
-#: portal/models.py:52
-msgid "Geändert am"
-msgstr "Changed on"
-
-#: portal/models.py:56 portal/navigation.py:66
+#: portal/models.py:56 portal/navigation.py:68
 #: templates/portal/_notizen.html:23
 msgid "Notizen"
 msgstr "Notes"
 
-#: portal/navigation.py:61 templates/aufnahme/anmeldung.html:6
+#: portal/navigation.py:63 templates/aufnahme/anmeldung.html:6
 #: templates/aufnahme/formular.html:5 templates/aufnahme/liste.html:8
 #: templates/aufnahme/uebernahme.html:5
+#: templates/elternkontakt/gespraech.html:5 templates/elternkontakt/neu.html:5
+#: templates/elternkontakt/neu_auswahl.html:5
+#: templates/elternkontakt/regel.html:5 templates/elternkontakt/regeln.html:8
+#: templates/elternkontakt/uebersicht.html:8
 #: templates/foerderung/nachteilsausgleich.html:7
 #: templates/foerderung/plan.html:7 templates/portal/klassenliste.html:5
 #: templates/portal/notenuebersicht.html:6 templates/portal/rollen.html:6
@@ -2322,165 +3001,180 @@ msgstr "Notes"
 msgid "Start"
 msgstr "Home"
 
-#: portal/navigation.py:62 portal/navigation.py:237
+#: portal/navigation.py:64 portal/navigation.py:245
 msgid "Übersicht"
 msgstr "Overview"
 
-#: portal/navigation.py:63 templates/admin/base_site.html:13
+#: portal/navigation.py:65 templates/admin/base_site.html:13
 msgid "Startseite"
 msgstr "Home"
 
-#: portal/navigation.py:64 templates/portal/_menueband.html:12
+#: portal/navigation.py:66 templates/portal/_menueband.html:12
 #: templates/portal/suche.html:7
 msgid "Person suchen"
 msgstr "Search for a person"
 
-#: portal/navigation.py:65
+#: portal/navigation.py:67
 msgid "Persönlich"
 msgstr "Personal"
 
-#: portal/navigation.py:67 templates/portal/_geburtstage.html:4
+#: portal/navigation.py:69 templates/portal/_geburtstage.html:4
 msgid "Geburtstage"
 msgstr "Birthdays"
 
-#: portal/navigation.py:68
+#: portal/navigation.py:70
 msgid "Mitteilung schreiben"
 msgstr "Write announcement"
 
-#: portal/navigation.py:69 templates/portal/_menueband.html:21
+#: portal/navigation.py:71 templates/portal/_menueband.html:21
 #: templates/portal/_menueband.html:27
 msgid "Konto"
 msgstr "Account"
 
-#: portal/navigation.py:70 templates/portal/_menueband.html:28
+#: portal/navigation.py:72 templates/portal/_menueband.html:28
 msgid "Passwort ändern"
 msgstr "Change password"
 
-#: portal/navigation.py:74
+#: portal/navigation.py:76
 msgid "Meine Klassen"
 msgstr "My classes"
 
-#: portal/navigation.py:79
+#: portal/navigation.py:81
 #, python-format
 msgid "Klassenliste %(name)s"
 msgstr "Class list %(name)s"
 
-#: portal/navigation.py:87
+#: portal/navigation.py:89
 #, python-format
 msgid "%(name)s, Jahrgänge %(von)s bis %(bis)s"
 msgstr "%(name)s, years %(von)s to %(bis)s"
 
-#: portal/navigation.py:92
+#: portal/navigation.py:94
 msgid "Neuanmeldung"
 msgstr "Admissions"
 
-#: portal/navigation.py:94
+#: portal/navigation.py:96
 msgid "Bewerbungen mit Unterlagen, Checkliste und vorläufiger Klasse"
 msgstr "Applications with documents, checklist and provisional class"
 
-#: portal/navigation.py:95 templates/aufnahme/_start.html:8
+#: portal/navigation.py:97 templates/aufnahme/_start.html:8
 #: templates/aufnahme/formular.html:3 templates/aufnahme/formular.html:6
 #: templates/aufnahme/formular.html:7 templates/aufnahme/liste.html:12
 msgid "Neue Anmeldung"
 msgstr "New application"
 
-#: portal/navigation.py:97
+#: portal/navigation.py:99
 msgid "Zugesagte Anmeldungen, Übernahme offen"
 msgstr "Offers made, enrolment pending"
 
-#: portal/navigation.py:102 portal/navigation.py:225 stammdaten/admin.py:127
+#: portal/navigation.py:104 portal/navigation.py:233 stammdaten/admin.py:127
 #: stammdaten/models.py:164 stammdaten/models.py:949
 #: templates/portal/stufe.html:11 templates/portal/stufe.html:22
 #: templates/portal/suche.html:17
 msgid "Schüler:innen"
 msgstr "Students"
 
-#: portal/navigation.py:106 portal/rollen.py:143
+#: portal/navigation.py:108 portal/rollen.py:152
 msgid "Schülerakten"
 msgstr "Student records"
 
-#: portal/navigation.py:107
+#: portal/navigation.py:109
 msgid "Alle Schüler:innen"
 msgstr "All students"
 
-#: portal/navigation.py:109
+#: portal/navigation.py:111
 msgid "Direkt anlegen"
 msgstr "Create directly"
 
-#: portal/navigation.py:111
+#: portal/navigation.py:113
 msgid "Schüler:in ohne Anmeldeverfahren direkt anlegen"
 msgstr "Create a student directly without the admissions process"
 
-#: portal/navigation.py:112
+#: portal/navigation.py:114
 msgid "Eltern und Kontakte"
 msgstr "Parents and contacts"
 
-#: portal/navigation.py:114 templates/portal/_anhaenge.html:4
+#: portal/navigation.py:116 templates/portal/_anhaenge.html:4
 msgid "Anhänge"
 msgstr "Attachments"
 
-#: portal/navigation.py:115 portal/navigation.py:118 stammdaten/admin.py:187
+#: portal/navigation.py:119
+msgid "Nachrichten an Eltern, Antworten und Bestätigungen"
+msgstr "Messages to parents, replies and confirmations"
+
+#: portal/navigation.py:120 templates/elternkontakt/_start.html:7
+#: templates/elternkontakt/neu.html:5
+#: templates/elternkontakt/neu_auswahl.html:5
+#: templates/elternkontakt/uebersicht.html:14
+msgid "Neue Nachricht"
+msgstr "New message"
+
+#: portal/navigation.py:121 templates/elternkontakt/regel.html:5
+#: templates/elternkontakt/regeln.html:3 templates/elternkontakt/regeln.html:8
+#: templates/elternkontakt/uebersicht.html:13
+msgid "Benachrichtigungsregeln"
+msgstr "Notification rules"
+
+#: portal/navigation.py:122
+msgid "Automatische Benachrichtigung bei Fehlzeiten und Verspätungen"
+msgstr "Automatic notification of absences and late arrivals"
+
+#: portal/navigation.py:123 portal/navigation.py:126 stammdaten/admin.py:187
 msgid "Klassen und Gruppen"
 msgstr "Classes and groups"
 
-#: portal/navigation.py:116 templates/aufnahme/anmeldung.html:201
+#: portal/navigation.py:124 templates/aufnahme/anmeldung.html:201
 msgid "Zuordnen"
 msgstr "Assign"
 
-#: portal/navigation.py:117
+#: portal/navigation.py:125
 msgid "Schüler:innen Klassen, Lerngruppen und AGs zuordnen"
 msgstr "Assign students to classes, teaching groups and clubs"
 
-#: portal/navigation.py:120 stammdaten/models.py:599
+#: portal/navigation.py:128 stammdaten/models.py:599
 msgid "Mitgliedschaften"
 msgstr "Memberships"
 
-#: portal/navigation.py:122 stammdaten/admin.py:200 stammdaten/models.py:825
+#: portal/navigation.py:130 stammdaten/admin.py:200 stammdaten/models.py:825
 #: templates/aufnahme/uebernahme.html:29 templates/portal/schuelerakte.html:74
 msgid "Schullaufbahn"
 msgstr "School career"
 
-#: portal/navigation.py:126
+#: portal/navigation.py:134
 msgid "Offene Entschuldigungen"
 msgstr "Open excuse notes"
 
-#: portal/navigation.py:128
+#: portal/navigation.py:136
 msgid "Fehlzeit erfassen"
 msgstr "Record absence"
 
-#: portal/navigation.py:132 templates/portal/start.html:28
+#: portal/navigation.py:140 templates/portal/start.html:28
 msgid "Mein Unterricht"
 msgstr "My teaching"
 
-#: portal/navigation.py:138
+#: portal/navigation.py:146
 #, python-format
 msgid "Notenübersicht %(fach)s %(gruppe)s, %(abschnitt)s"
 msgstr "Grade overview %(fach)s %(gruppe)s, %(abschnitt)s"
 
-#: portal/navigation.py:141
+#: portal/navigation.py:149
 msgctxt "Menüband"
 msgid "Unterricht"
 msgstr "Teaching"
 
-#: portal/navigation.py:143 templates/foerderung/plan.html:53
+#: portal/navigation.py:151 templates/foerderung/plan.html:53
 msgid "Bewertung"
 msgstr "Assessment"
 
-#: portal/navigation.py:146
+#: portal/navigation.py:154
 msgid "Neuer Leistungsnachweis"
 msgstr "New assessment"
 
-#: portal/navigation.py:148
+#: portal/navigation.py:156
 msgid "Einzelnoten"
 msgstr "Individual grades"
 
-#: portal/navigation.py:149 stammdaten/models.py:699
-#: templates/zeugnisse/druck.html:6 zeugnisse/models.py:77
-#: zeugnisse/models.py:116 zeugnisse/models.py:135 zeugnisse/models.py:156
-msgid "Zeugnis"
-msgstr "Report"
-
-#: portal/navigation.py:150 templates/portal/klassenliste.html:7
+#: portal/navigation.py:158 templates/portal/klassenliste.html:7
 #: templates/zeugnisse/_start.html:4 templates/zeugnisse/klasse.html:3
 #: templates/zeugnisse/klasse.html:6 templates/zeugnisse/konferenz.html:6
 #: templates/zeugnisse/uebersicht.html:3 templates/zeugnisse/uebersicht.html:5
@@ -2489,192 +3183,192 @@ msgstr "Report"
 msgid "Zeugnisse"
 msgstr "Reports"
 
-#: portal/navigation.py:151
+#: portal/navigation.py:159
 msgid "Zeugnisnoten, Kommentare, Zeugnisse und Konferenzen"
 msgstr "Report grades, comments, reports and conferences"
 
-#: portal/navigation.py:152
+#: portal/navigation.py:160
 msgid "Zeugnisnoten (Liste)"
 msgstr "Report grades (list)"
 
-#: portal/navigation.py:154 templates/zeugnisse/uebersicht.html:56
+#: portal/navigation.py:162 templates/zeugnisse/uebersicht.html:56
 #: zeugnisse/models.py:198
 msgid "Konferenzen"
 msgstr "Conferences"
 
-#: portal/navigation.py:156
+#: portal/navigation.py:164
 msgid "Nachmittag"
 msgstr "Afternoon"
 
-#: portal/navigation.py:159
+#: portal/navigation.py:167
 msgid "Zuteilungen"
 msgstr "Allocations"
 
-#: portal/navigation.py:160 portal/navigation.py:210
+#: portal/navigation.py:168 portal/navigation.py:218
 msgid "Einstellungen"
 msgstr "Settings"
 
-#: portal/navigation.py:161
+#: portal/navigation.py:169
 msgid "Unterrichtsverteilung"
 msgstr "Teaching assignments"
 
-#: portal/navigation.py:175 templates/foerderung/_akte.html:7
+#: portal/navigation.py:183 templates/foerderung/_akte.html:7
 msgid "Neuer Förderplan"
 msgstr "New support plan"
 
-#: portal/navigation.py:179
+#: portal/navigation.py:187
 msgid "Gültige"
 msgstr "Valid"
 
-#: portal/navigation.py:180
+#: portal/navigation.py:188
 msgid "Gültige Nachteilsausgleiche"
 msgstr "Valid access arrangements"
 
-#: portal/navigation.py:181
+#: portal/navigation.py:189
 msgid "Beantragt"
 msgstr "Requested"
 
-#: portal/navigation.py:183
+#: portal/navigation.py:191
 msgid "Erfassen"
 msgstr "Record"
 
-#: portal/navigation.py:184 templates/foerderung/_akte.html:8
+#: portal/navigation.py:192 templates/foerderung/_akte.html:8
 msgid "Nachteilsausgleich erfassen"
 msgstr "Record access arrangements"
 
-#: portal/navigation.py:186
+#: portal/navigation.py:194
 msgid "Erhalt offen"
 msgstr "Receipt pending"
 
-#: portal/navigation.py:187
+#: portal/navigation.py:195
 msgid "Elternbestätigung offen"
 msgstr "Parent confirmation pending"
 
-#: portal/navigation.py:188
+#: portal/navigation.py:196
 msgid "Kataloge"
 msgstr "Catalogues"
 
-#: portal/navigation.py:197 portal/rollen.py:151 stammdaten/admin.py:127
+#: portal/navigation.py:205 portal/rollen.py:160 stammdaten/admin.py:127
 #: stammdaten/admin.py:153 stammdaten/models.py:285 stammdaten/models.py:286
 #: stammdaten/models.py:365 stammdaten/models.py:407 stammdaten/models.py:442
 #: stammdaten/models.py:461 stammdaten/models.py:949
 msgid "Personal"
 msgstr "Staff"
 
-#: portal/navigation.py:198
+#: portal/navigation.py:206
 msgid "Beschäftigte"
 msgstr "Employees"
 
-#: portal/navigation.py:199 templates/portal/_start_hr.html:5
+#: portal/navigation.py:207 templates/portal/_start_hr.html:5
 msgid "Personalliste"
 msgstr "Staff list"
 
-#: portal/navigation.py:201
+#: portal/navigation.py:209
 msgid "Einstellen"
 msgstr "Hire"
 
-#: portal/navigation.py:202
+#: portal/navigation.py:210
 msgid "Neue Mitarbeiterin / neuen Mitarbeiter anlegen"
 msgstr "Add a new member of staff"
 
-#: portal/navigation.py:203
+#: portal/navigation.py:211
 msgid "Nachweise offen"
 msgstr "Certificates outstanding"
 
-#: portal/navigation.py:205 portal/navigation.py:206
+#: portal/navigation.py:213 portal/navigation.py:214
 msgid "Abwesenheiten"
 msgstr "Absences"
 
-#: portal/navigation.py:208
+#: portal/navigation.py:216
 msgid "Offene Anträge"
 msgstr "Open requests"
 
-#: portal/navigation.py:211 stammdaten/models.py:199
+#: portal/navigation.py:219 stammdaten/models.py:199
 msgid "Personalbereiche"
 msgstr "Staff areas"
 
-#: portal/navigation.py:212 stammdaten/models.py:359
+#: portal/navigation.py:220 stammdaten/models.py:359
 msgid "Nachweisarten"
 msgstr "Certificate types"
 
-#: portal/navigation.py:213 portal/navigation.py:228
+#: portal/navigation.py:221 portal/navigation.py:236
 msgid "Dienstleister"
 msgstr "Contractors"
 
-#: portal/navigation.py:220
+#: portal/navigation.py:228
 msgid "Schulgeld"
 msgstr "School fees"
 
-#: portal/navigation.py:221
+#: portal/navigation.py:229
 msgid "Rechnungsempfänger"
 msgstr "Invoice recipients"
 
-#: portal/navigation.py:223 stammdaten/models.py:498
+#: portal/navigation.py:231 stammdaten/models.py:498
 msgid "Elternprofile"
 msgstr "Parent profiles"
 
-#: portal/navigation.py:227
+#: portal/navigation.py:235
 msgid "Verträge"
 msgstr "Contracts"
 
-#: portal/navigation.py:230
+#: portal/navigation.py:238
 msgid "Vertragsunterlagen"
 msgstr "Contract documents"
 
-#: portal/navigation.py:236 stammdaten/admin.py:45
+#: portal/navigation.py:244 stammdaten/admin.py:45
 msgid "Verwaltung"
 msgstr "Administration"
 
-#: portal/navigation.py:238
+#: portal/navigation.py:246
 msgid "Alle Bereiche"
 msgstr "All areas"
 
-#: portal/navigation.py:240 stammdaten/models.py:29
+#: portal/navigation.py:248 stammdaten/models.py:29
 msgid "Schuljahre"
 msgstr "School years"
 
-#: portal/navigation.py:243 stammdaten/models.py:787
+#: portal/navigation.py:251 stammdaten/models.py:787
 msgid "Bildungsgänge"
 msgstr "School tracks"
 
-#: portal/navigation.py:244 stammdaten/models.py:851
+#: portal/navigation.py:252 stammdaten/models.py:851
 msgid "Abschlussarten"
 msgstr "Qualification types"
 
-#: portal/navigation.py:245
+#: portal/navigation.py:253
 msgid "Datenfelder"
 msgstr "Data fields"
 
-#: portal/navigation.py:246
+#: portal/navigation.py:254
 msgid "Eigene Felder"
 msgstr "Custom fields"
 
-#: portal/navigation.py:247
+#: portal/navigation.py:255
 msgid "Zusatzfelder für Schüler:innen, Personal und Eltern"
 msgstr "Custom fields for students, staff and parents"
 
-#: portal/navigation.py:248
+#: portal/navigation.py:256
 msgid "Benutzer und Rechte"
 msgstr "Users and permissions"
 
-#: portal/navigation.py:249
+#: portal/navigation.py:257
 msgid "Benutzerkonten"
 msgstr "User accounts"
 
-#: portal/navigation.py:250
+#: portal/navigation.py:258
 msgid "Rollen"
 msgstr "Roles"
 
-#: portal/navigation.py:251 templates/portal/rollen.html:3
+#: portal/navigation.py:259 templates/portal/rollen.html:3
 #: templates/portal/rollen.html:6 templates/portal/rollen.html:7
 msgid "Rollen und Rechte"
 msgstr "Roles and permissions"
 
-#: portal/navigation.py:252
+#: portal/navigation.py:260
 msgid "Übersicht: welche Rolle was darf"
 msgstr "Overview: what each role may do"
 
-#: portal/navigation.py:263
+#: portal/navigation.py:271
 msgid "Vollzugriff"
 msgstr "Full access"
 
@@ -2807,102 +3501,97 @@ msgid ""
 "Portal."
 msgstr "Prepared for future parent communication. No portal access yet."
 
-#: portal/rollen.py:141
+#: portal/rollen.py:148
 msgid "Noten und Zeugnisnoten"
 msgstr "Grades and report grades"
 
-#: portal/rollen.py:142
+#: portal/rollen.py:149
 msgid "Zeugnisse, Kommentare, Konferenzen"
 msgstr "Reports, comments, conferences"
 
-#: portal/rollen.py:144 stammdaten/models.py:929 stammdaten/models.py:930
-#: templates/portal/schuelerakte.html:153
+#: portal/rollen.py:153 stammdaten/models.py:929 stammdaten/models.py:930
+#: templates/portal/schuelerakte.html:155
 msgid "Gesundheitsangaben"
 msgstr "Health information"
 
-#: portal/rollen.py:148
+#: portal/rollen.py:157
 msgid "Schüler- und Elternstammdaten"
 msgstr "Student and parent master data"
 
-#: portal/rollen.py:149 templates/portal/zuordnung.html:3
+#: portal/rollen.py:158 templates/portal/zuordnung.html:3
 #: templates/portal/zuordnung.html:8 templates/portal/zuordnung.html:9
 msgid "Klassen und Gruppen zuordnen"
 msgstr "Assign classes and groups"
 
-#: portal/rollen.py:152
+#: portal/rollen.py:161
 msgid "HR-Daten"
 msgstr "HR data"
 
-#: portal/rollen.py:153
+#: portal/rollen.py:162
 msgid "Finanzen / Rechnungsempfänger"
 msgstr "Finance / invoice recipients"
 
-#: portal/rollen.py:154
+#: portal/rollen.py:163
 msgid "Schuljahre, Fächer, Notenskalen"
 msgstr "School years, subjects, grading scales"
 
-#: portal/rollen.py:155
+#: portal/rollen.py:164
 msgid "Benutzerkonten und Rollen"
 msgstr "User accounts and roles"
 
-#: portal/rollen.py:179 stammdaten/models.py:1086
-#: templates/portal/schuelerakte.html:162
+#: portal/rollen.py:188 stammdaten/models.py:1086
+#: templates/portal/schuelerakte.html:164
 msgid "ja"
 msgstr "yes"
 
-#: portal/rollen.py:179 templates/aufnahme/anmeldung.html:54
+#: portal/rollen.py:188 templates/aufnahme/anmeldung.html:54
 #: templates/aufnahme/liste.html:39 templates/aufnahme/liste.html:53
 #: templates/aufnahme/uebernahme.html:31
 msgid "Checkliste"
 msgstr "Checklist"
 
-#: portal/rollen.py:179
+#: portal/rollen.py:188
+msgid "Zeugnis/Fehlzeiten"
+msgstr "Reports/absences"
+
+#: portal/rollen.py:188
 msgid "lesen"
 msgstr "read"
 
-#: portal/rollen.py:179
+#: portal/rollen.py:188
 msgid "eigene"
 msgstr "own"
 
-#: portal/rollen.py:179
-msgid "Stufe"
-msgstr "stage"
-
-#: portal/startseite.py:33
+#: portal/startseite.py:34
 msgid "Guten Morgen"
 msgstr "Good morning"
 
-#: portal/startseite.py:35
+#: portal/startseite.py:36
 msgid "Guten Tag"
 msgstr "Good afternoon"
 
-#: portal/startseite.py:36
+#: portal/startseite.py:37
 msgid "Guten Abend"
 msgstr "Good evening"
 
-#: portal/startseite.py:58
-#, python-format
-msgid "Jahrgänge %(von)s–%(bis)s"
-msgstr "Years %(von)s–%(bis)s"
-
-#: portal/startseite.py:123
+#: portal/startseite.py:124
 #, python-format
 msgid "Klasse %(klasse)s"
 msgstr "Class %(klasse)s"
 
-#: portal/startseite.py:159
+#: portal/startseite.py:160
 msgid "Notiz schreiben …"
 msgstr "Write a note …"
 
-#: portal/startseite.py:218 portal/startseite.py:230
+#: portal/startseite.py:219 portal/startseite.py:231
 msgid "Notiz nicht gespeichert – bitte einen Text eingeben."
 msgstr "Note not saved – please enter some text."
 
-#: portal/startseite.py:290
+#: portal/startseite.py:292
 msgid "Mittelstufe"
 msgstr "Middle school"
 
-#: portal/startseite.py:290
+#: portal/startseite.py:292
 msgid "Oberstufe"
 msgstr "Upper school"
 
@@ -3058,7 +3747,7 @@ msgid "Schülerakte"
 msgstr "Student record"
 
 #: stammdaten/admin.py:329 templates/portal/_start_hr.html:18
-#: templates/zeugnisse/klasse.html:40 templates/zeugnisse/zeugnis.html:44
+#: templates/zeugnisse/klasse.html:41 templates/zeugnisse/zeugnis.html:44
 msgid "fehlt"
 msgstr "missing"
 
@@ -3648,10 +4337,6 @@ msgstr "Certificate on file"
 msgid "Fortbildungen"
 msgstr "Professional development"
 
-#: stammdaten/models.py:463 stammdaten/models.py:528
-msgid "Beziehung"
-msgstr "Relationship"
-
 #: stammdaten/models.py:463
 msgid "z. B. Ehepartner:in"
 msgstr "e.g. spouse"
@@ -3794,7 +4479,7 @@ msgstr "Change history: group"
 msgid "Gruppen / Klassen"
 msgstr "Groups / Classes"
 
-#: stammdaten/models.py:588 templates/portal/start.html:61
+#: stammdaten/models.py:588 templates/portal/start.html:62
 msgid "Gruppe"
 msgstr "Group"
 
@@ -3936,7 +4621,7 @@ msgstr "Change history: consent"
 msgid "Einwilligung"
 msgstr "Consent"
 
-#: stammdaten/models.py:683 templates/portal/schuelerakte.html:137
+#: stammdaten/models.py:683 templates/portal/schuelerakte.html:139
 msgid "Einwilligungen"
 msgstr "Consents"
 
@@ -4115,10 +4800,6 @@ msgstr "Change history: qualification"
 msgid "Abschlüsse / Zertifikate"
 msgstr "Qualifications / Certificates"
 
-#: stammdaten/models.py:877
-msgid "Schule"
-msgstr "School"
-
 #: stammdaten/models.py:886
 msgid "Vorherige Schule"
 msgstr "Previous school"
@@ -4135,7 +4816,8 @@ msgstr "Foreign language no."
 msgid "1 = erste Fremdsprache usw."
 msgstr "1 = first foreign language, etc."
 
-#: stammdaten/models.py:897 templates/zeugnisse/zeugnis.html:106
+#: stammdaten/models.py:897 templates/elternkontakt/eltern_nachricht.html:4
+#: templates/elternkontakt/neu.html:32 templates/zeugnisse/zeugnis.html:106
 msgid "Sprache"
 msgstr "Language"
 
@@ -4318,7 +5000,7 @@ msgstr "Custom fields"
 msgid "Bitte mindestens eine Option angeben (eine pro Zeile)."
 msgstr "Please enter at least one option (one per line)."
 
-#: stammdaten/models.py:1086 templates/portal/schuelerakte.html:162
+#: stammdaten/models.py:1086 templates/portal/schuelerakte.html:164
 msgid "nein"
 msgstr "no"
 
@@ -4327,7 +5009,7 @@ msgid "Bitte Ja oder Nein wählen."
 msgstr "Please choose Yes or No."
 
 #: stammdaten/zusatzfelder.py:90 stammdaten/zusatzfelder.py:139
-#: templates/aufnahme/formular.html:132 templates/portal/schuelerakte.html:143
+#: templates/aufnahme/formular.html:132 templates/portal/schuelerakte.html:145
 #: templates/portal/zuordnung.html:43
 msgid "Weitere Angaben"
 msgstr "Further information"
@@ -4357,7 +5039,7 @@ msgid_plural "%(n)s offen"
 msgstr[0] "%(n)s open"
 msgstr[1] "%(n)s open"
 
-#: templates/aufnahme/_start.html:7
+#: templates/aufnahme/_start.html:7 templates/elternkontakt/_start.html:6
 msgid "Alle anzeigen"
 msgstr "Show all"
 
@@ -4378,8 +5060,10 @@ msgid "Meine offenen Checklistenpunkte"
 msgstr "My open checklist items"
 
 #: templates/aufnahme/_start.html:19 templates/aufnahme/liste.html:37
-#: templates/aufnahme/uebernahme.html:29 templates/portal/schuelerakte.html:77
-#: templates/zeugnisse/klasse.html:36 templates/zeugnisse/konferenz.html:59
+#: templates/aufnahme/uebernahme.html:29
+#: templates/elternkontakt/neu_auswahl.html:13
+#: templates/portal/schuelerakte.html:77 templates/zeugnisse/klasse.html:37
+#: templates/zeugnisse/konferenz.html:59
 msgid "Jg."
 msgstr "Year"
 
@@ -4394,11 +5078,6 @@ msgstr[1] "%(n)s items"
 #, python-format
 msgid "Jahrgang %(jg)s"
 msgstr "Year %(jg)s"
-
-#: templates/aufnahme/anmeldung.html:11
-#, python-format
-msgid "Schuljahr %(sj)s"
-msgstr "School year %(sj)s"
 
 #: templates/aufnahme/anmeldung.html:12
 #, python-format
@@ -4499,8 +5178,8 @@ msgid "Weitere Aktionen"
 msgstr "More actions"
 
 #: templates/aufnahme/anmeldung.html:82 templates/aufnahme/anmeldung.html:145
-#: templates/aufnahme/formular.html:140 templates/zeugnisse/konferenz.html:99
-#: templates/zeugnisse/zeugnis.html:114
+#: templates/aufnahme/formular.html:140 templates/elternkontakt/regel.html:29
+#: templates/zeugnisse/konferenz.html:99 templates/zeugnisse/zeugnis.html:114
 msgid "Speichern"
 msgstr "Save"
 
@@ -4612,7 +5291,7 @@ msgid "— keine —"
 msgstr "— none —"
 
 #: templates/aufnahme/anmeldung.html:196 templates/aufnahme/anmeldung.html:198
-#: templates/portal/klassenliste.html:9 templates/portal/start.html:23
+#: templates/portal/klassenliste.html:10 templates/portal/start.html:23
 #, python-format
 msgid "%(n)s Schüler:in"
 msgid_plural "%(n)s Schüler:innen"
@@ -4686,6 +5365,7 @@ msgid "Keine Kontakte erfasst."
 msgstr "No contacts recorded."
 
 #: templates/aufnahme/anmeldung.html:242
+#: templates/elternkontakt/gespraech.html:24
 msgid "Verlauf"
 msgstr "History"
 
@@ -4779,6 +5459,7 @@ msgid "Anmeldung anlegen"
 msgstr "Create application"
 
 #: templates/aufnahme/formular.html:141 templates/aufnahme/uebernahme.html:73
+#: templates/elternkontakt/neu.html:52 templates/elternkontakt/regel.html:31
 msgid "Abbrechen"
 msgstr "Cancel"
 
@@ -4790,12 +5471,8 @@ msgstr ""
 "Applications up to admission: documents, checklist, provisional class and "
 "enrolment into the student records."
 
-#: templates/aufnahme/liste.html:22 templates/aufnahme/liste.html:25
-msgid "alle"
-msgstr "all"
-
-#: templates/aufnahme/liste.html:27 templates/portal/suche.html:3
-#: templates/portal/suche.html:5
+#: templates/aufnahme/liste.html:27 templates/elternkontakt/uebersicht.html:30
+#: templates/portal/suche.html:3 templates/portal/suche.html:5
 msgid "Suche"
 msgstr "Search"
 
@@ -4807,12 +5484,13 @@ msgstr "Name, number, parent"
 msgid "nur mit meinen offenen Punkten"
 msgstr "only with my open items"
 
-#: templates/aufnahme/liste.html:30 templates/portal/_anhaenge.html:17
-#: templates/portal/zuordnung.html:15 templates/zeugnisse/uebersicht.html:13
+#: templates/aufnahme/liste.html:30 templates/elternkontakt/uebersicht.html:32
+#: templates/portal/_anhaenge.html:17 templates/portal/zuordnung.html:15
+#: templates/zeugnisse/uebersicht.html:13
 msgid "Anzeigen"
 msgstr "Show"
 
-#: templates/aufnahme/liste.html:37 templates/portal/klassenliste.html:12
+#: templates/aufnahme/liste.html:37 templates/portal/klassenliste.html:13
 msgid "Nr."
 msgstr "No."
 
@@ -4934,9 +5612,462 @@ msgstr[1] "%(n)s files remain in the application file only."
 msgid "Jetzt übernehmen"
 msgstr "Enrol now"
 
+#: templates/elternkontakt/_akte.html:4 templates/portal/suche.html:21
+msgid "Eltern schreiben"
+msgstr "Write to parents"
+
+#: templates/elternkontakt/_akte.html:6
+#: templates/elternkontakt/uebersicht.html:51
+#, python-format
+msgid "%(b)s/%(e)s bestätigt"
+msgstr "%(b)s/%(e)s confirmed"
+
+#: templates/elternkontakt/_akte.html:7
+#: templates/elternkontakt/uebersicht.html:47
+msgid "neue Antwort"
+msgstr "new reply"
+
+#: templates/elternkontakt/_akte.html:8
+#: templates/elternkontakt/eltern_portal.html:13
+msgid "Keine Nachrichten."
+msgstr "No messages."
+
+#: templates/elternkontakt/_start.html:4
+#, python-format
+msgid "%(n)s neue Antwort"
+msgid_plural "%(n)s neue Antworten"
+msgstr[0] "%(n)s new reply"
+msgstr[1] "%(n)s new replies"
+
+#: templates/elternkontakt/_start.html:12
+#, python-format
+msgid "%(n)s Nachricht wartet auf Bestätigung der Eltern."
+msgid_plural "%(n)s Nachrichten warten auf Bestätigung der Eltern."
+msgstr[0] "%(n)s message is awaiting confirmation by parents."
+msgstr[1] "%(n)s messages are awaiting confirmation by parents."
+
+#: templates/elternkontakt/_start.html:14
+msgid "Automatische Benachrichtigungen (14 Tage)"
+msgstr "Automatic notifications (14 days)"
+
+#: templates/elternkontakt/_start.html:17
+msgid "Keine neuen Antworten."
+msgstr "No new replies."
+
+#: templates/elternkontakt/eltern_basis.html:8
+msgid "Nachricht der Schule"
+msgstr "Message from the school"
+
+#: templates/elternkontakt/eltern_basis.html:13
+msgid "Nachrichten für Eltern"
+msgstr "Messages for parents"
+
+#: templates/elternkontakt/eltern_basis.html:17
+msgid ""
+"Diese Seite ist nur für Sie bestimmt. Bitte geben Sie den Link nicht weiter."
+msgstr "This page is intended for you only. Please do not share the link."
+
+#: templates/elternkontakt/eltern_nachricht.html:6
+#, python-format
+msgid ""
+"Vorschau: So sieht %(name)s diese Nachricht (ohne Knöpfe; es wird nichts als"
+" gelesen vermerkt)."
+msgstr ""
+"Preview: this is how %(name)s sees this message (without buttons; nothing is"
+" marked as read)."
+
+#: templates/elternkontakt/eltern_nachricht.html:6
+#: templates/zeugnisse/druck.html:11
+msgid "Zurück"
+msgstr "Back"
+
+#: templates/elternkontakt/eltern_nachricht.html:7
+msgid "Alle Nachrichten"
+msgstr "All messages"
+
+#: templates/elternkontakt/eltern_nachricht.html:9
+#, python-format
+msgid "Zu %(kind)s · für %(name)s"
+msgstr "About %(kind)s · for %(name)s"
+
+#: templates/elternkontakt/eltern_nachricht.html:11
+msgid "Vielen Dank – Ihre Bestätigung ist bei der Schule eingegangen."
+msgstr "Thank you – the school has received your confirmation."
+
+#: templates/elternkontakt/eltern_nachricht.html:12
+msgid "Vielen Dank – Ihre Antwort wurde an die Schule übermittelt."
+msgstr "Thank you – your reply has been sent to the school."
+
+#: templates/elternkontakt/eltern_nachricht.html:20
+#, python-format
+msgid "Sie haben am %(d)s bestätigt."
+msgstr "You confirmed on %(d)s."
+
+#: templates/elternkontakt/eltern_nachricht.html:22
+msgid "Bitte bestätigen Sie, dass Ihnen das Zeugnis vorgelegt wurde."
+msgstr "Please confirm that you have seen the report."
+
+#: templates/elternkontakt/eltern_nachricht.html:22
+msgid "Die Schule bittet Sie, den Erhalt dieser Nachricht zu bestätigen."
+msgstr "The school asks you to confirm receipt of this message."
+
+#: templates/elternkontakt/eltern_nachricht.html:23
+msgid "Erhalt des Zeugnisses bestätigen"
+msgstr "Confirm receipt of the report"
+
+#: templates/elternkontakt/eltern_nachricht.html:23
+#: templates/elternkontakt/eltern_nachricht.html:24
+#: templates/foerderung/_aushaendigung.html:23
+msgid "Erhalt bestätigen"
+msgstr "Confirm receipt"
+
+#: templates/elternkontakt/eltern_nachricht.html:31
+msgid "Antworten"
+msgstr "Reply"
+
+#: templates/elternkontakt/eltern_nachricht.html:36
+#: templates/elternkontakt/gespraech.html:30
+msgid "Antwort senden"
+msgstr "Send reply"
+
+#: templates/elternkontakt/eltern_nachricht.html:38
+msgid "Hier können die Eltern antworten."
+msgstr "Parents can reply here."
+
+#: templates/elternkontakt/eltern_portal.html:3
+msgid "Nachrichten der Schule"
+msgstr "Messages from the school"
+
+#: templates/elternkontakt/eltern_portal.html:4
+#: templates/portal/_menueband.html:30
+msgid "Abmelden"
+msgstr "Log out"
+
+#: templates/elternkontakt/eltern_portal.html:6
+#, python-format
+msgid "Nachrichten für %(name)s"
+msgstr "Messages for %(name)s"
+
+#: templates/elternkontakt/eltern_portal.html:11
+msgid "Bestätigung erbeten"
+msgstr "Confirmation requested"
+
+#: templates/elternkontakt/eltern_portal.html:12
+msgid "neu"
+msgstr "new"
+
+#: templates/elternkontakt/eltern_ungueltig.html:3
+msgid "Link nicht gültig"
+msgstr "Link not valid"
+
+#: templates/elternkontakt/eltern_ungueltig.html:6
+msgid "Dieser Link ist nicht (mehr) gültig."
+msgstr "This link is not (or no longer) valid."
+
+#: templates/elternkontakt/eltern_ungueltig.html:7
+msgid ""
+"Persönliche Links sind aus Sicherheitsgründen nur begrenzt gültig. Bitte "
+"wenden Sie sich an das Sekretariat oder die Klassenleitung, wenn Sie die "
+"Nachricht noch benötigen."
+msgstr ""
+"For security reasons, personal links are only valid for a limited time. "
+"Please contact the school office or the form tutor if you still need the "
+"message."
+
+#: templates/elternkontakt/gespraech.html:11
+#, python-format
+msgid "begonnen von %(name)s am %(datum)s"
+msgstr "started by %(name)s on %(datum)s"
+
+#: templates/elternkontakt/gespraech.html:11
+#, python-format
+msgid "automatisch am %(datum)s"
+msgstr "automatically on %(datum)s"
+
+#: templates/elternkontakt/gespraech.html:12
+#: templates/elternkontakt/uebersicht.html:48
+msgid "abgeschlossen"
+msgstr "closed"
+
+#: templates/elternkontakt/gespraech.html:16 templates/portal/_notizen.html:55
+#: templates/zeugnisse/konferenz.html:15
+msgid "Wieder öffnen"
+msgstr "Reopen"
+
+#: templates/elternkontakt/gespraech.html:17
+msgid "Abschließen"
+msgstr "Close"
+
+#: templates/elternkontakt/gespraech.html:37
+#, python-format
+msgid "%(b)s von %(e)s bestätigt"
+msgstr "%(b)s of %(e)s confirmed"
+
+#: templates/elternkontakt/gespraech.html:38
+#, python-format
+msgid "%(b)s von %(e)s gelesen"
+msgstr "%(b)s of %(e)s read"
+
+#: templates/elternkontakt/gespraech.html:39
+msgid ""
+"Der E-Mail-Versand ist ausgeschaltet: Die Nachricht liegt im Postausgang. "
+"Den Erhalt können Sie unten vermerken (z. B. bei einem Rücklaufzettel)."
+msgstr ""
+"Email sending is switched off: the message is in the outbox. You can record "
+"receipt below (e.g. for a return slip)."
+
+#: templates/elternkontakt/gespraech.html:45
+#, python-format
+msgid "geöffnet %(d)s"
+msgstr "opened %(d)s"
+
+#: templates/elternkontakt/gespraech.html:45
+msgid "noch nicht geöffnet"
+msgstr "not yet opened"
+
+#: templates/elternkontakt/gespraech.html:46
+#, python-format
+msgid "bestätigt %(d)s (%(w)s)"
+msgstr "confirmed %(d)s (%(w)s)"
+
+#: templates/elternkontakt/gespraech.html:50
+msgid "Elternansicht"
+msgstr "Parent view"
+
+#: templates/elternkontakt/gespraech.html:52
+msgid "Erneut senden"
+msgstr "Send again"
+
+#: templates/elternkontakt/gespraech.html:54
+msgid "Erhalt vermerken"
+msgstr "Record receipt"
+
+#: templates/elternkontakt/gespraech.html:56
+msgid "z. B. Rücklaufzettel unterschrieben"
+msgstr "e.g. return slip signed"
+
+#: templates/elternkontakt/gespraech.html:57
+#: templates/foerderung/_aushaendigung.html:47
+msgid "Vermerken"
+msgstr "Record"
+
+#: templates/elternkontakt/gespraech.html:63
+msgid "Keine Empfänger:innen."
+msgstr "No recipients."
+
+#: templates/elternkontakt/neu.html:3 templates/elternkontakt/neu.html:6
+#: templates/elternkontakt/neu_auswahl.html:3
+#: templates/elternkontakt/neu_auswahl.html:6
+msgid "Neue Nachricht an Eltern"
+msgstr "New message to parents"
+
+#: templates/elternkontakt/neu.html:7
+#, python-format
+msgid "Eltern der Gruppe %(name)s"
+msgstr "Parents of group %(name)s"
+
+#: templates/elternkontakt/neu.html:21
+msgid ""
+"Freie Texte werden nicht übersetzt. Bei Eltern mit Englisch als bevorzugter "
+"Sprache schreiben Sie bitte zweisprachig."
+msgstr ""
+"Free texts are not translated. For parents who prefer English, please write "
+"in both languages."
+
+#: templates/elternkontakt/neu.html:32
+msgid "sorgeberechtigt"
+msgstr "has custody"
+
+#: templates/elternkontakt/neu.html:34
+msgid "Keine Kontaktperson mit Auskunftsrecht hinterlegt."
+msgstr "No contact person with the right to information on file."
+
+#: templates/elternkontakt/neu.html:35
+msgid "Kontaktpersonen ohne Auskunftsrecht werden nicht angezeigt."
+msgstr "Contact persons without the right to information are not shown."
+
+#: templates/elternkontakt/neu.html:37
+msgid ""
+"Je Schüler:in erhalten die sorgeberechtigten Kontaktpersonen eine eigene "
+"Nachricht."
+msgstr ""
+"For each student, the contact persons with custody receive their own "
+"message."
+
+#: templates/elternkontakt/neu.html:43
+msgid "ohne E-Mail"
+msgstr "no email"
+
+#: templates/elternkontakt/neu.html:43
+msgid "keine sorgeberechtigte Kontaktperson"
+msgstr "no contact person with custody"
+
+#: templates/elternkontakt/neu.html:51
+msgid "Senden"
+msgstr "Send"
+
+#: templates/elternkontakt/neu_auswahl.html:9
+msgid "An die Eltern einer Klasse oder Lerngruppe"
+msgstr "To the parents of a class or learning group"
+
+#: templates/elternkontakt/neu_auswahl.html:10
+msgid ""
+"Jede Familie erhält eine eigene Nachricht; Antworten sehen nur Sie und die "
+"Klassenleitung, nicht die anderen Eltern."
+msgstr ""
+"Each family receives its own message; replies are seen only by you and the "
+"form tutor, not by other parents."
+
+#: templates/elternkontakt/neu_auswahl.html:15
+msgid "Keine Gruppen im aktuellen Schuljahr."
+msgstr "No groups in the current school year."
+
+#: templates/elternkontakt/neu_auswahl.html:18
+msgid "An die Eltern einer einzelnen Schülerin / eines Schülers"
+msgstr "To the parents of an individual student"
+
+#: templates/elternkontakt/neu_auswahl.html:19
+msgid ""
+"Öffnen Sie die Schülerakte oder die Klassenliste und wählen Sie dort „Eltern"
+" schreiben“ – oder suchen Sie die Person:"
+msgstr ""
+"Open the student file or the class list and choose “Write to parents” there "
+"– or search for the person:"
+
+#: templates/elternkontakt/neu_auswahl.html:21
+msgid "Name der Schülerin / des Schülers"
+msgstr "Name of the student"
+
+#: templates/elternkontakt/neu_auswahl.html:22 templates/portal/suche.html:10
+msgid "Suchen"
+msgstr "Search"
+
+#: templates/elternkontakt/regel.html:3 templates/elternkontakt/regel.html:5
+#: templates/elternkontakt/regeln.html:13
+msgid "Neue Regel"
+msgstr "New rule"
+
+#: templates/elternkontakt/regel.html:6
+msgid "Neue Benachrichtigungsregel"
+msgstr "New notification rule"
+
+#: templates/elternkontakt/regel.html:26
+msgid ""
+"Gezählt werden die Einträge unter „Fehlzeiten“; schulische Veranstaltungen "
+"zählen nicht. Fehltage sind Werktage (Montag bis Freitag) ganztägiger "
+"Abwesenheit; Fehlstunden umfassen einzelne Stunden und ganze Tage (Stunden "
+"laut Zeitraster)."
+msgstr ""
+"The entries under “Absences” are counted; school events do not count. Days "
+"absent are weekdays (Monday to Friday) of full-day absence; lessons missed "
+"include individual lessons and full days (lessons according to the timetable"
+" grid)."
+
+#: templates/elternkontakt/regel.html:30
+msgid "Vorschau: wer ist betroffen?"
+msgstr "Preview: who is affected?"
+
+#: templates/elternkontakt/regel.html:35
+msgid "Regel löschen?"
+msgstr "Delete rule?"
+
+#: templates/elternkontakt/regel.html:36
+msgid "Regel löschen"
+msgstr "Delete rule"
+
+#: templates/elternkontakt/regel.html:41
+msgid "Aktuell betroffen (noch nicht benachrichtigt)"
+msgstr "Currently affected (not yet notified)"
+
+#: templates/elternkontakt/regel.html:43
+msgid "Derzeit erreicht niemand die Schwelle."
+msgstr "Nobody currently reaches the threshold."
+
+#: templates/elternkontakt/regeln.html:9
+msgid "Benachrichtigungsregeln für Fehlzeiten"
+msgstr "Notification rules for absences"
+
+#: templates/elternkontakt/regeln.html:10
+msgid ""
+"Ab einer Schwelle erhalten die sorgeberechtigten Eltern automatisch eine "
+"Nachricht. Jede Regel löst je Halbjahr bzw. Schuljahr einmal aus (auf Wunsch"
+" erneut bei jedem Vielfachen)."
+msgstr ""
+"From a threshold onwards, parents with custody automatically receive a "
+"message. Each rule triggers once per semester or school year (optionally "
+"again at every multiple)."
+
+#: templates/elternkontakt/regeln.html:11
+#, python-format
+msgid "Sie können Regeln für die Jahrgänge Ihrer Stufe anlegen (%(j)s)."
+msgstr "You can create rules for the years of your section (%(j)s)."
+
+#: templates/elternkontakt/regeln.html:18
+msgid "Bedingung"
+msgstr "Condition"
+
+#: templates/elternkontakt/regeln.html:19
+msgid "Ausgelöst"
+msgstr "Triggered"
+
+#: templates/elternkontakt/regeln.html:24
+#, python-format
+msgid "ab %(s)s · %(m)s · %(z)s"
+msgstr "from %(s)s · %(m)s · %(z)s"
+
+#: templates/elternkontakt/regeln.html:25
+msgid "wiederholt"
+msgstr "repeated"
+
+#: templates/elternkontakt/regeln.html:25
+msgid "Kenntnisnahme erbeten"
+msgstr "acknowledgement requested"
+
+#: templates/elternkontakt/regeln.html:28
+msgid "aktiv"
+msgstr "active"
+
+#: templates/elternkontakt/regeln.html:28
+msgid "inaktiv"
+msgstr "inactive"
+
+#: templates/elternkontakt/regeln.html:34
+msgid "Noch keine Regeln angelegt."
+msgstr "No rules created yet."
+
+#: templates/elternkontakt/uebersicht.html:10
+msgid ""
+"Nachrichten an Eltern, ihre Antworten sowie Lese- und Empfangsbestätigungen."
+msgstr ""
+"Messages to parents, their replies and read and receipt confirmations."
+
+#: templates/elternkontakt/uebersicht.html:18
+msgid "Ansicht"
+msgstr "View"
+
+#: templates/elternkontakt/uebersicht.html:31
+msgid "Name oder Betreff"
+msgstr "Name or subject"
+
+#: templates/elternkontakt/uebersicht.html:49
+#, python-format
+msgid "%(n)s Beitrag"
+msgid_plural "%(n)s Beiträge"
+msgstr[0] "%(n)s post"
+msgstr[1] "%(n)s posts"
+
+#: templates/elternkontakt/uebersicht.html:52
+#, python-format
+msgid "%(b)s/%(e)s gelesen"
+msgstr "%(b)s/%(e)s read"
+
+#: templates/elternkontakt/uebersicht.html:61
+msgid "Keine Nachrichten in dieser Ansicht."
+msgstr "No messages in this view."
+
 #: templates/foerderung/_akte.html:4
 #: templates/foerderung/nachteilsausgleich.html:6
-#: templates/foerderung/plan.html:6 templates/portal/schuelerakte.html:153
+#: templates/foerderung/plan.html:6 templates/portal/schuelerakte.html:155
 msgid "vertraulich"
 msgstr "confidential"
 
@@ -4976,10 +6107,6 @@ msgstr "on"
 msgid "durch"
 msgstr "by"
 
-#: templates/foerderung/_aushaendigung.html:23
-msgid "Erhalt bestätigen"
-msgstr "Confirm receipt"
-
 #: templates/foerderung/_aushaendigung.html:27
 msgid "ältere Fassung"
 msgstr "older version"
@@ -4991,10 +6118,6 @@ msgstr "Not yet handed to the parents."
 #: templates/foerderung/_aushaendigung.html:39
 msgid "Aushändigung vermerken"
 msgstr "Record hand-out"
-
-#: templates/foerderung/_aushaendigung.html:47
-msgid "Vermerken"
-msgstr "Record"
 
 #: templates/foerderung/_aushaendigung.html:51
 msgid "Für diese Person sind keine Eltern oder Kontaktpersonen eingetragen."
@@ -5240,10 +6363,6 @@ msgstr "No birthdays in the next seven days."
 msgid "Schüler:in, Kolleg:in oder Eltern suchen"
 msgstr "Search students, staff or parents"
 
-#: templates/portal/_menueband.html:30
-msgid "Abmelden"
-msgstr "Log out"
-
 #: templates/portal/_menueband.html:39
 msgid "Menüband"
 msgstr "Ribbon"
@@ -5315,10 +6434,6 @@ msgid_plural "%(n)s erledigte Notizen"
 msgstr[0] "%(n)s completed note"
 msgstr[1] "%(n)s completed notes"
 
-#: templates/portal/_notizen.html:55 templates/zeugnisse/konferenz.html:15
-msgid "Wieder öffnen"
-msgstr "Reopen"
-
 #: templates/portal/_notizen.html:60
 msgid "Alle erledigten löschen"
 msgstr "Delete all completed"
@@ -5381,37 +6496,41 @@ msgstr ""
 "version)"
 
 #: templates/portal/klassenliste.html:8
+msgid "Eltern der Klasse schreiben"
+msgstr "Write to the parents of the class"
+
+#: templates/portal/klassenliste.html:9
 msgid "Mitglieder zuordnen"
 msgstr "Assign members"
 
-#: templates/portal/klassenliste.html:9
+#: templates/portal/klassenliste.html:10
 #, python-format
 msgid "Klassenleitung %(leitung)s"
 msgstr "Class teacher %(leitung)s"
 
-#: templates/portal/klassenliste.html:12
+#: templates/portal/klassenliste.html:13
 msgid "davon unentsch."
 msgstr "of which unexc."
 
-#: templates/portal/klassenliste.html:12
-#: templates/portal/schuelerakte.html:109
+#: templates/portal/klassenliste.html:13
+#: templates/portal/schuelerakte.html:111
 msgid "Verspätungen"
 msgstr "Late arrivals"
 
-#: templates/portal/klassenliste.html:12
+#: templates/portal/klassenliste.html:13
 msgid "Kontakte"
 msgstr "Contacts"
 
-#: templates/portal/klassenliste.html:16
+#: templates/portal/klassenliste.html:17
 #: templates/portal/notenuebersicht.html:35 templates/portal/stufe.html:23
 msgid "NTA"
 msgstr "AA"
 
-#: templates/portal/klassenliste.html:16
+#: templates/portal/klassenliste.html:17
 msgid "aktiver Förderplan"
 msgstr "active support plan"
 
-#: templates/portal/klassenliste.html:16
+#: templates/portal/klassenliste.html:17
 msgid "FP"
 msgstr "SP"
 
@@ -5452,7 +6571,7 @@ msgid "Ordnerschnitte"
 msgstr "Folder averages"
 
 #: templates/portal/notenuebersicht.html:19
-#: templates/portal/schuelerakte.html:119
+#: templates/portal/schuelerakte.html:121
 #: templates/zeugnisse/konferenz.html:53
 #: templates/zeugnisse/unterricht.html:20
 msgid "Vorschlag"
@@ -5614,7 +6733,7 @@ msgstr "Special educational needs"
 msgid "in Jahrgang %(jg)s"
 msgstr "in year %(jg)s"
 
-#: templates/portal/schuelerakte.html:49 templates/portal/suche.html:34
+#: templates/portal/schuelerakte.html:49 templates/portal/suche.html:35
 msgid "Eltern und Kontaktpersonen"
 msgstr "Parents and contacts"
 
@@ -5673,71 +6792,71 @@ msgstr "Not recorded."
 msgid "Kurse und AGs"
 msgstr "Courses and clubs"
 
-#: templates/portal/schuelerakte.html:105
+#: templates/portal/schuelerakte.html:107
 #, python-format
 msgid "Fehlzeiten %(sj)s"
 msgstr "Absences %(sj)s"
 
-#: templates/portal/schuelerakte.html:108
+#: templates/portal/schuelerakte.html:110
 msgid "davon unentschuldigt"
 msgstr "of which unexcused"
 
-#: templates/portal/schuelerakte.html:110 templates/portal/start.html:43
+#: templates/portal/schuelerakte.html:112 templates/portal/start.html:43
 #: templates/portal/stufe.html:14
 msgid "offene Entschuldigungen"
 msgstr "open excuse notes"
 
-#: templates/portal/schuelerakte.html:112
+#: templates/portal/schuelerakte.html:114
 msgid "Einzelne Fehlzeiten anzeigen"
 msgstr "Show individual absences"
 
-#: templates/portal/schuelerakte.html:116
+#: templates/portal/schuelerakte.html:118
 #, python-format
 msgid "Notenstand %(sj)s"
 msgstr "Current grades %(sj)s"
 
-#: templates/portal/schuelerakte.html:131
+#: templates/portal/schuelerakte.html:133
 msgid "Kein Unterricht im aktuellen Schuljahr."
 msgstr "No courses in the current school year."
 
-#: templates/portal/schuelerakte.html:138
+#: templates/portal/schuelerakte.html:140
 #, python-format
 msgid "widerrufen %(datum)s"
 msgstr "withdrawn %(datum)s"
 
-#: templates/portal/schuelerakte.html:138
+#: templates/portal/schuelerakte.html:140
 msgid "Keine Einwilligungen erfasst – im Zweifel gilt: nicht erteilt."
 msgstr "No consents recorded – if in doubt, consent has not been given."
 
-#: templates/portal/schuelerakte.html:156
+#: templates/portal/schuelerakte.html:158
 msgid "Allergien"
 msgstr "Allergies"
 
-#: templates/portal/schuelerakte.html:157
+#: templates/portal/schuelerakte.html:159
 msgid "Erkrankungen"
 msgstr "Conditions"
 
-#: templates/portal/schuelerakte.html:158
+#: templates/portal/schuelerakte.html:160
 msgid "Medikamente"
 msgstr "Medication"
 
-#: templates/portal/schuelerakte.html:159
+#: templates/portal/schuelerakte.html:161
 msgid "Notfallhinweise"
 msgstr "Emergency information"
 
-#: templates/portal/schuelerakte.html:160
+#: templates/portal/schuelerakte.html:162
 msgid "Ärztin / Arzt"
 msgstr "Doctor"
 
-#: templates/portal/schuelerakte.html:161
+#: templates/portal/schuelerakte.html:163
 msgid "Versicherung"
 msgstr "Insurance"
 
-#: templates/portal/schuelerakte.html:162
+#: templates/portal/schuelerakte.html:164
 msgid "Schwimmen"
 msgstr "Swimming"
 
-#: templates/portal/schuelerakte.html:164
+#: templates/portal/schuelerakte.html:166
 msgid "Keine Angaben hinterlegt."
 msgstr "No information on file."
 
@@ -5774,20 +6893,20 @@ msgstr "Teaching groups"
 msgid "Fehlzeiten heute"
 msgstr "Absences today"
 
-#: templates/portal/start.html:58
+#: templates/portal/start.html:59
 #, python-format
 msgid "Unterricht im Schuljahr %(sj)s"
 msgstr "Courses in %(sj)s"
 
-#: templates/portal/start.html:69
+#: templates/portal/start.html:70
 msgid "Kein Unterricht zugeordnet."
 msgstr "No courses assigned."
 
-#: templates/portal/start.html:75
+#: templates/portal/start.html:76
 msgid "Willkommen"
 msgstr "Welcome"
 
-#: templates/portal/start.html:76
+#: templates/portal/start.html:77
 msgid ""
 "Ihrem Konto sind noch keine Klassen und kein Unterricht zugeordnet. Die "
 "Verwaltung trägt das unter Unterricht › Unterrichtsverteilung ein."
@@ -5834,27 +6953,23 @@ msgstr "Teaching groups and courses"
 msgid "Person suchen …"
 msgstr "Search for a person …"
 
-#: templates/portal/suche.html:10
-msgid "Suchen"
-msgstr "Search"
-
 #: templates/portal/suche.html:13
 msgid "Bitte mindestens zwei Buchstaben eingeben."
 msgstr "Please enter at least two letters."
 
-#: templates/portal/suche.html:21
+#: templates/portal/suche.html:22
 msgid "Keine Treffer unter den Schüler:innen, die Sie sehen dürfen."
 msgstr "No matches among the students you are allowed to see."
 
-#: templates/portal/suche.html:25
+#: templates/portal/suche.html:26
 msgid "Kollegium und Personal"
 msgstr "Colleagues and staff"
 
-#: templates/portal/suche.html:29
+#: templates/portal/suche.html:30
 msgid "Keine Treffer."
 msgstr "No matches."
 
-#: templates/portal/suche.html:37
+#: templates/portal/suche.html:38
 msgid "von"
 msgstr "of"
 
@@ -5947,15 +7062,6 @@ msgstr "not yet assigned to a class"
 #: templates/portal/zuordnung.html:117 templates/portal/zuordnung.html:140
 msgid "ohne Klasse"
 msgstr "no class"
-
-#: templates/portal/zuordnung.html:120
-msgid "alle Jahrgänge"
-msgstr "all years"
-
-#: templates/portal/zuordnung.html:120
-#, python-format
-msgid "Jahrgang %(j)s"
-msgstr "Year %(j)s"
 
 #: templates/portal/zuordnung.html:121
 msgid "Religion / Ethik: alle"
@@ -6053,10 +7159,6 @@ msgid "In Ihrer Klasse fehlt noch %(n)s Zeugniskommentar."
 msgid_plural "In Ihrer Klasse fehlen noch %(n)s Zeugniskommentare."
 msgstr[0] "%(n)s report comment is still missing in your class."
 msgstr[1] "%(n)s report comments are still missing in your class."
-
-#: templates/zeugnisse/druck.html:11
-msgid "Zurück"
-msgstr "Back"
 
 #: templates/zeugnisse/druck.html:12
 #, python-format
@@ -6197,7 +7299,7 @@ msgstr "To the parents or guardians of"
 
 #: templates/zeugnisse/gefaehrdung.html:19
 #: templates/zeugnisse/protokoll.html:16 templates/zeugnisse/zeugnis.html:11
-#: zeugnisse/ansichten.py:543
+#: zeugnisse/ansichten.py:551
 #, python-format
 msgid "Klasse %(k)s"
 msgstr "Class %(k)s"
@@ -6297,48 +7399,59 @@ msgid "Konferenz anlegen"
 msgstr "Create conference"
 
 #: templates/zeugnisse/klasse.html:23
+#, python-format
+msgid "Empfangsbestätigung der Eltern anfordern (%(n)s)"
+msgid_plural "Empfangsbestätigung der Eltern anfordern (%(n)s)"
+msgstr[0] "Request receipt confirmation from parents (%(n)s)"
+msgstr[1] "Request receipt confirmation from parents (%(n)s)"
+
+#: templates/zeugnisse/klasse.html:24
 msgid ""
 "Alle vollständigen Zeugnisse freigeben? Danach sind sie schreibgeschützt."
 msgstr "Release all complete reports? They will then be read-only."
 
-#: templates/zeugnisse/klasse.html:23
+#: templates/zeugnisse/klasse.html:24
 msgid "Vollständige freigeben"
 msgstr "Release complete ones"
 
-#: templates/zeugnisse/klasse.html:30
+#: templates/zeugnisse/klasse.html:31
 msgid "Versetzung (Vorschlag)"
 msgstr "Promotion (suggestion)"
 
-#: templates/zeugnisse/klasse.html:30 templates/zeugnisse/zeugnis.html:119
-#: zeugnisse/models.py:121
-msgid "Vermerk"
-msgstr "Endorsement"
+#: templates/zeugnisse/klasse.html:31
+msgid "Erhalt (Eltern)"
+msgstr "Receipt (parents)"
 
-#: templates/zeugnisse/klasse.html:37
+#: templates/zeugnisse/klasse.html:38
 #, python-format
 msgid "%(n)s fehlt"
 msgid_plural "%(n)s fehlen"
 msgstr[0] "%(n)s missing"
 msgstr[1] "%(n)s missing"
 
-#: templates/zeugnisse/klasse.html:37
+#: templates/zeugnisse/klasse.html:38
 msgid "vollständig"
 msgstr "complete"
 
-#: templates/zeugnisse/klasse.html:40
+#: templates/zeugnisse/klasse.html:41
 #, python-format
 msgid "%(a)s/%(p)s abgezeichnet"
 msgstr "%(a)s/%(p)s initialled"
 
-#: templates/zeugnisse/klasse.html:43
+#: templates/zeugnisse/klasse.html:44
+#, python-format
+msgid "%(b)s/%(g)s bestätigt"
+msgstr "%(b)s/%(g)s confirmed"
+
+#: templates/zeugnisse/klasse.html:45
 msgid "Druck"
 msgstr "Print"
 
-#: templates/zeugnisse/klasse.html:45 templates/zeugnisse/konferenz.html:89
+#: templates/zeugnisse/klasse.html:47 templates/zeugnisse/konferenz.html:89
 msgid "Keine Schüler:innen in dieser Klasse."
 msgstr "No students in this class."
 
-#: templates/zeugnisse/klasse.html:50
+#: templates/zeugnisse/klasse.html:52
 msgid ""
 "Der Versetzungsvorschlag folgt Ziffer 5.3 der Richtlinie Sek I für Deutsche "
 "Schulen im Ausland; die Entscheidung trifft die Klassenkonferenz als "
@@ -6800,20 +7913,20 @@ msgid_plural "%(n)s Zeugnisse freigegeben."
 msgstr[0] "%(n)s report released."
 msgstr[1] "%(n)s reports released."
 
-#: zeugnisse/ansichten.py:353
+#: zeugnisse/ansichten.py:361
 #, python-format
 msgid "Zeugnisnoten fehlen: %(faecher)s"
 msgstr "Report grades missing: %(faecher)s"
 
-#: zeugnisse/ansichten.py:355
+#: zeugnisse/ansichten.py:363
 msgid "Keine Fächer gefunden."
 msgstr "No subjects found."
 
-#: zeugnisse/ansichten.py:357
+#: zeugnisse/ansichten.py:365
 msgid "Das Datum des Zeugnisses fehlt."
 msgstr "The report date is missing."
 
-#: zeugnisse/ansichten.py:366
+#: zeugnisse/ansichten.py:374
 #, python-format
 msgid "Der Kommentar ist von %(n)s Lehrkraft noch nicht abgezeichnet."
 msgid_plural ""
@@ -6821,56 +7934,56 @@ msgid_plural ""
 msgstr[0] "The comment has not yet been initialled by %(n)s teacher."
 msgstr[1] "The comment has not yet been initialled by %(n)s teachers."
 
-#: zeugnisse/ansichten.py:369
+#: zeugnisse/ansichten.py:377
 msgid "Es gibt offene Anmerkungen zum Kommentar."
 msgstr "There are open notes on the comment."
 
-#: zeugnisse/ansichten.py:371
+#: zeugnisse/ansichten.py:379
 msgid "Kein Versetzungsvermerk eingetragen."
 msgstr "No promotion endorsement entered."
 
-#: zeugnisse/ansichten.py:415
+#: zeugnisse/ansichten.py:423
 msgid "Zeugnis gespeichert."
 msgstr "Report saved."
 
-#: zeugnisse/ansichten.py:422
+#: zeugnisse/ansichten.py:430
 msgid "Kommentar gespeichert. Bisherige Abzeichnungen müssen erneuert werden."
 msgstr "Comment saved. Existing initials must be renewed."
 
-#: zeugnisse/ansichten.py:432
+#: zeugnisse/ansichten.py:440
 msgid "Zeugnis freigegeben."
 msgstr "Report released."
 
-#: zeugnisse/ansichten.py:440
+#: zeugnisse/ansichten.py:448
 msgid "Freigabe aufgehoben – das Zeugnis ist wieder ein Entwurf."
 msgstr "Release revoked – the report is a draft again."
 
-#: zeugnisse/ansichten.py:478
+#: zeugnisse/ansichten.py:486
 msgid "sie"
 msgstr "she"
 
-#: zeugnisse/ansichten.py:478
+#: zeugnisse/ansichten.py:486
 msgid "er"
 msgstr "he"
 
-#: zeugnisse/ansichten.py:478
+#: zeugnisse/ansichten.py:486
 msgid "sie/er"
 msgstr "she/he"
 
-#: zeugnisse/ansichten.py:499
+#: zeugnisse/ansichten.py:507
 #, python-format
 msgid "Versetzt in die Jahrgangsstufe %(jg)s."
 msgstr "Promoted to year %(jg)s."
 
-#: zeugnisse/ansichten.py:499
+#: zeugnisse/ansichten.py:507
 msgid "Versetzt."
 msgstr "Promoted."
 
-#: zeugnisse/ansichten.py:500
+#: zeugnisse/ansichten.py:508
 msgid "Nicht versetzt."
 msgstr "Not promoted."
 
-#: zeugnisse/ansichten.py:501
+#: zeugnisse/ansichten.py:509
 #, python-format
 msgid ""
 "Die Berechtigung zum Übergang in die Qualifikationsphase hat %(pron)s "
@@ -6881,43 +7994,43 @@ msgstr ""
 "qualification phase includes the intermediate school-leaving certificate "
 "(Mittlerer Schulabschluss)."
 
-#: zeugnisse/ansichten.py:503
+#: zeugnisse/ansichten.py:511
 #, python-format
 msgid ""
 "Die Berechtigung zum Übergang in die Qualifikationsphase hat %(pron)s nicht "
 "erhalten."
 msgstr "%(pron)s has not been granted entry to the qualification phase."
 
-#: zeugnisse/ansichten.py:504
+#: zeugnisse/ansichten.py:512
 msgid "Die Jahrgangsstufe wird freiwillig wiederholt."
 msgstr "The year is repeated voluntarily."
 
-#: zeugnisse/ansichten.py:646
+#: zeugnisse/ansichten.py:654
 #, python-format
 msgid "%(name)s: keine Entscheidung."
 msgstr "%(name)s: no decision."
 
-#: zeugnisse/ansichten.py:648
+#: zeugnisse/ansichten.py:656
 #, python-format
 msgid "%(name)s: Die Nichtversetzung bedarf einer Begründung im Protokoll."
 msgstr "%(name)s: non-promotion requires a reason in the minutes."
 
-#: zeugnisse/ansichten.py:650
+#: zeugnisse/ansichten.py:658
 #, python-format
 msgid "%(name)s: Bitte den Notenausgleich im Protokoll vermerken."
 msgstr "%(name)s: please record the compensation in the minutes."
 
-#: zeugnisse/ansichten.py:652
+#: zeugnisse/ansichten.py:660
 msgid "Das Datum der Konferenz fehlt."
 msgstr "The conference date is missing."
 
-#: zeugnisse/ansichten.py:702
+#: zeugnisse/ansichten.py:710
 msgid ""
 "Konferenz abgeschlossen. Die Beschlüsse sind in die Zeugnisse übernommen."
 msgstr ""
 "Conference closed. The decisions have been transferred to the reports."
 
-#: zeugnisse/ansichten.py:705
+#: zeugnisse/ansichten.py:713
 msgid "Konferenz gespeichert."
 msgstr "Conference saved."
 
@@ -6940,14 +8053,6 @@ msgstr "Entry to the qualification phase not granted"
 #: zeugnisse/models.py:29 zeugnisse/models.py:220
 msgid "Freiwillige Wiederholung"
 msgstr "Voluntary repetition"
-
-#: zeugnisse/models.py:35
-msgid "Halbjahreszeugnis"
-msgstr "Half-year report"
-
-#: zeugnisse/models.py:35
-msgid "Jahreszeugnis"
-msgstr "End-of-year report"
 
 #: zeugnisse/models.py:40
 msgid "1. Fremdsprache / Landessprache als Fremdsprache"
@@ -7088,10 +8193,6 @@ msgstr "Planned"
 #: zeugnisse/models.py:176
 msgid "Durchgeführt"
 msgstr "Held"
-
-#: zeugnisse/models.py:176
-msgid "Abgeschlossen"
-msgstr "Closed"
 
 #: zeugnisse/models.py:184
 msgid "Ort / Raum"

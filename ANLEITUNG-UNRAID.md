@@ -129,3 +129,8 @@ docker compose start web sicherung
 - **Zugriff im Tailnet einschränken:** Wer im Tailnet ist, erreicht den Port. Mit den Zugriffsregeln
   (*Access Controls*) in der Tailscale-Verwaltung lässt sich der Zugriff auf einzelne Geräte oder Personen
   begrenzen.
+- **Elternnachrichten (ab 0.4.2.9):** Eltern sind nicht im Tailnet und können persönliche Links über eine
+  Tailscale-Adresse nicht öffnen. Solange `ELTERN_EMAIL_VERSAND=0` bleibt, wird nichts verschickt (Postausgang).
+  Für den echten Versand braucht es eine **öffentliche HTTPS-Adresse** (`ELTERN_LINK_BASIS`), etwa über einen
+  Reverse Proxy, der nach außen **nur** `/eltern/n/` und `/static/` freigibt – nicht die Anmeldung des Kollegiums.
+  Das öffnet das System ins Internet: erst nach Zwei-Faktor-Anmeldung und Datenschutzfreigabe.

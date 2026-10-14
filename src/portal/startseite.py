@@ -13,6 +13,7 @@ from django.utils import timezone
 from django.utils.translation import gettext, gettext_lazy as _
 from django.views.decorators.http import require_POST
 
+from elternkontakt.rechte import darf_schreiben
 from stammdaten.models import Gruppe, Mitgliedschaft, Person, Personalprofil, Schuelerprofil, Schuljahr
 
 from .models import Notiz
@@ -272,7 +273,8 @@ def suche(request):
         sj = Schuljahr.aktuelles()
         for s in sichtbar.filter(person__in=personen).select_related("person")[:50]:
             klasse = s.stammklasse(sj)
-            schueler.append({"s": s, "klasse": klasse, "akte": darf_akte_sehen(request.user, s)})
+            schueler.append({"s": s, "klasse": klasse, "akte": darf_akte_sehen(request.user, s),
+                             "schreiben": request.user.has_perm("elternkontakt.add_gespraech") and darf_schreiben(request.user, s)})
 
         if request.user.is_staff:
             for pp in Personalprofil.objects.filter(aktiv=True, person__in=personen).select_related("person", "bereich")[:50]:

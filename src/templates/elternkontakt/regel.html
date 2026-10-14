@@ -1,0 +1,46 @@
+{% extends "portal/base.html" %}
+{% load i18n %}
+{% block title %}{% if regel %}{{ regel.name }}{% else %}{% translate "Neue Regel" %}{% endif %}{% endblock %}
+{% block inhalt %}
+<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › <a href="{% url 'elternkontakt_regeln' %}">{% translate "Benachrichtigungsregeln" %}</a> › {% if regel %}{{ regel.name }}{% else %}{% translate "Neue Regel" %}{% endif %}</p>
+<h1>{% if regel %}{{ regel.name }}{% else %}{% translate "Neue Benachrichtigungsregel" %}{% endif %}</h1>
+
+<form method="post" novalidate>
+  {% csrf_token %}
+  {% if form.non_field_errors %}<p class="fehler">{{ form.non_field_errors|join:" " }}</p>{% endif %}
+  <section class="karte">
+    <div class="an-felder">
+      {% include "aufnahme/_feld.html" with f=form.name breit=True %}
+      {% include "aufnahme/_feld.html" with f=form.merkmal %}
+      {% include "aufnahme/_feld.html" with f=form.schwelle %}
+      {% include "aufnahme/_feld.html" with f=form.zaehlung %}
+      {% include "aufnahme/_feld.html" with f=form.zeitraum %}
+      {% include "aufnahme/_feld.html" with f=form.jahrgang_von %}
+      {% include "aufnahme/_feld.html" with f=form.jahrgang_bis %}
+      {% include "aufnahme/_feld.html" with f=form.wiederholen breit=True %}
+      {% include "aufnahme/_feld.html" with f=form.bestaetigung_erbeten breit=True %}
+      {% include "aufnahme/_feld.html" with f=form.zusatztext breit=True %}
+      {% include "aufnahme/_feld.html" with f=form.aktiv %}
+      {% include "aufnahme/_feld.html" with f=form.jetzt_benachrichtigen breit=True %}
+    </div>
+    <p class="hinweistext">{% translate "Gezählt werden die Einträge unter „Fehlzeiten“; schulische Veranstaltungen zählen nicht. Fehltage sind Werktage (Montag bis Freitag) ganztägiger Abwesenheit; Fehlstunden umfassen einzelne Stunden und ganze Tage (Stunden laut Zeitraster)." %}</p>
+  </section>
+  <div class="knopfreihe zg-speichern">
+    <button type="submit" class="knopf">{% translate "Speichern" %}</button>
+    <button type="submit" name="vorschau" value="1" class="knopf zweitrangig">{% translate "Vorschau: wer ist betroffen?" %}</button>
+    <a class="knopf zweitrangig" href="{% url 'elternkontakt_regeln' %}">{% translate "Abbrechen" %}</a>
+  </div>
+</form>
+{% if regel %}
+<form method="post" action="{% url 'elternkontakt_regel_loeschen' regel.pk %}" onsubmit="return confirm('{% translate "Regel löschen?" as frage %}{{ frage|escapejs }}')">{% csrf_token %}
+  <button type="submit" class="knopf gefahr klein">{% translate "Regel löschen" %}</button></form>
+{% endif %}
+
+{% if vorschau is not None %}
+<section class="karte ek-vorschau-liste">
+  <h2>{% translate "Aktuell betroffen (noch nicht benachrichtigt)" %} <span class="leise">({{ vorschau|length }})</span></h2>
+  {% for v in vorschau %}<p>{{ v.schueler.person.nachname }}, {{ v.schueler.person.rufname|default:v.schueler.person.vorname }} <span class="leise">· {{ v.klasse.name }} · {{ v.wert }}</span></p>
+  {% empty %}<p class="leer">{% translate "Derzeit erreicht niemand die Schwelle." %}</p>{% endfor %}
+</section>
+{% endif %}
+{% endblock %}

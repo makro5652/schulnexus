@@ -1,0 +1,10 @@
+{% extends "elternkontakt/eltern_basis.html" %}
+{% load i18n %}
+{% block title %}{% translate "Link nicht gültig" %}{% endblock %}
+{% block inhalt %}
+<section class="karte">
+  <h1>{% translate "Dieser Link ist nicht (mehr) gültig." %}</h1>
+  <p>{% translate "Persönliche Links sind aus Sicherheitsgründen nur begrenzt gültig. Bitte wenden Sie sich an das Sekretariat oder die Klassenleitung, wenn Sie die Nachricht noch benötigen." %}</p>
+  <p lang="en" class="leise">This link is no longer valid. Please contact the school office or the class teacher if you still need the message.</p>
+</section>
+{% endblock %}

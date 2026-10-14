@@ -1,4 +1,4 @@
-# Schulverwaltung (Version 0.4.2.8, Entwicklungsstand)
+# Schulverwaltung (Version 0.4.2.9, Entwicklungsstand)
 
 Open-Source-Schulverwaltung für die DSN: Stammdaten, Klassen und Lerngruppen,
 Noten mit Gewichtung, Fehlzeiten, Nachmittagsprogramm, Anhänge zur Schülerakte,
@@ -105,6 +105,48 @@ Fehltage erscheinen auf dem Zeugnis nur mit `ZEUGNIS_FEHLZEITEN=1` (im KMK-Muste
 | Stufenkoordination | Zeugnisse der Stufe bearbeiten und freigeben, Konferenzen leiten |
 | Schulleitung | alles |
 | Sekretariat, Verwaltungsleitung | Zeugnisse vorbereiten (Bemerkungen, Datum, GeR) und drucken, Konferenzen lesen |
+
+## Elternkommunikation
+
+**Menüband › Schüler:innen › Eltern.** Lehrkräfte schreiben den Eltern ihrer Schüler:innen, Eltern antworten,
+bestätigen den Erhalt (z. B. des Zeugnisses) – und bei Fehlzeiten oder Verspätungen benachrichtigt das System
+die Eltern automatisch.
+
+- **Zustellung ohne Elternkonto:** Eltern erhalten eine E-Mail mit einem persönlichen, signierten und befristeten
+  Link (`ELTERN_LINK_TAGE`, Standard 60). Darüber lesen sie die Nachricht, bestätigen den Erhalt und antworten.
+  Die E-Mail enthält standardmäßig nur Hinweis und Link, nicht den Inhalt (`ELTERN_EMAIL_INHALT=0`).
+  Die Seite erscheint in der bevorzugten Sprache der Kontaktperson (Deutsch/Englisch, umschaltbar).
+- **Versand ist ausgeschaltet** (`ELTERN_EMAIL_VERSAND=0`): Nachrichten bleiben im **Postausgang**; der Erhalt kann
+  von der Schule vermerkt werden (z. B. Rücklaufzettel). Nach dem Einschalten verschickt
+  `python manage.py elternpost_senden` den Postausgang. SMTP-Zugang über `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`,
+  `EMAIL_HOST_PASSWORD`, `DEFAULT_FROM_EMAIL`.
+- **Wichtig:** Eltern müssen den Link öffnen können – der Server muss dafür unter `ELTERN_LINK_BASIS` aus dem Internet
+  per HTTPS erreichbar sein (z. B. Reverse Proxy oder Tailscale Funnel). Eine reine Tailscale-Adresse genügt nicht.
+- **Empfänger:innen:** nur Kontaktpersonen mit Auskunftsrecht; vorausgewählt sind die Sorgeberechtigten.
+  Nachrichten an eine Klasse oder Lerngruppe erzeugen je Familie ein eigenes Gespräch.
+  Eltern sehen die Beiträge der Schule und ihre eigenen Antworten, nicht die anderer Kontaktpersonen.
+- **Zeugnisempfang:** Auf der Zeugnisseite einer Klasse fordert die Klassenleitung (oder Koordination, Sekretariat)
+  für alle freigegebenen Zeugnisse die Empfangsbestätigung an; die Spalte „Erhalt (Eltern)“ zeigt den Stand.
+- **Automatische Benachrichtigung bei Fehlzeiten:** Unter **Benachrichtigungsregeln** legen Schulleitung und
+  erweiterte Schulleitung (Verwaltungsleitung, Mittel- und Oberstufenkoordination – diese nur für ihre Jahrgänge)
+  Schwellen fest: Fehltage, Fehlstunden, Anzahl oder Minuten der Verspätungen; alle, nicht entschuldigte oder nur
+  unentschuldigte Einträge; je Halbjahr oder Schuljahr; auf Wunsch erneut bei jedem Vielfachen. Geprüft wird nach jedem
+  Speichern einer Fehlzeit; schulische Veranstaltungen zählen nicht. Beim Anlegen einer Regel werden bereits erreichte
+  Schwellen still vorgemerkt – oder, wenn angehakt, sofort benachrichtigt. „Vorschau“ zeigt vorher, wer betroffen wäre.
+  Für eine tägliche Prüfung aller Schüler:innen: `python manage.py fehlzeiten_pruefen`.
+- **Elternportal mit Anmeldung** ist vorbereitet, aber ausgeschaltet (`ELTERNPORTAL_AKTIV=0`). Eltern mit Benutzerkonto
+  (Rolle „Eltern“) sehen dann alle ihre Nachrichten unter `/eltern/`. **Erst nach Zwei-Faktor-Anmeldung und
+  Datenschutzfreigabe einschalten**; die Systemprüfung warnt, solange es aktiv ist.
+
+| Rolle | Elternkommunikation |
+| --- | --- |
+| Lehrer:in | Eltern der eigenen Schüler:innen schreiben; eigene Gespräche; als Klassenleitung alle Gespräche der Klasse |
+| Stufenkoordination | alle Gespräche der Stufe; Benachrichtigungsregeln für die Jahrgänge der Stufe |
+| Schulleitung | alles |
+| Verwaltungsleitung | Zeugnisempfang und automatische Fehlzeiten-Nachrichten, allen Eltern schreiben; Benachrichtigungsregeln |
+| Sekretariat | Zeugnisempfang und automatische Fehlzeiten-Nachrichten, allen Eltern schreiben; Regeln lesen |
+
+Persönliche Gespräche zwischen Lehrkräften und Eltern sehen Sekretariat und Verwaltungsleitung nicht.
 
 ## Neuanmeldungen
 
@@ -391,6 +433,8 @@ und fehlende Beispiele (z. B. Neuanmeldungen) ergänzt. Checklisten-Vorlagen wer
 | Protokoll ansehen | `docker compose logs -f web` |
 | Alles löschen und neu beginnen | `docker compose down -v` und danach `./start.sh` |
 | Tests ausführen | `docker compose exec web python manage.py test` |
+| Elternpost versenden (nach dem Einschalten) | `docker compose exec web python manage.py elternpost_senden` |
+| Fehlzeitenregeln für alle prüfen | `docker compose exec web python manage.py fehlzeiten_pruefen` |
 
 ## Aufbau
 
@@ -403,6 +447,7 @@ und fehlende Beispiele (z. B. Neuanmeldungen) ergänzt. Checklisten-Vorlagen wer
 | `src/portal` | Startseite, Menüband, Notenübersicht, Klassenliste, Schülerakte, Stufenübersicht, Rollen (`rollen.py`) und Rechteprüfung (`rechte.py`), Sprachwahl, Demo-Daten |
 | `src/foerderung` | Förderpläne, Nachteilsausgleiche, Elternbestätigung |
 | `src/zeugnisse` | Zeugnisse, Kommentare mit Abzeichnung, Konferenzen; Versetzungsregeln in `versetzung.py` |
+| `src/elternkontakt` | Elternkommunikation: Gespräche, Empfänger:innen, Links und E-Mail (`versand.py`), Fehlzeitenregeln (`pruefung.py`), Elternseite (`eltern.py`) |
 | `src/aufnahme` | Neuanmeldungen: Bewerbungsakte, Checklisten, Unterlagen, Übernahme (`uebernahme.py`), Rechte (`rechte.py`) |
 | `src/locale` | Übersetzungen (Englisch) |
 | `unraid/` | Betrieb auf Unraid: `docker-compose.yml`, `.env.example`, `einrichten.sh` |

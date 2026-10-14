@@ -1,0 +1,15 @@
+{% extends "elternkontakt/eltern_basis.html" %}
+{% load i18n %}
+{% block title %}{% translate "Nachrichten der Schule" %}{% endblock %}
+{% block sprachen %}<form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit" class="link">{% translate "Abmelden" %}</button></form>{% endblock %}
+{% block inhalt %}
+<h1>{% blocktranslate with name=person.anzeigename %}Nachrichten für {{ name }}{% endblocktranslate %}</h1>
+<section class="karte">
+  {% for e in eintraege %}
+  <p class="ek-portalzeile"><a href="{% url 'elternportal_gespraech' e.gespraech_id %}"><strong>{{ e.gespraech.titel }}</strong></a>
+    <span class="leise">· {{ e.gespraech.schueler.person.anzeigename }} · {{ e.gespraech.letzte_aktivitaet|date:"SHORT_DATE_FORMAT" }}</span>
+    {% if e.gespraech.bestaetigung_erbeten and not e.bestaetigt_am %}<span class="etikett">{% translate "Bestätigung erbeten" %}</span>{% endif %}
+    {% if not e.gelesen_am %}<span class="etikett">{% translate "neu" %}</span>{% endif %}</p>
+  {% empty %}<p class="leer">{% translate "Keine Nachrichten." %}</p>{% endfor %}
+</section>
+{% endblock %}

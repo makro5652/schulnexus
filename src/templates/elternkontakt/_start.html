@@ -1,0 +1,18 @@
+{% load i18n %}
+<section class="karte hr" id="elternnachrichten">
+  <div class="karte-kopf">
+    <h2>{% translate "Elternnachrichten" %}{% if elternkontakt.n_ungelesen %} <span class="leise">· {% blocktranslate count n=elternkontakt.n_ungelesen %}{{ n }} neue Antwort{% plural %}{{ n }} neue Antworten{% endblocktranslate %}</span>{% endif %}</h2>
+    <div class="knopfreihe">
+      <a class="knopf zweitrangig klein" href="{% url 'elternkontakt' %}">{% translate "Alle anzeigen" %}</a>
+      {% if perms.elternkontakt.add_gespraech %}<a class="knopf klein" href="{% url 'elternnachricht_neu' %}">{% translate "Neue Nachricht" %}</a>{% endif %}
+    </div>
+  </div>
+  {% for g in elternkontakt.ungelesen %}<p><a href="{% url 'elterngespraech' g.pk %}"><strong>{{ g.titel }}</strong></a>
+    <span class="leise">· {{ g.schueler.person.anzeigename }} · {{ g.eltern_antwort_am|date:"SHORT_DATETIME_FORMAT" }}</span></p>{% endfor %}
+  {% if elternkontakt.offen %}<p><a href="{% url 'elternkontakt' %}?tab=offen">{% blocktranslate count n=elternkontakt.offen %}{{ n }} Nachricht wartet auf Bestätigung der Eltern.{% plural %}{{ n }} Nachrichten warten auf Bestätigung der Eltern.{% endblocktranslate %}</a></p>{% endif %}
+  {% if elternkontakt.automatisch %}
+  <h3>{% translate "Automatische Benachrichtigungen (14 Tage)" %}</h3>
+  {% for g in elternkontakt.automatisch %}<p><a href="{% url 'elterngespraech' g.pk %}">{{ g.titel }}</a> <span class="leise">· {{ g.schueler.person.anzeigename }} · {{ g.erstellt_am|date:"SHORT_DATE_FORMAT" }}</span></p>{% endfor %}
+  {% endif %}
+  {% if not elternkontakt.ungelesen and not elternkontakt.offen and not elternkontakt.automatisch %}<p class="leer">{% translate "Keine neuen Antworten." %}</p>{% endif %}
+</section>

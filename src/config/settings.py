@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "foerderung",
     "aufnahme",
     "zeugnisse",
+    "elternkontakt",
     "portal",
 ]
 
@@ -169,6 +170,31 @@ SCHULNAME = os.environ.get("SCHULNAME", "Deutsche Schule Nairobi")
 SCHULORT = os.environ.get("SCHULORT", "Nairobi")
 # Fehltage auf dem Zeugnis ausweisen (im KMK-Muster nicht vorgesehen; 1 = ja)
 ZEUGNIS_FEHLZEITEN = env_bool("ZEUGNIS_FEHLZEITEN", False)
+
+# ---------------------------------------------------------------- Elternkommunikation (ab 0.4.2.9)
+# Eltern erhalten eine E-Mail mit einem persönlichen, befristeten Link (ohne Konto): lesen, bestätigen, antworten.
+# Solange ELTERN_EMAIL_VERSAND=0 ist, wird nichts verschickt – Nachrichten bleiben im Postausgang
+# (später: manage.py elternpost_senden). Der Erhalt kann von der Schule vermerkt werden (z. B. Rücklaufzettel).
+ELTERN_EMAIL_VERSAND = env_bool("ELTERN_EMAIL_VERSAND", False)
+# Öffentliche Adresse, unter der Eltern die Links öffnen. Eine reine Tailscale-Adresse ist für Eltern NICHT erreichbar.
+ELTERN_LINK_BASIS = os.environ.get("ELTERN_LINK_BASIS", "http://localhost:8000").rstrip("/")
+ELTERN_LINK_TAGE = int(os.environ.get("ELTERN_LINK_TAGE", "60"))
+# Nachrichtentext zusätzlich in die E-Mail schreiben (Standard: nur Hinweis und Link – datensparsamer)
+ELTERN_EMAIL_INHALT = env_bool("ELTERN_EMAIL_INHALT", False)
+# Elternportal mit eigener Anmeldung (vorbereitet). Erst nach Zwei-Faktor-Anmeldung und Datenschutzfreigabe einschalten.
+ELTERNPORTAL_AKTIV = env_bool("ELTERNPORTAL_AKTIV", False)
+
+EMAIL_BACKEND = os.environ.get(
+    "EMAIL_BACKEND",
+    "django.core.mail.backends.smtp.EmailBackend" if ELTERN_EMAIL_VERSAND else "django.core.mail.backends.console.EmailBackend")
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "localhost")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", True)
+EMAIL_USE_SSL = env_bool("EMAIL_USE_SSL", False)
+EMAIL_TIMEOUT = 20
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", f"{SCHULNAME} <schulverwaltung@localhost>")
 
 LOGGING = {
     "version": 1,

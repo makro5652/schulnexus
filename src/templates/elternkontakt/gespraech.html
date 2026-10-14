@@ -1,0 +1,66 @@
+{% extends "portal/base.html" %}
+{% load i18n %}
+{% block title %}{{ g.titel }}{% endblock %}
+{% block inhalt %}
+<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › <a href="{% url 'elternkontakt' %}">{% translate "Elternnachrichten" %}</a> › {{ g.schueler.person.anzeigename }}</p>
+<div class="akte-kopf">
+  <div>
+    <h1>{{ g.titel }}</h1>
+    <p class="unterzeile"><span class="ek-art ek-art-{{ g.art }}">{{ g.get_art_display }}</span>
+      · {% if klasse %}<a href="{% url 'schuelerakte' g.schueler.pk %}">{{ g.schueler.person.anzeigename }}</a> ({{ klasse.name }}){% else %}{{ g.schueler.person.anzeigename }}{% endif %}
+      · {% if g.erstellt_von %}{% blocktranslate with name=g.erstellt_von.person.anzeigename|default:g.erstellt_von.get_username datum=g.erstellt_am|date:"SHORT_DATE_FORMAT" %}begonnen von {{ name }} am {{ datum }}{% endblocktranslate %}{% else %}{% blocktranslate with datum=g.erstellt_am|date:"SHORT_DATE_FORMAT" %}automatisch am {{ datum }}{% endblocktranslate %}{% endif %}
+      {% if g.abgeschlossen %}· <span class="etikett">{% translate "abgeschlossen" %}</span>{% endif %}</p>
+  </div>
+  {% if darf_verwalten %}
+  <form method="post" class="knopfreihe">{% csrf_token %}
+    {% if g.abgeschlossen %}<button type="submit" name="aktion" value="oeffnen" class="knopf zweitrangig klein">{% translate "Wieder öffnen" %}</button>
+    {% else %}<button type="submit" name="aktion" value="abschliessen" class="knopf zweitrangig klein">{% translate "Abschließen" %}</button>{% endif %}
+  </form>
+  {% endif %}
+</div>
+
+<div class="spalten ek-spalten">
+  <section class="karte">
+    <h2>{% translate "Verlauf" %}</h2>
+    {% include "elternkontakt/_verlauf.html" %}
+    {% if darf_antworten %}
+    <form method="post" class="ek-antwort">{% csrf_token %}
+      <input type="hidden" name="aktion" value="antworten">
+      {% include "aufnahme/_feld.html" with f=form.text breit=True %}
+      <button type="submit" class="knopf">{% translate "Antwort senden" %}</button>
+    </form>
+    {% endif %}
+  </section>
+
+  <section class="karte">
+    <h2>{% translate "Eltern" %}</h2>
+    {% if g.bestaetigung_erbeten %}<p class="ek-zusammenfassung">{% blocktranslate with b=status.bestaetigt e=status.gesamt %}{{ b }} von {{ e }} bestätigt{% endblocktranslate %}</p>
+    {% else %}<p class="ek-zusammenfassung">{% blocktranslate with b=status.gelesen e=status.gesamt %}{{ b }} von {{ e }} gelesen{% endblocktranslate %}</p>{% endif %}
+    {% if status.wartet %}<p class="hinweistext">{% translate "Der E-Mail-Versand ist ausgeschaltet: Die Nachricht liegt im Postausgang. Den Erhalt können Sie unten vermerken (z. B. bei einem Rücklaufzettel)." %}</p>{% endif %}
+    {% for e in empfaenger %}
+    <div class="ek-empfaenger">
+      <strong>{{ e.person.anzeigename }}</strong> <span class="leise">· {{ e.person.get_sprache_display }}</span>
+      <ul class="ek-status">
+        <li class="ek-zustellung-{{ e.versand_status }}">{{ e.get_versand_status_display }}{% if e.versendet_am %} · {{ e.versendet_am|date:"SHORT_DATETIME_FORMAT" }}{% endif %}{% if e.versand_fehler %} <small>({{ e.versand_fehler }})</small>{% endif %}</li>
+        <li>{% if e.gelesen_am %}{% blocktranslate with d=e.gelesen_am|date:"SHORT_DATETIME_FORMAT" %}geöffnet {{ d }}{% endblocktranslate %}{% else %}<span class="leise">{% translate "noch nicht geöffnet" %}</span>{% endif %}</li>
+        {% if g.bestaetigung_erbeten %}<li>{% if e.bestaetigt_am %}<span class="ek-ok">{% blocktranslate with d=e.bestaetigt_am|date:"SHORT_DATETIME_FORMAT" w=e.get_bestaetigt_ueber_display %}bestätigt {{ d }} ({{ w }}){% endblocktranslate %}</span>{% if e.bestaetigung_vermerkt_von %} <small class="leise">{{ e.bestaetigung_vermerkt_von.person.anzeigename|default:e.bestaetigung_vermerkt_von.get_username }}{% if e.bestaetigung_notiz %}: {{ e.bestaetigung_notiz }}{% endif %}</small>{% endif %}
+          {% else %}<span class="ek-offen">{% translate "Bestätigung offen" %}</span>{% endif %}</li>{% endif %}
+      </ul>
+      <div class="ek-aktionen">
+        <a href="{% url 'elterngespraech_vorschau' g.pk e.pk %}" class="klein">{% translate "Elternansicht" %}</a>
+        {% if darf_verwalten %}
+          {% if e.versand_status == "wartet" or e.versand_status == "fehler" %}<form method="post">{% csrf_token %}<input type="hidden" name="empfaenger" value="{{ e.pk }}"><button type="submit" name="aktion" value="erneut" class="link klein">{% translate "Erneut senden" %}</button></form>{% endif %}
+          {% if g.bestaetigung_erbeten and not e.bestaetigt_am %}
+          <details class="ek-vermerk"><summary class="klein">{% translate "Erhalt vermerken" %}</summary>
+            <form method="post">{% csrf_token %}<input type="hidden" name="empfaenger" value="{{ e.pk }}">
+              <input type="text" name="notiz" maxlength="200" placeholder="{% translate 'z. B. Rücklaufzettel unterschrieben' %}" aria-label="{% translate 'Vermerk' %}">
+              <button type="submit" name="aktion" value="vermerken" class="knopf klein">{% translate "Vermerken" %}</button></form>
+          </details>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+    {% empty %}<p class="leer">{% translate "Keine Empfänger:innen." %}</p>{% endfor %}
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% load static i18n %}<!doctype html>
+<html lang="{{ sprache|default:'de' }}" data-design="standard">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+  <title>{% block title %}{% translate "Nachricht der Schule" %}{% endblock %} · {{ SCHULNAME }}</title>
+  <link rel="stylesheet" href="{% static 'portal.css' %}">
+</head>
+<body class="ek-eltern">
+  <header class="ek-eltern-kopf">
+    <div class="ek-eltern-marke"><span class="marke-zeichen" aria-hidden="true">S</span><span><strong>{{ SCHULNAME }}</strong><small>{% translate "Nachrichten für Eltern" %}</small></span></div>
+    {% block sprachen %}{% endblock %}
+  </header>
+  <main class="ek-eltern-inhalt">{% block inhalt %}{% endblock %}</main>
+  <footer class="fuss">{% translate "Diese Seite ist nur für Sie bestimmt. Bitte geben Sie den Link nicht weiter." %}</footer>
+</body>
+</html>

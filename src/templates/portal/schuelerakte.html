@@ -101,6 +101,8 @@
     {% if gruppen %}<h3>{% translate "Kurse und AGs" %}</h3><p>{% for g in gruppen %}{{ g.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>{% endif %}
   </section>
 
+  {% if elternkontakt %}{% include "elternkontakt/_akte.html" %}{% endif %}
+
   <section class="karte">
     <h2>{% blocktranslate with sj=AKTUELLES_SCHULJAHR %}Fehlzeiten {{ sj }}{% endblocktranslate %}</h2>
     <dl class="daten zahlen">

@@ -1,0 +1,41 @@
+{% extends "elternkontakt/eltern_basis.html" %}
+{% load i18n %}
+{% block title %}{{ g.titel }}{% endblock %}
+{% block sprachen %}{% if not vorschau %}<nav class="ek-sprachwahl" aria-label="{% translate 'Sprache' %}">{% for code, name in SPRACHEN %}<a href="?sprache={{ code }}" lang="{{ code }}"{% if code == sprache %} aria-current="true"{% endif %}>{{ name }}</a>{% endfor %}</nav>{% endif %}{% endblock %}
+{% block inhalt %}
+{% if vorschau %}<p class="ek-vorschau">{% blocktranslate with name=e.person.anzeigename %}Vorschau: So sieht {{ name }} diese Nachricht (ohne Knöpfe; es wird nichts als gelesen vermerkt).{% endblocktranslate %} <a href="{% url 'elterngespraech' g.pk %}">{% translate "Zurück" %}</a></p>{% endif %}
+{% if portal %}<p class="brotkrumen"><a href="{% url 'elternportal' %}">{% translate "Alle Nachrichten" %}</a></p>{% endif %}
+<h1>{{ g.titel }}</h1>
+<p class="unterzeile">{% blocktranslate with kind=g.schueler.person.anzeigename name=e.person.anzeigename %}Zu {{ kind }} · für {{ name }}{% endblocktranslate %}</p>
+
+{% if bestaetigt %}<p class="ek-meldung">{% translate "Vielen Dank – Ihre Bestätigung ist bei der Schule eingegangen." %}</p>{% endif %}
+{% if gesendet %}<p class="ek-meldung">{% translate "Vielen Dank – Ihre Antwort wurde an die Schule übermittelt." %}</p>{% endif %}
+
+<section class="karte">
+  {% include "elternkontakt/_verlauf.html" with eltern=True %}
+</section>
+
+{% if g.bestaetigung_erbeten %}
+<section class="karte ek-bestaetigung">
+  {% if e.bestaetigt_am %}<p class="ek-ok">{% blocktranslate with d=e.bestaetigt_am|date:"SHORT_DATETIME_FORMAT" %}Sie haben am {{ d }} bestätigt.{% endblocktranslate %}</p>
+  {% else %}
+    <p>{% if g.art == "zeugnis" %}{% translate "Bitte bestätigen Sie, dass Ihnen das Zeugnis vorgelegt wurde." %}{% else %}{% translate "Die Schule bittet Sie, den Erhalt dieser Nachricht zu bestätigen." %}{% endif %}</p>
+    {% if not vorschau %}<form method="post">{% csrf_token %}<button type="submit" name="aktion" value="bestaetigen" class="knopf">{% if g.art == "zeugnis" %}{% translate "Erhalt des Zeugnisses bestätigen" %}{% else %}{% translate "Erhalt bestätigen" %}{% endif %}</button></form>
+    {% else %}<button type="button" class="knopf" disabled>{% translate "Erhalt bestätigen" %}</button>{% endif %}
+  {% endif %}
+</section>
+{% endif %}
+
+{% if g.nimmt_antworten_an %}
+<section class="karte">
+  <h2>{% translate "Antworten" %}</h2>
+  {% if not vorschau %}
+  <form method="post" class="ek-antwort">{% csrf_token %}
+    <input type="hidden" name="aktion" value="antworten">
+    {% include "aufnahme/_feld.html" with f=form.text breit=True %}
+    <button type="submit" class="knopf">{% translate "Antwort senden" %}</button>
+  </form>
+  {% else %}<p class="leise">{% translate "Hier können die Eltern antworten." %}</p>{% endif %}
+</section>
+{% endif %}
+{% endblock %}

@@ -20,6 +20,7 @@
   <a class="knopf zweitrangig" href="{% url 'zeugnis_klasse_druck' klasse.pk abschnitt.pk %}?sprache=en" target="_blank" rel="noopener">{% translate "Englische Übersetzung" %}</a>
   {% if konferenz %}<a class="knopf zweitrangig" href="{% url 'konferenz' konferenz.pk %}">{{ konferenz.get_art_display }} · {{ konferenz.get_status_display }}</a>
   {% elif darf_konferenz %}<form method="post">{% csrf_token %}<button type="submit" name="aktion" value="konferenz" class="knopf zweitrangig">{% translate "Konferenz anlegen" %}</button></form>{% endif %}
+  {% if darf_empfang and empfang_offen %}<form method="post" action="{% url 'zeugnisempfang_anfordern' klasse.pk abschnitt.pk %}">{% csrf_token %}<input type="hidden" name="zurueck" value="{{ request.get_full_path }}"><button type="submit" class="knopf zweitrangig">{% blocktranslate count n=empfang_offen %}Empfangsbestätigung der Eltern anfordern ({{ n }}){% plural %}Empfangsbestätigung der Eltern anfordern ({{ n }}){% endblocktranslate %}</button></form>{% endif %}
   {% if darf_freigeben %}<form method="post" onsubmit="return confirm('{% translate "Alle vollständigen Zeugnisse freigeben? Danach sind sie schreibgeschützt." as frage %}{{ frage|escapejs }}')">{% csrf_token %}<button type="submit" name="aktion" value="freigeben" class="knopf">{% translate "Vollständige freigeben" %}</button></form>{% endif %}
 </div>
 
@@ -27,7 +28,7 @@
 <table class="liste">
   <thead><tr>
     <th>{% translate "Schüler:in" %}</th><th>{% translate "Bildungsgang" %}</th><th class="zahl">{% translate "Noten" %}</th><th class="zahl">Ø</th>
-    <th>{% translate "Versetzung (Vorschlag)" %}</th><th>{% translate "Kommentar" %}</th><th>{% translate "Vermerk" %}</th><th>{% translate "Status" %}</th><th></th>
+    <th>{% translate "Versetzung (Vorschlag)" %}</th><th>{% translate "Kommentar" %}</th><th>{% translate "Vermerk" %}</th><th>{% translate "Status" %}</th><th>{% translate "Erhalt (Eltern)" %}</th><th></th>
   </tr></thead>
   <tbody>
   {% for r in zeilen %}
@@ -40,9 +41,10 @@
       <td>{% if r.kommentar %}<small>{% blocktranslate with a=r.kommentar.aktuell|length p=r.kommentar.pflicht|length %}{{ a }}/{{ p }} abgezeichnet{% endblocktranslate %}</small>{% if r.anmerkungen_offen %} <span class="etikett warnend">{{ r.anmerkungen_offen }}</span>{% endif %}{% else %}<span class="leer">{% translate "fehlt" %}</span>{% endif %}</td>
       <td><small>{{ r.z.get_versetzung_display|default:"–" }}</small></td>
       <td><span class="zg-status zg-status-{{ r.z.status }}">{{ r.z.get_status_display }}</span></td>
+      <td class="nowrap">{% if r.empfang %}<a href="{% url 'elterngespraech' r.empfang.gespraech %}"><small class="{% if r.empfang.bestaetigt >= r.empfang.gesamt %}ek-ok{% endif %}">{% blocktranslate with b=r.empfang.bestaetigt g=r.empfang.gesamt %}{{ b }}/{{ g }} bestätigt{% endblocktranslate %}</small></a>{% else %}<span class="leise">–</span>{% endif %}</td>
       <td class="nowrap"><a href="{% url 'zeugnis_druck' r.z.pk %}" target="_blank" rel="noopener">{% translate "Druck" %}</a></td>
     </tr>
-  {% empty %}<tr><td colspan="9" class="leer">{% translate "Keine Schüler:innen in dieser Klasse." %}</td></tr>
+  {% empty %}<tr><td colspan="10" class="leer">{% translate "Keine Schüler:innen in dieser Klasse." %}</td></tr>
   {% endfor %}
   </tbody>
 </table>

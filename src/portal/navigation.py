@@ -7,6 +7,8 @@ die nötigen Rechte hat. Leere Gruppen und Karten werden ausgeblendet.
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import gettext as _, pgettext
 
+from elternkontakt.rechte import darf_regeln
+
 from .rechte import (
     ist_finanzen, ist_foerderkoordination, ist_personalverwaltung, ist_schulleitung, ist_systemverwaltung, ist_verwaltung,
     personal_von,
@@ -112,6 +114,12 @@ def menueband(request):
         .add(_("Eltern und Kontakte"), _url("admin:stammdaten_person_changelist", query="?rolle=eltern"), "personen",
              bedingung=verwaltung and p("stammdaten.view_person"))
         .add(_("Anhänge"), _url("admin:stammdaten_dokument_changelist"), "klammer", bedingung=p("stammdaten.view_dokument")),
+        Gruppe(_("Eltern"))
+        .add(_("Elternnachrichten"), _url("elternkontakt"), "brief", gross=True, bedingung=p("elternkontakt.view_gespraech"),
+             hinweis=_("Nachrichten an Eltern, Antworten und Bestätigungen"))
+        .add(_("Neue Nachricht"), _url("elternnachricht_neu"), "plus", bedingung=p("elternkontakt.add_gespraech"))
+        .add(_("Benachrichtigungsregeln"), _url("elternkontakt_regeln"), "glocke", bedingung=darf_regeln(user),
+             hinweis=_("Automatische Benachrichtigung bei Fehlzeiten und Verspätungen")),
         Gruppe(_("Klassen und Gruppen"))
         .add(_("Zuordnen"), _url("zuordnung"), "person_plus", gross=True, bedingung=darf_zuordnen(user),
              hinweis=_("Schüler:innen Klassen, Lerngruppen und AGs zuordnen"))
@@ -264,7 +272,7 @@ def menueband(request):
     return {"karten": karten, "aktiv": aktiv, "rollen": rollen}
 
 
-PFAD_REGELN = [("/klassen/", "schueler"), ("/schueler/", "schueler"), ("/stufe/", "schueler"), ("/zuordnung/", "schueler"), ("/aufnahme/", "schueler"),
+PFAD_REGELN = [("/klassen/", "schueler"), ("/schueler/", "schueler"), ("/stufe/", "schueler"), ("/zuordnung/", "schueler"), ("/aufnahme/", "schueler"), ("/elternkontakt/", "schueler"),
                ("/noten/", "unterricht"), ("/zeugnisse/", "unterricht"),
                ("/rollen/", "verwaltung"),
                ("/foerderung/", "foerderung"), ("/verwaltung/", "verwaltung")]
