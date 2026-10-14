@@ -30,11 +30,14 @@ services:
     environment:
       DATABASE_URL: postgres://${DB_BENUTZER:-schule}:${DB_PASSWORT}@db:5432/${DB_NAME:-schulverwaltung}
       MEDIA_ROOT: /daten/dokumente
+      MODUL_SICHERUNGEN: /daten/modulsicherungen
     ports:
       - "${PORT:-8000}:8000"
     volumes:
       - dokumente:/daten/dokumente
+      - modulsicherungen:/daten/modulsicherungen
 
 volumes:
   datenbank:
   dokumente:
+  modulsicherungen:

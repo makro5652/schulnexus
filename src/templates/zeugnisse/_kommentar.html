@@ -1,10 +1,10 @@
-{% load i18n %}
+{% load i18n formate %}
 {# Zeugniskommentar mit Abzeichnung und Anmerkungen. Erwartet: z, status, eigene, darf_abzeichnen, darf_anmerken, anmerkungen, weiter #}
 <div class="zg-kommentar">
   {% if z.kommentar %}
     {% if not nur_aktionen %}<blockquote class="zg-kommentartext">{{ z.kommentar|linebreaksbr }}</blockquote>{% endif %}
     <p class="zg-kommentarmeta leise">
-      {% if z.kommentar_geaendert %}{% blocktranslate with datum=z.kommentar_geaendert|date:"SHORT_DATETIME_FORMAT" wer=z.kommentar_von.person.anzeigename|default:z.kommentar_von.get_username|default:"–" %}Stand {{ datum }} · {{ wer }}{% endblocktranslate %} · {% endif %}
+      {% if z.kommentar_geaendert %}{% blocktranslate with datum=z.kommentar_geaendert|date:"SHORT_DATETIME_FORMAT" wer=z.kommentar_von|benutzername %}Stand {{ datum }} · {{ wer }}{% endblocktranslate %} · {% endif %}
       {% blocktranslate with a=status.aktuell|length p=status.pflicht|length %}abgezeichnet {{ a }} von {{ p }}{% endblocktranslate %}
     </p>
     <div class="zg-kommentaraktionen">
@@ -28,7 +28,7 @@
   <ul class="zg-anmerkungen">
     {% for a in anmerkungen %}
     <li class="{% if a.erledigt %}erledigt{% endif %}">
-      <span class="zg-anmerkung-kopf">{{ a.autor.person.anzeigename|default:a.autor.get_username }} · {{ a.erstellt|date:"SHORT_DATETIME_FORMAT" }}{% if a.erledigt %} · {% translate "erledigt" %}{% endif %}</span>
+      <span class="zg-anmerkung-kopf">{{ a.autor|benutzername }} · {{ a.erstellt|date:"SHORT_DATETIME_FORMAT" }}{% if a.erledigt %} · {% translate "erledigt" %}{% endif %}</span>
       <span class="zg-anmerkung-text">{{ a.text|linebreaksbr }}</span>
       {% if darf_erledigen or a.autor_id == user.pk %}
       <form method="post" action="{% url 'zeugnis_kommentar' z.pk %}" class="zg-inline">

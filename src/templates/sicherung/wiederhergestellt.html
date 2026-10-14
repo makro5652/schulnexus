@@ -1,0 +1,12 @@
+{% extends "portal/base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Wiederherstellung abgeschlossen" %}{% endblock %}
+{% block inhalt %}
+{% translate "Wiederherstellung abgeschlossen" as titel %}{% include "sicherung/_kopf.html" %}
+<section class="karte">
+  <p class="ek-meldung">{% blocktranslate with datei=s.datei %}Die gewählten Module wurden auf den Stand von {{ datei }} zurückgesetzt.{% endblocktranslate %}</p>
+  <ul>{% for m in plan.module %}<li><strong>{{ m.name }}</strong>: {% blocktranslate with n=m.neu g=m.geaendert l=m.loeschen %}{{ n }} angelegt, {{ g }} überschrieben, {{ l }} gelöscht{% endblocktranslate %}</li>{% endfor %}</ul>
+  <p>{% blocktranslate with datei=vorher.datei %}Der vorherige Stand ist gesichert in {{ datei }}.{% endblocktranslate %}</p>
+  <p><a class="knopf zweitrangig" href="{% url 'sicherungen' %}">{% translate "Zurück zu den Sicherungen" %}</a></p>
+</section>
+{% endblock %}

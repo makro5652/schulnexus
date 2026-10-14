@@ -148,6 +148,10 @@ class Command(BaseCommand):
                 call_command("grundeinrichtung", stdout=self.stdout)
                 self.aufnahme_anlegen()
                 self.stdout.write("Beispiele für Neuanmeldungen ergänzt.")
+            if not User.objects.filter(username="it").exists():
+                call_command("grundeinrichtung", stdout=self.stdout)
+                self.it_konto_anlegen(opts["passwort"])
+                self.stdout.write("Demo-Konto für die IT-Administration ergänzt.")
             from elternkontakt.models import Gespraech
 
             if not Gespraech.objects.exists():
@@ -741,6 +745,7 @@ class Command(BaseCommand):
         konto("schulleitung", sl.person, R.SCHULLEITUNG)
         vl = neues_personal("James", "Mwangi", "VERW", "Verwaltungsleiter", "Herr", 2019)
         konto("verwaltungsleitung", vl.person, R.VERWALTUNGSLEITUNG)
+        self.it_konto_anlegen(pw)
         fin = Personalprofil.objects.filter(stellenbezeichnung="Buchhalterin").select_related("person").first()
         if fin and not fin.person.benutzer_id:
             konto("finanzen", fin.person, R.FINANZEN)
@@ -1008,6 +1013,20 @@ class Command(BaseCommand):
         k.save()
         return k
 
+
+    # ------------------------------------------------------------ IT-Administration (ab 0.4.3.0)
+    def it_konto_anlegen(self, pw):
+        """IT-Konto mit Vollzugriff (Rolle IT-Administration, Superuser)."""
+        from portal import rollen as R
+        p = Person.objects.create(anrede="Herr", vorname="Daniel", nachname="Wafula", email="daniel.wafula@privat.example",
+                                  geburtsdatum=date(1988, 6, 2))
+        Personalprofil.objects.create(person=p, bereich=Personalbereich.objects.get(kuerzel="VERW"), stellenbezeichnung="IT-Administrator",
+                                      anstellungsart="ortskraft", dienstbeginn=date(2024, 8, 1), dienst_email="it@schule.example",
+                                      personalnummer="P-2024IT")
+        u = User.objects.create_user("it", password=pw, is_staff=True, is_superuser=True, first_name="Daniel", last_name="Wafula")
+        u.groups.add(Group.objects.get(name=R.IT))
+        p.benutzer = u
+        p.save(update_fields=["benutzer"])
 
     # ------------------------------------------------------------ Elternkommunikation (ab 0.4.2.9)
     def elternkontakt_anlegen(self):

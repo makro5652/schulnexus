@@ -1,0 +1,79 @@
+{% extends "portal/base.html" %}
+{% load i18n %}
+{% block title %}{% translate "PDF-Export" %}{% endblock %}
+{% block kopf %}{% if laeuft %}<meta http-equiv="refresh" content="4">{% endif %}{% endblock %}
+{% block inhaltsklasse %}breit{% endblock %}
+{% block inhalt %}
+{% translate "PDF-Export" as titel %}{% include "sicherung/_kopf.html" %}
+
+<div class="sy-raster">
+  <section class="karte">
+    <h2>{% translate "Neuer PDF-Export" %}</h2>
+    <form method="post" class="sy-formular" novalidate>{% csrf_token %}
+      {% if form.non_field_errors %}<p class="fehler">{{ form.non_field_errors|join:" " }}</p>{% endif %}
+      <fieldset class="sy-module"><legend>{% translate "Module" %}</legend>
+        <label class="haken sy-alle"><input type="checkbox" data-alle="module"> <strong>{% translate "alle Module" %}</strong></label>
+        {% for cb in form.module %}<label class="haken">{{ cb.tag }} {{ cb.choice_label }}</label>{% endfor %}
+        {% for e in form.module.errors %}<small class="fehler">{{ e }}</small>{% endfor %}
+      </fieldset>
+      <div class="sy-zeitraum">
+        <label class="sy-feld">{{ form.zeitraum.label }} {{ form.zeitraum }}</label>
+        <label class="sy-feld">{{ form.von.label }} {{ form.von }}</label>
+        <label class="sy-feld">{{ form.bis.label }} {{ form.bis }}</label>
+      </div>
+      <label class="sy-feld">{{ form.aufteilung.label }} {{ form.aufteilung }}</label>
+      <label class="haken">{{ form.mit_bestand }} {{ form.mit_bestand.label }}</label>
+      <label class="haken">{{ form.mit_protokoll }} {{ form.mit_protokoll.label }}</label>
+      <button type="submit" class="knopf">{% translate "PDF erstellen" %}</button>
+    </form>
+  </section>
+  <section class="karte">
+    <h2>{% translate "Hinweise" %}</h2>
+    <ul class="sy-hinweise">
+      <li>{% translate "Einträge mit Datum (z. B. Fehlzeiten, Noten, Nachrichten, Zeugnisse) werden nach dem Zeitraum gefiltert." %}</li>
+      <li>{% translate "Einträge ohne Datum (Personen, Klassen, Kataloge) erscheinen als „Bestand“ mit dem heutigen Stand in einer eigenen Datei." %}</li>
+      <li>{% blocktranslate with n=grenze %}Jede Datei enthält höchstens {{ n }} Einträge; lange Zeiträume werden automatisch nach Monaten aufgeteilt.{% endblocktranslate %}</li>
+      <li>{% translate "Passwörter und Zugangsschlüssel werden nie ausgegeben. Die PDFs enthalten personenbezogene Daten und sind als vertraulich gekennzeichnet." %}</li>
+    </ul>
+  </section>
+</div>
+
+<h2 class="sy-ueberschrift">{% translate "Erstellte PDFs" %}</h2>
+{% for a in auftraege %}
+<section class="karte sy-auftrag">
+  <div class="karte-kopf">
+    <div><strong>{{ a.modulnamen|join:", " }}</strong>
+      <small class="leise blockzeile">{{ a.zeitraum }} · {{ a.get_aufteilung_display }} · {{ a.erstellt_am|date:"SHORT_DATETIME_FORMAT" }} · {{ a.erstellt_von.username|default:"–" }}</small></div>
+    <div class="knopfreihe">
+      <span class="sy-status sy-status-{{ a.status }}">{{ a.get_status_display }}</span>
+      {% if a.status == "fertig" and a.dateien %}<a class="knopf klein" href="{% url 'pdf_zip' a.pk %}">{% blocktranslate count n=a.dateien|length %}Als ZIP ({{ n }} Datei){% plural %}Alle als ZIP ({{ n }} Dateien){% endblocktranslate %}</a>{% endif %}
+      <form method="post" action="{% url 'pdf_loeschen' a.pk %}">{% csrf_token %}<button type="submit" class="knopf gefahr klein">{% translate "Löschen" %}</button></form>
+    </div>
+  </div>
+  {% if a.status == "fehler" %}<p class="fehler">{{ a.fehler }}</p>{% endif %}
+  {% if a.dateien %}
+  <ul class="sy-dateien">
+    {% for d in a.dateien %}<li><a href="{% url 'pdf_datei' a.pk d.name %}?ansehen=1" target="_blank" rel="noopener">{{ d.titel }}</a>
+      <span class="leise">· {% blocktranslate count n=d.seiten %}{{ n }} Seite{% plural %}{{ n }} Seiten{% endblocktranslate %} · {% blocktranslate count n=d.eintraege %}{{ n }} Eintrag{% plural %}{{ n }} Einträge{% endblocktranslate %} · {{ d.groesse|filesizeformat }}</span>
+      <a class="klein" href="{% url 'pdf_datei' a.pk d.name %}">{% translate "herunterladen" %}</a></li>{% endfor %}
+  </ul>
+  {% endif %}
+</section>
+{% empty %}<section class="karte"><p class="leer">{% translate "Noch keine PDF-Exporte." %}</p></section>{% endfor %}
+<script>
+document.querySelectorAll("[data-alle]").forEach(function (alle) {
+  var boxen = document.querySelectorAll('input[name="' + alle.dataset.alle + '"]');
+  function stand() { alle.checked = Array.prototype.every.call(boxen, function (b) { return b.checked; }); }
+  alle.addEventListener("change", function () { boxen.forEach(function (b) { b.checked = alle.checked; }); });
+  boxen.forEach(function (b) { b.addEventListener("change", stand); });
+  stand();
+});
+(function () {
+  var wahl = document.querySelector('select[name="zeitraum"]');
+  if (!wahl) return;
+  function zeigen() { var eigen = wahl.value === "eigen";
+    document.querySelectorAll('input[name="von"], input[name="bis"]').forEach(function (f) { f.closest("label").hidden = !eigen; }); }
+  wahl.addEventListener("change", zeigen); zeigen();
+})();
+</script>
+{% endblock %}

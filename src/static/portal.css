@@ -673,3 +673,65 @@ a.klein, .klein { font-size: 0.85rem; }
 .ek-vorschau { padding: 0.6rem 0.9rem; border-radius: 8px; background: var(--hinweis-flaeche); color: var(--hinweis-text); margin: 0; }
 .ek-bestaetigung p { margin-top: 0; }
 .ek-portalzeile { padding: 0.4rem 0; border-bottom: 1px solid var(--linie); margin: 0; }
+
+/* ---------------------------------------------------------------- System: Sicherung, PDF-Export, Benutzer und Rechte */
+.sy-reiter { margin-bottom: 1rem; }
+.sy-raster { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 1.2rem; align-items: start; }
+.sy-formular { display: grid; gap: 0.7rem; }
+.sy-raster > * { min-width: 0; }
+.sy-module { min-width: 0; border: 1px solid var(--linie); border-radius: 8px; padding: 0.6rem 0.9rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(17rem, 100%), 1fr)); gap: 0.25rem 1rem; margin: 0.3rem 0 0.8rem; }
+.sy-module legend { font-weight: 600; font-size: 0.85rem; padding: 0 0.3rem; }
+.sy-alle { grid-column: 1 / -1; border-bottom: 1px solid var(--linie); padding-bottom: 0.3rem; }
+.sy-feld { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.85rem; font-weight: 600; }
+.sy-feld input, .sy-feld select { font: inherit; font-weight: 400; padding: 0.42rem 0.55rem; border: 1px solid var(--linie); border-radius: 7px; background: var(--grund); color: var(--text); }
+.sy-zeitraum { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.7rem; }
+.sy-formular .knopf { justify-self: start; }
+.sy-hinweise { margin: 0 0 0.8rem; padding-left: 1.1rem; display: grid; gap: 0.35rem; font-size: 0.9rem; }
+.sy-ueberschrift { margin: 1.4rem 0 0.7rem; }
+.sy-aktionen { display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap; }
+.sy-aktionen form { margin: 0; }
+.sy-art { display: inline-block; padding: 0.05rem 0.5rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; background: var(--linie); color: var(--text); white-space: nowrap; }
+.sy-art-vor_wiederherstellung { background: var(--hinweis-flaeche); color: var(--hinweis-text); }
+.sy-art-hochgeladen { background: var(--info-flaeche); color: var(--info-text); }
+.sy-art-automatisch { background: var(--lila-flaeche); color: var(--lila-text); }
+.sy-plan td, .sy-plan th { font-size: 0.88rem; }
+.sy-unterzeile td { font-size: 0.8rem !important; color: var(--leise); padding-top: 0.15rem; padding-bottom: 0.15rem; }
+.sy-unterzeile td:first-child { padding-left: 1.6rem; }
+.sy-warnung { margin: 1rem 0; padding: 0.8rem 1rem; border-radius: 8px; background: var(--hinweis-flaeche); color: var(--hinweis-text); }
+.sy-warnung ul { margin: 0.4rem 0 0; padding-left: 1.1rem; }
+.sy-blockiert { background: var(--gefahr-flaeche); color: var(--warnung); }
+.sy-fehler { padding: 0.6rem 0.8rem; border-radius: 8px; background: var(--gefahr-flaeche); }
+.sy-bestaetigung { display: grid; gap: 0.6rem; margin-top: 1rem; padding: 0.9rem 1rem; border: 1px solid var(--warnung); border-radius: 10px; max-width: 46rem; }
+.sy-bestaetigung p { margin: 0; }
+.sy-bestaetigung .knopf { justify-self: start; }
+.sy-bestaetigung input[type=text] { max-width: 18rem; }
+.sy-status { display: inline-block; padding: 0.15rem 0.6rem; border-radius: 999px; font-size: 0.78rem; font-weight: 700; background: var(--linie); }
+.sy-status-fertig { background: var(--akzent-hell); color: var(--akzent); }
+.sy-status-laeuft, .sy-status-wartet { background: var(--info-flaeche); color: var(--info-text); }
+.sy-status-fehler { background: var(--gefahr-flaeche); color: var(--warnung); }
+.sy-auftrag { margin-bottom: 0.8rem; }
+.sy-dateien { margin: 0.6rem 0 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; font-size: 0.9rem; }
+.sy-plus { color: var(--ok); font-weight: 700; }
+.sy-minus { color: var(--warnung); font-weight: 700; }
+.sy-pw { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 1.4rem; font-weight: 700; letter-spacing: 0.05em; margin: 0.3rem 0; }
+.sy-passwort { border-color: var(--akzent); margin-bottom: 1rem; }
+.sy-aktiv { margin: 0.8rem 0; }
+.sy-app { border-top: 1px solid var(--linie); padding: 0.5rem 0; }
+.sy-app summary { cursor: pointer; padding: 0.2rem 0; }
+.sy-rechtetabelle th, .sy-rechtetabelle td { font-size: 0.82rem; padding: 0.25rem 0.4rem; }
+.sy-rechtetabelle thead th { text-align: left; }
+.sy-wahl { font: inherit; font-size: 0.8rem; padding: 0.15rem 0.3rem; border: 1px solid var(--linie); border-radius: 5px; background: var(--grund); color: var(--text); }
+.sy-wahl-plus { border-color: var(--ok); color: var(--ok); font-weight: 700; }
+.sy-wahl-minus { border-color: var(--warnung); color: var(--warnung); font-weight: 700; }
+.sy-sonder th { font-weight: 400; font-style: italic; }
+@media (max-width: 860px) { .sy-raster, .sy-zeitraum { grid-template-columns: 1fr; } }
+.sy-dateiname { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.7rem; }
+.sy-raster .daten { grid-template-columns: auto minmax(0, 1fr); }
+.sy-raster .daten dd { overflow-wrap: anywhere; }
+.sy-reiter { overflow-x: auto; }
+.startraster > * { min-width: 0; }
+.hauptspalte, .seitenspalte { grid-template-columns: minmax(0, 1fr); }
+.sy-raster .hinweistext { overflow-wrap: anywhere; }
+.sy-raster input[type=file] { max-width: 100%; min-width: 0; }
+.sy-raster .inline-form { flex-wrap: wrap; }
+.sy-feld[hidden] { display: none; }

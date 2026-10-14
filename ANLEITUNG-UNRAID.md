@@ -134,3 +134,9 @@ docker compose start web sicherung
   Für den echten Versand braucht es eine **öffentliche HTTPS-Adresse** (`ELTERN_LINK_BASIS`), etwa über einen
   Reverse Proxy, der nach außen **nur** `/eltern/n/` und `/static/` freigibt – nicht die Anmeldung des Kollegiums.
   Das öffnet das System ins Internet: erst nach Zwei-Faktor-Anmeldung und Datenschutzfreigabe.
+- **Modulsicherungen (ab 0.4.3.0):** Sicherungen und PDF-Exporte aus dem Portal liegen in
+  `${APPDATA}/modulsicherungen`. Der Ordner wird beim Start angelegt. Für eine tägliche automatische Modulsicherung
+  in Unraid unter *User Scripts* einen Zeitplan anlegen mit
+  `docker compose -f /mnt/user/appdata/schulverwaltung/unraid/docker-compose.yml exec -T web python manage.py modulsicherung`
+  (Pfad an den eigenen Installationsordner anpassen).
+

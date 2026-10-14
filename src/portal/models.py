@@ -14,13 +14,16 @@ DESIGNS = [
 
 
 class Benutzereinstellung(models.Model):
-    """Persönliche Einstellungen je Benutzerkonto: Sprache und Design der Oberfläche."""
+    """Persönliche Einstellungen je Benutzerkonto: Sprache, Design der Oberfläche und entzogene Einzelrechte."""
 
     benutzer = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="einstellung", verbose_name=_("Benutzerkonto")
     )
     sprache = models.CharField(_("Sprache der Oberfläche"), max_length=8, choices=settings.LANGUAGES, default=settings.LANGUAGE_CODE)
     design = models.CharField(_("Design"), max_length=12, choices=DESIGNS, default="standard")
+    entzogene_rechte = models.ManyToManyField(
+        "auth.Permission", blank=True, related_name="+", verbose_name=_("Entzogene Rechte"),
+        help_text=_("Rechte, die dieses Konto trotz seiner Rollen nicht hat (siehe Benutzer und Rechte)."))
 
     class Meta:
         verbose_name = _("Benutzereinstellung")

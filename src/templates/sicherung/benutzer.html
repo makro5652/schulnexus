@@ -1,0 +1,35 @@
+{% extends "portal/base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Benutzer und Rechte" %}{% endblock %}
+{% block inhaltsklasse %}breit{% endblock %}
+{% block inhalt %}
+{% translate "Benutzer und Rechte" as titel %}{% include "sicherung/_kopf.html" %}
+<form method="get" class="filterzeile an-filter">
+  <label>{% translate "Rolle" %}
+    <select name="rolle" onchange="this.form.submit()"><option value="">{% translate "alle" %}</option>
+      {% for r, name in rollen %}<option value="{{ r }}"{% if rolle == r %} selected{% endif %}>{{ name }}</option>{% endfor %}</select></label>
+  <label>{% translate "Suche" %} <input type="search" name="q" value="{{ q }}" placeholder="{% translate 'Name oder Benutzername' %}"></label>
+  <button type="submit" class="knopf zweitrangig klein">{% translate "Anzeigen" %}</button>
+</form>
+<div class="tabellenrahmen">
+<table class="liste">
+  <thead><tr><th>{% translate "Benutzername" %}</th><th>{% translate "Name" %}</th><th>{% translate "Rollen" %}</th>
+    <th>{% translate "Einzelrechte" %}</th><th>{% translate "Letzte Anmeldung" %}</th><th>{% translate "Status" %}</th></tr></thead>
+  <tbody>
+  {% for z in zeilen %}
+    <tr>
+      <td><a href="{% url 'benutzer_bearbeiten' z.u.pk %}"><strong>{{ z.u.username }}</strong></a></td>
+      <td>{{ z.u.person.anzeigename|default:"–" }}</td>
+      <td>{% for r in z.rollen %}<span class="etikett">{{ r }}</span>{% empty %}<span class="leise">–</span>{% endfor %}
+        {% if z.u.is_superuser %}<span class="etikett warnend">{% translate "Vollzugriff" %}</span>{% endif %}</td>
+      <td>{% if z.plus %}<span class="sy-plus">+{{ z.plus }}</span>{% endif %} {% if z.minus %}<span class="sy-minus">−{{ z.minus }}</span>{% endif %}{% if not z.plus and not z.minus %}<span class="leise">–</span>{% endif %}</td>
+      <td class="nowrap"><small>{{ z.u.last_login|date:"SHORT_DATETIME_FORMAT"|default:"–" }}</small></td>
+      <td>{% if z.u.is_active %}{% translate "aktiv" %}{% else %}<span class="auffaellig">{% translate "gesperrt" %}</span>{% endif %}</td>
+    </tr>
+  {% empty %}<tr><td colspan="6" class="leer">{% translate "Keine Konten gefunden." %}</td></tr>{% endfor %}
+  </tbody>
+</table>
+</div>
+<p class="hinweistext">{% translate "Neue Konten legen Sie in der Verwaltungsoberfläche unter Benutzerkonten an; Rollen und Einzelrechte vergeben Sie hier." %}
+  <a href="{% url 'admin:auth_user_add' %}">{% translate "Neues Konto anlegen" %}</a></p>
+{% endblock %}

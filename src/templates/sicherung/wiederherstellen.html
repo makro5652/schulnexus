@@ -1,0 +1,55 @@
+{% extends "portal/base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Wiederherstellen" %}{% endblock %}
+{% block inhaltsklasse %}breit{% endblock %}
+{% block inhalt %}
+{% translate "Wiederherstellen" as titel %}{% include "sicherung/_kopf.html" %}
+
+<section class="karte">
+  <h2>{% blocktranslate with datei=s.datei %}Sicherung {{ datei }}{% endblocktranslate %}</h2>
+  <p class="unterzeile">{{ s.erstellt_am|date:"SHORT_DATETIME_FORMAT" }} · {{ s.get_art_display }} · {% translate "Version" %} {{ s.version|default:"?" }}{% if s.bemerkung %} · {{ s.bemerkung }}{% endif %}</p>
+  {% if fehler %}<p class="fehler sy-fehler">{{ fehler }}</p>{% endif %}
+  <form method="post">{% csrf_token %}
+    <fieldset class="sy-module"><legend>{% translate "Welche Module sollen wiederhergestellt werden?" %}</legend>
+      {% for k, name in angeboten %}<label class="haken"><input type="checkbox" name="module" value="{{ k }}"{% if k in gewaehlt %} checked{% endif %}> {{ name }}</label>{% endfor %}
+    </fieldset>
+    <button type="submit" name="aktion" value="vorschau" class="knopf zweitrangig">{% translate "Vorschau berechnen" %}</button>
+
+    {% if plan %}
+    <h3>{% translate "Vorschau: Änderungen am aktuellen Stand" %}</h3>
+    <div class="tabellenrahmen">
+    <table class="liste sy-plan">
+      <thead><tr><th>{% translate "Modul" %}</th><th class="zahl">{% translate "neu angelegt" %}</th><th class="zahl">{% translate "überschrieben" %}</th>
+        <th class="zahl">{% translate "gelöscht" %}</th><th class="zahl">{% translate "unverändert" %}</th></tr></thead>
+      <tbody>
+      {% for m in plan.module %}
+        <tr><th scope="row">{{ m.name }}</th><td class="zahl">{{ m.neu }}</td><td class="zahl">{{ m.geaendert }}</td>
+          <td class="zahl{% if m.loeschen %} auffaellig{% endif %}">{{ m.loeschen }}</td><td class="zahl">{{ m.gleich }}</td></tr>
+        {% for z in m.modelle %}<tr class="sy-unterzeile{% if z.protokoll %} sy-protokollzeile{% endif %}"><td>{{ z.name }}</td><td class="zahl">{{ z.neu }}</td><td class="zahl">{{ z.geaendert }}</td><td class="zahl">{{ z.loeschen }}</td><td></td></tr>{% endfor %}
+      {% endfor %}
+      </tbody>
+    </table>
+    </div>
+    {% if plan.kaskade %}
+    <div class="sy-warnung">
+      <strong>{% translate "Mitbetroffen in anderen Modulen (wird gelöscht oder geleert):" %}</strong>
+      <ul>{% for k in plan.kaskade %}<li>{{ k.modul }}: {{ k.name }} – {{ k.anzahl }}</li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+    {% for h in plan.hinweise %}<p class="hinweistext">{{ h }}</p>{% endfor %}
+    {% if plan.blockiert %}
+      <div class="sy-warnung sy-blockiert"><strong>{% translate "Wiederherstellung nicht möglich:" %}</strong>
+        <ul>{% for b in plan.blockiert %}<li>{{ b }}</li>{% endfor %}</ul></div>
+    {% else %}
+    <div class="sy-bestaetigung">
+      <p>{% translate "Vorher wird automatisch eine Gesamtsicherung angelegt. Wenn Benutzerkonten wiederhergestellt werden, kann eine erneute Anmeldung nötig sein." %}</p>
+      <label class="haken"><input type="checkbox" name="verstanden" value="1"> {% translate "Ich habe die Vorschau geprüft und möchte den Stand der Sicherung übernehmen." %}</label>
+      <label class="sy-feld">{% blocktranslate with wort=bestaetigung %}Zur Bestätigung „{{ wort }}“ eingeben{% endblocktranslate %}
+        <input type="text" name="bestaetigung" autocomplete="off" spellcheck="false"></label>
+      <button type="submit" name="aktion" value="ausfuehren" class="knopf gefahr">{% translate "Jetzt wiederherstellen" %}</button>
+    </div>
+    {% endif %}
+    {% endif %}
+  </form>
+</section>
+{% endblock %}

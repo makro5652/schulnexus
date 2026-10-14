@@ -1,0 +1,81 @@
+{% extends "portal/base.html" %}
+{% load i18n formate %}
+{% block title %}{% translate "Sicherung und Wiederherstellung" %}{% endblock %}
+{% block inhaltsklasse %}breit{% endblock %}
+{% block inhalt %}
+{% translate "Sicherung und Wiederherstellung" as titel %}{% include "sicherung/_kopf.html" %}
+
+<div class="sy-raster">
+  <section class="karte">
+    <h2>{% translate "Neue Sicherung" %}</h2>
+    <form method="post" class="sy-formular">{% csrf_token %}
+      <fieldset class="sy-module"><legend>{% translate "Module" %}</legend>
+        <label class="haken sy-alle"><input type="checkbox" data-alle="module" checked> <strong>{% translate "alle Module" %}</strong></label>
+        {% for cb in form.module %}<label class="haken">{{ cb.tag }} {{ cb.choice_label }}</label>{% endfor %}
+        {% for e in form.module.errors %}<small class="fehler">{{ e }}</small>{% endfor %}
+      </fieldset>
+      <label class="haken">{{ form.mit_dateien }} {{ form.mit_dateien.label }}</label>
+      <label class="sy-feld">{{ form.bemerkung.label }} {{ form.bemerkung }}</label>
+      <button type="submit" class="knopf">{% translate "Sicherung erstellen" %}</button>
+    </form>
+  </section>
+  <section class="karte">
+    <h2>{% translate "So funktioniert es" %}</h2>
+    <ul class="sy-hinweise">
+      <li>{% translate "Jede Sicherung ist eine ZIP-Datei mit den gewählten Modulen; sie lässt sich herunterladen und auf einem anderen Datenträger aufbewahren." %}</li>
+      <li>{% translate "Wiederherstellen setzt die gewählten Module auf den Stand der Sicherung zurück. Eine Vorschau zeigt vorher, was angelegt, geändert und gelöscht wird – auch in anderen Modulen." %}</li>
+      <li>{% translate "Vor jeder Wiederherstellung legt das System automatisch eine Gesamtsicherung an." %}</li>
+      <li>{% translate "Wiederherstellen ist nur mit derselben Programmversion möglich, mit der gesichert wurde." %}</li>
+      <li>{% translate "Sicherungen enthalten personenbezogene Daten: heruntergeladene Dateien bitte verschlüsselt und zugriffsgeschützt aufbewahren." %}</li>
+    </ul>
+    <p class="hinweistext">{% blocktranslate with ordner=ordner %}Ablage auf dem Server: {{ ordner }}{% endblocktranslate %}</p>
+    <h3>{% translate "Sicherung hochladen" %}</h3>
+    <form method="post" enctype="multipart/form-data" class="inline-form">{% csrf_token %}
+      <input type="hidden" name="aktion" value="hochladen">
+      {{ hochladen.datei }} <button type="submit" class="knopf zweitrangig klein">{% translate "Hochladen und prüfen" %}</button>
+      {% for e in hochladen.datei.errors %}<small class="fehler blockzeile">{{ e }}</small>{% endfor %}
+    </form>
+  </section>
+</div>
+
+<h2 class="sy-ueberschrift">{% translate "Vorhandene Sicherungen" %}</h2>
+{% if sicherungen %}
+<div class="tabellenrahmen">
+<table class="liste">
+  <thead><tr><th>{% translate "Erstellt" %}</th><th>{% translate "Art" %}</th><th>{% translate "Module" %}</th><th class="zahl">{% translate "Einträge" %}</th>
+    <th class="zahl">{% translate "Größe" %}</th><th>{% translate "Version" %}</th><th></th></tr></thead>
+  <tbody>
+  {% for s in sicherungen %}
+    <tr>
+      <td class="nowrap">{{ s.erstellt_am|date:"SHORT_DATETIME_FORMAT" }}<small class="leise blockzeile">{% if s.erstellt_von %}{{ s.erstellt_von|benutzername }}{% else %}{% translate "automatisch" %}{% endif %}</small>
+        <small class="leise blockzeile sy-dateiname">{{ s.datei }}</small></td>
+      <td><span class="sy-art sy-art-{{ s.art }}">{{ s.get_art_display }}</span>{% if s.mit_dateien %} <span class="etikett">{% translate "mit Dateien" %}</span>{% endif %}
+        {% if s.bemerkung %}<small class="leise blockzeile">{{ s.bemerkung }}</small>{% endif %}</td>
+      <td><small>{% if s.module|length == alle_module %}{% translate "alle Module" %}{% else %}{{ s.modulnamen|join:", " }}{% endif %}</small></td>
+      <td class="zahl">{{ s.gesamt }}</td>
+      <td class="zahl nowrap">{{ s.groesse|filesizeformat }}</td>
+      <td>{{ s.version|default:"–" }}</td>
+      <td class="nowrap sy-aktionen">
+        {% if s.vorhanden %}
+        <a class="knopf zweitrangig klein" href="{% url 'wiederherstellen' s.pk %}">{% translate "Wiederherstellen …" %}</a>
+        <a class="knopf zweitrangig klein" href="{% url 'sicherung_herunterladen' s.pk %}">{% translate "Herunterladen" %}</a>
+        {% else %}<span class="auffaellig">{% translate "Datei fehlt" %}</span>{% endif %}
+        <form method="post" action="{% url 'sicherung_loeschen' s.pk %}" onsubmit="return confirm('{% translate "Diese Sicherung endgültig löschen?" as frage %}{{ frage|escapejs }}')">{% csrf_token %}
+          <button type="submit" class="knopf gefahr klein">{% translate "Löschen" %}</button></form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}<section class="karte"><p class="leer">{% translate "Noch keine Sicherungen vorhanden." %}</p></section>{% endif %}
+<script>
+document.querySelectorAll("[data-alle]").forEach(function (alle) {
+  var boxen = document.querySelectorAll('input[name="' + alle.dataset.alle + '"]');
+  function stand() { alle.checked = Array.prototype.every.call(boxen, function (b) { return b.checked; }); }
+  alle.addEventListener("change", function () { boxen.forEach(function (b) { b.checked = alle.checked; }); });
+  boxen.forEach(function (b) { b.addEventListener("change", stand); });
+  stand();
+});
+</script>
+{% endblock %}

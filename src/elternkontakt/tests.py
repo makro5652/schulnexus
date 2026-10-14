@@ -2,7 +2,6 @@
 import re
 from datetime import date, timedelta
 
-from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.core import mail
 from django.core.checks import run_checks
@@ -413,6 +412,8 @@ class ElternportalTest(Grundlage):
         self.assertRedirects(r, reverse("elternportal"))
         r = self.client.get(reverse("elternportal"))
         self.assertContains(r, "Portalnachricht")
+        self.assertContains(r, "melden Sie sich nach der Nutzung ab")
+        self.assertNotContains(r, "Link nicht weiter")
         self.assertNotContains(r, "Fremd")
         self.assertEqual(self.client.get(reverse("elternportal_gespraech", args=[self.g.pk])).status_code, 200)
         self.assertEqual(self.client.get(reverse("elternportal_gespraech", args=[self.fremd_g.pk])).status_code, 404)

@@ -21,6 +21,7 @@ FINANZEN = "Finanzen"
 FOERDERKOORDINATION = "Förderkoordination"
 SCHUELER = "Schüler:in"
 ELTERN = "Eltern"
+IT = "IT-Administration"
 
 # Frühere Gruppennamen (bis Version 0.4.2.2) – werden per Migration umbenannt.
 ALTE_NAMEN = {"Lehrkraft": LEHRER, "Verwaltung": SEKRETARIAT, "Personalverwaltung": HR}
@@ -29,7 +30,7 @@ ANZEIGE = {
     LEHRER: _("Lehrer:in"), MITTELSTUFE: _("Mittelstufenkoordination"), OBERSTUFE: _("Oberstufenkoordination"),
     SCHULLEITUNG: _("Schulleitung"), SEKRETARIAT: _("Sekretariat"), VERWALTUNGSLEITUNG: _("Verwaltungsleitung"),
     HR: _("HR-Management"), FINANZEN: _("Finanzen"), FOERDERKOORDINATION: _("Förderkoordination"),
-    SCHUELER: _("Schüler:in"), ELTERN: _("Eltern"),
+    SCHUELER: _("Schüler:in"), ELTERN: _("Eltern"), IT: _("IT-Administration"),
 }
 
 BESCHREIBUNG = {
@@ -53,11 +54,14 @@ BESCHREIBUNG = {
                 "Anhänge der Kategorie Verwaltung, Neuanmeldungen lesen mit Checkliste, Kontakten und Unterlagen. Keine Noten, keine Förder- und Gesundheitsdaten. Ein Finanzmodul folgt später."),
     FOERDERKOORDINATION: _("Alle Förderpläne und Nachteilsausgleiche der Schule, Genehmigung, Kataloge, Schülerakten lesend."),
     SCHUELER: _("Vorbereitet für den späteren Stundenplan. Derzeit kein Zugang zum Portal."),
-    ELTERN: _("Vorbereitet für die spätere Elternkommunikation. Derzeit kein Zugang zum Portal."),
+    ELTERN: _("Elternportal mit eigener Anmeldung (vorbereitet, standardmäßig abgeschaltet): eigene Nachrichten lesen, "
+              "bestätigen und beantworten. Ohne Portal erhalten Eltern Nachrichten über persönliche Links."),
+    IT: _("Administration mit Vollzugriff: alle Daten und Einstellungen, Benutzerkonten, Rollen und Einzelrechte "
+          "(erteilen und entziehen), Sicherung, Wiederherstellung und PDF-Export."),
 }
 
 REIHENFOLGE = [LEHRER, MITTELSTUFE, OBERSTUFE, SCHULLEITUNG, SEKRETARIAT, VERWALTUNGSLEITUNG, HR, FINANZEN,
-               FOERDERKOORDINATION, SCHUELER, ELTERN]
+               FOERDERKOORDINATION, IT, SCHUELER, ELTERN]
 
 ALLE = ("add", "change", "view", "delete")
 
@@ -121,6 +125,7 @@ ROLLEN_RECHTE = {
     MITTELSTUFE: _STUFE | _AUFNAHME_STUFE,
     OBERSTUFE: _STUFE | _AUFNAHME_STUFE,
     SCHULLEITUNG: "__alle__",
+    IT: "__alle__",
     SEKRETARIAT: _SEKRETARIAT,
     VERWALTUNGSLEITUNG: _SEKRETARIAT | _REGELN | r(ALLE, *_KATALOGE) | _HR | r(ALLE, "user", "group") | {"view_permission"},
     HR: _HR,
@@ -136,10 +141,10 @@ FOERDERKOORDINATION_EXTRA = (r("view", "person", "schuelerprofil", "gruppe", "mi
                              | r(ALLE, "dokument"))
 
 # Apps, deren Rechte über Rollen vergeben werden
-APPS = ["stammdaten", "noten", "fehlzeiten", "nachmittag", "foerderung", "aufnahme", "zeugnisse", "elternkontakt", "auth"]
+APPS = ["stammdaten", "noten", "fehlzeiten", "nachmittag", "foerderung", "aufnahme", "zeugnisse", "elternkontakt", "sicherung", "auth"]
 
 # Rollen, die im Portal arbeiten (Beschäftigte). Schüler:innen und Eltern erhalten später eigene Oberflächen.
-PORTAL_ROLLEN = {LEHRER, MITTELSTUFE, OBERSTUFE, SCHULLEITUNG, SEKRETARIAT, VERWALTUNGSLEITUNG, HR, FINANZEN, FOERDERKOORDINATION}
+PORTAL_ROLLEN = {LEHRER, MITTELSTUFE, OBERSTUFE, SCHULLEITUNG, SEKRETARIAT, VERWALTUNGSLEITUNG, HR, FINANZEN, FOERDERKOORDINATION, IT}
 
 
 # ---------------------------------------------------------------- Übersicht (Seite „Rollen und Rechte“)
@@ -162,6 +167,8 @@ BEREICHE = [
     ("finanzen", _("Finanzen / Rechnungsempfänger")),
     ("einstellungen", _("Schuljahre, Fächer, Notenskalen")),
     ("benutzer", _("Benutzerkonten und Rollen")),
+    ("einzelrechte", _("Einzelrechte erteilen und entziehen")),
+    ("sicherung", _("Sicherung, Wiederherstellung, PDF-Export")),
 ]
 
 MATRIX = {
@@ -183,6 +190,10 @@ MATRIX = {
     SCHUELER: {k: "" for k, _n in BEREICHE},
     ELTERN: {k: "" for k, _n in BEREICHE},
 }
+MATRIX[IT] = {k: "ja" for k, _n in BEREICHE}
+for _rolle, _werte in MATRIX.items():          # neue Bereiche: nur Schulleitung (Sicherung) und IT
+    _werte.setdefault("einzelrechte", "ja" if _rolle == IT else "")
+    _werte.setdefault("sicherung", "ja" if _rolle in (SCHULLEITUNG, IT) else "")
 MATRIX[OBERSTUFE] = dict(MATRIX[MITTELSTUFE])
 
 WERTE = {"ja": _("ja"), "teils": _("Checkliste"), "teils_ek": _("Zeugnis/Fehlzeiten"), "lesen": _("lesen"), "eigene": _("eigene"), "stufe": _("Stufe"), "": "–"}

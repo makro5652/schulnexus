@@ -92,7 +92,7 @@
   </form>
   {% for e in eintraege %}
     <div class="kontakt">
-      <strong>{{ e.datum|kurzdatum }}</strong> · {{ e.get_art_display }} <span class="leise">· {{ e.verfasst_von.person.anzeigename|default:e.verfasst_von.get_username|default:"—" }}</span>
+      <strong>{{ e.datum|kurzdatum }}</strong> · {{ e.get_art_display }} <span class="leise">· {{ e.verfasst_von|benutzername:"—" }}</span>
       <div>{{ e.text|linebreaksbr }}</div>
     </div>
   {% empty %}<p class="leer">{% translate "Noch keine Einträge." %}</p>{% endfor %}

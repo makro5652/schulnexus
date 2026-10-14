@@ -21,6 +21,7 @@ urlpatterns = [
     path("zeugnisse/", include("zeugnisse.urls")),
     path("elternkontakt/", include("elternkontakt.urls")),
     path("eltern/", include("elternkontakt.urls_eltern")),
+    path("system/", include("sicherung.urls")),
     path("suche/", startseite.suche, name="suche"),
     path("stufe/<slug:schluessel>/", startseite.stufe, name="stufe"),
     path("rollen/", startseite.rollenuebersicht, name="rollen"),

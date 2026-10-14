@@ -10,8 +10,8 @@ from django.utils.translation import gettext as _, pgettext
 from elternkontakt.rechte import darf_regeln
 
 from .rechte import (
-    ist_finanzen, ist_foerderkoordination, ist_personalverwaltung, ist_schulleitung, ist_systemverwaltung, ist_verwaltung,
-    personal_von,
+    darf_sichern, ist_finanzen, ist_foerderkoordination, ist_it, ist_personalverwaltung, ist_schulleitung, ist_systemverwaltung,
+    ist_verwaltung, personal_von,
 )
 
 
@@ -257,7 +257,14 @@ def menueband(request):
         .add(_("Benutzerkonten"), _url("admin:auth_user_changelist"), "schluessel", gross=True, bedingung=p("auth.view_user"))
         .add(_("Rollen"), _url("admin:auth_group_changelist"), "schild", bedingung=p("auth.view_group"))
         .add(_("Rollen und Rechte"), _url("rollen"), "liste", bedingung=ist_systemverwaltung(user),
-             hinweis=_("Übersicht: welche Rolle was darf")),
+             hinweis=_("Übersicht: welche Rolle was darf"))
+        .add(_("Einzelrechte"), _url("benutzerverwaltung"), "person_plus", bedingung=ist_it(user),
+             hinweis=_("Rollen und Einzelrechte je Konto erteilen oder entziehen")),
+        Gruppe(_("System"))
+        .add(_("Sicherung"), _url("sicherungen"), "archiv", gross=True, bedingung=darf_sichern(user),
+             hinweis=_("Module sichern und wiederherstellen"))
+        .add(_("PDF-Export"), _url("pdf_export"), "pdf", bedingung=darf_sichern(user), hinweis=_("Daten eines Zeitraums als PDF"))
+        .add(_("Protokoll"), _url("systemprotokoll"), "liste", bedingung=darf_sichern(user) or ist_it(user)),
     )
 
     karten = [k for k in (start, schueler, unterricht, foerderung, personal_karte, finanzen_karte, verwaltung_karte) if k]
@@ -274,7 +281,7 @@ def menueband(request):
 
 PFAD_REGELN = [("/klassen/", "schueler"), ("/schueler/", "schueler"), ("/stufe/", "schueler"), ("/zuordnung/", "schueler"), ("/aufnahme/", "schueler"), ("/elternkontakt/", "schueler"),
                ("/noten/", "unterricht"), ("/zeugnisse/", "unterricht"),
-               ("/rollen/", "verwaltung"),
+               ("/rollen/", "verwaltung"), ("/system/", "verwaltung"),
                ("/foerderung/", "foerderung"), ("/verwaltung/", "verwaltung")]
 
 

@@ -21,11 +21,12 @@ services:
     network_mode: none
     entrypoint: ["/bin/sh", "-c"]
     command: >-
-      mkdir -p /daten/dokumente /sicherungen &&
-      chown -R ${PUID:-99}:${PGID:-100} /daten/dokumente /sicherungen &&
-      chmod 750 /daten/dokumente /sicherungen
+      mkdir -p /daten/dokumente /daten/modulsicherungen /sicherungen &&
+      chown -R ${PUID:-99}:${PGID:-100} /daten/dokumente /daten/modulsicherungen /sicherungen &&
+      chmod 750 /daten/dokumente /daten/modulsicherungen /sicherungen
     volumes:
       - ${APPDATA:?Bitte APPDATA in unraid/.env setzen}/dokumente:/daten/dokumente
+      - ${APPDATA}/modulsicherungen:/daten/modulsicherungen
       - ${APPDATA}/sicherungen:/sicherungen
 
   db:
@@ -63,9 +64,11 @@ services:
     environment:
       DATABASE_URL: postgres://${DB_BENUTZER:-schule}:${DB_PASSWORT}@db:5432/${DB_NAME:-schulverwaltung}
       MEDIA_ROOT: /daten/dokumente
+      MODUL_SICHERUNGEN: /daten/modulsicherungen
       HOME: /tmp
     volumes:
       - ${APPDATA}/dokumente:/daten/dokumente
+      - ${APPDATA}/modulsicherungen:/daten/modulsicherungen
 
   sicherung:
     image: postgres:16-alpine

@@ -42,6 +42,16 @@ def ist_schulleitung(user) -> bool:
     return _in_gruppen(user, LEITUNGSGRUPPEN)
 
 
+def ist_it(user) -> bool:
+    """IT-Administration (oder Superuser): Benutzer, Rollen und Einzelrechte verwalten."""
+    return _in_gruppen(user, {R.IT})
+
+
+def darf_sichern(user) -> bool:
+    """Sicherung, Wiederherstellung und PDF-Export: Schulleitung und IT."""
+    return _in_gruppen(user, {R.SCHULLEITUNG, R.IT})
+
+
 def ist_finanzen(user) -> bool:
     return _in_gruppen(user, FINANZGRUPPEN)
 

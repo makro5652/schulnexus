@@ -11,13 +11,18 @@ WORKDIR /app
 # Eigener, unprivilegierter Benutzer statt root
 RUN useradd --create-home --uid 1000 schule
 
+# Schrift mit vollständigem Zeichensatz für den PDF-Export (Namen mit Sonderzeichen)
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends fonts-dejavu-core \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 COPY src/ /app/
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh \
-    && mkdir -p /app/staticfiles /daten/dokumente \
+    && mkdir -p /app/staticfiles /daten/dokumente /daten/modulsicherungen \
     && SECRET_KEY=build-only python manage.py collectstatic --noinput \
     && chown -R schule:schule /app /daten
 

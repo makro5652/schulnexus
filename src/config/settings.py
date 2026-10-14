@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "aufnahme",
     "zeugnisse",
     "elternkontakt",
+    "sicherung",
     "portal",
 ]
 
@@ -170,6 +171,23 @@ SCHULNAME = os.environ.get("SCHULNAME", "Deutsche Schule Nairobi")
 SCHULORT = os.environ.get("SCHULORT", "Nairobi")
 # Fehltage auf dem Zeugnis ausweisen (im KMK-Muster nicht vorgesehen; 1 = ja)
 ZEUGNIS_FEHLZEITEN = env_bool("ZEUGNIS_FEHLZEITEN", False)
+
+# ---------------------------------------------------------------- Sicherung, Wiederherstellung, PDF-Export (ab 0.4.3.0)
+# Ablage der Modulsicherungen und PDF-Exporte – muss auf einem dauerhaften Datenträger liegen (Docker: eigenes Volume).
+MODUL_SICHERUNGEN = Path(os.environ.get("MODUL_SICHERUNGEN", BASE_DIR / "modulsicherungen"))
+if TESTLAUF:
+    import tempfile
+
+    MODUL_SICHERUNGEN = Path(tempfile.mkdtemp(prefix="sv-test-sicherungen-"))
+SICHERUNG_UPLOAD_MAX_MB = int(os.environ.get("SICHERUNG_UPLOAD_MAX_MB", "500"))
+SICHERUNG_BEHALTEN_AUTOMATISCH = int(os.environ.get("SICHERUNG_BEHALTEN_AUTOMATISCH", "14"))
+# PDF-Export: höchstens so viele Einträge je PDF-Datei; mehr werden auf mehrere Dateien verteilt
+PDF_EINTRAEGE_JE_DATEI = int(os.environ.get("PDF_EINTRAEGE_JE_DATEI", "1500"))
+# PDF-Exporte im Hintergrund erstellen (in Tests sofort)
+SICHERUNG_HINTERGRUND = not TESTLAUF
+
+# Einzelnen Konten können Rechte ihrer Rollen entzogen werden (Benutzer und Rechte)
+AUTHENTICATION_BACKENDS = ["portal.backends.RechteBackend"]
 
 # ---------------------------------------------------------------- Elternkommunikation (ab 0.4.2.9)
 # Eltern erhalten eine E-Mail mit einem persönlichen, befristeten Link (ohne Konto): lesen, bestätigen, antworten.

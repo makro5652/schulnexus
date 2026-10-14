@@ -1,0 +1,81 @@
+{% extends "portal/base.html" %}
+{% load i18n %}
+{% block title %}{{ u.username }} · {% translate "Benutzer und Rechte" %}{% endblock %}
+{% block inhaltsklasse %}breit{% endblock %}
+{% block inhalt %}
+{% translate "Benutzer und Rechte" as titel %}{% include "sicherung/_kopf.html" %}
+<h2 class="sy-ueberschrift">{{ u.username }}{% if u.person %} <span class="leise">· {{ u.person.anzeigename }}</span>{% endif %}
+  {% if vollzugriff %}<span class="etikett warnend">{% translate "Vollzugriff" %}</span>{% endif %}
+  {% if not u.is_active %}<span class="etikett warnend">{% translate "gesperrt" %}</span>{% endif %}</h2>
+
+{% if neues_passwort %}
+<section class="karte sy-passwort">
+  <p>{% blocktranslate with name=u.username %}Neues vorläufiges Passwort für {{ name }}:{% endblocktranslate %}</p>
+  <p class="sy-pw">{{ neues_passwort }}</p>
+  <p class="hinweistext">{% translate "Es wird nur jetzt angezeigt. Bitte persönlich übergeben und die Person bitten, es nach der ersten Anmeldung unter „Passwort ändern“ zu ersetzen." %}</p>
+</section>
+{% endif %}
+
+<div class="sy-raster">
+  <section class="karte">
+    <h3>{% translate "Rollen" %}</h3>
+    <form method="post">{% csrf_token %}<input type="hidden" name="aktion" value="konto">
+      {% for r in rollen %}
+      <label class="ek-empf"><input type="checkbox" name="rollen" value="{{ r.name }}"{% if r.aktiv %} checked{% endif %}>
+        <span><strong>{{ r.anzeige }}</strong><small class="blockzeile leise">{{ r.beschreibung }}</small></span></label>
+      {% endfor %}
+      <label class="haken sy-aktiv"><input type="checkbox" name="aktiv" value="1"{% if u.is_active %} checked{% endif %}> {% translate "Konto aktiv (nicht gesperrt)" %}</label>
+      <button type="submit" class="knopf">{% translate "Rollen speichern" %}</button>
+    </form>
+  </section>
+  <section class="karte">
+    <h3>{% translate "Konto" %}</h3>
+    <dl class="daten">
+      <dt>{% translate "Letzte Anmeldung" %}</dt><dd>{{ u.last_login|date:"SHORT_DATETIME_FORMAT"|default:"–" }}</dd>
+      <dt>{% translate "Angelegt" %}</dt><dd>{{ u.date_joined|date:"SHORT_DATE_FORMAT" }}</dd>
+      <dt>{% translate "E-Mail" %}</dt><dd>{{ email|default:"–" }}</dd>
+    </dl>
+    <form method="post" onsubmit="return confirm('{% translate "Ein neues Passwort erzeugen? Das bisherige gilt dann nicht mehr." as frage %}{{ frage|escapejs }}')">{% csrf_token %}
+      <input type="hidden" name="aktion" value="passwort">
+      <button type="submit" class="knopf zweitrangig">{% translate "Passwort zurücksetzen" %}</button></form>
+    <p class="hinweistext">{% translate "Die Rolle IT-Administration gibt Vollzugriff auf alle Daten. Für Konten mit Vollzugriff gelten Einzelrechte nicht." %}</p>
+  </section>
+</div>
+
+<section class="karte sy-rechte">
+  <h3>{% translate "Einzelrechte" %}</h3>
+  <p class="hinweistext">{% translate "„ja (Rolle)“ bzw. „nein“ ist der Stand aus den Rollen. Mit „+ erteilen“ erhält das Konto ein Recht zusätzlich, mit „− entziehen“ verliert es ein Recht trotz seiner Rolle. Sichtbarkeitsregeln nach Klasse und Stufe (z. B. Klassenleitung) bleiben davon unberührt." %}</p>
+  <form method="post">{% csrf_token %}<input type="hidden" name="aktion" value="rechte">
+    {% for app in tabelle %}
+    <details class="sy-app"{% if app.geaendert %} open{% endif %}>
+      <summary><strong>{{ app.name }}</strong>{% if app.geaendert %} <span class="etikett">{% blocktranslate count n=app.geaendert %}{{ n }} Änderung{% plural %}{{ n }} Änderungen{% endblocktranslate %}</span>{% endif %}</summary>
+      <div class="rollbar">
+      <table class="liste sy-rechtetabelle">
+        <thead><tr><th>{% translate "Bereich" %}</th>{% for a in aktionen %}<th>{{ a }}</th>{% endfor %}</tr></thead>
+        <tbody>
+        {% for name, zellen in app.zeilen %}
+          <tr><th scope="row">{{ name }}</th>
+            {% for z in zellen %}<td>{% if z %}
+              <select name="r_{{ z.perm.pk }}" class="sy-wahl{% if z.zustand %} sy-wahl-{% if z.zustand == '+' %}plus{% else %}minus{% endif %}{% endif %}" aria-label="{{ name }}: {{ z.perm.name }}">
+                <option value="">{% if z.rolle %}{% translate "ja (Rolle)" %}{% else %}{% translate "nein" %}{% endif %}</option>
+                {% if not z.rolle %}<option value="+"{% if z.zustand == "+" %} selected{% endif %}>{% translate "+ erteilen" %}</option>{% endif %}
+                {% if z.rolle %}<option value="-"{% if z.zustand == "-" %} selected{% endif %}>{% translate "− entziehen" %}</option>{% endif %}
+              </select>{% endif %}</td>{% endfor %}</tr>
+        {% endfor %}
+        {% for z in app.sonder %}
+          <tr class="sy-sonder"><th scope="row" colspan="3">{{ z.name }}</th><td colspan="2">
+            <select name="r_{{ z.perm.pk }}" class="sy-wahl{% if z.zustand %} sy-wahl-{% if z.zustand == '+' %}plus{% else %}minus{% endif %}{% endif %}" aria-label="{{ z.name }}">
+              <option value="">{% if z.rolle %}{% translate "ja (Rolle)" %}{% else %}{% translate "nein" %}{% endif %}</option>
+              {% if not z.rolle %}<option value="+"{% if z.zustand == "+" %} selected{% endif %}>{% translate "+ erteilen" %}</option>{% endif %}
+              {% if z.rolle %}<option value="-"{% if z.zustand == "-" %} selected{% endif %}>{% translate "− entziehen" %}</option>{% endif %}
+            </select></td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      </div>
+    </details>
+    {% endfor %}
+    <button type="submit" class="knopf">{% translate "Einzelrechte speichern" %}</button>
+  </form>
+</section>
+{% endblock %}

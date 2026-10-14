@@ -21,7 +21,7 @@
 {% if a.abgeschlossen %}
 <div class="an-banner ok">
   <strong>{% translate "Übernommen" %}</strong>
-  {% blocktranslate with datum=a.uebernommen_am|date:"SHORT_DATE_FORMAT" wer=a.uebernommen_von.get_full_name|default:a.uebernommen_von.get_username %}am {{ datum }} von {{ wer }}{% endblocktranslate %}.
+  {% blocktranslate with datum=a.uebernommen_am|date:"SHORT_DATE_FORMAT" wer=a.uebernommen_von|benutzername %}am {{ datum }} von {{ wer }}{% endblocktranslate %}.
   {% if a.schueler %}<a href="{% url 'schuelerakte' a.schueler.pk %}">{% blocktranslate with name=a.schueler.person.anzeigename nr=a.schueler.schuelernummer %}Zur Schülerakte von {{ name }} (Nr. {{ nr }}){% endblocktranslate %}</a>{% endif %}
   <span class="leise blockzeile">{% translate "Die Bewerbungsakte ist abgeschlossen und kann nicht mehr geändert werden." %}</span>
 </div>
@@ -70,7 +70,7 @@
             {% if p.pflicht %}<span class="an-pflicht" title="{% translate 'Muss vor der Übernahme erledigt sein' %}">{% translate "Pflicht" %}</span>{% endif %}
             {% if p.zustaendig %}<span class="etikett{% if p.meins %} meins{% endif %}"{% if p.meins %} title="{% translate 'Ihre Zuständigkeit' %}"{% endif %}>{{ p.get_zustaendig_display }}</span>{% endif %}
             {% if p.erledigt or p.bemerkung %}<small class="leise blockzeile">
-              {% if p.erledigt %}{% blocktranslate with datum=p.erledigt_am|date:"SHORT_DATE_FORMAT" wer=p.erledigt_von.person.anzeigename|default:p.erledigt_von.get_username %}erledigt am {{ datum }} · {{ wer }}{% endblocktranslate %}{% endif %}{% if p.erledigt and p.bemerkung %} · {% endif %}{% if p.bemerkung %}<em>{{ p.bemerkung }}</em>{% endif %}</small>{% endif %}
+              {% if p.erledigt %}{% blocktranslate with datum=p.erledigt_am|date:"SHORT_DATE_FORMAT" wer=p.erledigt_von|benutzername %}erledigt am {{ datum }} · {{ wer }}{% endblocktranslate %}{% endif %}{% if p.erledigt and p.bemerkung %} · {% endif %}{% if p.bemerkung %}<em>{{ p.bemerkung }}</em>{% endif %}</small>{% endif %}
           </div>
           {% if darf.abhaken %}
           <details class="an-punkt-menue">
@@ -132,7 +132,7 @@
         <tbody>
         {% for d in dateien %}
           <tr>
-            <td class="nowrap">{{ d.hochgeladen_am|date:"SHORT_DATETIME_FORMAT" }}<small class="leise blockzeile">{{ d.hochgeladen_von.person.anzeigename|default:d.hochgeladen_von.get_username|default:"" }}</small></td>
+            <td class="nowrap">{{ d.hochgeladen_am|date:"SHORT_DATETIME_FORMAT" }}<small class="leise blockzeile">{{ d.hochgeladen_von|benutzername:"" }}</small></td>
             <td><strong>{{ d.titel }}</strong><small class="leise blockzeile">{{ d.get_kategorie_display }}</small>{% if d.notiz %}<small class="notiz">{{ d.notiz }}</small>{% endif %}</td>
             <td class="nowrap">{% if d.inline_moeglich %}<a href="{% url 'aufnahme_datei' d.pk %}?ansehen=1" target="_blank" rel="noopener">{% translate "Öffnen" %}</a> · {% endif %}<a href="{% url 'aufnahme_datei' d.pk %}">{% translate "Herunterladen" %}</a>
               <small class="leise blockzeile">{{ d.dateiendung }} · {{ d.groesse_lesbar }}</small></td>

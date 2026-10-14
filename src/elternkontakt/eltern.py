@@ -95,7 +95,8 @@ def portal_start(request):
     eintraege = (Empfaenger.objects.filter(person=person).select_related("gespraech__schueler__person")
                  .order_by("-gespraech__letzte_aktivitaet"))
     with translation.override(_sprache(request, person)):
-        return _absichern(render(request, "elternkontakt/eltern_portal.html", {"eintraege": eintraege, "person": person}))
+        return _absichern(render(request, "elternkontakt/eltern_portal.html", {"eintraege": eintraege, "person": person,
+                                                                                       "portal": True}))
 
 
 @login_required

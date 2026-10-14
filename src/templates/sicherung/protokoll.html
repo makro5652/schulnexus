@@ -1,0 +1,23 @@
+{% extends "portal/base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Protokoll" %}{% endblock %}
+{% block inhaltsklasse %}breit{% endblock %}
+{% block inhalt %}
+{% translate "Protokoll" as titel %}{% include "sicherung/_kopf.html" %}
+<form method="get" class="filterzeile an-filter">
+  <label>{% translate "Aktion" %}
+    <select name="aktion" onchange="this.form.submit()"><option value="">{% translate "alle" %}</option>
+      {% for k, name in aktionen %}<option value="{{ k }}"{% if aktion == k %} selected{% endif %}>{{ name }}</option>{% endfor %}</select></label>
+</form>
+<div class="tabellenrahmen">
+<table class="liste">
+  <thead><tr><th>{% translate "Zeit" %}</th><th>{% translate "Benutzer:in" %}</th><th>{% translate "Aktion" %}</th><th>{% translate "Beschreibung" %}</th></tr></thead>
+  <tbody>
+  {% for e in eintraege %}
+    <tr><td class="nowrap">{{ e.zeit|date:"SHORT_DATETIME_FORMAT" }}</td><td>{{ e.benutzername|default:"–" }}</td>
+      <td class="nowrap">{{ e.get_aktion_display }}</td><td><small>{{ e.text }}</small></td></tr>
+  {% empty %}<tr><td colspan="4" class="leer">{% translate "Noch keine Einträge." %}</td></tr>{% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

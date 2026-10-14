@@ -1,4 +1,4 @@
-# Schulverwaltung (Version 0.4.2.9, Entwicklungsstand)
+# Schulverwaltung (Version 0.4.3.0, Entwicklungsstand)
 
 Open-Source-Schulverwaltung für die DSN: Stammdaten, Klassen und Lerngruppen,
 Noten mit Gewichtung, Fehlzeiten, Nachmittagsprogramm, Anhänge zur Schülerakte,
@@ -37,7 +37,8 @@ http://localhost:8000. Die Zugangsdaten stehen in der Datei `.env`
 | `personal` | HR-Management | `DEMO_PASSWORT` in `.env` |
 | `finanzen` | Finanzen | `DEMO_PASSWORT` in `.env` |
 | `foerderung` | Förderkoordination (zugleich Klassenleitung 9b) | `DEMO_PASSWORT` in `.env` |
-| `schueler`, `eltern` | vorbereitet, derzeit **kein** Portalzugang | `DEMO_PASSWORT` in `.env` |
+| `it` | IT-Administration (Vollzugriff, Benutzer und Einzelrechte, Sicherung) | `DEMO_PASSWORT` in `.env` |
+| `schueler`, `eltern` | kein Portalzugang (`eltern` nur mit eingeschaltetem Elternportal) | `DEMO_PASSWORT` in `.env` |
 
 ## Klassen und Gruppen zuordnen
 
@@ -200,7 +201,16 @@ unter **Verwaltung › Rollen und Rechte** (für Verwaltungsleitung und Schullei
 | HR-Management | Personal aller Bereiche inkl. Dienstverhältnis, Nachweise, Abwesenheiten |
 | Finanzen | Rechnungsempfänger, Eltern- und Schülerstammdaten (lesend), Dienstleister, Vertragsunterlagen; Neuanmeldungen lesen und Checkliste abhaken |
 | Förderkoordination | alle Förderpläne und Nachteilsausgleiche, Genehmigung, Kataloge |
-| Schüler:in, Eltern | vorbereitet für Stundenplan bzw. Elternkommunikation; derzeit kein Zugang |
+| IT-Administration | Vollzugriff (Superuser): alle Daten, Benutzerkonten, Rollen und Einzelrechte, Sicherung, Wiederherstellung, PDF-Export |
+| Schüler:in, Eltern | vorbereitet für Stundenplan bzw. Elternportal; derzeit kein Zugang |
+
+**Einzelrechte (ab 0.4.3.0):** Unter **Verwaltung › System › Benutzer und Rechte** (nur IT) lassen sich je Konto
+Rollen setzen, das Konto sperren, ein vorläufiges Passwort erzeugen und einzelne Rechte zusätzlich **erteilen** oder trotz
+Rolle **entziehen** (je Bereich: ansehen, anlegen, ändern, löschen, dazu Sonderrechte). Die Vergabe der Rolle
+IT-Administration macht das Konto zum Administrator; man kann sie sich nicht selbst entziehen und das eigene Konto nicht
+sperren. Alle Änderungen stehen im Protokoll. Einschränkung: Entzogene Rechte wirken überall dort, wo Modellrechte
+geprüft werden (Menüband, Verwaltungsoberfläche, Bearbeiten). Die Sichtbarkeitsregeln nach Klasse und Stufe
+(z. B. „Klassenleitung sieht die Akte ihrer Klasse“) hängen an der Rolle und bleiben bestehen.
 
 Die Jahrgänge der Stufen stehen in der `.env` (`MITTELSTUFE=5-10`, `OBERSTUFE=11-12`).
 Rechte werden beim Start nur ergänzt, nie entfernt – eigene Anpassungen bleiben erhalten.
@@ -210,6 +220,34 @@ Auf die Standardrechte zurücksetzen:
 Beim Update von älteren Versionen werden die Gruppen umbenannt (Lehrkraft → Lehrer:in,
 Verwaltung → Sekretariat, Personalverwaltung → HR-Management); die Mitglieder bleiben erhalten.
 Das Sekretariat erhält dabei die neuen, engeren Standardrechte.
+
+## Sicherung, Wiederherstellung und PDF-Export
+
+**Menüband › Verwaltung › System** – nur Schulleitung und IT-Administration.
+
+- **Sicherung je Modul:** Stammdaten, Unterricht und Noten, Fehlzeiten, Nachmittag/AGs, Förderung, Neuanmeldungen,
+  Zeugnisse und Konferenzen, Elternkommunikation, Startseite/Einstellungen, Benutzerkonten und Rollen – einzeln oder
+  alle zusammen, auf Wunsch mit den hochgeladenen Dateien. Jede Sicherung ist eine ZIP-Datei (Daten als JSON,
+  Prüfsummen, Programmversion) zum Herunterladen; Sicherungen anderer Systeme lassen sich hochladen und werden geprüft.
+- **Wiederherstellen** setzt die gewählten Module auf den Stand der Sicherung zurück. Die **Vorschau** zeigt je Modul,
+  was neu angelegt, überschrieben und gelöscht wird, und welche Daten **anderer Module** dadurch mitbetroffen sind
+  (z. B. Fehlzeiten einer seither neu aufgenommenen Schülerin beim Zurücksetzen der Stammdaten). Fehlen Bezüge
+  (z. B. Noten zu einer inzwischen gelöschten Schülerin), wird die Wiederherstellung verweigert – dann beide Module
+  gemeinsam wiederherstellen. Bestätigung per Häkchen und Eingabe von „WIEDERHERSTELLEN“. **Vor jeder Wiederherstellung
+  entsteht automatisch eine Gesamtsicherung.** Wiederherstellen ist nur mit derselben Programmversion (Datenbankstand)
+  möglich, mit der gesichert wurde. Das eigene Konto bleibt beim Zurücksetzen der Benutzerkonten erhalten.
+- **PDF-Export:** Module wählen, Zeitraum (aktuelles Halbjahr, Schuljahr, letzte 30 Tage, eigener Zeitraum oder ohne
+  Begrenzung), Aufteilung (automatisch, je Monat, je Halbjahr, keine). Einträge mit Datum (Fehlzeiten, Noten,
+  Nachrichten, Zeugnisse …) werden nach dem Zeitraum gefiltert; Einträge ohne Datum (Personen, Klassen, Kataloge)
+  erscheinen als „Bestand“ in eigener Datei; optional das Änderungsprotokoll. Höchstens `PDF_EINTRAEGE_JE_DATEI`
+  Einträge (Standard 1500) je Datei, darüber „Teil 1 von n“. Herunterladen einzeln oder als ZIP. Passwörter und
+  Link-Schlüssel erscheinen nie im PDF. Die PDFs werden im Hintergrund erstellt; die Seite aktualisiert sich selbst.
+- **Protokoll:** Sicherungen, Downloads, Wiederherstellungen, PDF-Exporte, Rechte- und Kontoänderungen mit Zeit und Person.
+- **Ablage:** `MODUL_SICHERUNGEN` (Docker: Volume `modulsicherungen`, Unraid: `${APPDATA}/modulsicherungen`).
+  Automatisch, z. B. täglich per Zeitplan: `python manage.py modulsicherung` (bewahrt `SICHERUNG_BEHALTEN_AUTOMATISCH`
+  Sicherungen auf). Die tägliche Gesamtsicherung der Datenbank (pg_dump, Unraid) bleibt davon unabhängig bestehen.
+- Sicherungen und PDFs enthalten personenbezogene Daten: heruntergeladene Dateien verschlüsselt und zugriffsgeschützt
+  aufbewahren.
 
 ## Noten mit Bewertungsordnern
 
@@ -435,6 +473,7 @@ und fehlende Beispiele (z. B. Neuanmeldungen) ergänzt. Checklisten-Vorlagen wer
 | Tests ausführen | `docker compose exec web python manage.py test` |
 | Elternpost versenden (nach dem Einschalten) | `docker compose exec web python manage.py elternpost_senden` |
 | Fehlzeitenregeln für alle prüfen | `docker compose exec web python manage.py fehlzeiten_pruefen` |
+| Modulsicherung aller Module | `docker compose exec web python manage.py modulsicherung` |
 
 ## Aufbau
 
@@ -447,6 +486,7 @@ und fehlende Beispiele (z. B. Neuanmeldungen) ergänzt. Checklisten-Vorlagen wer
 | `src/portal` | Startseite, Menüband, Notenübersicht, Klassenliste, Schülerakte, Stufenübersicht, Rollen (`rollen.py`) und Rechteprüfung (`rechte.py`), Sprachwahl, Demo-Daten |
 | `src/foerderung` | Förderpläne, Nachteilsausgleiche, Elternbestätigung |
 | `src/zeugnisse` | Zeugnisse, Kommentare mit Abzeichnung, Konferenzen; Versetzungsregeln in `versetzung.py` |
+| `src/sicherung` | Modulsicherung und Wiederherstellung (`archiv.py`), PDF-Export (`pdf.py`), Benutzer und Einzelrechte (`konten.py`), Protokoll |
 | `src/elternkontakt` | Elternkommunikation: Gespräche, Empfänger:innen, Links und E-Mail (`versand.py`), Fehlzeitenregeln (`pruefung.py`), Elternseite (`eltern.py`) |
 | `src/aufnahme` | Neuanmeldungen: Bewerbungsakte, Checklisten, Unterlagen, Übernahme (`uebernahme.py`), Rechte (`rechte.py`) |
 | `src/locale` | Übersetzungen (Englisch) |

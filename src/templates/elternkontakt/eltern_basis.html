@@ -14,6 +14,6 @@
     {% block sprachen %}{% endblock %}
   </header>
   <main class="ek-eltern-inhalt">{% block inhalt %}{% endblock %}</main>
-  <footer class="fuss">{% translate "Diese Seite ist nur für Sie bestimmt. Bitte geben Sie den Link nicht weiter." %}</footer>
+  <footer class="fuss">{% block fuss %}{% if portal %}{% translate "Diese Seite ist nur für Sie bestimmt. Bitte melden Sie sich nach der Nutzung ab, besonders an gemeinsam genutzten Geräten." %}{% else %}{% translate "Diese Seite ist nur für Sie bestimmt. Bitte geben Sie den Link nicht weiter." %}{% endif %}{% endblock %}</footer>
 </body>
 </html>

@@ -37,3 +37,16 @@ def langdatum(wert):
 def wochentag_datum(wert):
     """Donnerstag, 15. Oktober / Thursday 15 October"""
     return formats.date_format(wert, WOCHENTAG_DATUM.get(_sprache(), WOCHENTAG_DATUM["de"])) if wert else ""
+
+
+@register.filter
+def benutzername(benutzer, ersatz="–"):
+    """Anzeigename eines Benutzerkontos (Name der Person, sonst Benutzername) – auch wenn das Konto fehlt (None)."""
+    if not benutzer:
+        return ersatz
+    person = getattr(benutzer, "person", None) if hasattr(benutzer, "_meta") else None
+    try:
+        name = person.anzeigename if person else ""
+    except Exception:
+        name = ""
+    return name or benutzer.get_full_name() or benutzer.get_username()
