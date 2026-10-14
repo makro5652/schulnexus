@@ -4,14 +4,15 @@ import uuid
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.files.storage import FileSystemStorage
+from portal.krypto import VerschluesselterSpeicher
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext
 
 
-class GeschuetzterSpeicher(FileSystemStorage):
-    """Dateien liegen außerhalb des Webpfads; Links führen immer über die rechtegeprüfte Download-Ansicht."""
+class GeschuetzterSpeicher(VerschluesselterSpeicher):
+    """Dateien liegen außerhalb des Webpfads (verschlüsselt, sofern DATEN_SCHLUESSEL gesetzt ist);
+    Links führen immer über die rechtegeprüfte Download-Ansicht."""
 
     def url(self, name):
         return reverse("anhang_pfad", args=[name])

@@ -26,6 +26,8 @@
           <p class="mb-konto-kopf"><strong>{{ user.person.anzeigename|default:user.get_username }}</strong>
             <small>{{ MENUEBAND.rollen|join:", "|default:_("Konto") }}</small></p>
           {% if user.is_staff and user.has_usable_password %}<a href="{% url 'admin:password_change' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-schluessel"/></svg>{% translate "Passwort ändern" %}</a>{% endif %}
+          <a href="{% url 'sicherheit' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-schild"/></svg>{% translate "Sicherheit" %}</a>
+          <a href="{% url 'office' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-brief"/></svg>{% translate "Office" %}</a>
           <form method="post" action="{% url 'logout' %}">{% csrf_token %}
             <button type="submit"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-tuer"/></svg>{% translate "Abmelden" %}</button>
           </form>

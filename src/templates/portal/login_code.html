@@ -1,0 +1,17 @@
+{% extends "portal/base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Anmelden" %}{% endblock %}
+{% block inhalt %}
+<section class="karte anmeldung">
+  <h1>{% translate "Zweiter Schritt" %}</h1>
+  <p>{% blocktranslate with name=benutzer.get_username %}Bitte geben Sie den sechsstelligen Code aus Ihrer Authenticator-App für das Konto <strong>{{ name }}</strong> ein.{% endblocktranslate %}</p>
+  <form method="post">
+    {% csrf_token %}
+    <label>{{ form.code.label }} {{ form.code }}</label>
+    {% for e in form.code.errors %}<p class="fehler">{{ e }}</p>{% endfor %}
+    <button type="submit" class="knopf">{% translate "Bestätigen" %}</button>
+  </form>
+  <p class="hinweistext">{% translate "Telefon verloren? Melden Sie sich mit einem Ihrer Ersatzcodes an oder bitten Sie die IT, die Zwei-Faktor-Anmeldung zurückzusetzen." %}</p>
+  <p><a href="{% url 'login' %}">{% translate "Abbrechen" %}</a></p>
+</section>
+{% endblock %}

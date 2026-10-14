@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-14 19:34+0300\n"
+"POT-Creation-Date: 2026-10-14 20:15+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -55,8 +55,8 @@ msgid "Kategorie"
 msgstr "Category"
 
 #: aufnahme/ansichten.py:114 aufnahme/models.py:259 aufnahme/models.py:306
-#: foerderung/models.py:86 nachmittag/models.py:20 stammdaten/models.py:82
-#: stammdaten/models.py:455 stammdaten/models.py:730
+#: foerderung/models.py:86 nachmittag/models.py:20 portal/models.py:110
+#: stammdaten/models.py:82 stammdaten/models.py:455 stammdaten/models.py:730
 #: templates/aufnahme/anmeldung.html:130 templates/portal/_anhaenge.html:25
 #: termine/models.py:54 termine/models.py:147
 msgid "Titel"
@@ -104,7 +104,7 @@ msgstr[1] "%(n)s files saved."
 msgid "Änderungen an der Anmeldung %(nr)s gespeichert."
 msgstr "Changes to application %(nr)s saved."
 
-#: aufnahme/ansichten.py:375 sicherung/pdf.py:293
+#: aufnahme/ansichten.py:375 sicherung/pdf.py:295
 msgid "angelegt"
 msgstr "created"
 
@@ -176,7 +176,7 @@ msgstr ""
 msgid "%(name)s wurde als Schüler:in übernommen (Schülernummer %(nr)s)."
 msgstr "%(name)s has been enrolled as a student (student number %(nr)s)."
 
-#: aufnahme/apps.py:8 portal/navigation.py:115 portal/rollen.py:181
+#: aufnahme/apps.py:8 portal/navigation.py:118 portal/rollen.py:181
 #: sicherung/module.py:12 templates/aufnahme/_start.html:4
 #: templates/aufnahme/anmeldung.html:6 templates/aufnahme/formular.html:5
 #: templates/aufnahme/liste.html:3 templates/aufnahme/liste.html:8
@@ -184,20 +184,20 @@ msgstr "%(name)s has been enrolled as a student (student number %(nr)s)."
 msgid "Neuanmeldungen"
 msgstr "Admissions"
 
-#: aufnahme/models.py:29 fehlzeiten/models.py:47 portal/navigation.py:253
+#: aufnahme/models.py:29 fehlzeiten/models.py:47 portal/navigation.py:256
 #: portal/rollen.py:32
 msgid "Sekretariat"
 msgstr "School office"
 
-#: aufnahme/models.py:30 portal/navigation.py:272 portal/rollen.py:33
+#: aufnahme/models.py:30 portal/navigation.py:275 portal/rollen.py:33
 msgid "Finanzen"
 msgstr "Finance"
 
-#: aufnahme/models.py:31 portal/navigation.py:106
+#: aufnahme/models.py:31 portal/navigation.py:109
 msgid "Stufenkoordination"
 msgstr "Stage coordination"
 
-#: aufnahme/models.py:32 portal/navigation.py:224 portal/rollen.py:32
+#: aufnahme/models.py:32 portal/navigation.py:227 portal/rollen.py:32
 #: templates/laufbahn/_kopf.html:2
 msgid "Schulleitung"
 msgstr "School management"
@@ -221,7 +221,7 @@ msgstr "Name (English)"
 
 #: aufnahme/models.py:71 laufbahn/models.py:133 nachmittag/models.py:21
 #: noten/models.py:29 noten/models.py:80 noten/models.py:222
-#: sicherung/models.py:95 stammdaten/models.py:367 stammdaten/models.py:688
+#: sicherung/models.py:96 stammdaten/models.py:367 stammdaten/models.py:688
 #: templates/sicherung/protokoll.html:14 templates/termine/termin.html:47
 #: termine/models.py:64
 msgid "Beschreibung"
@@ -260,9 +260,9 @@ msgstr "Active"
 #: aufnahme/models.py:78 aufnahme/models.py:99 aufnahme/models.py:279
 #: aufnahme/models.py:350 foerderung/models.py:25 foerderung/models.py:44
 #: foerderung/models.py:155 noten/models.py:65 noten/models.py:221
-#: stammdaten/models.py:207 stammdaten/models.py:366 stammdaten/models.py:477
-#: stammdaten/models.py:796 stammdaten/models.py:862 stammdaten/models.py:1004
-#: zeugnisse/models.py:126
+#: portal/models.py:120 stammdaten/models.py:207 stammdaten/models.py:366
+#: stammdaten/models.py:477 stammdaten/models.py:796 stammdaten/models.py:862
+#: stammdaten/models.py:1004 zeugnisse/models.py:126
 msgid "Reihenfolge"
 msgstr "Order"
 
@@ -270,7 +270,7 @@ msgstr "Order"
 msgid "Checklisten-Vorlage"
 msgstr "Checklist template"
 
-#: aufnahme/models.py:82 portal/navigation.py:120
+#: aufnahme/models.py:82 portal/navigation.py:123
 msgid "Checklisten-Vorlagen"
 msgstr "Checklist templates"
 
@@ -315,7 +315,7 @@ msgstr "Under review"
 msgid "Warteliste"
 msgstr "Waiting list"
 
-#: aufnahme/models.py:119 portal/navigation.py:118
+#: aufnahme/models.py:119 portal/navigation.py:121
 msgid "Zugesagt"
 msgstr "Offer made"
 
@@ -700,7 +700,7 @@ msgid "Erledigt von"
 msgstr "Completed by"
 
 #: aufnahme/models.py:355 foerderung/models.py:319 laufbahn/ansichten.py:261
-#: laufbahn/models.py:134 sicherung/ansichten.py:69 sicherung/models.py:27
+#: laufbahn/models.py:134 sicherung/ansichten.py:71 sicherung/models.py:27
 #: stammdaten/models.py:382 stammdaten/models.py:426 stammdaten/models.py:835
 #: stammdaten/models.py:878 templates/aufnahme/anmeldung.html:81
 #: templates/portal/schuelerakte.html:90
@@ -1011,11 +1011,11 @@ msgid "Schüler:in"
 msgstr "Student"
 
 #: elternkontakt/models.py:34 fehlzeiten/models.py:53 foerderung/models.py:189
-#: laufbahn/models.py:131 sicherung/models.py:21 sicherung/pdf.py:232
+#: laufbahn/models.py:131 sicherung/models.py:21 sicherung/pdf.py:234
 #: stammdaten/models.py:420 stammdaten/models.py:531
 #: templates/elternkontakt/uebersicht.html:27
 #: templates/elternkontakt/uebersicht.html:39
-#: templates/sicherung/sicherungen.html:45 templates/termine/kalender.html:16
+#: templates/sicherung/sicherungen.html:48 templates/termine/kalender.html:16
 #: templates/termine/termin.html:42 termine/models.py:31 termine/models.py:56
 #: termine/models.py:146 zeugnisse/models.py:48 zeugnisse/models.py:182
 msgid "Art"
@@ -1041,7 +1041,7 @@ msgstr "Closed"
 msgid "Abgeschlossene Gespräche nehmen keine Antworten mehr an."
 msgstr "Closed conversations no longer accept replies."
 
-#: elternkontakt/models.py:44 portal/navigation.py:166
+#: elternkontakt/models.py:44 portal/navigation.py:169
 #: stammdaten/models.py:712 templates/zeugnisse/druck.html:6
 #: zeugnisse/models.py:79 zeugnisse/models.py:118 zeugnisse/models.py:137
 #: zeugnisse/models.py:158
@@ -1076,7 +1076,7 @@ msgstr "Change history: parent conversation"
 msgid "Elternnachricht"
 msgstr "Parent message"
 
-#: elternkontakt/models.py:55 portal/navigation.py:133
+#: elternkontakt/models.py:55 portal/navigation.py:136
 #: templates/elternkontakt/_akte.html:3 templates/elternkontakt/_start.html:4
 #: templates/elternkontakt/gespraech.html:5 templates/elternkontakt/neu.html:5
 #: templates/elternkontakt/neu_auswahl.html:5
@@ -1194,7 +1194,7 @@ msgstr "Parents (portal)"
 
 #: elternkontakt/models.py:135 sicherung/models.py:17
 #: templates/elternkontakt/uebersicht.html:53
-#: templates/sicherung/sicherungen.html:50
+#: templates/sicherung/sicherungen.html:53
 msgid "automatisch"
 msgstr "automatic"
 
@@ -1275,7 +1275,7 @@ msgid "Ab (Schwelle)"
 msgstr "From (threshold)"
 
 #: elternkontakt/models.py:201 elternkontakt/models.py:253
-#: fehlzeiten/admin.py:26 fehlzeiten/admin.py:30 sicherung/ansichten.py:175
+#: fehlzeiten/admin.py:26 fehlzeiten/admin.py:30 sicherung/ansichten.py:204
 #: templates/foerderung/_akte.html:36 templates/foerderung/plan.html:26
 #: templates/laufbahn/schuljahre.html:23 templates/portal/schuelerakte.html:90
 msgid "Zeitraum"
@@ -1561,12 +1561,12 @@ msgstr "Mark as unexcused"
 msgid "%(n)s Fehlzeiten als unentschuldigt markiert."
 msgstr "%(n)s absences marked as unexcused."
 
-#: fehlzeiten/apps.py:8 fehlzeiten/models.py:70 portal/navigation.py:141
-#: portal/navigation.py:142 portal/rollen.py:176 sicherung/module.py:9
+#: fehlzeiten/apps.py:8 fehlzeiten/models.py:70 portal/navigation.py:144
+#: portal/navigation.py:145 portal/rollen.py:176 sicherung/module.py:9
 msgid "Fehlzeiten"
 msgstr "Absences"
 
-#: fehlzeiten/models.py:23 foerderung/models.py:85 portal/navigation.py:225
+#: fehlzeiten/models.py:23 foerderung/models.py:85 portal/navigation.py:228
 #: stammdaten/models.py:28 stammdaten/models.py:55 stammdaten/models.py:558
 #: stammdaten/models.py:825 templates/aufnahme/liste.html:21
 #: templates/laufbahn/schuljahre.html:23 templates/portal/schuelerakte.html:26
@@ -1594,7 +1594,7 @@ msgstr "End"
 msgid "Unterrichtsstunde (Zeitraster)"
 msgstr "Lesson period (timetable grid)"
 
-#: fehlzeiten/models.py:30 portal/navigation.py:229
+#: fehlzeiten/models.py:30 portal/navigation.py:232
 #: templates/termine/sprechtag.html:25
 msgid "Zeitraster"
 msgstr "Timetable grid"
@@ -1744,7 +1744,7 @@ msgstr "Starting point"
 msgid "Vereinbarungen und Evaluation"
 msgstr "Agreements and evaluation"
 
-#: foerderung/admin.py:196 foerderung/admin.py:287 portal/navigation.py:287
+#: foerderung/admin.py:196 foerderung/admin.py:287 portal/navigation.py:290
 #: stammdaten/admin.py:118 templates/sicherung/_kopf.html:2
 #: templates/sicherung/_kopf.html:4
 msgid "System"
@@ -1760,8 +1760,8 @@ msgstr "System"
 msgid "Klasse"
 msgstr "Class"
 
-#: foerderung/admin.py:215 foerderung/admin.py:319 portal/navigation.py:132
-#: portal/navigation.py:191 portal/rollen.py:34
+#: foerderung/admin.py:215 foerderung/admin.py:319 portal/navigation.py:135
+#: portal/navigation.py:194 portal/rollen.py:34
 #: templates/elternkontakt/gespraech.html:36
 #: templates/elternkontakt/uebersicht.html:40
 #: templates/foerderung/_akte.html:16 templates/foerderung/_akte.html:36
@@ -1798,13 +1798,13 @@ msgstr "Measures"
 msgid "Geltung und Beschluss"
 msgstr "Validity and decision"
 
-#: foerderung/admin.py:315 foerderung/models.py:226 portal/navigation.py:235
+#: foerderung/admin.py:315 foerderung/models.py:226 portal/navigation.py:238
 #: stammdaten/models.py:670 templates/foerderung/_akte.html:16
 #: templates/foerderung/nachteilsausgleich.html:32
 msgid "Fächer"
 msgstr "Subjects"
 
-#: foerderung/admin.py:354 foerderung/models.py:190 sicherung/pdf.py:232
+#: foerderung/admin.py:354 foerderung/models.py:190 sicherung/pdf.py:234
 msgid "Eintrag"
 msgstr "Entry"
 
@@ -1855,7 +1855,7 @@ msgstr "Receipt confirmed by %(person)s."
 msgid "Bitte ein gültiges Datum angeben (nicht vor der Aushändigung)."
 msgstr "Please enter a valid date (not before the hand-out date)."
 
-#: foerderung/apps.py:8 portal/navigation.py:177 sicherung/module.py:11
+#: foerderung/apps.py:8 portal/navigation.py:180 sicherung/module.py:11
 #: templates/foerderung/_akte.html:4
 msgid "Förderung"
 msgstr "Learning support"
@@ -1865,7 +1865,7 @@ msgid "Förderschwerpunkt"
 msgstr "Area of need"
 
 #: foerderung/models.py:30 foerderung/models.py:87 foerderung/models.py:219
-#: portal/navigation.py:195 templates/foerderung/_akte.html:36
+#: portal/navigation.py:198 templates/foerderung/_akte.html:36
 #: templates/foerderung/plan.html:27
 msgid "Förderschwerpunkte"
 msgstr "Areas of need"
@@ -1888,7 +1888,7 @@ msgstr ""
 msgid "Ausgleichsmaßnahme"
 msgstr "Access arrangement measure"
 
-#: foerderung/models.py:49 portal/navigation.py:197
+#: foerderung/models.py:49 portal/navigation.py:200
 msgid "Ausgleichsmaßnahmen"
 msgstr "Access arrangement measures"
 
@@ -1994,14 +1994,14 @@ msgstr "Change history: support plan"
 msgid "Förderplan"
 msgstr "Support plan"
 
-#: foerderung/models.py:116 portal/navigation.py:178 portal/navigation.py:179
+#: foerderung/models.py:116 portal/navigation.py:181 portal/navigation.py:182
 #: portal/rollen.py:177 templates/foerderung/_akte.html:33
 #: templates/foerderung/_start.html:7 templates/portal/stufe.html:23
 msgid "Förderpläne"
 msgstr "Support plans"
 
 #: foerderung/models.py:128 foerderung/models.py:251
-#: sicherung/ansichten.py:205 termine/models.py:94
+#: sicherung/ansichten.py:234 termine/models.py:94
 msgid "Das Ende darf nicht vor dem Beginn liegen."
 msgstr "The end must not be before the start."
 
@@ -2038,7 +2038,7 @@ msgid "Fach"
 msgstr "Subject"
 
 #: foerderung/models.py:148 stammdaten/models.py:252
-#: templates/sicherung/benutzer_bearbeiten.html:54
+#: templates/sicherung/benutzer_bearbeiten.html:71
 msgid "Bereich"
 msgstr "Area"
 
@@ -2058,7 +2058,7 @@ msgstr "phrase as concretely and measurably as possible"
 msgid "z. B. Deutschlehrkraft, Eltern, Schüler:in"
 msgstr "e.g. German teacher, parents, student"
 
-#: foerderung/models.py:152 sicherung/ansichten.py:177 sicherung/models.py:57
+#: foerderung/models.py:152 sicherung/ansichten.py:206 sicherung/models.py:57
 #: stammdaten/models.py:422 stammdaten/models.py:604 stammdaten/models.py:833
 #: stammdaten/models.py:897 templates/termine/sprechtag.html:28
 #: termine/ansichten.py:221 termine/models.py:105 termine/models.py:215
@@ -2141,7 +2141,7 @@ msgstr "Change history: progress entry"
 msgid "Verlaufseintrag"
 msgstr "Progress entry"
 
-#: foerderung/models.py:198 portal/navigation.py:182
+#: foerderung/models.py:198 portal/navigation.py:185
 #: templates/foerderung/plan.html:82
 msgid "Verlaufsdokumentation"
 msgstr "Progress log"
@@ -2224,7 +2224,7 @@ msgstr "Change history: access arrangements"
 msgid "Nachteilsausgleich"
 msgstr "Access arrangements"
 
-#: foerderung/models.py:243 portal/navigation.py:184 portal/rollen.py:178
+#: foerderung/models.py:243 portal/navigation.py:187 portal/rollen.py:178
 #: templates/foerderung/_akte.html:13 templates/foerderung/_start.html:8
 msgid "Nachteilsausgleiche"
 msgstr "Access arrangements"
@@ -2335,15 +2335,15 @@ msgid "Schuljahre und Wechsel"
 msgstr "School years and transition"
 
 #: laufbahn/ansichten.py:28 laufbahn/ansichten.py:387
-#: laufbahn/ereignisse.py:263 portal/navigation.py:239
-#: portal/navigation.py:240 portal/navigation.py:265
+#: laufbahn/ereignisse.py:263 portal/navigation.py:242
+#: portal/navigation.py:243 portal/navigation.py:268
 #: templates/laufbahn/archiv.html:3 templates/laufbahn/schuljahre.html:14
 #: templates/laufbahn/wechsel.html:101 templates/laufbahn/wechsel.html:108
 msgid "Archiv"
 msgstr "Archive"
 
 #: laufbahn/ansichten.py:30 laufbahn/ansichten.py:471 laufbahn/models.py:185
-#: portal/navigation.py:242 templates/laufbahn/loeschfristen.html:3
+#: portal/navigation.py:245 templates/laufbahn/loeschfristen.html:3
 #: templates/laufbahn/schuljahre.html:14
 msgid "Löschfristen"
 msgstr "Retention periods"
@@ -2800,7 +2800,7 @@ msgstr "Carried out on"
 msgid "Änderungsprotokoll Schuljahreswechsel"
 msgstr "Change log year-end transition"
 
-#: laufbahn/models.py:52 laufbahn/models.py:53 portal/navigation.py:226
+#: laufbahn/models.py:52 laufbahn/models.py:53 portal/navigation.py:229
 #: portal/rollen.py:189 templates/laufbahn/schueler.html:93
 #: templates/laufbahn/schuljahre.html:12 templates/laufbahn/wechsel.html:6
 msgid "Schuljahreswechsel"
@@ -2983,7 +2983,7 @@ msgstr "Retention period"
 msgid "Kann Daten aus dem Archiv endgültig löschen"
 msgstr "Can permanently delete data from the archive"
 
-#: laufbahn/models.py:200 sicherung/pdf.py:293
+#: laufbahn/models.py:200 sicherung/pdf.py:295
 #: templates/sicherung/wiederherstellen.html:23
 msgid "gelöscht"
 msgstr "deleted"
@@ -3009,7 +3009,7 @@ msgstr "Deleted entries"
 msgid "Aufgeschoben bis"
 msgstr "Postponed until"
 
-#: laufbahn/models.py:209 sicherung/ansichten.py:176 sicherung/models.py:56
+#: laufbahn/models.py:209 sicherung/ansichten.py:205 sicherung/models.py:56
 #: stammdaten/models.py:421 stammdaten/models.py:603 stammdaten/models.py:832
 #: stammdaten/models.py:896 templates/laufbahn/loeschfristen.html:76
 #: templates/termine/sprechtag.html:28 termine/ansichten.py:220
@@ -3173,7 +3173,7 @@ msgstr "Change history: club"
 msgid "AG-Angebot"
 msgstr "Club"
 
-#: nachmittag/models.py:39 portal/navigation.py:268
+#: nachmittag/models.py:39 portal/navigation.py:271
 #: templates/portal/start.html:41
 msgid "AG-Angebote"
 msgstr "Clubs"
@@ -3202,7 +3202,7 @@ msgstr "Priority"
 msgid "AG-Wunsch"
 msgstr "Club choice"
 
-#: nachmittag/models.py:75 portal/navigation.py:270
+#: nachmittag/models.py:75 portal/navigation.py:273
 msgid "AG-Wünsche"
 msgstr "Club choices"
 
@@ -3232,7 +3232,7 @@ msgid "Unterricht"
 msgstr "Course"
 
 #: noten/admin.py:102 noten/admin.py:130 noten/models.py:226
-#: noten/models.py:227 portal/navigation.py:164
+#: noten/models.py:227 portal/navigation.py:167
 msgid "Bewertungsordner"
 msgstr "Assessment folder"
 
@@ -3265,7 +3265,7 @@ msgstr "Folder"
 msgid "Anteil an der Gesamtnote"
 msgstr "Share of the overall grade"
 
-#: noten/admin.py:188 noten/models.py:296 portal/navigation.py:161
+#: noten/admin.py:188 noten/models.py:296 portal/navigation.py:164
 #: templates/portal/notenuebersicht.html:64
 msgid "Leistungsnachweise"
 msgstr "Assessments"
@@ -3328,7 +3328,7 @@ msgstr ""
 msgid "Notenskala"
 msgstr "Grading scale"
 
-#: noten/models.py:42 portal/navigation.py:236
+#: noten/models.py:42 portal/navigation.py:239
 msgid "Notenskalen"
 msgstr "Grading scales"
 
@@ -3401,7 +3401,7 @@ msgstr "Description / department decision"
 msgid "Gewichtungsvorlage"
 msgstr "Weighting template"
 
-#: noten/models.py:123 portal/navigation.py:237
+#: noten/models.py:123 portal/navigation.py:240
 msgid "Gewichtungsvorlagen"
 msgstr "Weighting templates"
 
@@ -3704,7 +3704,7 @@ msgstr "Catppuccin Latte (light)"
 msgid "Catppuccin Mocha (dunkel)"
 msgstr "Catppuccin Mocha (dark)"
 
-#: portal/models.py:20 stammdaten/models.py:107
+#: portal/models.py:20 portal/models.py:79 stammdaten/models.py:107
 msgid "Benutzerkonto"
 msgstr "User account"
 
@@ -3764,7 +3764,7 @@ msgstr "Pink"
 msgid "Grau"
 msgstr "Grey"
 
-#: portal/models.py:46
+#: portal/models.py:46 portal/models.py:119
 msgid "Farbe"
 msgstr "Colour"
 
@@ -3785,10 +3785,160 @@ msgstr "Visible to"
 msgid "Angeheftet"
 msgstr "Pinned"
 
-#: portal/models.py:59 portal/navigation.py:69
+#: portal/models.py:59 portal/navigation.py:71
 #: templates/portal/_notizen.html:23
 msgid "Notizen"
 msgstr "Notes"
+
+#: portal/models.py:80
+msgid "Geheimnis (verschlüsselt)"
+msgstr "Secret (encrypted)"
+
+#: portal/models.py:81
+msgid "Eingerichtet"
+msgstr "Set up"
+
+#: portal/models.py:82
+msgid "Verpflichtend"
+msgstr "Mandatory"
+
+#: portal/models.py:83
+msgid "Von der IT angeordnet: Anmeldung erst nach Einrichtung möglich."
+msgstr "Required by IT: sign-in only possible after setup."
+
+#: portal/models.py:84 templates/portal/sicherheit.html:38
+msgid "Eingerichtet am"
+msgstr "Set up on"
+
+#: portal/models.py:85
+msgid "Zuletzt verwendeter Zeitschritt"
+msgstr "Last used time step"
+
+#: portal/models.py:86
+msgid "Ersatzcodes (Prüfwerte)"
+msgstr "Backup codes (hashes)"
+
+#: portal/models.py:87 templates/portal/sicherheit.html:39
+msgid "Zuletzt verwendet"
+msgstr "Last used"
+
+#: portal/models.py:90 sicherung/models.py:89
+#: templates/portal/sicherheit.html:11
+#: templates/sicherung/benutzer_bearbeiten.html:44
+msgid "Zwei-Faktor-Anmeldung"
+msgstr "Two-factor sign-in"
+
+#: portal/models.py:91
+msgid "Zwei-Faktor-Anmeldungen"
+msgstr "Two-factor sign-ins"
+
+#: portal/models.py:104
+msgid "Brief (E-Mail)"
+msgstr "Letter (email)"
+
+#: portal/models.py:104 portal/navigation.py:84
+msgid "Kalender"
+msgstr "Calendar"
+
+#: portal/models.py:104
+msgid "Personen (Teams)"
+msgstr "People (Teams)"
+
+#: portal/models.py:105
+msgid "Ordner (Dateien)"
+msgstr "Folder (files)"
+
+#: portal/models.py:105
+msgid "Stift (Text)"
+msgstr "Pen (text)"
+
+#: portal/models.py:105
+msgid "Liste (Tabelle)"
+msgstr "List (spreadsheet)"
+
+#: portal/models.py:106
+msgid "Tafel (Präsentation)"
+msgstr "Board (presentation)"
+
+#: portal/models.py:106
+msgid "Buch (Notizbuch)"
+msgstr "Book (notebook)"
+
+#: portal/models.py:106
+msgid "Haken (Formulare)"
+msgstr "Tick (forms)"
+
+#: portal/models.py:107
+msgid "Gebäude (Intranet)"
+msgstr "Building (intranet)"
+
+#: portal/models.py:107
+msgid "Haus (Startseite)"
+msgstr "House (home page)"
+
+#: portal/models.py:107
+msgid "Klammer (Sonstiges)"
+msgstr "Clip (other)"
+
+#: portal/models.py:111
+msgid "Titel (englisch)"
+msgstr "Title (English)"
+
+#: portal/models.py:112
+msgid "Leer lassen, wenn der Titel in beiden Sprachen gleich ist."
+msgstr "Leave empty if the title is the same in both languages."
+
+#: portal/models.py:113
+msgid "Kurzbeschreibung"
+msgstr "Short description"
+
+#: portal/models.py:114
+msgid "Kurzbeschreibung (englisch)"
+msgstr "Short description (English)"
+
+#: portal/models.py:115 templates/aufnahme/anmeldung.html:219
+#: templates/aufnahme/formular.html:45
+msgid "Adresse"
+msgstr "Address"
+
+#: portal/models.py:116
+#, python-brace-format
+msgid ""
+"Vollständige https-Adresse. Der Platzhalter {mandant} wird durch "
+"OFFICE_MANDANT aus der .env ersetzt, z. B. https://{mandant}.sharepoint.com;"
+" ohne OFFICE_MANDANT wird eine solche Kachel ausgeblendet."
+msgstr ""
+"Full https address. The placeholder {mandant} is replaced by OFFICE_MANDANT "
+"from the .env, e.g. https://{mandant}.sharepoint.com; without OFFICE_MANDANT"
+" such a tile is hidden."
+
+#: portal/models.py:118
+msgid "Symbol"
+msgstr "Icon"
+
+#: portal/models.py:119
+msgid "Hex-Farbwert, z. B. #0f6cbd."
+msgstr "Hex colour value, e.g. #0f6cbd."
+
+#: portal/models.py:121
+msgid "Angezeigt"
+msgstr "Shown"
+
+#: portal/models.py:124
+msgid "Office-Kachel"
+msgstr "Office tile"
+
+#: portal/models.py:125
+msgid "Office-Kacheln"
+msgstr "Office tiles"
+
+#: portal/models.py:137
+msgid "Die Adresse muss mit https:// beginnen."
+msgstr "The address must start with https://."
+
+#: portal/models.py:139
+msgid "Bitte einen Hex-Farbwert wie #0f6cbd angeben."
+msgstr "Please enter a hex colour value such as #0f6cbd."
 
 #: portal/navigation.py:64 templates/aufnahme/anmeldung.html:6
 #: templates/aufnahme/formular.html:5 templates/aufnahme/liste.html:8
@@ -3802,18 +3952,19 @@ msgstr "Notes"
 #: templates/laufbahn/schueler.html:5 templates/laufbahn/wechsel.html:6
 #: templates/portal/klassenliste.html:5
 #: templates/portal/notenuebersicht.html:6 templates/portal/rollen.html:6
-#: templates/portal/schuelerakte.html:5 templates/portal/start.html:3
-#: templates/portal/stufe.html:5 templates/portal/suche.html:5
-#: templates/portal/zuordnung.html:8 templates/sicherung/_kopf.html:2
-#: templates/termine/_kopf.html:2 templates/termine/sprechtag.html:6
-#: templates/termine/sprechzeiten.html:6 templates/termine/termin.html:5
-#: templates/termine/uebersicht.html:6 templates/zeugnisse/klasse.html:6
-#: templates/zeugnisse/konferenz.html:6 templates/zeugnisse/uebersicht.html:5
-#: templates/zeugnisse/unterricht.html:5 templates/zeugnisse/zeugnis.html:6
+#: templates/portal/schuelerakte.html:5 templates/portal/sicherheit.html:5
+#: templates/portal/start.html:3 templates/portal/stufe.html:5
+#: templates/portal/suche.html:5 templates/portal/zuordnung.html:8
+#: templates/sicherung/_kopf.html:2 templates/termine/_kopf.html:2
+#: templates/termine/sprechtag.html:6 templates/termine/sprechzeiten.html:6
+#: templates/termine/termin.html:5 templates/termine/uebersicht.html:6
+#: templates/zeugnisse/klasse.html:6 templates/zeugnisse/konferenz.html:6
+#: templates/zeugnisse/uebersicht.html:5 templates/zeugnisse/unterricht.html:5
+#: templates/zeugnisse/zeugnis.html:6
 msgid "Start"
 msgstr "Home"
 
-#: portal/navigation.py:65 portal/navigation.py:250
+#: portal/navigation.py:65 portal/navigation.py:253
 #: templates/termine/eltern_sprechtag.html:4
 msgid "Übersicht"
 msgstr "Overview"
@@ -3828,73 +3979,92 @@ msgid "Person suchen"
 msgstr "Search for a person"
 
 #: portal/navigation.py:68
+msgid "Microsoft 365"
+msgstr "Microsoft 365"
+
+#: portal/navigation.py:69 templates/portal/_menueband.html:30
+#: templates/portal/office.html:3 templates/portal/office.html:14
+msgid "Office"
+msgstr "Office"
+
+#: portal/navigation.py:69
+msgid "Outlook, Teams, Word, Excel und weitere Anwendungen"
+msgstr "Outlook, Teams, Word, Excel and other apps"
+
+#: portal/navigation.py:70
 msgid "Persönlich"
 msgstr "Personal"
 
-#: portal/navigation.py:70 templates/portal/_geburtstage.html:4
+#: portal/navigation.py:72 templates/portal/_geburtstage.html:4
 msgid "Geburtstage"
 msgstr "Birthdays"
 
-#: portal/navigation.py:71
+#: portal/navigation.py:73
 msgid "Mitteilung schreiben"
 msgstr "Write announcement"
 
-#: portal/navigation.py:72 templates/portal/_menueband.html:21
+#: portal/navigation.py:74 templates/portal/_menueband.html:21
 #: templates/portal/_menueband.html:27
 #: templates/sicherung/benutzer_bearbeiten.html:32
 msgid "Konto"
 msgstr "Account"
 
-#: portal/navigation.py:73 templates/portal/_menueband.html:28
+#: portal/navigation.py:75 templates/portal/_menueband.html:28
+#: templates/portal/sicherheit.html:60
 msgid "Passwort ändern"
 msgstr "Change password"
 
-#: portal/navigation.py:80 templates/termine/_kopf.html:2
+#: portal/navigation.py:76 templates/portal/_menueband.html:29
+#: templates/portal/sicherheit.html:3 templates/portal/sicherheit.html:5
+msgid "Sicherheit"
+msgstr "Security"
+
+#: portal/navigation.py:76
+msgid "Zwei-Faktor-Anmeldung einrichten"
+msgstr "Set up two-factor sign-in"
+
+#: portal/navigation.py:83 templates/termine/_kopf.html:2
 #: templates/termine/_kopf.html:4 termine/models.py:74
 msgid "Termine"
 msgstr "Calendar"
 
-#: portal/navigation.py:81
-msgid "Kalender"
-msgstr "Calendar"
-
-#: portal/navigation.py:82 templates/termine/_start.html:5
+#: portal/navigation.py:85 templates/termine/_start.html:5
 #: templates/termine/kalender.html:3 templates/termine/termin.html:5
 #: termine/ansichten.py:30 termine/ansichten.py:136 termine/ansichten.py:191
 msgid "Schulkalender"
 msgstr "School calendar"
 
-#: portal/navigation.py:83 templates/termine/kalender.html:21
+#: portal/navigation.py:86 templates/termine/kalender.html:21
 #: termine/ansichten.py:175
 msgid "Neuer Termin"
 msgstr "New event"
 
-#: portal/navigation.py:84
+#: portal/navigation.py:87
 msgid "Kalender abonnieren"
 msgstr "Subscribe to calendar"
 
-#: portal/navigation.py:85
+#: portal/navigation.py:88
 msgid "Termine als iCalendar-Datei, z. B. für Outlook"
 msgstr "Events as an iCalendar file, e.g. for Outlook"
 
-#: portal/navigation.py:86 templates/termine/raumplan.html:3
+#: portal/navigation.py:89 templates/termine/raumplan.html:3
 #: termine/ansichten.py:32 termine/ansichten.py:310 termine/models.py:40
 msgid "Räume"
 msgstr "Rooms"
 
-#: portal/navigation.py:87
+#: portal/navigation.py:90
 msgid "Raumplan"
 msgstr "Room plan"
 
-#: portal/navigation.py:88
+#: portal/navigation.py:91
 msgid "Belegung ansehen und Räume buchen"
 msgstr "View occupancy and book rooms"
 
-#: portal/navigation.py:89 templates/termine/raumplan.html:17
+#: portal/navigation.py:92 templates/termine/raumplan.html:17
 msgid "Räume verwalten"
 msgstr "Manage rooms"
 
-#: portal/navigation.py:90 portal/navigation.py:91
+#: portal/navigation.py:93 portal/navigation.py:94
 #: templates/termine/eltern_uebersicht.html:17
 #: templates/termine/sprechtag.html:6 templates/termine/sprechtage.html:10
 #: templates/termine/sprechzeiten.html:6 templates/termine/uebersicht.html:6
@@ -3902,43 +4072,43 @@ msgstr "Manage rooms"
 msgid "Sprechtage"
 msgstr "Consultation days"
 
-#: portal/navigation.py:92
+#: portal/navigation.py:95
 msgid "Elternsprechtage und Lern- und Entwicklungsgespräche"
 msgstr "Parent-teacher days and learning and development talks"
 
-#: portal/navigation.py:96
+#: portal/navigation.py:99
 msgid "Meine Klassen"
 msgstr "My classes"
 
-#: portal/navigation.py:101
+#: portal/navigation.py:104
 #, python-format
 msgid "Klassenliste %(name)s"
 msgstr "Class list %(name)s"
 
-#: portal/navigation.py:109
+#: portal/navigation.py:112
 #, python-format
 msgid "%(name)s, Jahrgänge %(von)s bis %(bis)s"
 msgstr "%(name)s, years %(von)s to %(bis)s"
 
-#: portal/navigation.py:114
+#: portal/navigation.py:117
 msgid "Neuanmeldung"
 msgstr "Admissions"
 
-#: portal/navigation.py:116
+#: portal/navigation.py:119
 msgid "Bewerbungen mit Unterlagen, Checkliste und vorläufiger Klasse"
 msgstr "Applications with documents, checklist and provisional class"
 
-#: portal/navigation.py:117 templates/aufnahme/_start.html:8
+#: portal/navigation.py:120 templates/aufnahme/_start.html:8
 #: templates/aufnahme/formular.html:3 templates/aufnahme/formular.html:6
 #: templates/aufnahme/formular.html:7 templates/aufnahme/liste.html:12
 msgid "Neue Anmeldung"
 msgstr "New application"
 
-#: portal/navigation.py:119
+#: portal/navigation.py:122
 msgid "Zugesagte Anmeldungen, Übernahme offen"
 msgstr "Offers made, enrolment pending"
 
-#: portal/navigation.py:124 portal/navigation.py:277 stammdaten/admin.py:127
+#: portal/navigation.py:127 portal/navigation.py:280 stammdaten/admin.py:127
 #: stammdaten/models.py:169 stammdaten/models.py:964
 #: templates/laufbahn/schuljahre.html:24 templates/laufbahn/wechsel.html:22
 #: templates/portal/stufe.html:11 templates/portal/stufe.html:22
@@ -3946,86 +4116,86 @@ msgstr "Offers made, enrolment pending"
 msgid "Schüler:innen"
 msgstr "Students"
 
-#: portal/navigation.py:128 portal/rollen.py:174
+#: portal/navigation.py:131 portal/rollen.py:174
 msgid "Schülerakten"
 msgstr "Student records"
 
-#: portal/navigation.py:129
+#: portal/navigation.py:132
 msgid "Alle Schüler:innen"
 msgstr "All students"
 
-#: portal/navigation.py:131 templates/portal/_anhaenge.html:4
+#: portal/navigation.py:134 templates/portal/_anhaenge.html:4
 msgid "Anhänge"
 msgstr "Attachments"
 
-#: portal/navigation.py:134
+#: portal/navigation.py:137
 msgid "Nachrichten an Eltern, Antworten und Bestätigungen"
 msgstr "Messages to parents, replies and confirmations"
 
-#: portal/navigation.py:135 templates/elternkontakt/_start.html:7
+#: portal/navigation.py:138 templates/elternkontakt/_start.html:7
 #: templates/elternkontakt/neu.html:5
 #: templates/elternkontakt/neu_auswahl.html:5
 #: templates/elternkontakt/uebersicht.html:14
 msgid "Neue Nachricht"
 msgstr "New message"
 
-#: portal/navigation.py:136 templates/elternkontakt/regel.html:5
+#: portal/navigation.py:139 templates/elternkontakt/regel.html:5
 #: templates/elternkontakt/regeln.html:3 templates/elternkontakt/regeln.html:8
 #: templates/elternkontakt/uebersicht.html:13
 msgid "Benachrichtigungsregeln"
 msgstr "Notification rules"
 
-#: portal/navigation.py:137
+#: portal/navigation.py:140
 msgid "Automatische Benachrichtigung bei Fehlzeiten und Verspätungen"
 msgstr "Automatic notification of absences and late arrivals"
 
-#: portal/navigation.py:138 portal/navigation.py:259 stammdaten/admin.py:187
+#: portal/navigation.py:141 portal/navigation.py:262 stammdaten/admin.py:187
 msgid "Klassen und Gruppen"
 msgstr "Classes and groups"
 
-#: portal/navigation.py:139 templates/aufnahme/anmeldung.html:201
+#: portal/navigation.py:142 templates/aufnahme/anmeldung.html:201
 msgid "Zuordnen"
 msgstr "Assign"
 
-#: portal/navigation.py:140
+#: portal/navigation.py:143
 msgid "Schüler:innen Klassen, Lerngruppen und AGs zuordnen"
 msgstr "Assign students to classes, teaching groups and clubs"
 
-#: portal/navigation.py:143
+#: portal/navigation.py:146
 msgid "Offene Entschuldigungen"
 msgstr "Open excuse notes"
 
-#: portal/navigation.py:145
+#: portal/navigation.py:148
 msgid "Fehlzeit erfassen"
 msgstr "Record absence"
 
-#: portal/navigation.py:149 templates/portal/start.html:28
+#: portal/navigation.py:152 templates/portal/start.html:28
 msgid "Mein Unterricht"
 msgstr "My teaching"
 
-#: portal/navigation.py:155
+#: portal/navigation.py:158
 #, python-format
 msgid "Notenübersicht %(fach)s %(gruppe)s, %(abschnitt)s"
 msgstr "Grade overview %(fach)s %(gruppe)s, %(abschnitt)s"
 
-#: portal/navigation.py:158
+#: portal/navigation.py:161
 msgctxt "Menüband"
 msgid "Unterricht"
 msgstr "Teaching"
 
-#: portal/navigation.py:160 templates/foerderung/plan.html:53
+#: portal/navigation.py:163 templates/foerderung/plan.html:53
 msgid "Bewertung"
 msgstr "Assessment"
 
-#: portal/navigation.py:163
+#: portal/navigation.py:166
 msgid "Neuer Leistungsnachweis"
 msgstr "New assessment"
 
-#: portal/navigation.py:165
+#: portal/navigation.py:168
 msgid "Einzelnoten"
 msgstr "Individual grades"
 
-#: portal/navigation.py:167 templates/portal/klassenliste.html:7
+#: portal/navigation.py:170 templates/portal/klassenliste.html:7
 #: templates/zeugnisse/_start.html:4 templates/zeugnisse/klasse.html:3
 #: templates/zeugnisse/klasse.html:6 templates/zeugnisse/konferenz.html:6
 #: templates/zeugnisse/uebersicht.html:3 templates/zeugnisse/uebersicht.html:5
@@ -4034,259 +4204,259 @@ msgstr "Individual grades"
 msgid "Zeugnisse"
 msgstr "Reports"
 
-#: portal/navigation.py:168
+#: portal/navigation.py:171
 msgid "Zeugnisnoten, Kommentare, Zeugnisse und Konferenzen"
 msgstr "Report grades, comments, reports and conferences"
 
-#: portal/navigation.py:169
+#: portal/navigation.py:172
 msgid "Zeugnisnoten (Liste)"
 msgstr "Report grades (list)"
 
-#: portal/navigation.py:171 templates/zeugnisse/uebersicht.html:56
+#: portal/navigation.py:174 templates/zeugnisse/uebersicht.html:56
 #: zeugnisse/models.py:200
 msgid "Konferenzen"
 msgstr "Conferences"
 
-#: portal/navigation.py:181 templates/foerderung/_akte.html:7
+#: portal/navigation.py:184 templates/foerderung/_akte.html:7
 msgid "Neuer Förderplan"
 msgstr "New support plan"
 
-#: portal/navigation.py:185
+#: portal/navigation.py:188
 msgid "Gültige"
 msgstr "Valid"
 
-#: portal/navigation.py:186
+#: portal/navigation.py:189
 msgid "Gültige Nachteilsausgleiche"
 msgstr "Valid access arrangements"
 
-#: portal/navigation.py:187
+#: portal/navigation.py:190
 msgid "Beantragt"
 msgstr "Requested"
 
-#: portal/navigation.py:189
+#: portal/navigation.py:192
 msgid "Erfassen"
 msgstr "Record"
 
-#: portal/navigation.py:190 templates/foerderung/_akte.html:8
+#: portal/navigation.py:193 templates/foerderung/_akte.html:8
 msgid "Nachteilsausgleich erfassen"
 msgstr "Record access arrangements"
 
-#: portal/navigation.py:192
+#: portal/navigation.py:195
 msgid "Erhalt offen"
 msgstr "Receipt pending"
 
-#: portal/navigation.py:193
+#: portal/navigation.py:196
 msgid "Elternbestätigung offen"
 msgstr "Parent confirmation pending"
 
-#: portal/navigation.py:194
+#: portal/navigation.py:197
 msgid "Kataloge"
 msgstr "Catalogues"
 
-#: portal/navigation.py:203 portal/rollen.py:182 stammdaten/admin.py:127
+#: portal/navigation.py:206 portal/rollen.py:182 stammdaten/admin.py:127
 #: stammdaten/admin.py:153 stammdaten/models.py:297 stammdaten/models.py:298
 #: stammdaten/models.py:377 stammdaten/models.py:419 stammdaten/models.py:454
 #: stammdaten/models.py:473 stammdaten/models.py:964
 msgid "Personal"
 msgstr "Staff"
 
-#: portal/navigation.py:204
+#: portal/navigation.py:207
 msgid "Beschäftigte"
 msgstr "Employees"
 
-#: portal/navigation.py:205 templates/portal/_start_hr.html:5
+#: portal/navigation.py:208 templates/portal/_start_hr.html:5
 msgid "Personalliste"
 msgstr "Staff list"
 
-#: portal/navigation.py:207
+#: portal/navigation.py:210
 msgid "Einstellen"
 msgstr "Hire"
 
-#: portal/navigation.py:208
+#: portal/navigation.py:211
 msgid "Neue Mitarbeiterin / neuen Mitarbeiter anlegen"
 msgstr "Add a new member of staff"
 
-#: portal/navigation.py:209
+#: portal/navigation.py:212
 msgid "Nachweise offen"
 msgstr "Certificates outstanding"
 
-#: portal/navigation.py:211 portal/navigation.py:212
+#: portal/navigation.py:214 portal/navigation.py:215
 msgid "Abwesenheiten"
 msgstr "Absences"
 
-#: portal/navigation.py:214
+#: portal/navigation.py:217
 msgid "Offene Anträge"
 msgstr "Open requests"
 
-#: portal/navigation.py:216 templates/termine/sprechtag.html:47
+#: portal/navigation.py:219 templates/termine/sprechtag.html:47
 msgid "Einstellungen"
 msgstr "Settings"
 
-#: portal/navigation.py:217 stammdaten/models.py:211
+#: portal/navigation.py:220 stammdaten/models.py:211
 msgid "Personalbereiche"
 msgstr "Staff areas"
 
-#: portal/navigation.py:218 stammdaten/models.py:371
+#: portal/navigation.py:221 stammdaten/models.py:371
 msgid "Nachweisarten"
 msgstr "Certificate types"
 
-#: portal/navigation.py:219 portal/navigation.py:279
+#: portal/navigation.py:222 portal/navigation.py:282
 msgid "Dienstleister"
 msgstr "Contractors"
 
-#: portal/navigation.py:227
+#: portal/navigation.py:230
 msgid "Schuljahre anlegen, Schüler:innen versetzen, Wechsel zurücknehmen"
 msgstr "Create school years, promote students, revert transitions"
 
-#: portal/navigation.py:228 stammdaten/models.py:29
+#: portal/navigation.py:231 stammdaten/models.py:29
 #: templates/laufbahn/schuljahre.html:21 templates/laufbahn/wechsel.html:6
 msgid "Schuljahre"
 msgstr "School years"
 
-#: portal/navigation.py:230 stammdaten/models.py:800
+#: portal/navigation.py:233 stammdaten/models.py:800
 msgid "Bildungsgänge"
 msgstr "School tracks"
 
-#: portal/navigation.py:231 stammdaten/models.py:866
+#: portal/navigation.py:234 stammdaten/models.py:866
 msgid "Abschlussarten"
 msgstr "Qualification types"
 
-#: portal/navigation.py:232
+#: portal/navigation.py:235
 msgid "Unterrichtsorganisation"
 msgstr "Teaching organisation"
 
-#: portal/navigation.py:233
+#: portal/navigation.py:236
 msgid "Unterrichtsverteilung"
 msgstr "Teaching assignments"
 
-#: portal/navigation.py:241 portal/navigation.py:266
+#: portal/navigation.py:244 portal/navigation.py:269
 msgid "Abgegangene Schüler:innen, Abgangszeugnisse, Löschfristen"
 msgstr "Former students, leaving certificates, retention periods"
 
-#: portal/navigation.py:243
+#: portal/navigation.py:246
 msgid "Aufbewahrungsfristen für das Archiv und fällige Löschungen"
 msgstr "Retention periods for the archive and due deletions"
 
-#: portal/navigation.py:249 stammdaten/admin.py:45
+#: portal/navigation.py:252 stammdaten/admin.py:45
 #: templates/laufbahn/_kopf.html:2
 msgid "Verwaltung"
 msgstr "Administration"
 
-#: portal/navigation.py:251
+#: portal/navigation.py:254
 msgid "Alle Bereiche"
 msgstr "All areas"
 
-#: portal/navigation.py:254
+#: portal/navigation.py:257
 msgid "Schüler:in anlegen"
 msgstr "Add student"
 
-#: portal/navigation.py:256
+#: portal/navigation.py:259
 msgid "Schüler:in ohne Anmeldeverfahren direkt anlegen"
 msgstr "Create a student directly without the admissions process"
 
-#: portal/navigation.py:257
+#: portal/navigation.py:260
 msgid "Eltern und Kontakte"
 msgstr "Parents and contacts"
 
-#: portal/navigation.py:261 stammdaten/models.py:612
+#: portal/navigation.py:264 stammdaten/models.py:612
 msgid "Mitgliedschaften"
 msgstr "Memberships"
 
-#: portal/navigation.py:263 stammdaten/admin.py:200 stammdaten/models.py:840
+#: portal/navigation.py:266 stammdaten/admin.py:200 stammdaten/models.py:840
 #: templates/aufnahme/uebernahme.html:29 templates/portal/schuelerakte.html:87
 msgid "Schullaufbahn"
 msgstr "School career"
 
-#: portal/navigation.py:267
+#: portal/navigation.py:270
 msgid "Nachmittag"
 msgstr "Afternoon"
 
-#: portal/navigation.py:271
+#: portal/navigation.py:274
 msgid "Zuteilungen"
 msgstr "Allocations"
 
-#: portal/navigation.py:273
+#: portal/navigation.py:276
 msgid "Rechnungsempfänger"
 msgstr "Invoice recipients"
 
-#: portal/navigation.py:275 stammdaten/models.py:510
+#: portal/navigation.py:278 stammdaten/models.py:510
 msgid "Elternprofile"
 msgstr "Parent profiles"
 
-#: portal/navigation.py:281
+#: portal/navigation.py:284
 msgid "Vertragsunterlagen"
 msgstr "Contract documents"
 
-#: portal/navigation.py:288 sicherung/ansichten.py:58
+#: portal/navigation.py:291 sicherung/ansichten.py:60
 #: templates/sicherung/benutzer.html:3 templates/sicherung/benutzer.html:6
 #: templates/sicherung/benutzer_bearbeiten.html:3
 #: templates/sicherung/benutzer_bearbeiten.html:6
 msgid "Benutzer und Rechte"
 msgstr "Users and permissions"
 
-#: portal/navigation.py:289
+#: portal/navigation.py:292
 msgid "Benutzerkonten"
 msgstr "User accounts"
 
-#: portal/navigation.py:290 templates/sicherung/benutzer.html:16
+#: portal/navigation.py:293 templates/sicherung/benutzer.html:16
 #: templates/sicherung/benutzer_bearbeiten.html:21
 msgid "Rollen"
 msgstr "Roles"
 
-#: portal/navigation.py:291 templates/portal/rollen.html:3
+#: portal/navigation.py:294 templates/portal/rollen.html:3
 #: templates/portal/rollen.html:6 templates/portal/rollen.html:7
 msgid "Rollen und Rechte"
 msgstr "Roles and permissions"
 
-#: portal/navigation.py:292
+#: portal/navigation.py:295
 msgid "Übersicht: welche Rolle was darf"
 msgstr "Overview: what each role may do"
 
-#: portal/navigation.py:293 templates/sicherung/benutzer.html:17
-#: templates/sicherung/benutzer_bearbeiten.html:46
+#: portal/navigation.py:296 templates/sicherung/benutzer.html:17
+#: templates/sicherung/benutzer_bearbeiten.html:63
 msgid "Einzelrechte"
 msgstr "Individual permissions"
 
-#: portal/navigation.py:294
+#: portal/navigation.py:297
 msgid "Rollen und Einzelrechte je Konto erteilen oder entziehen"
 msgstr "Grant or revoke roles and individual permissions per account"
 
-#: portal/navigation.py:295
+#: portal/navigation.py:298
 msgid "Datenfelder"
 msgstr "Data fields"
 
-#: portal/navigation.py:296
+#: portal/navigation.py:299
 msgid "Eigene Felder"
 msgstr "Custom fields"
 
-#: portal/navigation.py:297
+#: portal/navigation.py:300
 msgid "Zusatzfelder für Schüler:innen, Personal und Eltern"
 msgstr "Custom fields for students, staff and parents"
 
-#: portal/navigation.py:298 portal/navigation.py:299 sicherung/models.py:33
+#: portal/navigation.py:301 portal/navigation.py:302 sicherung/models.py:33
 msgid "Sicherung"
 msgstr "Backup"
 
-#: portal/navigation.py:300
+#: portal/navigation.py:303
 msgid "Module sichern und wiederherstellen"
 msgstr "Back up and restore modules"
 
-#: portal/navigation.py:301 sicherung/ansichten.py:56 sicherung/models.py:71
+#: portal/navigation.py:304 sicherung/ansichten.py:58 sicherung/models.py:71
 #: sicherung/models.py:87 templates/sicherung/pdf.html:3
 #: templates/sicherung/pdf.html:7
 msgid "PDF-Export"
 msgstr "PDF export"
 
-#: portal/navigation.py:301
+#: portal/navigation.py:304
 msgid "Daten eines Zeitraums als PDF"
 msgstr "Data for a period as PDF"
 
-#: portal/navigation.py:302 sicherung/ansichten.py:59
+#: portal/navigation.py:305 sicherung/ansichten.py:61
 msgctxt "System"
 msgid "Protokoll"
 msgstr "Log"
 
-#: portal/navigation.py:313 templates/sicherung/benutzer.html:24
+#: portal/navigation.py:316 templates/sicherung/benutzer.html:24
 #: templates/sicherung/benutzer_bearbeiten.html:8
 msgid "Vollzugriff"
 msgstr "Full access"
@@ -4517,7 +4687,7 @@ msgstr "Plan parent-teacher days and LDT"
 msgid "Eigene Sprechzeiten und Gesprächstermine"
 msgstr "Own consultation times and appointments"
 
-#: portal/rollen.py:235 sicherung/pdf.py:153 stammdaten/models.py:1101
+#: portal/rollen.py:235 sicherung/pdf.py:155 stammdaten/models.py:1101
 #: templates/portal/schuelerakte.html:177
 msgid "ja"
 msgstr "yes"
@@ -4539,6 +4709,76 @@ msgstr "read"
 #: portal/rollen.py:235
 msgid "eigene"
 msgstr "own"
+
+#: portal/sicherheit.py:24
+msgid "Code aus der App oder Ersatzcode"
+msgstr "Code from the app or backup code"
+
+#: portal/sicherheit.py:50
+msgid "Bitte melden Sie sich erneut an."
+msgstr "Please sign in again."
+
+#: portal/sicherheit.py:68
+#, python-format
+msgid ""
+"Ersatzcode verwendet – es bleibt %(n)s Ersatzcode. Neue Codes erzeugen Sie "
+"unter „Sicherheit“."
+msgid_plural ""
+"Ersatzcode verwendet – es bleiben %(n)s Ersatzcodes. Neue Codes erzeugen Sie"
+" unter „Sicherheit“."
+msgstr[0] ""
+"Backup code used – %(n)s backup code left. You can create new codes under "
+"“Security”."
+msgstr[1] ""
+"Backup code used – %(n)s backup codes left. You can create new codes under "
+"“Security”."
+
+#: portal/sicherheit.py:76
+msgid "Zu viele falsche Codes. Bitte melden Sie sich erneut an."
+msgstr "Too many wrong codes. Please sign in again."
+
+#: portal/sicherheit.py:79
+msgid "Der Code stimmt nicht. Bitte den aktuellen Code der App eingeben."
+msgstr "The code is not correct. Please enter the current code from the app."
+
+#: portal/sicherheit.py:108
+msgid "Zwei-Faktor-Anmeldung eingerichtet"
+msgstr "Two-factor sign-in set up"
+
+#: portal/sicherheit.py:109
+msgid "Die Zwei-Faktor-Anmeldung ist eingerichtet."
+msgstr "Two-factor sign-in is set up."
+
+#: portal/sicherheit.py:111
+msgid "Der Code stimmt nicht. Bitte die Uhrzeit des Telefons prüfen."
+msgstr "The code is not correct. Please check the phone's clock."
+
+#: portal/sicherheit.py:118
+msgid "Neue Ersatzcodes erzeugt; die bisherigen gelten nicht mehr."
+msgstr "New backup codes created; the previous ones are no longer valid."
+
+#: portal/sicherheit.py:120
+msgid "Die Zwei-Faktor-Anmeldung ist für Ihr Konto verpflichtend."
+msgstr "Two-factor sign-in is mandatory for your account."
+
+#: portal/sicherheit.py:123
+msgid "Zwei-Faktor-Anmeldung abgeschaltet"
+msgstr "Two-factor sign-in switched off"
+
+#: portal/sicherheit.py:124
+msgid "Die Zwei-Faktor-Anmeldung ist abgeschaltet."
+msgstr "Two-factor sign-in is switched off."
+
+#: portal/sicherheit.py:127
+msgid "Der Code stimmt nicht."
+msgstr "The code is not correct."
+
+#: portal/sicherheit.py:156
+msgid ""
+"Für Ihr Konto ist die Zwei-Faktor-Anmeldung vorgeschrieben. Bitte richten "
+"Sie sie jetzt ein."
+msgstr ""
+"Two-factor sign-in is required for your account. Please set it up now."
 
 #: portal/startseite.py:34
 msgid "Guten Morgen"
@@ -4624,176 +4864,225 @@ msgstr "Group “%(name)s” created."
 msgid "Gruppe nicht angelegt: %(fehler)s"
 msgstr "Group not created: %(fehler)s"
 
-#: sicherung/ansichten.py:28
+#: sicherung/ansichten.py:30
 msgid "WIEDERHERSTELLEN"
 msgstr "RESTORE"
 
-#: sicherung/ansichten.py:56 sicherung/apps.py:8
+#: sicherung/ansichten.py:58 sicherung/apps.py:8
 #: templates/sicherung/sicherungen.html:3
 #: templates/sicherung/sicherungen.html:6
 msgid "Sicherung und Wiederherstellung"
 msgstr "Backup and restore"
 
-#: sicherung/ansichten.py:66 sicherung/ansichten.py:173 sicherung/models.py:22
+#: sicherung/ansichten.py:68 sicherung/ansichten.py:202 sicherung/models.py:22
 #: sicherung/models.py:55 templates/sicherung/pdf.html:14
 #: templates/sicherung/sicherungen.html:12
-#: templates/sicherung/sicherungen.html:45
+#: templates/sicherung/sicherungen.html:48
 msgid "Module"
 msgstr "Modules"
 
-#: sicherung/ansichten.py:68
+#: sicherung/ansichten.py:70
 msgid "Hochgeladene Dateien einschließen (Anhänge, Bewerbungsunterlagen)"
 msgstr "Include uploaded files (attachments, application documents)"
 
-#: sicherung/ansichten.py:73
-msgid "Sicherungsdatei (ZIP)"
-msgstr "Backup file (ZIP)"
+#: sicherung/ansichten.py:75
+msgid "Sicherungsdatei (ZIP oder verschlüsselt)"
+msgstr "Backup file (ZIP or encrypted)"
 
-#: sicherung/ansichten.py:78
+#: sicherung/ansichten.py:76
+msgid "Passwort (bei verschlüsselten Downloads)"
+msgstr "Password (for encrypted downloads)"
+
+#: sicherung/ansichten.py:82
 #, python-format
 msgid "Die Datei ist größer als %(mb)s MB."
 msgstr "The file is larger than %(mb)s MB."
 
-#: sicherung/ansichten.py:95
+#: sicherung/ansichten.py:100
 #, python-format
 msgid "Sicherung hochgeladen und geprüft: %(datei)s"
 msgstr "Backup uploaded and checked: %(datei)s"
 
-#: sicherung/ansichten.py:102
+#: sicherung/ansichten.py:107
 #, python-format
 msgid "Sicherung erstellt: %(datei)s (%(n)s Einträge)"
 msgstr "Backup created: %(datei)s (%(n)s entries)"
 
-#: sicherung/ansichten.py:128
+#: sicherung/ansichten.py:133
+msgid "Bitte ein Passwort mit mindestens 10 Zeichen angeben."
+msgstr "Please enter a password with at least 10 characters."
+
+#: sicherung/ansichten.py:146
+#, python-format
+msgid "%(datei)s (mit Passwort verschlüsselt)"
+msgstr "%(datei)s (encrypted with password)"
+
+#: sicherung/ansichten.py:148
+#, python-format
+msgid "%(datei)s (unverschlüsselt)"
+msgstr "%(datei)s (unencrypted)"
+
+#: sicherung/ansichten.py:157
 msgid "Sicherung gelöscht."
 msgstr "Backup deleted."
 
-#: sicherung/ansichten.py:136
+#: sicherung/ansichten.py:165
 msgid "Die Datei dieser Sicherung fehlt im Sicherungsordner."
 msgstr "The file of this backup is missing from the backup folder."
 
-#: sicherung/ansichten.py:143 sicherung/archiv.py:71
+#: sicherung/ansichten.py:172 sicherung/archiv.py:72
 msgid "Bitte mindestens ein Modul wählen."
 msgstr "Please select at least one module."
 
-#: sicherung/ansichten.py:146
+#: sicherung/ansichten.py:175
 msgid "Bitte die Sicherheitsabfrage ausfüllen."
 msgstr "Please complete the security confirmation."
 
-#: sicherung/ansichten.py:168
+#: sicherung/ansichten.py:197
 msgid "aktuelles Halbjahr"
 msgstr "current semester"
 
-#: sicherung/ansichten.py:168
+#: sicherung/ansichten.py:197
 msgid "aktuelles Schuljahr"
 msgstr "current school year"
 
-#: sicherung/ansichten.py:168
+#: sicherung/ansichten.py:197
 msgid "letzte 30 Tage"
 msgstr "last 30 days"
 
-#: sicherung/ansichten.py:169
+#: sicherung/ansichten.py:198
 msgid "eigener Zeitraum"
 msgstr "custom period"
 
-#: sicherung/ansichten.py:169
+#: sicherung/ansichten.py:198
 msgid "ohne Begrenzung"
 msgstr "no limit"
 
-#: sicherung/ansichten.py:178
+#: sicherung/ansichten.py:207
 msgid "Aufteilung in mehrere PDFs"
 msgstr "Split into several PDFs"
 
-#: sicherung/ansichten.py:179
+#: sicherung/ansichten.py:208
 msgid ""
 "Bestandsdaten ohne Datum einbeziehen (z. B. Personen, Klassen, Kataloge)"
 msgstr "Include records without a date (e.g. persons, classes, catalogues)"
 
-#: sicherung/ansichten.py:181
+#: sicherung/ansichten.py:210
 msgid "Änderungsprotokoll im Zeitraum einbeziehen"
 msgstr "Include the change history for the period"
 
-#: sicherung/ansichten.py:190
+#: sicherung/ansichten.py:219
 msgid "Heute liegt in keinem Halbjahr – bitte einen eigenen Zeitraum wählen."
 msgstr "Today is not within a semester – please choose a custom period."
 
-#: sicherung/ansichten.py:195
+#: sicherung/ansichten.py:224
 msgid "Kein aktuelles Schuljahr – bitte einen eigenen Zeitraum wählen."
 msgstr "No current school year – please choose a custom period."
 
-#: sicherung/ansichten.py:203
+#: sicherung/ansichten.py:232
 msgid "Bitte Beginn und Ende des Zeitraums angeben."
 msgstr "Please enter the start and end of the period."
 
-#: sicherung/ansichten.py:219
+#: sicherung/ansichten.py:248
 msgid ""
 "PDF-Export gestartet. Die Dateien erscheinen unten, sobald sie fertig sind."
 msgstr "PDF export started. The files appear below as soon as they are ready."
 
-#: sicherung/ansichten.py:271
+#: sicherung/ansichten.py:301
 msgid "PDF-Export gelöscht."
 msgstr "PDF export deleted."
 
-#: sicherung/ansichten.py:309
+#: sicherung/ansichten.py:339
 msgid "Rollen und Konto gespeichert."
 msgstr "Roles and account saved."
 
-#: sicherung/ansichten.py:313
+#: sicherung/ansichten.py:343
 #, python-format
 msgid "%(n)d Einzelrecht geändert."
 msgid_plural "%(n)d Einzelrechte geändert."
 msgstr[0] "%(n)d individual permission changed."
 msgstr[1] "%(n)d individual permissions changed."
 
-#: sicherung/ansichten.py:316
+#: sicherung/ansichten.py:351
+#, python-format
+msgid "%(u)s: Zwei-Faktor-Anmeldung %(w)s"
+msgstr "%(u)s: two-factor sign-in %(w)s"
+
+#: sicherung/ansichten.py:352 templates/portal/sicherheit.html:13
+#: templates/sicherung/benutzer_bearbeiten.html:48
+msgid "verpflichtend"
+msgstr "mandatory"
+
+#: sicherung/ansichten.py:352
+msgid "freiwillig"
+msgstr "voluntary"
+
+#: sicherung/ansichten.py:353
+msgid "Einstellung zur Zwei-Faktor-Anmeldung gespeichert."
+msgstr "Two-factor sign-in setting saved."
+
+#: sicherung/ansichten.py:356
+#, python-format
+msgid "%(u)s: Zwei-Faktor-Anmeldung zurückgesetzt"
+msgstr "%(u)s: two-factor sign-in reset"
+
+#: sicherung/ansichten.py:357
+msgid ""
+"Zwei-Faktor-Anmeldung zurückgesetzt. Das Konto richtet sie bei der nächsten "
+"Anmeldung neu ein, falls sie verpflichtend ist."
+msgstr ""
+"Two-factor sign-in reset. If it is mandatory, the account sets it up again "
+"at the next sign-in."
+
+#: sicherung/ansichten.py:360
 msgid "Ihr eigenes Passwort ändern Sie über „Passwort ändern“ im Kontomenü."
 msgstr "Change your own password via “Change password” in the account menu."
 
-#: sicherung/ansichten.py:328
+#: sicherung/ansichten.py:372
 msgid "ansehen"
 msgstr "view"
 
-#: sicherung/ansichten.py:328 templates/laufbahn/wechsel.html:36
+#: sicherung/ansichten.py:372 templates/laufbahn/wechsel.html:36
 msgid "anlegen"
 msgstr "add"
 
-#: sicherung/ansichten.py:328
+#: sicherung/ansichten.py:372
 msgid "ändern"
 msgstr "change"
 
-#: sicherung/ansichten.py:328 templates/termine/raumplan.html:38
+#: sicherung/ansichten.py:372 templates/termine/raumplan.html:38
 msgid "löschen"
 msgstr "delete"
 
-#: sicherung/archiv.py:109
+#: sicherung/archiv.py:114
 #, python-format
 msgid "%(datei)s (%(art)s): %(module)s"
 msgstr "%(datei)s (%(art)s): %(module)s"
 
-#: sicherung/archiv.py:139 sicherung/archiv.py:142
+#: sicherung/archiv.py:152 sicherung/archiv.py:155
 msgid "Die Datei ist keine gültige Sicherung der Schulverwaltung."
 msgstr "The file is not a valid backup of the school administration."
 
-#: sicherung/archiv.py:150
+#: sicherung/archiv.py:163
 #, python-format
 msgid "In der Sicherung fehlt die Datei für %(modul)s."
 msgstr "The backup is missing the file for %(modul)s."
 
-#: sicherung/archiv.py:153
+#: sicherung/archiv.py:166
 #, python-format
 msgid "Die Sicherung ist beschädigt (Prüfsumme von %(modul)s stimmt nicht)."
 msgstr "The backup is damaged (checksum of %(modul)s does not match)."
 
-#: sicherung/archiv.py:182
+#: sicherung/archiv.py:209
 #, python-format
 msgid "erstellt %(zeit)s von %(wer)s"
 msgstr "created %(zeit)s by %(wer)s"
 
-#: sicherung/archiv.py:208
+#: sicherung/archiv.py:235
 msgid "Die gewählten Module sind in dieser Sicherung nicht enthalten."
 msgstr "The selected modules are not contained in this backup."
 
-#: sicherung/archiv.py:219
+#: sicherung/archiv.py:246
 #, python-format
 msgid ""
 "%(modul)s: Die Sicherung stammt von einem anderen Programmstand (Version "
@@ -4802,7 +5091,7 @@ msgstr ""
 "%(modul)s: The backup comes from a different program state (version %(v)s). "
 "Please restore with the same version."
 
-#: sicherung/archiv.py:289
+#: sicherung/archiv.py:316
 #, python-format
 msgid ""
 "%(n)d Verweise %(b)s fehlen im System – bitte zuerst das zugehörige Modul "
@@ -4811,25 +5100,25 @@ msgstr ""
 "%(n)d references %(b)s are missing in the system – please restore the "
 "related module first or both together."
 
-#: sicherung/archiv.py:292
+#: sicherung/archiv.py:319
 #, python-format
 msgid "%(n)d Verweise %(b)s gibt es nicht mehr; sie werden leer gelassen."
 msgstr "%(n)d references %(b)s no longer exist; they will be left empty."
 
-#: sicherung/archiv.py:294
+#: sicherung/archiv.py:321
 #, python-format
 msgid ""
 "%(n)d Einträge des nicht mehr vorhandenen Modells %(m)s werden übersprungen."
 msgstr "%(n)d entries of the no longer existing model %(m)s will be skipped."
 
-#: sicherung/archiv.py:311
+#: sicherung/archiv.py:338
 msgid ""
 "Ihr eigenes Benutzerkonto ist nicht in der Sicherung enthalten und bleibt "
 "erhalten."
 msgstr ""
 "Your own user account is not contained in the backup and will be kept."
 
-#: sicherung/archiv.py:333
+#: sicherung/archiv.py:360
 #, python-format
 msgid ""
 "Einige Einträge können nicht gelöscht werden, weil andere Daten sie "
@@ -4838,18 +5127,18 @@ msgstr ""
 "Some entries cannot be deleted because other data depends on them (%(was)s)."
 " Please restore the dependent modules as well."
 
-#: sicherung/archiv.py:362
+#: sicherung/archiv.py:389
 #, python-format
 msgid "vor Wiederherstellung aus %(datei)s"
 msgstr "before restoring from %(datei)s"
 
-#: sicherung/archiv.py:383
+#: sicherung/archiv.py:410
 #, python-format
 msgid ""
 "Die Wiederherstellung wurde abgebrochen, es wurde nichts verändert: %(f)s"
 msgstr "The restore was aborted, nothing was changed: %(f)s"
 
-#: sicherung/archiv.py:385
+#: sicherung/archiv.py:412
 #, python-format
 msgid ""
 "%(module)s aus %(datei)s; vorher gesichert in %(vorher)s; %(n)d Dateien "
@@ -4871,11 +5160,11 @@ msgid "Es muss mindestens ein aktives Konto mit Vollzugriff bleiben."
 msgstr "At least one active account with full access must remain."
 
 #: sicherung/konten.py:102 templates/elternkontakt/regeln.html:28
-#: templates/sicherung/benutzer.html:27
+#: templates/sicherung/benutzer.html:28
 msgid "aktiv"
 msgstr "active"
 
-#: sicherung/konten.py:102 templates/sicherung/benutzer.html:27
+#: sicherung/konten.py:102 templates/sicherung/benutzer.html:28
 #: templates/sicherung/benutzer_bearbeiten.html:9
 #: templates/termine/sprechtag.html:89 templates/termine/sprechzeiten.html:25
 #: templates/termine/sprechzeiten.html:35
@@ -4899,7 +5188,7 @@ msgstr "uploaded"
 msgid "Anzahl Einträge je Modul"
 msgstr "Number of entries per module"
 
-#: sicherung/models.py:24 templates/sicherung/sicherungen.html:52
+#: sicherung/models.py:24 templates/sicherung/sicherungen.html:55
 msgid "mit Dateien"
 msgstr "with files"
 
@@ -5001,33 +5290,33 @@ msgstr "Password reset"
 msgid "Benutzerkonto geändert"
 msgstr "User account changed"
 
-#: sicherung/models.py:90 templates/sicherung/protokoll.html:14
+#: sicherung/models.py:91 templates/sicherung/protokoll.html:14
 #: templates/termine/sprechzeiten.html:25
 #: templates/termine/sprechzeiten.html:85
 #: templates/zeugnisse/protokoll.html:18
 msgid "Zeit"
 msgstr "Time"
 
-#: sicherung/models.py:92 sicherung/pdf.py:232
+#: sicherung/models.py:93 sicherung/pdf.py:234
 #: templates/sicherung/protokoll.html:14
 msgid "Benutzer:in"
 msgstr "User"
 
-#: sicherung/models.py:93 templates/portal/login.html:10
+#: sicherung/models.py:94 templates/portal/login.html:10
 #: templates/sicherung/benutzer.html:16
 msgid "Benutzername"
 msgstr "Username"
 
-#: sicherung/models.py:94 templates/laufbahn/loeschfristen.html:12
+#: sicherung/models.py:95 templates/laufbahn/loeschfristen.html:12
 #: templates/sicherung/protokoll.html:8 templates/sicherung/protokoll.html:14
 msgid "Aktion"
 msgstr "Action"
 
-#: sicherung/models.py:98
+#: sicherung/models.py:99
 msgid "Protokolleintrag"
 msgstr "Log entry"
 
-#: sicherung/models.py:99
+#: sicherung/models.py:100
 msgid "Protokoll (Sicherung und Rechte)"
 msgstr "Log (backup and permissions)"
 
@@ -5066,74 +5355,74 @@ msgstr "Home page and personal settings"
 msgid "Änderungsprotokoll: %(was)s"
 msgstr "Change history: %(was)s"
 
-#: sicherung/pdf.py:137
+#: sicherung/pdf.py:139
 #, python-format
 msgid "ab %(d)s"
 msgstr "from %(d)s"
 
-#: sicherung/pdf.py:139
+#: sicherung/pdf.py:141
 #, python-format
 msgid "bis %(d)s"
 msgstr "until %(d)s"
 
-#: sicherung/pdf.py:140
+#: sicherung/pdf.py:142
 msgid "gesamter Zeitraum"
 msgstr "entire period"
 
-#: sicherung/pdf.py:153 stammdaten/models.py:1101
+#: sicherung/pdf.py:155 stammdaten/models.py:1101
 #: templates/portal/schuelerakte.html:177
-#: templates/sicherung/benutzer_bearbeiten.html:60
-#: templates/sicherung/benutzer_bearbeiten.html:68
+#: templates/sicherung/benutzer_bearbeiten.html:77
+#: templates/sicherung/benutzer_bearbeiten.html:85
 msgid "nein"
 msgstr "no"
 
-#: sicherung/pdf.py:228
+#: sicherung/pdf.py:230
 msgid "Keine Einträge in diesem Zeitraum."
 msgstr "No entries in this period."
 
-#: sicherung/pdf.py:232
+#: sicherung/pdf.py:234
 msgid "Zeitpunkt"
 msgstr "Time"
 
-#: sicherung/pdf.py:251
+#: sicherung/pdf.py:253
 msgid "Leere Felder sind ausgelassen."
 msgstr "Empty fields are omitted."
 
-#: sicherung/pdf.py:272
+#: sicherung/pdf.py:274
 #, python-format
 msgid "Seite %(n)d"
 msgstr "Page %(n)d"
 
-#: sicherung/pdf.py:293
+#: sicherung/pdf.py:295
 msgid "geändert"
 msgstr "changed"
 
-#: sicherung/pdf.py:343
+#: sicherung/pdf.py:345
 #, python-format
 msgid "%(n)d PDF-Dateien: %(module)s, %(zeitraum)s"
 msgstr "%(n)d PDF files: %(module)s, %(zeitraum)s"
 
-#: sicherung/pdf.py:359
+#: sicherung/pdf.py:361
 #, python-format
 msgid "Vertraulich – erstellt am %(zeit)s von %(wer)s"
 msgstr "Confidential – created on %(zeit)s by %(wer)s"
 
-#: sicherung/pdf.py:386 sicherung/pdf.py:404
+#: sicherung/pdf.py:388 sicherung/pdf.py:407
 #, python-format
 msgid "Teil %(i)d von %(n)d"
 msgstr "Part %(i)d of %(n)d"
 
-#: sicherung/pdf.py:389
+#: sicherung/pdf.py:391
 #, python-format
 msgid "Zeitraum: %(z)s"
 msgstr "Period: %(z)s"
 
-#: sicherung/pdf.py:390 sicherung/pdf.py:409
+#: sicherung/pdf.py:392 sicherung/pdf.py:412
 #, python-format
 msgid "%(n)d Einträge"
 msgstr "%(n)d entries"
 
-#: sicherung/pdf.py:408
+#: sicherung/pdf.py:411
 #, python-format
 msgid "Bestand (Stand %(d)s)"
 msgstr "Records (as of %(d)s)"
@@ -5301,7 +5590,7 @@ msgstr "%(n)s memberships created. Please then remove students who opted out."
 msgid "Gültig"
 msgstr "Valid"
 
-#: stammdaten/admin.py:521 templates/sicherung/sicherungen.html:46
+#: stammdaten/admin.py:521 templates/sicherung/sicherungen.html:49
 msgid "Größe"
 msgstr "Size"
 
@@ -5333,7 +5622,7 @@ msgstr "Visibility and display"
 msgid "Stammdaten"
 msgstr "Master data"
 
-#: stammdaten/dokumente.py:34
+#: stammdaten/dokumente.py:35
 #, python-format
 msgid "Die Datei ist zu groß (höchstens %(mb)s MB)."
 msgstr "The file is too large (maximum %(mb)s MB)."
@@ -6660,6 +6949,7 @@ msgstr "More actions"
 
 #: templates/aufnahme/anmeldung.html:82 templates/aufnahme/anmeldung.html:145
 #: templates/aufnahme/formular.html:140 templates/elternkontakt/regel.html:29
+#: templates/sicherung/benutzer_bearbeiten.html:51
 #: templates/termine/sprechtag.html:71 templates/termine/sprechzeiten.html:75
 #: templates/termine/termin.html:30 templates/zeugnisse/konferenz.html:99
 #: templates/zeugnisse/zeugnis.html:115
@@ -6720,7 +7010,7 @@ msgid "Öffnen"
 msgstr "Open"
 
 #: templates/aufnahme/anmeldung.html:137 templates/portal/_anhaenge.html:36
-#: templates/sicherung/sicherungen.html:61
+#: templates/sicherung/sicherungen.html:64
 msgid "Herunterladen"
 msgstr "Download"
 
@@ -6739,7 +7029,7 @@ msgstr "Delete this file permanently?"
 #: templates/aufnahme/anmeldung.html:151
 #: templates/laufbahn/loeschfristen.html:27 templates/portal/_anhaenge.html:43
 #: templates/portal/_notizen.html:40 templates/portal/_notizen.html:56
-#: templates/sicherung/pdf.html:50 templates/sicherung/sicherungen.html:64
+#: templates/sicherung/pdf.html:50 templates/sicherung/sicherungen.html:73
 #: templates/termine/sprechtag.html:119
 msgid "Löschen"
 msgstr "Delete"
@@ -6823,10 +7113,6 @@ msgstr "Family"
 #: templates/aufnahme/anmeldung.html:217 templates/portal/schuelerakte.html:34
 msgid "DaZ/DaF"
 msgstr "German support"
-
-#: templates/aufnahme/anmeldung.html:219 templates/aufnahme/formular.html:45
-msgid "Adresse"
-msgstr "Address"
 
 #: templates/aufnahme/anmeldung.html:220
 msgid "zuletzt"
@@ -6949,7 +7235,7 @@ msgstr "Create application"
 
 #: templates/aufnahme/formular.html:141 templates/aufnahme/uebernahme.html:73
 #: templates/elternkontakt/neu.html:52 templates/elternkontakt/regel.html:31
-#: templates/termine/termin.html:31
+#: templates/portal/login_code.html:15 templates/termine/termin.html:31
 msgid "Abbrechen"
 msgstr "Cancel"
 
@@ -7236,7 +7522,7 @@ msgid "Nachrichten der Schule"
 msgstr "Messages from the school"
 
 #: templates/elternkontakt/eltern_portal.html:4
-#: templates/portal/_menueband.html:30
+#: templates/portal/_menueband.html:32
 #: templates/termine/eltern_sprechtag.html:5
 #: templates/termine/eltern_uebersicht.html:5
 msgid "Abmelden"
@@ -7917,7 +8203,7 @@ msgstr "including the next 30 days"
 
 #: templates/laufbahn/loeschfristen.html:12
 #: templates/laufbahn/loeschfristen.html:76
-#: templates/sicherung/sicherungen.html:45
+#: templates/sicherung/sicherungen.html:48
 msgid "Einträge"
 msgstr "Entries"
 
@@ -8067,7 +8353,8 @@ msgstr ""
 " draft in the reports module (grades of the current semester) and is "
 "released and printed there."
 
-#: templates/laufbahn/schueler.html:61 templates/termine/uebersicht.html:12
+#: templates/laufbahn/schueler.html:61 templates/portal/sicherheit.html:20
+#: templates/termine/uebersicht.html:12
 msgid "Drucken"
 msgstr "Print"
 
@@ -8525,16 +8812,18 @@ msgstr "No birthdays in the next seven days."
 msgid "Schüler:in, Kolleg:in oder Eltern suchen"
 msgstr "Search students, staff or parents"
 
-#: templates/portal/_menueband.html:39
+#: templates/portal/_menueband.html:41
 msgid "Menüband"
 msgstr "Ribbon"
 
-#: templates/portal/_menueband.html:46
+#: templates/portal/_menueband.html:48 templates/portal/office.html:20
+#: templates/portal/office.html:42
 msgid "Menüband einblenden"
 msgstr "Show ribbon"
 
-#: templates/portal/_menueband.html:46 templates/portal/_menueband.html:47
-#: templates/portal/_menueband.html:48
+#: templates/portal/_menueband.html:48 templates/portal/_menueband.html:49
+#: templates/portal/_menueband.html:50 templates/portal/office.html:20
+#: templates/portal/office.html:21
 msgid "Menüband ausblenden"
 msgstr "Hide ribbon"
 
@@ -8697,7 +8986,7 @@ msgid "FP"
 msgstr "SP"
 
 #: templates/portal/login.html:3 templates/portal/login.html:6
-#: templates/portal/login.html:13
+#: templates/portal/login.html:13 templates/portal/login_code.html:3
 msgid "Anmelden"
 msgstr "Log in"
 
@@ -8705,9 +8994,34 @@ msgstr "Log in"
 msgid "Benutzername oder Passwort sind falsch."
 msgstr "Username or password is incorrect."
 
-#: templates/portal/login.html:11
+#: templates/portal/login.html:11 templates/portal/sicherheit.html:58
 msgid "Passwort"
 msgstr "Password"
+
+#: templates/portal/login_code.html:6
+msgid "Zweiter Schritt"
+msgstr "Second step"
+
+#: templates/portal/login_code.html:7
+#, python-format
+msgid ""
+"Bitte geben Sie den sechsstelligen Code aus Ihrer Authenticator-App für das "
+"Konto <strong>%(name)s</strong> ein."
+msgstr ""
+"Please enter the six-digit code from your authenticator app for the account "
+"<strong>%(name)s</strong>."
+
+#: templates/portal/login_code.html:12
+msgid "Bestätigen"
+msgstr "Confirm"
+
+#: templates/portal/login_code.html:14
+msgid ""
+"Telefon verloren? Melden Sie sich mit einem Ihrer Ersatzcodes an oder bitten"
+" Sie die IT, die Zwei-Faktor-Anmeldung zurückzusetzen."
+msgstr ""
+"Lost your phone? Sign in with one of your backup codes or ask IT to reset "
+"two-factor sign-in."
 
 #: templates/portal/notenuebersicht.html:8
 #: templates/zeugnisse/unterricht.html:3 templates/zeugnisse/unterricht.html:8
@@ -8802,6 +9116,35 @@ msgid ""
 msgstr ""
 "No folders yet. First create a folder, e.g. “Written” or “Class "
 "participation”."
+
+#: templates/portal/office.html:15
+msgid ""
+"Microsoft 365 der Schule. Die Anwendungen öffnen sich in einem neuen Tab; "
+"die Anmeldung erfolgt mit dem Schulkonto bei Microsoft."
+msgstr ""
+"The school's Microsoft 365. The apps open in a new tab; you sign in to "
+"Microsoft with your school account."
+
+#: templates/portal/office.html:18
+msgid "Kacheln verwalten"
+msgstr "Manage tiles"
+
+#: templates/portal/office.html:31
+msgid "(öffnet in neuem Tab)"
+msgstr "(opens in a new tab)"
+
+#: templates/portal/office.html:36
+msgid "Noch keine Kacheln eingerichtet."
+msgstr "No tiles set up yet."
+
+#: templates/portal/office.html:39
+msgid ""
+"Outlook, Teams und die anderen Anwendungen lassen sich nicht in diese Seite "
+"einbetten: Microsoft untersagt das aus Sicherheitsgründen. Deshalb öffnet "
+"jede Kachel einen eigenen Tab."
+msgstr ""
+"Outlook, Teams and the other apps cannot be embedded in this page: Microsoft"
+" prohibits this for security reasons. Each tile therefore opens its own tab."
 
 #: templates/portal/rollen.html:8
 msgid ""
@@ -9019,6 +9362,137 @@ msgstr "Swimming"
 msgid "Keine Angaben hinterlegt."
 msgstr "No information on file."
 
+#: templates/portal/sicherheit.html:5
+msgid "Mein Konto"
+msgstr "My account"
+
+#: templates/portal/sicherheit.html:6
+msgid "Sicherheit des Kontos"
+msgstr "Account security"
+
+#: templates/portal/sicherheit.html:7
+msgid ""
+"Für Ihr Konto hat die IT die Zwei-Faktor-Anmeldung vorgeschrieben. Bitte "
+"richten Sie sie jetzt ein; erst danach können Sie weiterarbeiten."
+msgstr ""
+"IT has made two-factor sign-in mandatory for your account. Please set it up "
+"now; only then can you continue working."
+
+#: templates/portal/sicherheit.html:12
+#: templates/sicherung/benutzer_bearbeiten.html:45
+msgid "eingerichtet"
+msgstr "set up"
+
+#: templates/portal/sicherheit.html:12
+#: templates/sicherung/benutzer_bearbeiten.html:47
+msgid "nicht eingerichtet"
+msgstr "not set up"
+
+#: templates/portal/sicherheit.html:17
+msgid "Ihre Ersatzcodes"
+msgstr "Your backup codes"
+
+#: templates/portal/sicherheit.html:18
+msgid ""
+"Jeder Code funktioniert einmal, wenn das Telefon nicht verfügbar ist. Bitte "
+"jetzt ausdrucken oder sicher notieren – sie werden nicht noch einmal "
+"angezeigt."
+msgstr ""
+"Each code works once if your phone is not available. Please print them now "
+"or note them down safely – they will not be shown again."
+
+#: templates/portal/sicherheit.html:26
+msgid ""
+"Authenticator-App auf dem Telefon öffnen (z. B. Microsoft Authenticator, "
+"Google Authenticator oder Aegis)."
+msgstr ""
+"Open an authenticator app on your phone (e.g. Microsoft Authenticator, "
+"Google Authenticator or Aegis)."
+
+#: templates/portal/sicherheit.html:27
+msgid "Konto hinzufügen und diesen QR-Code scannen:"
+msgstr "Add an account and scan this QR code:"
+
+#: templates/portal/sicherheit.html:29
+msgid "QR-Code lässt sich nicht scannen?"
+msgstr "Cannot scan the QR code?"
+
+#: templates/portal/sicherheit.html:30
+msgid "Schlüssel von Hand eingeben (zeitbasiert, 6 Ziffern):"
+msgstr "Enter the key manually (time-based, 6 digits):"
+
+#: templates/portal/sicherheit.html:31
+msgid "Den angezeigten sechsstelligen Code hier eingeben:"
+msgstr "Enter the six-digit code shown here:"
+
+#: templates/portal/sicherheit.html:33
+msgid "Einrichtung abschließen"
+msgstr "Complete setup"
+
+#: templates/portal/sicherheit.html:40
+msgid "Ersatzcodes übrig"
+msgstr "Backup codes left"
+
+#: templates/portal/sicherheit.html:43
+msgid "Aktueller Code aus der App"
+msgstr "Current code from the app"
+
+#: templates/portal/sicherheit.html:46
+msgid "Neue Ersatzcodes erzeugen"
+msgstr "Create new backup codes"
+
+#: templates/portal/sicherheit.html:47
+msgid "Abschalten"
+msgstr "Switch off"
+
+#: templates/portal/sicherheit.html:51
+msgid ""
+"Mit der Zwei-Faktor-Anmeldung braucht man zum Anmelden zusätzlich zum "
+"Passwort einen Code, den eine App auf Ihrem Telefon alle 30 Sekunden neu "
+"erzeugt. Ein gestohlenes Passwort allein genügt dann nicht mehr."
+msgstr ""
+"With two-factor sign-in you need, in addition to your password, a code that "
+"an app on your phone generates every 30 seconds. A stolen password alone is "
+"then no longer enough."
+
+#: templates/portal/sicherheit.html:53
+msgid "Jetzt einrichten"
+msgstr "Set up now"
+
+#: templates/portal/sicherheit.html:59
+msgid ""
+"Ein gutes Passwort ist lang (mindestens 12 Zeichen) und wird nirgends sonst "
+"verwendet."
+msgstr ""
+"A good password is long (at least 12 characters) and is not used anywhere "
+"else."
+
+#: templates/portal/sicherheit.html:61
+msgid "Gut zu wissen"
+msgstr "Good to know"
+
+#: templates/portal/sicherheit.html:63
+msgid ""
+"Die Uhrzeit des Telefons muss stimmen (automatisch stellen lassen), sonst "
+"passen die Codes nicht."
+msgstr ""
+"The phone's clock must be correct (set it automatically), otherwise the "
+"codes will not match."
+
+#: templates/portal/sicherheit.html:64
+msgid ""
+"Neues Telefon: vorher abschalten und auf dem neuen Gerät neu einrichten – "
+"oder mit einem Ersatzcode anmelden."
+msgstr ""
+"New phone: switch off beforehand and set up again on the new device – or "
+"sign in with a backup code."
+
+#: templates/portal/sicherheit.html:65
+msgid ""
+"Die IT kann die Zwei-Faktor-Anmeldung eines Kontos zurücksetzen oder "
+"verpflichtend machen."
+msgstr "IT can reset an account's two-factor sign-in or make it mandatory."
+
 #: templates/portal/start.html:13
 #, python-format
 msgid "Kalenderwoche %(kw)s"
@@ -9233,15 +9707,27 @@ msgid "Name oder Benutzername"
 msgstr "Name or username"
 
 #: templates/sicherung/benutzer.html:17
+msgid "2FA"
+msgstr "2FA"
+
+#: templates/sicherung/benutzer.html:17
 #: templates/sicherung/benutzer_bearbeiten.html:34
 msgid "Letzte Anmeldung"
 msgstr "Last login"
 
-#: templates/sicherung/benutzer.html:29
+#: templates/sicherung/benutzer.html:26
+msgid "an"
+msgstr "on"
+
+#: templates/sicherung/benutzer.html:26
+msgid "Pflicht, offen"
+msgstr "required, pending"
+
+#: templates/sicherung/benutzer.html:30
 msgid "Keine Konten gefunden."
 msgstr "No accounts found."
 
-#: templates/sicherung/benutzer.html:33
+#: templates/sicherung/benutzer.html:34
 msgid ""
 "Neue Konten legen Sie in der Verwaltungsoberfläche unter Benutzerkonten an; "
 "Rollen und Einzelrechte vergeben Sie hier."
@@ -9249,7 +9735,7 @@ msgstr ""
 "Create new accounts in the administration interface under user accounts; "
 "assign roles and individual permissions here."
 
-#: templates/sicherung/benutzer.html:34
+#: templates/sicherung/benutzer.html:35
 msgid "Neues Konto anlegen"
 msgstr "Create new account"
 
@@ -9294,7 +9780,36 @@ msgstr ""
 "The IT administration role gives full access to all data. Individual "
 "permissions do not apply to accounts with full access."
 
-#: templates/sicherung/benutzer_bearbeiten.html:47
+#: templates/sicherung/benutzer_bearbeiten.html:46
+#, python-format
+msgid "seit %(d)s"
+msgstr "since %(d)s"
+
+#: templates/sicherung/benutzer_bearbeiten.html:50
+msgid "Für dieses Konto verpflichtend"
+msgstr "Mandatory for this account"
+
+#: templates/sicherung/benutzer_bearbeiten.html:54
+msgid ""
+"Zwei-Faktor-Anmeldung zurücksetzen? Die Person muss sie danach neu "
+"einrichten."
+msgstr "Reset two-factor sign-in? The person must then set it up again."
+
+#: templates/sicherung/benutzer_bearbeiten.html:56
+msgid "Zurücksetzen (z. B. Telefon verloren)"
+msgstr "Reset (e.g. phone lost)"
+
+#: templates/sicherung/benutzer_bearbeiten.html:58
+msgid ""
+"Verpflichtend heißt: Nach der nächsten Anmeldung muss die Person die Zwei-"
+"Faktor-Anmeldung einrichten, bevor sie weiterarbeiten kann. Freiwillig "
+"einrichten kann sie jede Person selbst unter „Sicherheit“."
+msgstr ""
+"Mandatory means: after the next sign-in the person must set up two-factor "
+"sign-in before they can continue working. Anyone can set it up voluntarily "
+"under “Security”."
+
+#: templates/sicherung/benutzer_bearbeiten.html:64
 msgid ""
 "„ja (Rolle)“ bzw. „nein“ ist der Stand aus den Rollen. Mit „+ erteilen“ "
 "erhält das Konto ein Recht zusätzlich, mit „− entziehen“ verliert es ein "
@@ -9306,29 +9821,29 @@ msgstr ""
 "its role. Visibility rules by class and section (e.g. form tutor) are not "
 "affected."
 
-#: templates/sicherung/benutzer_bearbeiten.html:51
+#: templates/sicherung/benutzer_bearbeiten.html:68
 #, python-format
 msgid "%(n)s Änderung"
 msgid_plural "%(n)s Änderungen"
 msgstr[0] "%(n)s change"
 msgstr[1] "%(n)s changes"
 
-#: templates/sicherung/benutzer_bearbeiten.html:60
-#: templates/sicherung/benutzer_bearbeiten.html:68
+#: templates/sicherung/benutzer_bearbeiten.html:77
+#: templates/sicherung/benutzer_bearbeiten.html:85
 msgid "ja (Rolle)"
 msgstr "yes (role)"
 
-#: templates/sicherung/benutzer_bearbeiten.html:61
-#: templates/sicherung/benutzer_bearbeiten.html:69
+#: templates/sicherung/benutzer_bearbeiten.html:78
+#: templates/sicherung/benutzer_bearbeiten.html:86
 msgid "+ erteilen"
 msgstr "+ grant"
 
-#: templates/sicherung/benutzer_bearbeiten.html:62
-#: templates/sicherung/benutzer_bearbeiten.html:70
+#: templates/sicherung/benutzer_bearbeiten.html:79
+#: templates/sicherung/benutzer_bearbeiten.html:87
 msgid "− entziehen"
 msgstr "− revoke"
 
-#: templates/sicherung/benutzer_bearbeiten.html:78
+#: templates/sicherung/benutzer_bearbeiten.html:95
 msgid "Einzelrechte speichern"
 msgstr "Save individual permissions"
 
@@ -9337,7 +9852,7 @@ msgid "Neuer PDF-Export"
 msgstr "New PDF export"
 
 #: templates/sicherung/pdf.html:15 templates/sicherung/sicherungen.html:13
-#: templates/sicherung/sicherungen.html:54
+#: templates/sicherung/sicherungen.html:57
 msgid "alle Module"
 msgstr "all modules"
 
@@ -9461,11 +9976,13 @@ msgstr ""
 
 #: templates/sicherung/sicherungen.html:29
 msgid ""
-"Sicherungen enthalten personenbezogene Daten: heruntergeladene Dateien bitte"
-" verschlüsselt und zugriffsgeschützt aufbewahren."
+"Sicherungen enthalten personenbezogene Daten. Herunterladen am besten mit "
+"Passwort: Die Datei ist dann mit AES-256 verschlüsselt und lässt sich nur "
+"mit diesem Passwort wieder hochladen."
 msgstr ""
-"Backups contain personal data: please keep downloaded files encrypted and "
-"access-protected."
+"Backups contain personal data. Preferably download them with a password: the"
+" file is then encrypted with AES-256 and can only be uploaded again with "
+"this password."
 
 #: templates/sicherung/sicherungen.html:31
 #, python-format
@@ -9473,39 +9990,67 @@ msgid "Ablage auf dem Server: %(ordner)s"
 msgstr "Storage on the server: %(ordner)s"
 
 #: templates/sicherung/sicherungen.html:32
+msgid "Ablage verschlüsselt (AES-256, Serverschlüssel)"
+msgstr "Storage encrypted (AES-256, server key)"
+
+#: templates/sicherung/sicherungen.html:33
+msgid ""
+"Die Ablage ist nicht verschlüsselt: DATEN_SCHLUESSEL fehlt in der .env "
+"(siehe Anleitung)."
+msgstr ""
+"Storage is not encrypted: DATEN_SCHLUESSEL is missing from the .env (see "
+"guide)."
+
+#: templates/sicherung/sicherungen.html:34
 msgid "Sicherung hochladen"
 msgstr "Upload backup"
 
-#: templates/sicherung/sicherungen.html:35
+#: templates/sicherung/sicherungen.html:37
+msgid "Passwort (falls verschlüsselt)"
+msgstr "Password (if encrypted)"
+
+#: templates/sicherung/sicherungen.html:38
 msgid "Hochladen und prüfen"
 msgstr "Upload and check"
 
-#: templates/sicherung/sicherungen.html:41
+#: templates/sicherung/sicherungen.html:44
 msgid "Vorhandene Sicherungen"
 msgstr "Existing backups"
 
-#: templates/sicherung/sicherungen.html:45 zeugnisse/models.py:161
+#: templates/sicherung/sicherungen.html:48 zeugnisse/models.py:161
 msgid "Erstellt"
 msgstr "Created"
 
-#: templates/sicherung/sicherungen.html:46
+#: templates/sicherung/sicherungen.html:49
 #: templates/sicherung/wiederherstellen.html:10
 msgid "Version"
 msgstr "Version"
 
-#: templates/sicherung/sicherungen.html:60
+#: templates/sicherung/sicherungen.html:63
 msgid "Wiederherstellen …"
 msgstr "Restore …"
 
-#: templates/sicherung/sicherungen.html:62
+#: templates/sicherung/sicherungen.html:66
+msgid "Passwort für die Datei (mind. 10 Zeichen)"
+msgstr "Password for the file (min. 10 characters)"
+
+#: templates/sicherung/sicherungen.html:67
+msgid "Verschlüsselt herunterladen"
+msgstr "Download encrypted"
+
+#: templates/sicherung/sicherungen.html:68
+msgid "ohne Passwort (unverschlüsselt)"
+msgstr "without password (unencrypted)"
+
+#: templates/sicherung/sicherungen.html:71
 msgid "Datei fehlt"
 msgstr "File missing"
 
-#: templates/sicherung/sicherungen.html:63
+#: templates/sicherung/sicherungen.html:72
 msgid "Diese Sicherung endgültig löschen?"
 msgstr "Delete this backup permanently?"
 
-#: templates/sicherung/sicherungen.html:71
+#: templates/sicherung/sicherungen.html:80
 msgid "Noch keine Sicherungen vorhanden."
 msgstr "No backups yet."
 

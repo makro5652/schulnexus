@@ -12,7 +12,7 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from fehlzeiten.models import Fehlzeit
-from portal import rollen as R
+from portal import krypto, rollen as R
 from stammdaten.models import Dokument, Person, Schuelerprofil
 
 from . import archiv
@@ -32,6 +32,13 @@ class Grundlage(TestCase):
         call_command("demodaten", passwort=PW, stdout=open("/dev/null", "w"))
         cls.it = User.objects.get(username="it")
         cls.sl = User.objects.get(username="schulleitung")
+
+    def setUp(self):
+        # Andere Tests schalten im selben Prozess auf Englisch um (sprache_wechseln); Meldungen hier deutsch prüfen.
+        from django.utils import translation
+
+        translation.activate("de")
+        self.addCleanup(translation.deactivate)
 
     def anmelden(self, name):
         self.client.logout()
@@ -77,7 +84,9 @@ class SicherungTest(Grundlage):
         self.assertRedirects(r, reverse("sicherungen"))
         s = Sicherung.objects.get()
         self.assertEqual(s.module, ["noten", "fehlzeiten"])
-        with zipfile.ZipFile(s.pfad) as zf:
+        self.assertTrue(s.datei.endswith(".zip.enc"))
+        self.assertEqual(s.pfad.read_bytes()[:6], krypto.MAGIC)        # auf dem Datenträger verschlüsselt
+        with zipfile.ZipFile(io.BytesIO(krypto.ablage_lesen(s.pfad))) as zf:
             manifest = json.loads(zf.read("manifest.json"))
             self.assertEqual(set(manifest["module"]), {"noten", "fehlzeiten"})
             daten = json.loads(zf.read("daten/fehlzeiten.json"))
@@ -161,7 +170,7 @@ class SicherungTest(Grundlage):
 
     def test_hochladen_pruefen_und_wiederherstellen(self):
         s = archiv.sicherung_erstellen(["fehlzeiten"], self.sl)
-        daten = s.pfad.read_bytes()
+        daten = krypto.ablage_lesen(s.pfad)
         self.anmelden("it")
         r = self.client.post(reverse("sicherungen"), {"aktion": "hochladen", "datei": SimpleUploadedFile("x.zip", daten)})
         self.assertRedirects(r, reverse("sicherungen"))
@@ -179,10 +188,37 @@ class SicherungTest(Grundlage):
         self.assertContains(r, "beschädigt")
         self.assertEqual(Sicherung.objects.filter(art=Sicherung.HOCHGELADEN).count(), 1)
 
+    def test_herunterladen_mit_passwort_und_wieder_hochladen(self):
+        s = archiv.sicherung_erstellen(["fehlzeiten"], self.sl)
+        self.anmelden("it")
+        url = reverse("sicherung_herunterladen", args=[s.pk])
+        # zu kurzes Passwort
+        r = self.client.post(url, {"passwort": "kurz"})
+        self.assertRedirects(r, reverse("sicherungen"))
+        r = self.client.post(url, {"passwort": "Ein-langes-Passwort"})
+        self.assertEqual(r["Content-Disposition"].split("filename=")[1].strip('"'), s.datei)    # …zip.enc
+        daten = inhalt(r)
+        self.assertEqual(daten[:7], krypto.MAGIC + bytes([krypto.PASSWORT]))
+        self.assertTrue(Protokoll.objects.filter(aktion="heruntergeladen", text__contains="Passwort").exists())
+        # ohne Passwort abgelehnt, mit falschem abgelehnt, mit richtigem angenommen
+        r = self.client.post(reverse("sicherungen"), {"aktion": "hochladen", "datei": SimpleUploadedFile("a.enc", daten)})
+        self.assertContains(r, "Passwort")
+        r = self.client.post(reverse("sicherungen"), {"aktion": "hochladen", "datei": SimpleUploadedFile("a.enc", daten), "passwort": "falsch-falsch-falsch"})
+        self.assertContains(r, "Entschlüsselung fehlgeschlagen")
+        r = self.client.post(reverse("sicherungen"), {"aktion": "hochladen", "datei": SimpleUploadedFile("a.enc", daten), "passwort": "Ein-langes-Passwort"})
+        self.assertRedirects(r, reverse("sicherungen"))
+        hoch = Sicherung.objects.get(art=Sicherung.HOCHGELADEN)
+        self.assertEqual(hoch.pfad.read_bytes()[:7], krypto.MAGIC + bytes([krypto.SERVER]))   # wieder mit Serverschlüssel
+        self.assertEqual(hoch.module, ["fehlzeiten"])
+        # Datei mit dem Serverschlüssel dieser Installation (z. B. vom Datenträger kopiert)
+        r = self.client.post(reverse("sicherungen"), {"aktion": "hochladen", "datei": SimpleUploadedFile("b.zip.enc", s.pfad.read_bytes())})
+        self.assertRedirects(r, reverse("sicherungen"))
+        self.assertEqual(Sicherung.objects.filter(art=Sicherung.HOCHGELADEN).count(), 2)
+
     def test_anderer_programmstand_wird_abgelehnt(self):
         s = archiv.sicherung_erstellen(["fehlzeiten"], self.sl)
         puffer = io.BytesIO()
-        with zipfile.ZipFile(s.pfad) as alt, zipfile.ZipFile(puffer, "w") as neu:
+        with zipfile.ZipFile(io.BytesIO(krypto.ablage_lesen(s.pfad))) as alt, zipfile.ZipFile(puffer, "w") as neu:
             for n in alt.namelist():
                 inhalt_ = alt.read(n)
                 if n == "manifest.json":
@@ -192,6 +228,7 @@ class SicherungTest(Grundlage):
                     inhalt_ = json.dumps(m).encode()
                 neu.writestr(n, inhalt_)
         s.pfad.write_bytes(puffer.getvalue())
+        krypto.ablage_verschluesseln(s.pfad)
         plan = archiv.planen(s.pfad, ["fehlzeiten"], self.sl)
         self.assertTrue(any("Programmstand" in str(b) for b in plan["blockiert"]))
 
@@ -211,7 +248,9 @@ class PdfTest(Grundlage):
     def text(self, pfad):
         from pypdf import PdfReader
 
-        return "\n".join(seite.extract_text() for seite in PdfReader(str(pfad)).pages)
+        roh = pfad.read_bytes()
+        self.assertEqual(roh[:6], krypto.MAGIC)                         # PDF-Exporte liegen verschlüsselt
+        return "\n".join(seite.extract_text() for seite in PdfReader(io.BytesIO(krypto.ablage_lesen(pfad))).pages)
 
     def test_export_mit_zeitraum_und_monatsaufteilung(self):
         self.anmelden("schulleitung")

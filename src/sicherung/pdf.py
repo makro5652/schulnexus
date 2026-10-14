@@ -20,6 +20,8 @@ from django.db import close_old_connections, models
 from django.utils import formats, timezone, translation
 from django.utils.translation import gettext as _
 
+from portal import krypto
+
 from .models import Exportauftrag, Protokoll
 from .module import NAMEN, ist_protokollmodell, modellname, modelle
 
@@ -390,6 +392,7 @@ def _export(auftrag):
                                                     _("%(n)d Einträge") % {"n": eintraege}] if x)
                 seiten = pdf_schreiben(ordner / name, f"{modulname}", untertitel, teil,
                                        f"{settings.SCHULNAME} · {modulname} · {titel_fenster}", fuss)
+                krypto.ablage_verschluesseln(ordner / name)
                 dateien.append({"name": name, "modul": key, "titel": f"{modulname} – {titel_fenster}" + (f" ({teiltext})" if teiltext else ""),
                                 "eintraege": eintraege, "seiten": seiten, "groesse": (ordner / name).stat().st_size})
         if bestand:
@@ -409,6 +412,7 @@ def _export(auftrag):
                                                     _("%(n)d Einträge") % {"n": eintraege}] if x)
                 seiten = pdf_schreiben(ordner / name, modulname, untertitel, teil,
                                        f"{settings.SCHULNAME} · {modulname} · {_('Bestand')}", fuss)
+                krypto.ablage_verschluesseln(ordner / name)
                 dateien.append({"name": name, "modul": key, "titel": f"{modulname} – {_('Bestand')}" + (f" ({teiltext})" if teiltext else ""),
                                 "eintraege": eintraege, "seiten": seiten, "groesse": (ordner / name).stat().st_size})
     return dateien

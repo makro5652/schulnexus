@@ -17,6 +17,8 @@ if ! docker compose version >/dev/null 2>&1; then
 fi
 
 zufall() { LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c "$1"; }
+# 32 Zufallsbytes, Base64 (URL-sicher) – Schlüssel für die Verschlüsselung gespeicherter Dateien
+schluessel() { head -c 32 /dev/urandom | base64 | tr '+/' '-_' | tr -d '=\n'; }
 wert() { grep "^$1=" .env | head -n 1 | cut -d= -f2-; }
 setzen() { sed -i "s|^$1=.*|$1=$2|" .env; }
 
@@ -30,8 +32,10 @@ if [ ! -f .env ]; then
       -e "s|^DB_PASSWORT=.*|DB_PASSWORT=$(zufall 24)|" \
       -e "s|^ADMIN_PASSWORT=.*|ADMIN_PASSWORT=$(zufall 16)|" \
       -e "s|^DEMO_PASSWORT=.*|DEMO_PASSWORT=$(zufall 12)|" \
+      -e "s|^DATEN_SCHLUESSEL=.*|DATEN_SCHLUESSEL=$(schluessel)|" \
       .env.example > .env
   chmod 600 .env
+  NEUER_SCHLUESSEL=1
   printf "Ablageort der Daten [%s]: " "$(wert APPDATA)"
   read -r ANTWORT || true
   [ -n "$ANTWORT" ] && setzen APPDATA "$ANTWORT"
@@ -43,6 +47,12 @@ if [ ! -f .env ]; then
     read -r ANTWORT || true
     case "$ANTWORT" in j|J|ja|Ja) setzen BIND_ADRESSE "$TS_IP" ;; esac
   fi
+fi
+
+# Ab 0.4.6.0: bestehende .env um den Schlüssel für die Verschlüsselung ergänzen (einmalig)
+if ! grep -q '^DATEN_SCHLUESSEL=' .env; then
+  printf '\n# Verschlüsselung gespeicherter Dateien (ab 0.4.6.0) – getrennt vom Server sicher aufbewahren!\nDATEN_SCHLUESSEL=%s\nOFFICE_MANDANT=\nHTTPS=0\n' "$(schluessel)" >> .env
+  NEUER_SCHLUESSEL=1
 fi
 
 APPDATA="$(wert APPDATA)"; PORT="$(wert PORT)"; BIND="$(wert BIND_ADRESSE)"
@@ -99,3 +109,11 @@ if [ "$(wert DEMO_DATEN)" = "1" ]; then
 fi
 echo ""
 echo "Datenbanksicherungen: $APPDATA/sicherungen (täglich, $(wert SICHERUNG_BEHALTEN_TAGE) Tage aufbewahrt)"
+
+if [ -n "${NEUER_SCHLUESSEL:-}" ]; then
+  echo ""
+  echo "WICHTIG: In unraid/.env wurde ein Schlüssel für die Verschlüsselung erzeugt (DATEN_SCHLUESSEL)."
+  echo "Bitte ausdrucken bzw. getrennt vom Server sicher aufbewahren. Ohne ihn sind Anhänge und"
+  echo "Modulsicherungen nicht mehr lesbar:"
+  grep '^DATEN_SCHLUESSEL=' .env | sed 's/^/  /'
+fi

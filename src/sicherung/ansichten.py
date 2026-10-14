@@ -15,6 +15,8 @@ from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone, translation
 from django.utils.translation import gettext, gettext_lazy as _, ngettext, pgettext_lazy
+
+from portal import krypto
 from django.views.decorators.http import require_POST
 
 from portal import rollen as R
@@ -70,7 +72,9 @@ class SicherungForm(forms.Form):
 
 
 class HochladenForm(forms.Form):
-    datei = forms.FileField(label=_("Sicherungsdatei (ZIP)"))
+    datei = forms.FileField(label=_("Sicherungsdatei (ZIP oder verschlüsselt)"))
+    passwort = forms.CharField(label=_("Passwort (bei verschlüsselten Downloads)"), required=False,
+                               widget=forms.PasswordInput(attrs={"autocomplete": "off"}))
 
     def clean_datei(self):
         d = self.cleaned_data["datei"]
@@ -88,7 +92,8 @@ def sicherungen(request):
             hochladen = HochladenForm(request.POST, request.FILES)
             if hochladen.is_valid():
                 try:
-                    s = archiv.sicherung_hochladen(hochladen.cleaned_data["datei"], request.user)
+                    s = archiv.sicherung_hochladen(hochladen.cleaned_data["datei"], request.user,
+                                                   hochladen.cleaned_data.get("passwort") or None)
                 except archiv.SicherungFehler as fehler:
                     hochladen.add_error("datei", str(fehler))
                 else:
@@ -107,17 +112,41 @@ def sicherungen(request):
         s.vorhanden = s.pfad.exists()
     return render(request, "sicherung/sicherungen.html", {
         "reiter": _reiter(request, "sicherung"), "form": form, "hochladen": hochladen, "sicherungen": liste,
-        "ordner": settings.MODUL_SICHERUNGEN, "alle_module": len(SCHLUESSEL),
+        "ordner": settings.MODUL_SICHERUNGEN, "alle_module": len(SCHLUESSEL), "verschluesselt": krypto.aktiv(),
     })
 
 
 @nur_sicherung
 def sicherung_herunterladen(request, pk):
+    """
+    Herunterladen: mit Passwort verschlüsselt (POST mit Passwort, empfohlen) oder als unverschlüsselte ZIP-Datei.
+    Die Ablage auf dem Server bleibt mit dem Serverschlüssel verschlüsselt.
+    """
+    import tempfile
+
     s = get_object_or_404(Sicherung, pk=pk)
     if not s.pfad.exists():
         raise Http404
-    Protokoll.schreiben(request.user, "heruntergeladen", s.datei)
-    return FileResponse(open(s.pfad, "rb"), as_attachment=True, filename=s.datei, content_type="application/zip")
+    basis = s.datei[:-4] if s.datei.endswith(".enc") else s.datei
+    passwort = request.POST.get("passwort", "") if request.method == "POST" else ""
+    if request.method == "POST" and len(passwort) < 10 and not request.POST.get("ohne_passwort"):
+        messages.error(request, gettext("Bitte ein Passwort mit mindestens 10 Zeichen angeben."))
+        return redirect("sicherungen")
+    try:
+        klar = krypto.ablage_temporaer(s.pfad)
+    except krypto.KryptoFehler as f:
+        messages.error(request, str(f))
+        return redirect("sicherungen")
+    if passwort:
+        aus = tempfile.TemporaryFile()
+        salz = __import__("os").urandom(16)
+        krypto.verschluesseln(klar, aus, krypto.passwort_schluessel(passwort, salz), krypto.PASSWORT, salz)
+        klar.close()
+        aus.seek(0)
+        Protokoll.schreiben(request.user, "heruntergeladen", gettext("%(datei)s (mit Passwort verschlüsselt)") % {"datei": s.datei})
+        return FileResponse(aus, as_attachment=True, filename=basis + ".enc", content_type="application/octet-stream")
+    Protokoll.schreiben(request.user, "heruntergeladen", gettext("%(datei)s (unverschlüsselt)") % {"datei": s.datei})
+    return FileResponse(klar, as_attachment=True, filename=basis, content_type="application/zip")
 
 
 @nur_sicherung
@@ -243,7 +272,8 @@ def _export_datei(auftrag, name):
 def pdf_datei(request, pk, name):
     auftrag = get_object_or_404(Exportauftrag, pk=pk)
     pfad = _export_datei(auftrag, name)
-    return FileResponse(open(pfad, "rb"), as_attachment=request.GET.get("ansehen") != "1", filename=name, content_type="application/pdf")
+    return FileResponse(krypto.ablage_temporaer(pfad), as_attachment=request.GET.get("ansehen") != "1", filename=name,
+                        content_type="application/pdf")
 
 
 @nur_sicherung
@@ -254,7 +284,7 @@ def pdf_zip(request, pk):
         for d in auftrag.dateien:
             pfad = auftrag.ordner / d["name"]
             if pfad.exists():
-                zf.write(pfad, d["name"])
+                zf.writestr(d["name"], krypto.ablage_lesen(pfad))
     puffer.seek(0)
     name = f"pdf-export-{auftrag.pk}-{timezone.localtime(auftrag.erstellt_am):%Y%m%d}.zip"
     return FileResponse(puffer, as_attachment=True, filename=name, content_type="application/zip")
@@ -279,7 +309,7 @@ def benutzerverwaltung(request):
     User = get_user_model()
     q = (request.GET.get("q") or "").strip()
     rolle = request.GET.get("rolle") or ""
-    qs = User.objects.prefetch_related("groups").select_related("person", "einstellung").order_by("-is_active", "username")
+    qs = User.objects.prefetch_related("groups").select_related("person", "einstellung", "zweifaktor").order_by("-is_active", "username")
     if q:
         qs = qs.filter(Q(username__icontains=q) | Q(person__nachname__icontains=q) | Q(person__vorname__icontains=q))
     if rolle:
@@ -311,6 +341,20 @@ def benutzer_bearbeiten(request, pk):
                 zustaende = {int(k[2:]): v for k, v in request.POST.items() if k.startswith("r_") and k[2:].isdigit()}
                 n = konten.einzelrechte_speichern(u, zustaende, request.user)
                 messages.success(request, ngettext("%(n)d Einzelrecht geändert.", "%(n)d Einzelrechte geändert.", n) % {"n": n})
+            elif aktion in ("zweifaktor_pflicht", "zweifaktor_zuruecksetzen"):
+                from portal import zweifaktor as Z
+
+                z = Z.eintrag(u)
+                if aktion == "zweifaktor_pflicht":
+                    z.pflicht = bool(request.POST.get("pflicht"))
+                    z.save(update_fields=["pflicht"])
+                    Protokoll.schreiben(request.user, "zweifaktor", gettext("%(u)s: Zwei-Faktor-Anmeldung %(w)s") % {
+                        "u": u.username, "w": gettext("verpflichtend") if z.pflicht else gettext("freiwillig")})
+                    messages.success(request, gettext("Einstellung zur Zwei-Faktor-Anmeldung gespeichert."))
+                else:
+                    Z.abschalten(z)
+                    Protokoll.schreiben(request.user, "zweifaktor", gettext("%(u)s: Zwei-Faktor-Anmeldung zurückgesetzt") % {"u": u.username})
+                    messages.success(request, gettext("Zwei-Faktor-Anmeldung zurückgesetzt. Das Konto richtet sie bei der nächsten Anmeldung neu ein, falls sie verpflichtend ist."))
             elif aktion == "passwort":
                 if u == request.user:
                     raise konten.KontoFehler(gettext("Ihr eigenes Passwort ändern Sie über „Passwort ändern“ im Kontomenü."))
@@ -328,6 +372,7 @@ def benutzer_bearbeiten(request, pk):
         "tabelle": konten.rechte_tabelle(u), "aktionen": [_("ansehen"), _("anlegen"), _("ändern"), _("löschen")],
         "vollzugriff": u.is_superuser,
         "email": u.email or getattr(getattr(u, "person", None), "email", ""),
+        "zweifaktor": getattr(u, "zweifaktor", None),
     })
 
 

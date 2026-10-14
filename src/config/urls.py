@@ -2,12 +2,14 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
 
-from portal import anhaenge, startseite, views, zuordnung
-from portal.formulare import AnmeldeFormular
+from portal import anhaenge, sicherheit, startseite, views, zuordnung
 
 urlpatterns = [
     path("", views.start, name="start"),
-    path("anmelden/", auth_views.LoginView.as_view(template_name="portal/login.html", authentication_form=AnmeldeFormular), name="login"),
+    path("anmelden/", sicherheit.Anmelden.as_view(), name="login"),
+    path("anmelden/code/", sicherheit.anmelden_code, name="anmelden_code"),
+    path("konto/sicherheit/", sicherheit.sicherheit, name="sicherheit"),
+    path("office/", views.office, name="office"),
     path("abmelden/", auth_views.LogoutView.as_view(), name="logout"),
     path("noten/unterricht/<int:pk>/", views.notenuebersicht, name="notenuebersicht"),
     path("klassen/<int:pk>/", views.klassenliste, name="klassenliste"),

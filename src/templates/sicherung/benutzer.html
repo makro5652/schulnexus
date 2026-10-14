@@ -14,7 +14,7 @@
 <div class="tabellenrahmen">
 <table class="liste">
   <thead><tr><th>{% translate "Benutzername" %}</th><th>{% translate "Name" %}</th><th>{% translate "Rollen" %}</th>
-    <th>{% translate "Einzelrechte" %}</th><th>{% translate "Letzte Anmeldung" %}</th><th>{% translate "Status" %}</th></tr></thead>
+    <th>{% translate "Einzelrechte" %}</th><th>{% translate "2FA" %}</th><th>{% translate "Letzte Anmeldung" %}</th><th>{% translate "Status" %}</th></tr></thead>
   <tbody>
   {% for z in zeilen %}
     <tr>
@@ -23,10 +23,11 @@
       <td>{% for r in z.rollen %}<span class="etikett">{{ r }}</span>{% empty %}<span class="leise">–</span>{% endfor %}
         {% if z.u.is_superuser %}<span class="etikett warnend">{% translate "Vollzugriff" %}</span>{% endif %}</td>
       <td>{% if z.plus %}<span class="sy-plus">+{{ z.plus }}</span>{% endif %} {% if z.minus %}<span class="sy-minus">−{{ z.minus }}</span>{% endif %}{% if not z.plus and not z.minus %}<span class="leise">–</span>{% endif %}</td>
+      <td>{% if z.u.zweifaktor.aktiv %}<span class="zf-status an">{% translate "an" %}</span>{% elif z.u.zweifaktor.pflicht %}<span class="zf-status aus">{% translate "Pflicht, offen" %}</span>{% else %}<span class="leise">–</span>{% endif %}</td>
       <td class="nowrap"><small>{{ z.u.last_login|date:"SHORT_DATETIME_FORMAT"|default:"–" }}</small></td>
       <td>{% if z.u.is_active %}{% translate "aktiv" %}{% else %}<span class="auffaellig">{% translate "gesperrt" %}</span>{% endif %}</td>
     </tr>
-  {% empty %}<tr><td colspan="6" class="leer">{% translate "Keine Konten gefunden." %}</td></tr>{% endfor %}
+  {% empty %}<tr><td colspan="7" class="leer">{% translate "Keine Konten gefunden." %}</td></tr>{% endfor %}
   </tbody>
 </table>
 </div>

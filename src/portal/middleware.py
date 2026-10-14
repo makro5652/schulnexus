@@ -50,7 +50,7 @@ class NurPersonalMiddleware:
         user = getattr(request, "user", None)
         if user is not None and user.is_authenticated and not darf_portal_nutzen(user) and self.elternkonto(user):
             # Vorbereitetes Elternportal (ELTERNPORTAL_AKTIV): Eltern bleiben auf ihren eigenen Seiten.
-            if request.path.startswith(self.FREI + ("/eltern/",)):
+            if request.path.startswith(self.FREI + ("/eltern/", "/konto/sicherheit/")):
                 return self.get_response(request)
             return redirect("elternportal")
         if user is not None and user.is_authenticated and not darf_portal_nutzen(user) \
@@ -59,3 +59,24 @@ class NurPersonalMiddleware:
             messages.error(request, gettext("Dieses Portal ist nur für Beschäftigte der Schule zugänglich."))
             return redirect("login")
         return self.get_response(request)
+
+
+class SicherheitsKoepfeMiddleware:
+    """
+    Zusätzliche Sicherheitsköpfe für alle Antworten: Content-Security-Policy (nur Inhalte der eigenen Adresse,
+    keine Einbettung in fremde Seiten) und Permissions-Policy. Antworten mit eigener Richtlinie behalten diese.
+    """
+
+    CSP = ("default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; "
+           "font-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; "
+           "object-src 'none'")
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        antwort = self.get_response(request)
+        antwort.headers.setdefault("Content-Security-Policy", self.CSP)
+        antwort.headers.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=()")
+        antwort.headers.setdefault("Cross-Origin-Opener-Policy", "same-origin")
+        return antwort

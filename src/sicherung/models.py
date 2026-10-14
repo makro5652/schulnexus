@@ -86,6 +86,7 @@ class Protokoll(models.Model):
         ("heruntergeladen", _("Sicherung heruntergeladen")), ("geloescht", _("Sicherung gelöscht")),
         ("wiederhergestellt", _("Wiederherstellung")), ("pdf", _("PDF-Export")), ("rechte", _("Rollen und Rechte geändert")),
         ("passwort", _("Passwort zurückgesetzt")), ("konto", _("Benutzerkonto geändert")),
+        ("zweifaktor", _("Zwei-Faktor-Anmeldung")),
     ]
     zeit = models.DateTimeField(_("Zeit"), auto_now_add=True)
     benutzer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,

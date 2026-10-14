@@ -916,3 +916,52 @@ a.klein, .klein { font-size: 0.85rem; }
   .tm-z-gesperrt { display: none; }
 }
 .tm-zeiten .link, .tm-zeile .link, .tm-liste .link, .tm-buchungsliste .link, .tm-elternliste .link, #raster .link { color: var(--akzent); text-decoration: underline; font-size: 0.85rem; }
+
+/* ---------------------------------------------------------------- Sicherheit: Zwei-Faktor-Anmeldung, Sicherungen (0.4.6.0) */
+.zf-status { display: inline-block; font-size: 0.8rem; font-weight: 600; padding: 0.15rem 0.55rem; border-radius: 999px; vertical-align: middle; margin-left: 0.3rem; }
+.zf-status.an { background: var(--akzent-hell); color: var(--akzent); }
+.zf-status.aus { background: var(--grund); color: var(--leise); border: 1px solid var(--linie); }
+p.zf-status { margin: 0 0 0.6rem; }
+.zf-schritte { padding-left: 1.3rem; display: grid; gap: 0.8rem; }
+.zf-qr { margin: 0.6rem 0; }
+.zf-qr svg { display: block; width: 210px; max-width: 100%; height: auto; background: #fff; padding: 6px; border-radius: 8px; border: 1px solid var(--linie); }
+.zf-schluessel { font-size: 1rem; letter-spacing: 0.06em; word-break: break-all; }
+.zf-form { display: flex; gap: 0.6rem; align-items: flex-end; flex-wrap: wrap; margin-top: 0.4rem; }
+.zf-form input[type="text"], .zf-form input:not([type]) { font: inherit; font-size: 1.1rem; letter-spacing: 0.12em; padding: 0.45rem 0.6rem; border: 1px solid var(--linie); border-radius: 8px; background: var(--grund); color: var(--text); width: 11rem; max-width: 100%; }
+.zf-codes { border: 2px dashed var(--akzent); border-radius: var(--radius); padding: 0.8rem 1rem; margin-bottom: 1rem; }
+.zf-codes ul { display: grid; grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr)); gap: 0.35rem 1rem; list-style: none; padding: 0; margin: 0.5rem 0 0.8rem; }
+.zf-codes code { font-size: 1.05rem; letter-spacing: 0.05em; }
+.zf-anmeldung { max-width: 26rem; }
+.sy-download { display: inline-block; position: relative; }
+.sy-download > summary { list-style: none; }
+.sy-download > summary::-webkit-details-marker { display: none; }
+.sy-download[open] .sy-download-form { position: absolute; right: 0; z-index: 5; width: min(22rem, 80vw); background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--radius); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12); padding: 0.8rem; display: grid; gap: 0.5rem; text-align: left; }
+.sy-download-form input[type="password"] { font: inherit; padding: 0.4rem 0.55rem; border: 1px solid var(--linie); border-radius: 6px; background: var(--grund); color: var(--text); width: 100%; }
+@media print { .nicht-drucken { display: none !important; } }
+
+/* ---------------------------------------------------------------- Office-Kacheln (0.4.6.0) */
+.of-kopf { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.of-kopf h1 { margin: 0 0 0.2rem; }
+.of-kopf p { margin: 0; }
+.of-aktionen { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.of-aktionen .knopf, .of-zurueck { display: inline-flex; align-items: center; gap: 0.4rem; }
+.of-aktionen svg, .of-zurueck svg { width: 1.05rem; height: 1.05rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ohne-menueband #of-umschalten svg { transform: rotate(180deg); }
+.of-kacheln { list-style: none; padding: 0; margin: 0 0 1.2rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(15rem, 100%), 1fr)); gap: 0.9rem; }
+.of-kachel { position: relative; display: flex; align-items: center; gap: 0.9rem; min-height: 5.2rem; padding: 0.9rem 1rem; background: var(--flaeche); border: 1px solid var(--linie);
+  border-radius: var(--radius); color: var(--text); text-decoration: none; border-left: 5px solid var(--of-farbe, var(--akzent)); transition: transform .12s ease, box-shadow .12s ease; }
+.of-kachel:hover, .of-kachel:focus-visible { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1); border-color: var(--of-farbe, var(--akzent)); }
+.of-symbol { flex: none; display: grid; place-items: center; width: 2.9rem; height: 2.9rem; border-radius: 10px; background: var(--of-farbe, var(--akzent)); color: #fff; }
+.of-symbol svg { width: 1.6rem; height: 1.6rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.of-text { display: grid; gap: 0.15rem; min-width: 0; }
+.of-text strong { font-size: 1.05rem; }
+.of-text small { color: var(--leise); }
+.of-neu { position: absolute; top: 0.45rem; right: 0.6rem; color: var(--leise); font-size: 0.9rem; }
+.ohne-menueband #menueband { display: none; }
+.of-zurueck { position: fixed; right: 1rem; bottom: 1rem; z-index: 50; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18); }
+.of-zurueck[hidden] { display: none; }
+@media (prefers-reduced-motion: reduce) { .of-kachel { transition: none; } }
+.sy-warnung { background: var(--gefahr-flaeche); color: var(--warnung); border-radius: 8px; padding: 0.7rem 1rem; font-weight: 600; }
+.sy-spalte { display: grid; gap: 1rem; align-content: start; min-width: 0; }
+.zf-zeile .zf-status { margin-left: 0; }
+#zweifaktor form { margin: 0.6rem 0; display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }

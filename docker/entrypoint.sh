@@ -1,7 +1,8 @@
 #!/bin/sh
 # Startablauf im Container:
 # 1. auf die Datenbank warten  2. Migrationen  3. Grundeinrichtung
-# 4. Admin-Konto anlegen (falls angegeben)  5. optional Demo-Daten  6. Server starten
+# 4. vorhandene Dateien verschlüsseln (falls DATEN_SCHLUESSEL gesetzt)
+# 5. Admin-Konto anlegen (falls angegeben)  6. optional Demo-Daten  7. Server starten
 set -e
 
 echo "Warte auf die Datenbank ..."
@@ -22,6 +23,10 @@ PY
 
 python manage.py migrate --noinput
 python manage.py grundeinrichtung
+
+if [ -n "$DATEN_SCHLUESSEL" ]; then
+    python manage.py dateien_verschluesseln
+fi
 
 if [ -n "$ADMIN_BENUTZER" ] && [ -n "$ADMIN_PASSWORT" ]; then
 python - <<'PY'

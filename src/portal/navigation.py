@@ -65,12 +65,15 @@ def menueband(request):
         Gruppe(_("Übersicht"))
         .add(_("Startseite"), _url("start"), "haus", gross=True)
         .add(_("Person suchen"), _url("suche"), "lupe", gross=True),
+        Gruppe(_("Microsoft 365"))
+        .add(_("Office"), _url("office"), "brief", gross=True, hinweis=_("Outlook, Teams, Word, Excel und weitere Anwendungen")),
         Gruppe(_("Persönlich"))
         .add(_("Notizen"), _url("start", query="#notizen"), "notiz")
         .add(_("Geburtstage"), _url("start", query="#geburtstage"), "kerze")
         .add(_("Mitteilung schreiben"), _url("start", query="#notizen"), "nadel", bedingung=verwaltung),
         Gruppe(_("Konto"))
-        .add(_("Passwort ändern"), _url("admin:password_change"), "schluessel", bedingung=admin and user.has_usable_password()),
+        .add(_("Passwort ändern"), _url("admin:password_change"), "schluessel", bedingung=admin and user.has_usable_password())
+        .add(_("Sicherheit"), _url("sicherheit"), "schild", hinweis=_("Zwei-Faktor-Anmeldung einrichten")),
     )
 
     # ------------------------------------------------------------ Termine

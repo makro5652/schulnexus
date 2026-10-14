@@ -12,8 +12,8 @@ Nach außen geöffnet ist genau ein Port, voreingestellt **8010**. Über das Tai
 Unraid-Server läuft, erreichen alle Geräte deines Tailnets diesen Port. Die Datenbank hat keinen Port und
 keinen Internetzugang.
 
-> Nur mit **erfundenen Testdaten** betreiben. Für echte Schülerdaten fehlen noch Zwei-Faktor-Anmeldung
-> und die Freigabe durch den Datenschutz (Kenya Data Protection Act 2019).
+> Nur mit **erfundenen Testdaten** betreiben. Vor echten Schülerdaten: HTTPS (unten), verschlüsselte
+> Festplatten, sicher hinterlegter Datenschlüssel, Zwei-Faktor-Anmeldung für Leitung und IT, Datenschutzfreigabe.
 
 ## Voraussetzungen
 
@@ -73,7 +73,8 @@ Unter dem Ablageort, voreingestellt `/mnt/user/appdata/schulverwaltung-daten`:
 | Ordner | Inhalt |
 | --- | --- |
 | `datenbank/` | PostgreSQL-Datenbank |
-| `dokumente/` | hochgeladene Anhänge und Bewerbungsunterlagen |
+| `dokumente/` | hochgeladene Anhänge und Bewerbungsunterlagen (verschlüsselt, ab 0.4.6.0) |
+| `modulsicherungen/` | Modulsicherungen und PDF-Exporte aus dem Portal (verschlüsselt, ab 0.4.6.0) |
 | `sicherungen/` | tägliche Datenbanksicherungen (`*.dump`, 14 Tage aufbewahrt) |
 
 Das Plugin **„Appdata Backup“** kann diese Ordner zusätzlich mitsichern.
@@ -108,24 +109,9 @@ docker compose start web sicherung
   - Mit der Tailscale-IP des Servers (`100.x.y.z`) ist sie nur im Tailnet erreichbar.
   - Bei dieser engeren Variante muss Tailscale beim Start von Docker bereits verbunden sein. Ist die Seite
     nach einem Neustart des Servers nicht erreichbar, hilft `docker compose up -d` im Ordner `unraid`.
-- **Verschlüsselung:** Die Adresse beginnt mit `http://`. Der Weg durchs Tailnet ist trotzdem durch
-  Tailscale (WireGuard) verschlüsselt. Im Heimnetz (`0.0.0.0`) dagegen läuft der Verkehr unverschlüsselt.
-- **Optional echtes HTTPS mit „tailscale serve“.** Dafür müssen in der Tailscale-Verwaltung unter *DNS*
-  **MagicDNS** und **HTTPS Certificates** eingeschaltet sein. Dann im Unraid-Terminal:
-
-  ```sh
-  tailscale serve --bg --https=8443 http://127.0.0.1:8010
-  ```
-
-  Danach in `unraid/.env` setzen und `sh unraid/einrichten.sh` erneut ausführen:
-
-  ```
-  CSRF_TRUSTED_ORIGINS=https://*.ts.net:8443
-  SECURE_COOKIES=1
-  ```
-
-  Aufruf dann unter `https://tower.tail1234.ts.net:8443`. Ist der Port nur an die Tailscale-IP gebunden,
-  im `serve`-Befehl statt `127.0.0.1` diese IP eintragen.
+- **Verbindung:** Mit `http://` ist der Weg durchs Tailnet trotzdem durch Tailscale (WireGuard) verschlüsselt.
+  Im Heimnetz (`BIND_ADRESSE=0.0.0.0`) läuft der Verkehr dagegen unverschlüsselt. Für echte Daten HTTPS einrichten
+  (Abschnitt unten).
 - **Zugriff im Tailnet einschränken:** Wer im Tailnet ist, erreicht den Port. Mit den Zugriffsregeln
   (*Access Controls*) in der Tailscale-Verwaltung lässt sich der Zugriff auf einzelne Geräte oder Personen
   begrenzen.
@@ -140,3 +126,63 @@ docker compose start web sicherung
   `docker compose -f /mnt/user/appdata/schulverwaltung/unraid/docker-compose.yml exec -T web python manage.py modulsicherung`
   (Pfad an den eigenen Installationsordner anpassen).
 
+## HTTPS mit „tailscale serve“ (ab 0.4.6.0 empfohlen)
+
+1. In der Tailscale-Verwaltung unter *DNS* **MagicDNS** und **HTTPS Certificates** einschalten.
+2. Im Unraid-Terminal (Port an die eigene Einstellung anpassen):
+
+   ```sh
+   tailscale serve --bg --https=8443 http://127.0.0.1:8010
+   ```
+
+   Unsicherheit: Die Schreibweise der `serve`-Befehle hat sich zwischen Tailscale-Versionen geändert. Meldet der
+   Befehl einen Fehler, hilft `tailscale serve --help`; gemeint ist „https auf Port 8443 an http://127.0.0.1:8010
+   weiterreichen, im Hintergrund dauerhaft“.
+3. In `unraid/.env` setzen (Name des Servers anpassen) und `sh unraid/einrichten.sh` erneut ausführen:
+
+   ```
+   HTTPS=1
+   CSRF_TRUSTED_ORIGINS=https://tower.tail1234.ts.net:8443
+   BIND_ADRESSE=127.0.0.1
+   ```
+
+   `BIND_ADRESSE=127.0.0.1` sorgt dafür, dass die Anwendung **nur noch über https** erreichbar ist: Der Port 8010
+   ist dann weder im Heimnetz noch im Tailnet offen, nur `tailscale serve` auf demselben Server erreicht ihn.
+4. Aufruf: `https://tower.tail1234.ts.net:8443`.
+
+`HINTER_PROXY` und `HTTPS_UMLEITUNG` bleiben auf `0`. Unsicherheit: Ob `tailscale serve` den Kopf
+`X-Forwarded-Proto` setzt, ist nicht sicher belegt; mit `HINTER_PROXY=1` und `HTTPS_UMLEITUNG=1` ohne diesen Kopf
+entstünde eine Endlosweiterleitung. Mit `BIND_ADRESSE=127.0.0.1` ist die Umleitung ohnehin unnötig. Der HSTS-Kopf
+wird ohne `HINTER_PROXY=1` nicht gesendet; das ist bei einer reinen Tailnet-Adresse ohne http-Zugang vertretbar.
+
+## Verschlüsselung (ab 0.4.6.0)
+
+Drei Ebenen ergänzen sich:
+
+1. **Datenschlüssel der Anwendung (`DATEN_SCHLUESSEL` in `unraid/.env`).** `einrichten.sh` erzeugt ihn beim ersten
+   Aufruf bzw. beim ersten Update auf 0.4.6.0 und zeigt ihn einmal an. Damit werden Anhänge, Bewerbungsunterlagen,
+   Modulsicherungen und PDF-Exporte mit AES-256 verschlüsselt abgelegt; vorhandene Dateien werden beim Start
+   nachverschlüsselt. **Den Schlüssel ausdrucken und getrennt vom Server aufbewahren** (z. B. Tresor der
+   Schulleitung). Ohne ihn lassen sich diese Dateien – auch aus Sicherungen – nicht wiederherstellen. Den Schlüssel
+   nie ändern, solange damit verschlüsselte Dateien existieren.
+2. **Verschlüsselte Festplatten in Unraid (LUKS).** Schützt Datenbank, Dokumente und die täglichen
+   Datenbanksicherungen (`*.dump`), falls Server oder Platten gestohlen oder ausgemustert werden. Unraid bietet die
+   Dateisysteme „XFS – encrypted“ bzw. „BTRFS – encrypted“ je Platte und Pool an; das Passwort bzw. die Schlüsseldatei
+   wird beim Starten des Arrays eingegeben. Wichtig:
+   - Eine Platte wird nur durch **Neuformatieren** verschlüsselt. Vorher alle Daten auf andere Platten verschieben
+     (z. B. mit dem Plugin „unBALANCE“), dann die leere Platte im gestoppten Array auf das verschlüsselte Dateisystem
+     umstellen und formatieren, Platte für Platte.
+   - Der **Cache-Pool** (dort liegt meist `appdata`) muss ebenfalls verschlüsselt werden.
+   - Die Passphrase sicher hinterlegen; ohne sie ist das ganze Array verloren.
+   - Ein laufender, entsperrter Server ist dadurch nicht geschützt – dafür sorgen Anmeldung, Zwei-Faktor und Tailscale.
+   Unsicherheit: Die genauen Menüpunkte unterscheiden sich je nach Unraid-Version (*Main › Platte › File system type*);
+   bitte in der Unraid-Dokumentation zur eigenen Version nachsehen.
+3. **Verschlüsselte Downloads.** Sicherungen im Portal mit Passwort herunterladen (System › Sicherung ›
+   Herunterladen); die Datei ist dann auch auf dem Mac oder einem USB-Stick geschützt.
+
+## Zwei-Faktor-Anmeldung (ab 0.4.6.0)
+
+Jede Person richtet sie selbst unter Kontomenü › **Sicherheit** ein (Authenticator-App, QR-Code, Ersatzcodes).
+Die IT macht sie unter System › Benutzer und Rechte › Konto für einzelne Konten **verpflichtend** (empfohlen:
+Schulleitung, Verwaltungsleitung, IT, HR) und setzt sie bei Verlust des Telefons zurück. Die Uhr des Unraid-Servers
+muss stimmen (NTP ist in Unraid voreingestellt), sonst passen die Codes nicht.

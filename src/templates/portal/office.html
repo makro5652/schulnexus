@@ -1,0 +1,61 @@
+{% extends "portal/base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Office" %}{% endblock %}
+{% block inhaltsklasse %}breit{% endblock %}
+{% block kopf %}
+<script>
+  /* Menüband auf dieser Seite aus- oder einblenden (im Browser gemerkt); vor dem Zeichnen setzen, damit nichts flackert. */
+  try { if (window.localStorage.getItem("office-ohne-menueband") === "1") document.documentElement.classList.add("ohne-menueband"); } catch (e) {}
+</script>
+{% endblock %}
+{% block inhalt %}
+<div class="of-kopf">
+  <div>
+    <h1>{% translate "Office" %}</h1>
+    <p class="leise">{% translate "Microsoft 365 der Schule. Die Anwendungen öffnen sich in einem neuen Tab; die Anmeldung erfolgt mit dem Schulkonto bei Microsoft." %}</p>
+  </div>
+  <div class="of-aktionen">
+    {% if darf_verwalten %}<a class="knopf zweitrangig klein" href="{% url 'admin:portal_officekachel_changelist' %}">{% translate "Kacheln verwalten" %}</a>{% endif %}
+    <button type="button" class="knopf zweitrangig klein" id="of-umschalten" aria-pressed="false"
+            data-text-aus="{% translate 'Menüband ausblenden' %}" data-text-ein="{% translate 'Menüband einblenden' %}">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-hoch"/></svg><span>{% translate "Menüband ausblenden" %}</span></button>
+  </div>
+</div>
+
+{% if kacheln %}
+<ul class="of-kacheln">
+  {% for k in kacheln %}
+  <li><a class="of-kachel" href="{{ k.url }}" target="_blank" rel="noopener noreferrer" style="--of-farbe: {{ k.farbe }};">
+    <span class="of-symbol" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#s-{{ k.symbol }}"/></svg></span>
+    <span class="of-text"><strong>{{ k.titel }}</strong>{% if k.beschreibung %}<small>{{ k.beschreibung }}</small>{% endif %}</span>
+    <span class="of-neu" aria-hidden="true">↗</span><span class="mb-unsichtbar">{% translate "(öffnet in neuem Tab)" %}</span>
+  </a></li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="leer">{% translate "Noch keine Kacheln eingerichtet." %}</p>
+{% endif %}
+
+<p class="hinweistext">{% translate "Outlook, Teams und die anderen Anwendungen lassen sich nicht in diese Seite einbetten: Microsoft untersagt das aus Sicherheitsgründen. Deshalb öffnet jede Kachel einen eigenen Tab." %}</p>
+
+<button type="button" class="knopf of-zurueck" id="of-zurueck" hidden>
+  <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-hoch"/></svg><span>{% translate "Menüband einblenden" %}</span></button>
+
+<script>
+(function () {
+  "use strict";
+  var wurzel = document.documentElement, knopf = document.getElementById("of-umschalten"), zurueck = document.getElementById("of-zurueck");
+  var SCHLUESSEL = "office-ohne-menueband";
+  function setzen(aus, merken) {
+    wurzel.classList.toggle("ohne-menueband", aus);
+    knopf.setAttribute("aria-pressed", aus ? "true" : "false");
+    knopf.querySelector("span").textContent = aus ? knopf.dataset.textEin : knopf.dataset.textAus;
+    zurueck.hidden = !aus;
+    if (merken) { try { window.localStorage.setItem(SCHLUESSEL, aus ? "1" : "0"); } catch (e) {} }
+  }
+  knopf.addEventListener("click", function () { setzen(!wurzel.classList.contains("ohne-menueband"), true); });
+  zurueck.addEventListener("click", function () { setzen(false, true); knopf.focus(); });
+  setzen(wurzel.classList.contains("ohne-menueband"), false);
+})();
+</script>
+{% endblock %}

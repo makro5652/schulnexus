@@ -28,6 +28,7 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 
 from config.version import VERSION
+from portal import krypto
 
 from .models import Protokoll, Sicherung
 from .module import MODULE, NAMEN, SCHLUESSEL, ist_protokollmodell, modellname, modelle, modul_von
@@ -74,10 +75,11 @@ def sicherung_erstellen(module, benutzer=None, art=Sicherung.MANUELL, mit_dateie
     zeit = timezone.localtime()
     teil = "alle" if len(module) == len(SCHLUESSEL) else "-".join(module)
     name = f"sicherung-{zeit:%Y%m%d-%H%M%S}-{teil}"[:150]
-    nr, datei = 1, f"{name}.zip"
+    endung = ".zip.enc" if krypto.aktiv() else ".zip"
+    nr, datei = 1, f"{name}{endung}"
     while (ordner / datei).exists() or Sicherung.objects.filter(datei=datei).exists():
         nr += 1
-        datei = f"{name}-{nr}.zip"
+        datei = f"{name}-{nr}{endung}"
     manifest = {"format": FORMAT, "formatversion": FORMATVERSION, "version": VERSION, "erstellt": zeit.isoformat(),
                 "erstellt_von": getattr(benutzer, "username", ""), "schule": settings.SCHULNAME, "module": {},
                 "dateien": {"enthalten": bool(mit_dateien or dateien_fuer), "anzahl": 0}}
@@ -99,7 +101,10 @@ def sicherung_erstellen(module, benutzer=None, art=Sicherung.MANUELL, mit_dateie
                 if mit_dateien or key in dateien_fuer:
                     manifest["dateien"]["anzahl"] += _dateien_schreiben(zf, key)
             zf.writestr("manifest.json", json.dumps(manifest, ensure_ascii=False, indent=1))
-        zwischen.rename(ordner / datei)
+        if krypto.aktiv():
+            krypto.datei_verschluesseln(zwischen, ordner / datei)
+        else:
+            zwischen.rename(ordner / datei)
     finally:
         if zwischen.exists():
             zwischen.unlink()
@@ -130,10 +135,18 @@ def _dateien_schreiben(zf, key):
 
 # ---------------------------------------------------------------- Lesen und prüfen
 
+def _zip(pfad):
+    """ZipFile einer (ggf. mit dem Serverschlüssel verschlüsselten) Sicherung."""
+    try:
+        return zipfile.ZipFile(krypto.ablage_temporaer(pfad))
+    except krypto.KryptoFehler as f:
+        raise SicherungFehler(str(f)) from None
+
+
 def oeffnen(pfad):
     """Öffnet eine Sicherung und prüft Format und Prüfsummen. Gibt (ZipFile, Manifest) zurück."""
     try:
-        zf = zipfile.ZipFile(pfad)
+        zf = _zip(pfad)
         manifest = json.loads(zf.read("manifest.json"))
     except (OSError, KeyError, ValueError, zipfile.BadZipFile):
         raise SicherungFehler(_("Die Datei ist keine gültige Sicherung der Schulverwaltung.")) from None
@@ -154,26 +167,40 @@ def oeffnen(pfad):
     return zf, manifest
 
 
-def sicherung_hochladen(datei, benutzer):
-    """Speichert eine hochgeladene ZIP-Datei nach Prüfung als Sicherung."""
+def sicherung_hochladen(datei, benutzer, passwort=None):
+    """
+    Speichert eine hochgeladene Sicherung nach Prüfung. Angenommen werden unverschlüsselte ZIP-Dateien, mit Passwort
+    verschlüsselte Downloads (Passwort nötig) und mit dem Serverschlüssel dieser Installation verschlüsselte Dateien.
+    """
     ordner = settings.MODUL_SICHERUNGEN
     ordner.mkdir(parents=True, exist_ok=True)
     zeit = timezone.localtime()
-    name = f"hochgeladen-{zeit:%Y%m%d-%H%M%S}.zip"
+    endung = ".zip.enc" if krypto.aktiv() else ".zip"
+    name = f"hochgeladen-{zeit:%Y%m%d-%H%M%S}{endung}"
     nr = 1
     while (ordner / name).exists():
         nr += 1
-        name = f"hochgeladen-{zeit:%Y%m%d-%H%M%S}-{nr}.zip"
+        name = f"hochgeladen-{zeit:%Y%m%d-%H%M%S}-{nr}{endung}"
     ziel = ordner / name
-    with open(ziel, "wb") as f:
-        for stueck in datei.chunks():
-            f.write(stueck)
+    roh, klar = ordner / f".{name}.hoch", ordner / f".{name}.klar"
     try:
-        zf, manifest = oeffnen(ziel)
+        with open(roh, "wb") as f:
+            for stueck in datei.chunks():
+                f.write(stueck)
+        try:
+            krypto.datei_entschluesseln(roh, klar, passwort=passwort or None)
+        except krypto.KryptoFehler as f:
+            raise SicherungFehler(str(f)) from None
+        zf, manifest = oeffnen(klar)
         zf.close()
-    except SicherungFehler:
-        ziel.unlink()
-        raise
+        if krypto.aktiv():
+            krypto.datei_verschluesseln(klar, ziel)
+        else:
+            klar.rename(ziel)
+    finally:
+        for p in (roh, klar):
+            if p.exists():
+                p.unlink()
     module = [k for k in SCHLUESSEL if k in manifest["module"]]
     anzahl = {k: sum(manifest["module"][k]["anzahl"].values()) for k in module}
     s = Sicherung.objects.create(datei=name, art=Sicherung.HOCHGELADEN, module=module, anzahl=anzahl,
@@ -395,7 +422,7 @@ def _dateien_wiederherstellen(pfad, module):
             for f in _dateifelder(model):
                 felder[f"{model._meta.label_lower}/{f.name}/"] = f
     n = 0
-    with zipfile.ZipFile(pfad) as zf:
+    with _zip(pfad) as zf:
         for eintrag in zf.namelist():
             if not eintrag.startswith("dateien/") or eintrag.endswith("/"):
                 continue

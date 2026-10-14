@@ -67,3 +67,84 @@ class Notiz(models.Model):
         from django.utils import timezone
 
         return self.sichtbarkeit == self.PRIVAT and not self.erledigt and self.datum is not None and self.datum <= timezone.localdate()
+
+
+class Zweifaktor(models.Model):
+    """
+    Zwei-Faktor-Anmeldung mit Einmalcodes (TOTP, RFC 6238) aus einer Authenticator-App.
+    Freiwillig; die IT kann sie je Konto verpflichtend machen. Das Geheimnis wird verschlüsselt gespeichert.
+    """
+
+    benutzer = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="zweifaktor",
+                                    verbose_name=_("Benutzerkonto"))
+    geheimnis = models.TextField(_("Geheimnis (verschlüsselt)"), blank=True, editable=False)
+    aktiv = models.BooleanField(_("Eingerichtet"), default=False)
+    pflicht = models.BooleanField(_("Verpflichtend"), default=False,
+                                  help_text=_("Von der IT angeordnet: Anmeldung erst nach Einrichtung möglich."))
+    eingerichtet_am = models.DateTimeField(_("Eingerichtet am"), null=True, blank=True)
+    letzter_schritt = models.BigIntegerField(_("Zuletzt verwendeter Zeitschritt"), default=0, editable=False)
+    ersatzcodes = models.JSONField(_("Ersatzcodes (Prüfwerte)"), default=list, blank=True, editable=False)
+    zuletzt_verwendet = models.DateTimeField(_("Zuletzt verwendet"), null=True, blank=True)
+
+    class Meta:
+        verbose_name = _("Zwei-Faktor-Anmeldung")
+        verbose_name_plural = _("Zwei-Faktor-Anmeldungen")
+
+    def __str__(self):
+        return str(self.benutzer)
+
+
+class OfficeKachel(models.Model):
+    """
+    Kachel auf der Seite „Office“: Verknüpfung zu einer Microsoft-365-Anwendung (öffnet in neuem Tab).
+    Microsoft verbietet das Einbetten von Outlook & Co. in fremde Seiten (X-Frame-Options), daher keine Einbettung.
+    """
+
+    SYMBOLE = [
+        ("brief", _("Brief (E-Mail)")), ("kalender", _("Kalender")), ("personen", _("Personen (Teams)")),
+        ("ordner", _("Ordner (Dateien)")), ("stift", _("Stift (Text)")), ("liste", _("Liste (Tabelle)")),
+        ("tafel", _("Tafel (Präsentation)")), ("buch", _("Buch (Notizbuch)")), ("haken", _("Haken (Formulare)")),
+        ("gebaeude", _("Gebäude (Intranet)")), ("haus", _("Haus (Startseite)")), ("klammer", _("Klammer (Sonstiges)")),
+    ]
+
+    titel = models.CharField(_("Titel"), max_length=60)
+    titel_en = models.CharField(_("Titel (englisch)"), max_length=60, blank=True,
+                                help_text=_("Leer lassen, wenn der Titel in beiden Sprachen gleich ist."))
+    beschreibung = models.CharField(_("Kurzbeschreibung"), max_length=120, blank=True)
+    beschreibung_en = models.CharField(_("Kurzbeschreibung (englisch)"), max_length=120, blank=True)
+    url = models.CharField(_("Adresse"), max_length=300,
+                           help_text=_("Vollständige https-Adresse. Der Platzhalter {mandant} wird durch OFFICE_MANDANT aus der .env ersetzt, "
+                                       "z. B. https://{mandant}.sharepoint.com; ohne OFFICE_MANDANT wird eine solche Kachel ausgeblendet."))
+    symbol = models.CharField(_("Symbol"), max_length=20, choices=SYMBOLE, default="klammer")
+    farbe = models.CharField(_("Farbe"), max_length=7, default="#0f6cbd", help_text=_("Hex-Farbwert, z. B. #0f6cbd."))
+    reihenfolge = models.PositiveSmallIntegerField(_("Reihenfolge"), default=100)
+    aktiv = models.BooleanField(_("Angezeigt"), default=True)
+
+    class Meta:
+        verbose_name = _("Office-Kachel")
+        verbose_name_plural = _("Office-Kacheln")
+        ordering = ["reihenfolge", "titel"]
+
+    def __str__(self):
+        return self.titel
+
+    def clean(self):
+        import re
+
+        from django.core.exceptions import ValidationError
+
+        if not self.url.startswith("https://"):
+            raise ValidationError({"url": _("Die Adresse muss mit https:// beginnen.")})
+        if not re.fullmatch(r"#[0-9a-fA-F]{6}", self.farbe or ""):
+            raise ValidationError({"farbe": _("Bitte einen Hex-Farbwert wie #0f6cbd angeben.")})
+
+    def anzeige_titel(self, sprache):
+        return self.titel_en if sprache.startswith("en") and self.titel_en else self.titel
+
+    def anzeige_beschreibung(self, sprache):
+        return self.beschreibung_en if sprache.startswith("en") and self.beschreibung_en else self.beschreibung
+
+    def adresse(self, mandant=""):
+        if "{mandant}" in self.url:
+            return self.url.replace("{mandant}", mandant) if mandant else None
+        return self.url

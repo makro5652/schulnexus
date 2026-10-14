@@ -28,6 +28,7 @@
       <button type="submit" class="knopf">{% translate "Rollen speichern" %}</button>
     </form>
   </section>
+  <div class="sy-spalte">
   <section class="karte">
     <h3>{% translate "Konto" %}</h3>
     <dl class="daten">
@@ -40,6 +41,24 @@
       <button type="submit" class="knopf zweitrangig">{% translate "Passwort zurücksetzen" %}</button></form>
     <p class="hinweistext">{% translate "Die Rolle IT-Administration gibt Vollzugriff auf alle Daten. Für Konten mit Vollzugriff gelten Einzelrechte nicht." %}</p>
   </section>
+  <section class="karte" id="zweifaktor">
+    <h3>{% translate "Zwei-Faktor-Anmeldung" %}</h3>
+    <p class="zf-zeile">{% if zweifaktor.aktiv %}<span class="zf-status an">{% translate "eingerichtet" %}</span>
+      {% if zweifaktor.eingerichtet_am %}<span class="leise">{% blocktranslate with d=zweifaktor.eingerichtet_am|date:"SHORT_DATE_FORMAT" %}seit {{ d }}{% endblocktranslate %}</span>{% endif %}
+      {% else %}<span class="zf-status aus">{% translate "nicht eingerichtet" %}</span>{% endif %}
+      {% if zweifaktor.pflicht %}<span class="etikett">{% translate "verpflichtend" %}</span>{% endif %}</p>
+    <form method="post">{% csrf_token %}<input type="hidden" name="aktion" value="zweifaktor_pflicht">
+      <label class="haken"><input type="checkbox" name="pflicht" value="1"{% if zweifaktor.pflicht %} checked{% endif %}> {% translate "Für dieses Konto verpflichtend" %}</label>
+      <button type="submit" class="knopf zweitrangig">{% translate "Speichern" %}</button>
+    </form>
+    {% if zweifaktor.aktiv %}
+    <form method="post" onsubmit="return confirm('{% translate "Zwei-Faktor-Anmeldung zurücksetzen? Die Person muss sie danach neu einrichten." as frage2 %}{{ frage2|escapejs }}')">{% csrf_token %}
+      <input type="hidden" name="aktion" value="zweifaktor_zuruecksetzen">
+      <button type="submit" class="knopf zweitrangig">{% translate "Zurücksetzen (z. B. Telefon verloren)" %}</button></form>
+    {% endif %}
+    <p class="hinweistext">{% translate "Verpflichtend heißt: Nach der nächsten Anmeldung muss die Person die Zwei-Faktor-Anmeldung einrichten, bevor sie weiterarbeiten kann. Freiwillig einrichten kann sie jede Person selbst unter „Sicherheit“." %}</p>
+  </section>
+  </div>
 </div>
 
 <section class="karte sy-rechte">

@@ -8,3 +8,5 @@ argon2-cffi>=23.1
 polib>=1.2,<2  # Prüfen/Kompilieren der Übersetzungen (tools/sprachdateien.py, Tests)
 reportlab>=4.2,<5  # PDF-Export
 pypdf>=5,<7  # Prüfen der PDF-Exporte in den Tests
+cryptography>=43  # Verschlüsselung von Anhängen und Sicherungen (AES-256-GCM), Zwei-Faktor-Geheimnisse
+segno>=1.6,<2  # QR-Code für die Einrichtung der Zwei-Faktor-Anmeldung

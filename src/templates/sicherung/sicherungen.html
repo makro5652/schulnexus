@@ -26,13 +26,16 @@
       <li>{% translate "Wiederherstellen setzt die gewählten Module auf den Stand der Sicherung zurück. Eine Vorschau zeigt vorher, was angelegt, geändert und gelöscht wird – auch in anderen Modulen." %}</li>
       <li>{% translate "Vor jeder Wiederherstellung legt das System automatisch eine Gesamtsicherung an." %}</li>
       <li>{% translate "Wiederherstellen ist nur mit derselben Programmversion möglich, mit der gesichert wurde." %}</li>
-      <li>{% translate "Sicherungen enthalten personenbezogene Daten: heruntergeladene Dateien bitte verschlüsselt und zugriffsgeschützt aufbewahren." %}</li>
+      <li>{% translate "Sicherungen enthalten personenbezogene Daten. Herunterladen am besten mit Passwort: Die Datei ist dann mit AES-256 verschlüsselt und lässt sich nur mit diesem Passwort wieder hochladen." %}</li>
     </ul>
     <p class="hinweistext">{% blocktranslate with ordner=ordner %}Ablage auf dem Server: {{ ordner }}{% endblocktranslate %}</p>
+    {% if verschluesselt %}<p class="zf-status an">{% translate "Ablage verschlüsselt (AES-256, Serverschlüssel)" %}</p>
+    {% else %}<p class="sy-warnung">{% translate "Die Ablage ist nicht verschlüsselt: DATEN_SCHLUESSEL fehlt in der .env (siehe Anleitung)." %}</p>{% endif %}
     <h3>{% translate "Sicherung hochladen" %}</h3>
     <form method="post" enctype="multipart/form-data" class="inline-form">{% csrf_token %}
       <input type="hidden" name="aktion" value="hochladen">
-      {{ hochladen.datei }} <button type="submit" class="knopf zweitrangig klein">{% translate "Hochladen und prüfen" %}</button>
+      {{ hochladen.datei }} <input type="password" name="passwort" autocomplete="off" placeholder="{% translate 'Passwort (falls verschlüsselt)' %}" aria-label="{% translate 'Passwort (falls verschlüsselt)' %}">
+      <button type="submit" class="knopf zweitrangig klein">{% translate "Hochladen und prüfen" %}</button>
       {% for e in hochladen.datei.errors %}<small class="fehler blockzeile">{{ e }}</small>{% endfor %}
     </form>
   </section>
@@ -58,7 +61,13 @@
       <td class="nowrap sy-aktionen">
         {% if s.vorhanden %}
         <a class="knopf zweitrangig klein" href="{% url 'wiederherstellen' s.pk %}">{% translate "Wiederherstellen …" %}</a>
-        <a class="knopf zweitrangig klein" href="{% url 'sicherung_herunterladen' s.pk %}">{% translate "Herunterladen" %}</a>
+        <details class="sy-download"><summary class="knopf zweitrangig klein">{% translate "Herunterladen" %}</summary>
+          <form method="post" action="{% url 'sicherung_herunterladen' s.pk %}" class="sy-download-form">{% csrf_token %}
+            <label class="sy-feld">{% translate "Passwort für die Datei (mind. 10 Zeichen)" %} <input type="password" name="passwort" minlength="10" autocomplete="new-password"></label>
+            <button type="submit" class="knopf klein">{% translate "Verschlüsselt herunterladen" %}</button>
+            <button type="submit" name="ohne_passwort" value="1" formnovalidate class="link">{% translate "ohne Passwort (unverschlüsselt)" %}</button>
+          </form>
+        </details>
         {% else %}<span class="auffaellig">{% translate "Datei fehlt" %}</span>{% endif %}
         <form method="post" action="{% url 'sicherung_loeschen' s.pk %}" onsubmit="return confirm('{% translate "Diese Sicherung endgültig löschen?" as frage %}{{ frage|escapejs }}')">{% csrf_token %}
           <button type="submit" class="knopf gefahr klein">{% translate "Löschen" %}</button></form>

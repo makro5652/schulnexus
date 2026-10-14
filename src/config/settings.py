@@ -60,6 +60,8 @@ MIDDLEWARE = [
     "portal.middleware.BenutzerspracheMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "portal.middleware.NurPersonalMiddleware",
+    "portal.sicherheit.ZweifaktorPflichtMiddleware",
+    "portal.middleware.SicherheitsKoepfeMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
 ]
@@ -122,7 +124,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 TESTLAUF = len(sys.argv) > 1 and sys.argv[1] == "test"
 STORAGES = {
-    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "default": {"BACKEND": "portal.krypto.VerschluesselterSpeicher"},
     # Im Container: komprimierte Dateien mit Versions-Hash (nach collectstatic).
     # Bei Tests und lokaler Entwicklung: einfache Auslieferung ohne Manifest.
     "staticfiles": {
@@ -159,15 +161,43 @@ LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "start"
 LOGOUT_REDIRECT_URL = "login"
 
+# ---------------------------------------------------------------- HTTPS und Sitzungen (ab 0.4.6.0 erweitert)
+# HTTPS=1, sobald die Seite über https erreichbar ist (z. B. „tailscale serve“ oder ein Reverse-Proxy):
+# Cookies nur noch per HTTPS, HSTS (Browser merkt sich „nur HTTPS“), Weiterleitung http → https.
+HTTPS = env_bool("HTTPS", False)
+# Läuft ein Reverse-Proxy davor, der die Verbindung entschlüsselt (Tailscale Serve, Nginx Proxy Manager, Caddy …),
+# erkennt Django HTTPS am Kopf X-Forwarded-Proto. Nur setzen, wenn der Proxy diesen Kopf zuverlässig setzt.
+HINTER_PROXY = env_bool("HINTER_PROXY", False)
+if HINTER_PROXY:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+# Weiterleitung http → https durch Django (nur zusammen mit HINTER_PROXY=1, sonst Endlosschleife hinter einem Proxy)
+SECURE_SSL_REDIRECT = env_bool("HTTPS_UMLEITUNG", False)
+SECURE_REDIRECT_EXEMPT = [r"^gesundheit/$"]          # Docker-Healthcheck fragt intern per http
+SECURE_HSTS_SECONDS = int(os.environ.get("HSTS_SEKUNDEN", "31536000" if HTTPS else "0"))
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_HSTS_PRELOAD = False
 # Sitzungen laufen nach 8 Stunden ab; Cookies nur per HTTPS, sobald HTTPS aktiv ist.
 SESSION_COOKIE_AGE = 60 * 60 * 8
-SECURE_COOKIES = env_bool("SECURE_COOKIES", False)
+SECURE_COOKIES = HTTPS or env_bool("SECURE_COOKIES", False)
 SESSION_COOKIE_SECURE = SECURE_COOKIES
 CSRF_COOKIE_SECURE = SECURE_COOKIES
 SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
 X_FRAME_OPTIONS = "DENY"
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = "same-origin"
+SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin"
+
+# ---------------------------------------------------------------- Verschlüsselung gespeicherter Daten (ab 0.4.6.0)
+# 32 Byte (Base64), erzeugen mit:  python manage.py schluessel_erzeugen
+# Leer = keine Verschlüsselung. Ein verlorener Schlüssel macht verschlüsselte Anhänge und Sicherungen unlesbar!
+DATEN_SCHLUESSEL = os.environ.get("DATEN_SCHLUESSEL", "").strip()
+if TESTLAUF and not DATEN_SCHLUESSEL:
+    DATEN_SCHLUESSEL = "dGVzdHNjaGx1ZXNzZWwtbnVyLWZ1ZXItdGVzdHMtMzI"  # fester Testschlüssel (32 Byte)
+
+# ---------------------------------------------------------------- Office-Seite (ab 0.4.6.0)
+# Microsoft-365-Mandant (z. B. dsnairobi.onmicrosoft.com oder dsn.ac.ke); ergänzt Anmeldelinks um den Mandanten.
+OFFICE_MANDANT = os.environ.get("OFFICE_MANDANT", "").strip()
 
 SCHULNAME = os.environ.get("SCHULNAME", "Deutsche Schule Nairobi")
 SCHULORT = os.environ.get("SCHULORT", "Nairobi")

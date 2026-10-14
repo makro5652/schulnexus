@@ -8,4 +8,10 @@ class PortalConfig(AppConfig):
     verbose_name = _("Portal")
 
     def ready(self):
-        from . import signals  # noqa: F401 – registriert die Sprachübernahme beim Anmelden
+        from django.contrib import admin
+
+        from . import checks, signals  # noqa: F401 – Systemprüfungen; Sprachübernahme beim Anmelden
+        from .sicherheit import admin_anmeldung
+
+        # Die Verwaltungsoberfläche hat keine eigene Anmeldung (sonst ließe sich der zweite Faktor umgehen).
+        admin.site.login = admin_anmeldung

@@ -1,14 +1,15 @@
-# Schulverwaltung (Version 0.4.5.0, Entwicklungsstand)
+# Schulverwaltung (Version 0.4.6.0, Entwicklungsstand)
 
 Open-Source-Schulverwaltung für die DSN: Stammdaten, Klassen und Lerngruppen,
 Noten mit Gewichtung, Fehlzeiten, Nachmittagsprogramm, Anhänge zur Schülerakte,
 Förderpläne und Nachteilsausgleiche, Neuanmeldungen, Zeugnisse und Konferenzen, Schuljahreswechsel,
 Abgänge mit Abgangszeugnis, Archiv und Löschfristen, Schulkalender, Raumbuchung, Elternsprechtage und
-Lern- und Entwicklungsgespräche. Läuft im Browser,
-betrieben mit Docker.
+Lern- und Entwicklungsgespräche, Office-Startseite für Microsoft 365. Verschlüsselte Ablage von Anhängen und
+Sicherungen, Zwei-Faktor-Anmeldung, HTTPS-Betrieb. Läuft im Browser, betrieben mit Docker.
 
-> Nur mit **erfundenen Testdaten** verwenden. Für echte Schülerdaten fehlen noch
-> HTTPS, Backups, Zwei-Faktor-Anmeldung und die Freigabe durch den Datenschutz.
+> Nur mit **erfundenen Testdaten** verwenden. Vor echten Schülerdaten: HTTPS einrichten (`HTTPS=1`),
+> verschlüsselte Festplatten (Unraid), Schlüssel sicher hinterlegen, Zwei-Faktor-Anmeldung für Leitung und IT
+> verpflichtend machen und die Freigabe durch den Datenschutz einholen (siehe „Sicherheit und Verschlüsselung“).
 
 ## Starten auf dem MacBook
 
@@ -245,12 +246,52 @@ Das Sekretariat erhält dabei die neuen, engeren Standardrechte.
   erscheinen als „Bestand“ in eigener Datei; optional das Änderungsprotokoll. Höchstens `PDF_EINTRAEGE_JE_DATEI`
   Einträge (Standard 1500) je Datei, darüber „Teil 1 von n“. Herunterladen einzeln oder als ZIP. Passwörter und
   Link-Schlüssel erscheinen nie im PDF. Die PDFs werden im Hintergrund erstellt; die Seite aktualisiert sich selbst.
-- **Protokoll:** Sicherungen, Downloads, Wiederherstellungen, PDF-Exporte, Rechte- und Kontoänderungen mit Zeit und Person.
+- **Protokoll:** Sicherungen, Downloads, Wiederherstellungen, PDF-Exporte, Rechte- und Kontoänderungen,
+  Zwei-Faktor-Einstellungen mit Zeit und Person.
 - **Ablage:** `MODUL_SICHERUNGEN` (Docker: Volume `modulsicherungen`, Unraid: `${APPDATA}/modulsicherungen`).
   Automatisch, z. B. täglich per Zeitplan: `python manage.py modulsicherung` (bewahrt `SICHERUNG_BEHALTEN_AUTOMATISCH`
   Sicherungen auf). Die tägliche Gesamtsicherung der Datenbank (pg_dump, Unraid) bleibt davon unabhängig bestehen.
-- Sicherungen und PDFs enthalten personenbezogene Daten: heruntergeladene Dateien verschlüsselt und zugriffsgeschützt
-  aufbewahren.
+- Sicherungen und PDF-Exporte liegen auf dem Server verschlüsselt (`DATEN_SCHLUESSEL`, siehe „Sicherheit und
+  Verschlüsselung“). Heruntergeladene Sicherungen am besten mit Passwort verschlüsseln; PDFs zugriffsgeschützt aufbewahren.
+
+## Sicherheit und Verschlüsselung
+
+Ab 0.4.6.0. Ausführliche Einrichtung auf Unraid: `ANLEITUNG-UNRAID.md`, Abschnitte „HTTPS“ und „Verschlüsselung“.
+
+- **Verschlüsselte Ablage (AES-256-GCM):** Anhänge der Personenakten, Bewerbungsunterlagen, Modulsicherungen und
+  PDF-Exporte werden mit dem Schlüssel `DATEN_SCHLUESSEL` aus der `.env` verschlüsselt gespeichert und beim Öffnen in
+  der Anwendung entschlüsselt. `start.sh` bzw. `unraid/einrichten.sh` erzeugen den Schlüssel beim Einrichten bzw. beim
+  ersten Update und zeigen ihn einmal an. Beim Start des Containers werden ältere, noch unverschlüsselte Dateien
+  automatisch nachverschlüsselt (`manage.py dateien_verschluesseln`). Die Datenbankfelder selbst bleiben lesbar; sie
+  werden durch die verschlüsselten Festplatten des Servers geschützt.
+  **Den Schlüssel getrennt vom Server aufbewahren** (ausgedruckt im Tresor): Ohne ihn sind verschlüsselte Dateien und
+  Sicherungen nicht wiederherstellbar. Den Schlüssel nicht austauschen, solange Dateien damit verschlüsselt sind.
+- **Sicherungen herunterladen:** mit Passwort (mind. 10 Zeichen; AES-256, Schlüssel aus dem Passwort per scrypt) als
+  `.enc`-Datei oder bewusst unverschlüsselt als ZIP. Hochladen nimmt ZIP, passwortverschlüsselte Dateien (Passwort
+  angeben) und Dateien mit dem Serverschlüssel derselben Installation an.
+- **Zwei-Faktor-Anmeldung (TOTP):** Kontomenü › **Sicherheit** bzw. Menüband › Start › Konto › Sicherheit. Für alle
+  freiwillig; QR-Code mit einer Authenticator-App scannen (Microsoft Authenticator, Google Authenticator, Aegis …),
+  Code bestätigen, zehn **Ersatzcodes** ausdrucken. Danach fragt die Anmeldung nach Passwort und sechsstelligem Code
+  (5 Versuche, 5 Minuten). Die **IT** kann sie je Konto **verpflichtend** machen und bei verlorenem Telefon
+  **zurücksetzen** (System › Benutzer und Rechte › Konto); alles wird protokolliert. Die Verwaltungsoberfläche
+  (`/verwaltung/`) meldet sich ebenfalls über diese Anmeldung an.
+- **HTTPS:** `HTTPS=1` setzen, sobald die Seite über https erreichbar ist (z. B. `tailscale serve`), und die
+  https-Adresse in `CSRF_TRUSTED_ORIGINS` eintragen. Dann gelten sichere Cookies und HSTS. `HINTER_PROXY=1` und
+  `HTTPS_UMLEITUNG=1` nur, wenn der vorgeschaltete Proxy den Kopf `X-Forwarded-Proto` zuverlässig setzt.
+- **Sicherheitsköpfe:** Content-Security-Policy (keine fremden Skripte, keine Einbettung in fremde Seiten),
+  Permissions-Policy, Cross-Origin-Opener-Policy, Referrer-Policy `same-origin`, X-Frame-Options `DENY`.
+- **Startprüfung:** `manage.py check` warnt ohne `DATEN_SCHLUESSEL`, ohne HTTPS und bei fehlender https-Adresse in
+  `CSRF_TRUSTED_ORIGINS`.
+
+## Office (Microsoft 365)
+
+**Menüband › Start › Office** bzw. Kontomenü › Office. Kacheln für Outlook, Kalender, Teams, OneDrive, Word, Excel,
+PowerPoint, OneNote, SharePoint, Forms und die Microsoft-365-Startseite; jede öffnet die Anwendung **in einem neuen
+Tab**. Einbetten ist nicht möglich, weil Microsoft das Anzeigen in fremden Seiten untersagt. Mit **„Menüband
+ausblenden“** verschwindet die Menüleiste auf dieser Seite vollständig (der Browser merkt sich die Wahl); die
+schwebende Schaltfläche **„Menüband einblenden“** holt sie zurück.
+Die IT pflegt die Kacheln unter **Office › Kacheln verwalten** (Titel deutsch/englisch, Adresse, Symbol, Farbe,
+Reihenfolge). In Adressen wird `{mandant}` durch `OFFICE_MANDANT` ersetzt, z. B. `https://{mandant}.sharepoint.com`.
 
 ## Schuljahre, Schuljahreswechsel, Abgang und Archiv
 
@@ -547,7 +588,8 @@ im Portal, in der Verwaltungsoberfläche und auf der Anmeldeseite:
 ## Update von einer älteren Version
 
 Neuen Ordnerinhalt über den alten kopieren (die `.env` behalten) und erneut `./start.sh`
-ausführen. Die Datenbank wird automatisch umgestellt; vorhandene Kategorien werden zu Ordnern.
+ausführen. Ab 0.4.6.0 ergänzt das Skript die `.env` einmalig um `DATEN_SCHLUESSEL` (wird angezeigt –
+sicher aufbewahren) sowie `OFFICE_MANDANT` und `HTTPS`; vorhandene Dateien werden beim Start verschlüsselt. Die Datenbank wird automatisch umgestellt; vorhandene Kategorien werden zu Ordnern.
 Bei eingeschalteten Demo-Daten werden die englischen Bezeichnungen der Beispieldaten nachgetragen
 und fehlende Beispiele (z. B. Neuanmeldungen) ergänzt. Checklisten-Vorlagen werden beim Start angelegt.
 
@@ -563,6 +605,9 @@ und fehlende Beispiele (z. B. Neuanmeldungen) ergänzt. Checklisten-Vorlagen wer
 | Elternpost versenden (nach dem Einschalten) | `docker compose exec web python manage.py elternpost_senden` |
 | Fehlzeitenregeln für alle prüfen | `docker compose exec web python manage.py fehlzeiten_pruefen` |
 | Modulsicherung aller Module | `docker compose exec web python manage.py modulsicherung` |
+| Neuen Datenschlüssel erzeugen (nur Ersteinrichtung) | `docker compose exec web python manage.py schluessel_erzeugen` |
+| Vorhandene Dateien verschlüsseln (läuft auch beim Start) | `docker compose exec web python manage.py dateien_verschluesseln` |
+| Sicherheitsprüfung | `docker compose exec web python manage.py check --deploy` |
 
 ## Aufbau
 
@@ -572,7 +617,7 @@ und fehlende Beispiele (z. B. Neuanmeldungen) ergänzt. Checklisten-Vorlagen wer
 | `src/noten` | Notenskalen, Notenschlüssel (BE → Note), Gewichtungsvorlagen, Unterricht, Leistungsnachweise, Noten, Zeugnisnoten; Berechnung in `berechnung.py` |
 | `src/fehlzeiten` | Zeitraster, Fehlzeiten (ganztägig, stundenweise, Verspätung) |
 | `src/nachmittag` | AG-Angebote, Wünsche, Losverfahren in `zuteilung.py` |
-| `src/portal` | Startseite, Menüband, Notenübersicht, Klassenliste, Schülerakte, Stufenübersicht, Rollen (`rollen.py`) und Rechteprüfung (`rechte.py`), Sprachwahl, Demo-Daten |
+| `src/portal` | Startseite, Menüband, Office-Kacheln, Verschlüsselung (`krypto.py`), Zwei-Faktor-Anmeldung (`zweifaktor.py`, `sicherheit.py`), Notenübersicht, Klassenliste, Schülerakte, Stufenübersicht, Rollen (`rollen.py`) und Rechteprüfung (`rechte.py`), Sprachwahl, Demo-Daten |
 | `src/foerderung` | Förderpläne, Nachteilsausgleiche, Elternbestätigung |
 | `src/zeugnisse` | Zeugnisse, Kommentare mit Abzeichnung, Konferenzen; Versetzungsregeln in `versetzung.py` |
 | `src/sicherung` | Modulsicherung und Wiederherstellung (`archiv.py`), PDF-Export (`pdf.py`), Benutzer und Einzelrechte (`konten.py`), Protokoll |

@@ -12,7 +12,7 @@ import uuid
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.files.storage import FileSystemStorage
+from portal.krypto import VerschluesselterSpeicher
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -35,7 +35,7 @@ ZUSTAENDIG = [
 
 # ---------------------------------------------------------------- Ablage der Dateien
 
-class AufnahmeSpeicher(FileSystemStorage):
+class AufnahmeSpeicher(VerschluesselterSpeicher):
     """Wie bei den Anhängen: außerhalb des Webpfads, Links nur über die rechtegeprüfte Download-Ansicht."""
 
     def url(self, name):

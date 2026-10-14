@@ -1,0 +1,69 @@
+{% extends "portal/base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Sicherheit" %}{% endblock %}
+{% block inhalt %}
+<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › {% translate "Mein Konto" %} › {% translate "Sicherheit" %}</p>
+<h1>{% translate "Sicherheit des Kontos" %}</h1>
+{% if pflicht_offen %}<p class="sy-warnung">{% translate "Für Ihr Konto hat die IT die Zwei-Faktor-Anmeldung vorgeschrieben. Bitte richten Sie sie jetzt ein; erst danach können Sie weiterarbeiten." %}</p>{% endif %}
+
+<div class="sy-raster">
+  <section class="karte">
+    <h2>{% translate "Zwei-Faktor-Anmeldung" %}
+      {% if z.aktiv %}<span class="zf-status an">{% translate "eingerichtet" %}</span>{% else %}<span class="zf-status aus">{% translate "nicht eingerichtet" %}</span>{% endif %}
+      {% if z.pflicht %}<span class="etikett">{% translate "verpflichtend" %}</span>{% endif %}</h2>
+
+    {% if neue_codes %}
+      <div class="zf-codes">
+        <h3>{% translate "Ihre Ersatzcodes" %}</h3>
+        <p>{% translate "Jeder Code funktioniert einmal, wenn das Telefon nicht verfügbar ist. Bitte jetzt ausdrucken oder sicher notieren – sie werden nicht noch einmal angezeigt." %}</p>
+        <ul>{% for c in neue_codes %}<li><code>{{ c }}</code></li>{% endfor %}</ul>
+        <button type="button" class="knopf zweitrangig klein nicht-drucken" onclick="window.print()">{% translate "Drucken" %}</button>
+      </div>
+    {% endif %}
+
+    {% if geheimnis %}
+      <ol class="zf-schritte">
+        <li>{% translate "Authenticator-App auf dem Telefon öffnen (z. B. Microsoft Authenticator, Google Authenticator oder Aegis)." %}</li>
+        <li>{% translate "Konto hinzufügen und diesen QR-Code scannen:" %}
+          <div class="zf-qr">{{ qr|safe }}</div>
+          <details><summary>{% translate "QR-Code lässt sich nicht scannen?" %}</summary>
+            <p>{% translate "Schlüssel von Hand eingeben (zeitbasiert, 6 Ziffern):" %}</p><p><code class="zf-schluessel">{{ geheimnis_gruppen }}</code></p></details></li>
+        <li>{% translate "Den angezeigten sechsstelligen Code hier eingeben:" %}
+          <form method="post" class="inline-form zf-form">{% csrf_token %}<input type="hidden" name="aktion" value="bestaetigen">
+            {{ form.code }} <button type="submit" class="knopf">{% translate "Einrichtung abschließen" %}</button></form>
+          {% for e in form.code.errors %}<p class="fehler">{{ e }}</p>{% endfor %}</li>
+      </ol>
+    {% elif z.aktiv %}
+      <dl class="daten">
+        <dt>{% translate "Eingerichtet am" %}</dt><dd>{{ z.eingerichtet_am|date:"SHORT_DATETIME_FORMAT" }}</dd>
+        <dt>{% translate "Zuletzt verwendet" %}</dt><dd>{{ z.zuletzt_verwendet|date:"SHORT_DATETIME_FORMAT"|default:"–" }}</dd>
+        <dt>{% translate "Ersatzcodes übrig" %}</dt><dd class="{% if ersatz_rest < 3 %}auffaellig{% endif %}">{{ ersatz_rest }}</dd>
+      </dl>
+      <form method="post" class="sy-formular zf-form">{% csrf_token %}
+        <label class="sy-feld">{% translate "Aktueller Code aus der App" %} {{ form.code }}</label>
+        {% for e in form.code.errors %}<p class="fehler">{{ e }}</p>{% endfor %}
+        <div class="knopfreihe">
+          <button type="submit" name="aktion" value="ersatzcodes" class="knopf zweitrangig">{% translate "Neue Ersatzcodes erzeugen" %}</button>
+          {% if not z.pflicht %}<button type="submit" name="aktion" value="abschalten" class="knopf gefahr">{% translate "Abschalten" %}</button>{% endif %}
+        </div>
+      </form>
+    {% else %}
+      <p>{% translate "Mit der Zwei-Faktor-Anmeldung braucht man zum Anmelden zusätzlich zum Passwort einen Code, den eine App auf Ihrem Telefon alle 30 Sekunden neu erzeugt. Ein gestohlenes Passwort allein genügt dann nicht mehr." %}</p>
+      <form method="post">{% csrf_token %}<input type="hidden" name="aktion" value="beginnen">
+        <button type="submit" class="knopf">{% translate "Jetzt einrichten" %}</button></form>
+    {% endif %}
+  </section>
+
+  <section class="karte">
+    <h2>{% translate "Passwort" %}</h2>
+    <p>{% translate "Ein gutes Passwort ist lang (mindestens 12 Zeichen) und wird nirgends sonst verwendet." %}</p>
+    {% if user.has_usable_password %}<p><a class="knopf zweitrangig" href="{% url 'admin:password_change' %}">{% translate "Passwort ändern" %}</a></p>{% endif %}
+    <h3>{% translate "Gut zu wissen" %}</h3>
+    <ul class="sy-hinweise">
+      <li>{% translate "Die Uhrzeit des Telefons muss stimmen (automatisch stellen lassen), sonst passen die Codes nicht." %}</li>
+      <li>{% translate "Neues Telefon: vorher abschalten und auf dem neuen Gerät neu einrichten – oder mit einem Ersatzcode anmelden." %}</li>
+      <li>{% translate "Die IT kann die Zwei-Faktor-Anmeldung eines Kontos zurücksetzen oder verpflichtend machen." %}</li>
+    </ul>
+  </section>
+</div>
+{% endblock %}

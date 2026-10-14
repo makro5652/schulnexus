@@ -353,3 +353,23 @@ def design_wechseln(request):
         if request.user.is_authenticated:
             Benutzereinstellung.objects.update_or_create(benutzer=request.user, defaults={"design": design})
     return antwort
+
+
+@login_required
+def office(request):
+    """Kacheln zu Microsoft 365. Die Anwendungen öffnen in einem neuen Tab (Einbetten verbietet Microsoft)."""
+    from django.conf import settings
+    from django.utils.translation import get_language
+
+    from .models import OfficeKachel
+    from .rechte import ist_it
+
+    sprache = get_language() or "de"
+    mandant = (getattr(settings, "OFFICE_MANDANT", "") or "").strip()
+    kacheln = []
+    for k in OfficeKachel.objects.filter(aktiv=True):
+        adresse = k.adresse(mandant)
+        if adresse:
+            kacheln.append({"titel": k.anzeige_titel(sprache), "beschreibung": k.anzeige_beschreibung(sprache),
+                            "url": adresse, "symbol": k.symbol, "farbe": k.farbe})
+    return render(request, "portal/office.html", {"kacheln": kacheln, "darf_verwalten": ist_it(request.user)})
