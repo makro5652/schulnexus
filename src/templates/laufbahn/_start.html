@@ -1,0 +1,13 @@
+{% load i18n formate %}
+<section class="karte lb-erinnerung" id="schuljahr">
+  <h2>{% translate "Schuljahr und Archiv" %}</h2>
+  {% with w=laufbahn.wechsel %}{% if w %}
+  <p>{% if w.vorbei %}{% blocktranslate with sj=w.sj ende=w.sj.ende|kurzdatum %}Das Schuljahr {{ sj }} ist am {{ ende }} zu Ende gegangen.{% endblocktranslate %}{% else %}{% blocktranslate with sj=w.sj ende=w.sj.ende|kurzdatum %}Das Schuljahr {{ sj }} endet am {{ ende }}.{% endblocktranslate %}{% endif %}
+    {% if w.w %}{% translate "Der Schuljahreswechsel ist in Vorbereitung." %}{% else %}{% translate "Der Schuljahreswechsel ist noch nicht vorbereitet." %}{% endif %}</p>
+  <p>{% if w.w %}<a class="knopf klein" href="{% url 'schuljahreswechsel' w.w.pk %}">{% translate "Schuljahreswechsel fortsetzen" %}</a>{% else %}<a class="knopf klein" href="{% url 'schuljahre' %}">{% translate "Schuljahreswechsel vorbereiten" %}</a>{% endif %}</p>
+  {% endif %}{% endwith %}
+  {% if laufbahn.loeschungen %}
+  <p class="lb-faellig">{% blocktranslate count n=laufbahn.loeschungen %}Im Archiv ist {{ n }} Löschung fällig.{% plural %}Im Archiv sind {{ n }} Löschungen fällig.{% endblocktranslate %}
+    <a href="{% url 'loeschfristen' %}#faellig">{% translate "Prüfen und löschen" %}</a></p>
+  {% endif %}
+</section>

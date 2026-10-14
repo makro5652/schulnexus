@@ -1,0 +1,74 @@
+{% extends "portal/base.html" %}
+{% load i18n formate %}
+{% block title %}{{ titel }}{% endblock %}
+{% block inhaltsklasse %}breit{% endblock %}
+{% block inhalt %}
+{% include "laufbahn/_kopf.html" %}
+
+<ol class="lb-kette" aria-label="{% translate 'Ablauf der Schullaufbahn' %}">
+  <li><strong>{% translate "Aufnahme" %}</strong><span>{% translate "Neuanmeldung, Übernahme" %}</span></li>
+  <li><strong>{% translate "Klasse" %}</strong><span>{% translate "Zuordnung im Schuljahr" %}</span></li>
+  <li><strong>{% translate "Versetzung" %}</strong><span>{% translate "Konferenz, Jahreszeugnis" %}</span></li>
+  <li class="hier"><strong>{% translate "Schuljahreswechsel" %}</strong><span>{% translate "diese Seite" %}</span></li>
+  <li><strong>{% translate "Abgang" %}</strong><span>{% translate "mit Abgangszeugnis" %}</span></li>
+  <li><strong>{% translate "Archiv" %}</strong><span>{% translate "Löschfristen" %}</span></li>
+</ol>
+
+{% if aktuell_vorbei %}<p class="sy-warnung">{% blocktranslate with sj=aktuell ende=aktuell.ende|kurzdatum %}Das aktuelle Schuljahr {{ sj }} ist seit dem {{ ende }} beendet. Bitte den Schuljahreswechsel durchführen oder das neue Schuljahr als aktuelles setzen.{% endblocktranslate %}</p>{% endif %}
+
+<div class="sy-raster">
+  <section class="karte">
+    <h2>{% translate "Schuljahre" %}</h2>
+    <div class="tabellenrahmen"><table class="liste">
+      <thead><tr><th>{% translate "Schuljahr" %}</th><th>{% translate "Zeitraum" %}</th><th class="zahl">{% translate "Klassen" %}</th>
+        <th class="zahl">{% translate "Schüler:innen" %}</th><th>{% translate "Wechsel" %}</th><th></th></tr></thead>
+      <tbody>
+      {% for j in jahre %}
+        <tr{% if j.aktiv %} class="lb-aktiv"{% endif %}>
+          <td><strong>{{ j.name }}</strong>{% if j.aktiv %} <span class="etikett">{% translate "aktuell" %}</span>{% endif %}
+            <small class="leise blockzeile">{% for a in j.abschnitte.all %}{{ a.lokal_name }}{% if not forloop.last %} · {% endif %}{% empty %}{% translate "keine Halbjahre" %}{% endfor %}</small></td>
+          <td class="nowrap">{{ j.beginn|kurzdatum }} – {{ j.ende|kurzdatum }}</td>
+          <td class="zahl">{{ j.n_klassen }}</td>
+          <td class="zahl">{{ j.n_schueler }}</td>
+          <td>{% if j.wechsel %}<a href="{% url 'schuljahreswechsel' j.wechsel.pk %}">→ {{ j.wechsel.nach }}</a>
+              <small class="blockzeile"><span class="zg-status zg-status-{% if j.wechsel.durchgefuehrt %}abgeschlossen{% else %}entwurf{% endif %}">{{ j.wechsel.get_status_display }}</span></small>
+            {% elif j.folgejahr %}
+              <form method="post" class="zg-inline">{% csrf_token %}<input type="hidden" name="aktion" value="wechsel">
+                <input type="hidden" name="von" value="{{ j.pk }}"><input type="hidden" name="nach" value="{{ j.folgejahr.pk }}">
+                <button type="submit" class="knopf zweitrangig klein">{% blocktranslate with nach=j.folgejahr %}Wechsel nach {{ nach }} vorbereiten{% endblocktranslate %}</button></form>
+            {% else %}<span class="leise">–</span>{% endif %}</td>
+          <td class="sy-aktionen">{% if not j.aktiv %}
+            {% blocktranslate with sj=j.name asvar frage %}{{ sj }} als aktuelles Schuljahr setzen? Startseite, Menüband und Listen zeigen dann dieses Schuljahr.{% endblocktranslate %}
+            <form method="post" onsubmit="return confirm('{{ frage|escapejs }}')">{% csrf_token %}
+              <input type="hidden" name="aktion" value="aktivieren"><input type="hidden" name="schuljahr" value="{{ j.pk }}">
+              <button type="submit" class="knopf zweitrangig klein">{% translate "Als aktuelles setzen" %}</button></form>{% endif %}</td>
+        </tr>
+      {% empty %}<tr><td colspan="6" class="leer">{% translate "Noch kein Schuljahr angelegt." %}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="karte">
+    <h2>{% translate "Neues Schuljahr anlegen" %}</h2>
+    <form method="post" class="sy-formular">{% csrf_token %}<input type="hidden" name="aktion" value="anlegen">
+      {% if form.non_field_errors %}<p class="sy-fehler">{{ form.non_field_errors|join:" " }}</p>{% endif %}
+      <label class="sy-feld">{{ form.name.label }} {{ form.name }}{% for e in form.name.errors %}<small class="fehler">{{ e }}</small>{% endfor %}</label>
+      <div class="sy-zeitraum lb-zwei">
+        <label class="sy-feld">{{ form.beginn.label }} {{ form.beginn }}</label>
+        <label class="sy-feld">{{ form.ende.label }} {{ form.ende }}</label>
+      </div>
+      <label class="sy-feld">{{ form.vorlage.label }} {{ form.vorlage }}</label>
+      <p class="hinweistext">{% translate "Die Halbjahre der Vorlage werden um denselben Abstand verschoben übernommen; danach lassen sie sich unter Verwaltung › Schuljahre anpassen." %}</p>
+      <button type="submit" class="knopf">{% translate "Schuljahr anlegen" %}</button>
+    </form>
+    <h3>{% translate "So funktioniert der Wechsel" %}</h3>
+    <ul class="sy-hinweise">
+      <li>{% translate "Klassen planen: Aus 9a wird 10a, die Klassenleitung bleibt – beides lässt sich ändern." %}</li>
+      <li>{% translate "Entscheidungen: Vorschläge kommen aus der Versetzungskonferenz und dem Jahreszeugnis; je Schüler:in lässt sich versetzen, wiederholen, überspringen, zurückstufen oder entlassen." %}</li>
+      <li>{% translate "Durchführen: Alte Klassen enden mit dem letzten Schultag, neue beginnen mit dem ersten. Wer die Schule verlässt, kommt ins Archiv." %}</li>
+      <li>{% translate "Zurücknehmen ist jederzeit möglich – für einzelne Schüler:innen oder den ganzen Wechsel." %}</li>
+    </ul>
+  </section>
+</div>
+{% endblock %}

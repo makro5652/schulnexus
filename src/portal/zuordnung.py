@@ -21,7 +21,7 @@ from django.utils.dateparse import parse_date
 from django.utils.translation import gettext, gettext_lazy as _
 from django.views.decorators.http import require_POST
 
-from stammdaten.models import Gruppe, Mitgliedschaft, Personalprofil, Schuelerprofil, Schuljahr
+from stammdaten.models import Gruppe, Laufbahnabschnitt, Mitgliedschaft, Personalprofil, Schuelerprofil, Schuljahr
 
 from .rechte import ist_verwaltung, koordinierte_jahrgaenge
 
@@ -99,6 +99,12 @@ def hinzufuegen(gruppe, schueler_liste, datum=None):
         try:
             Mitgliedschaft.objects.create(gruppe=gruppe, schueler=s, von=start)
             ergebnis["neu"] += 1
+            if gruppe.typ == Gruppe.STAMMKLASSE:       # Schullaufbahn des Schuljahres nachführen (gleicher Jahrgang)
+                lb = Laufbahnabschnitt.objects.filter(schueler=s, schuljahr=gruppe.schuljahr).filter(
+                    Q(bis__isnull=True) | Q(bis__gte=start)).order_by("-von", "-pk").first()
+                if lb and (gruppe.jahrgang is None or lb.jahrgang == gruppe.jahrgang) and lb.stammklasse_id != gruppe.pk:
+                    lb.stammklasse = gruppe
+                    lb.save(update_fields=["stammklasse"])
         except ValidationError as e:
             ergebnis["fehler"].append(f"{s.person.anzeigename}: {' '.join(e.messages)}")
     return ergebnis

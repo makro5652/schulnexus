@@ -1,0 +1,8 @@
+{% load i18n %}
+<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › {% translate "Verwaltung" %} › {{ titel }}</p>
+<h1>{{ titel }}</h1>
+{% if reiter|length > 1 %}
+<nav class="an-tabs sy-reiter" aria-label="{% translate 'Schuljahr und Archiv' %}">
+  {% for r in reiter %}<a href="{% url r.url %}"{% if r.aktiv %} aria-current="page" class="aktiv"{% endif %}>{{ r.name }}</a>{% endfor %}
+</nav>
+{% endif %}

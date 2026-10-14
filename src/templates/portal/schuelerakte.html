@@ -13,8 +13,21 @@
       · <span class="marke-status status-{{ s.status }}">{{ s.get_status_display }}</span>
     </p>
   </div>
-  {% if user.is_staff %}<a class="knopf zweitrangig" href="{% url 'admin:stammdaten_schuelerprofil_change' s.pk %}">{% translate "Akte bearbeiten" %}</a>{% endif %}
+  <div class="knopfreihe">
+    {% if darf_laufbahn %}<a class="knopf zweitrangig" href="{% url 'laufbahn_schueler' s.pk %}">{% translate "Laufbahn und Abgang" %}</a>{% endif %}
+    {% if user.is_staff %}<a class="knopf zweitrangig" href="{% url 'admin:stammdaten_schuelerprofil_change' s.pk %}">{% if s.archiviert %}{% translate "Akte ansehen" %}{% else %}{% translate "Akte bearbeiten" %}{% endif %}</a>{% endif %}
+  </div>
 </div>
+{% if s.archiviert %}
+<p class="lb-archivhinweis">{% blocktranslate with datum=s.austrittsdatum|kurzdatum %}Archiv: Diese Schülerin / dieser Schüler hat die Schule am {{ datum }} verlassen. Die Akte ist nur noch lesbar; die Löschfristen laufen.{% endblocktranslate %}</p>
+{% endif %}
+{% if jahre|length > 1 %}
+<form method="get" class="lb-jahrwahl">
+  <label for="akte-sj">{% translate "Schuljahr" %}</label>
+  <select id="akte-sj" name="sj" onchange="this.form.submit()">{% for j in jahre %}<option value="{{ j.pk }}"{% if j == sj %} selected{% endif %}>{{ j.name }}{% if j.aktiv %} ({% translate "aktuell" %}){% endif %}</option>{% endfor %}</select>
+  <noscript><button type="submit" class="knopf zweitrangig klein">{% translate "Anzeigen" %}</button></noscript>
+</form>
+{% endif %}
 
 <div class="hinweisleiste">
   {% if anmeldung %}<a class="etikett" href="{% url 'anmeldung' anmeldung.pk %}">{% blocktranslate with nr=anmeldung.nummer %}Anmeldung {{ nr }}{% endblocktranslate %}</a>{% endif %}
@@ -73,7 +86,7 @@
   <section class="karte breit-2">
     <h2>{% translate "Schullaufbahn" %}</h2>
     {% if laufbahn %}
-    <table class="liste">
+    <div class="rollbar"><table class="liste">
       <thead><tr><th>{% translate "Schuljahr" %}</th><th class="zahl">{% translate "Jg." %}</th><th>{% translate "Bildungsgang" %}</th><th>{% translate "Klasse" %}</th><th>{% translate "Zeitraum" %}</th><th>{% translate "Ergebnis" %}</th><th>{% translate "Bemerkung" %}</th></tr></thead>
       <tbody>
       {% for l in laufbahn %}
@@ -85,7 +98,7 @@
         </tr>
       {% endfor %}
       </tbody>
-    </table>
+    </table></div>
     {% else %}<p class="leer">{% translate "Noch keine Laufbahn erfasst." %}</p>{% endif %}
     {% if vorherige %}
       <h3>{% translate "Vorherige Schulen" %}</h3>
@@ -104,7 +117,7 @@
   {% if elternkontakt %}{% include "elternkontakt/_akte.html" %}{% endif %}
 
   <section class="karte">
-    <h2>{% blocktranslate with sj=AKTUELLES_SCHULJAHR %}Fehlzeiten {{ sj }}{% endblocktranslate %}</h2>
+    <h2>{% blocktranslate with sj=sj %}Fehlzeiten {{ sj }}{% endblocktranslate %}</h2>
     <dl class="daten zahlen">
       <dt>{% translate "Fehlstunden" %}</dt><dd>{{ fz.stunden }}</dd>
       <dt>{% translate "davon unentschuldigt" %}</dt><dd class="{% if fz.unentschuldigt %}auffaellig{% endif %}">{{ fz.unentschuldigt }}</dd>
@@ -115,7 +128,7 @@
   </section>
 
   <section class="karte">
-    <h2>{% blocktranslate with sj=AKTUELLES_SCHULJAHR %}Notenstand {{ sj }}{% endblocktranslate %}</h2>
+    <h2>{% blocktranslate with sj=sj %}Notenstand {{ sj }}{% endblocktranslate %}</h2>
     {% if noten %}
     <div class="rollbar"><table class="liste eng">
       <thead><tr><th>{% translate "Fach" %}</th><th>{% translate "Halbjahr" %}</th><th class="zahl">Ø</th><th class="zahl">{% translate "Vorschlag" %}</th></tr></thead>

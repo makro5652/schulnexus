@@ -1,0 +1,82 @@
+{% extends "portal/base.html" %}
+{% load i18n formate %}
+{% block title %}{% translate "Löschfristen" %}{% endblock %}
+{% block inhaltsklasse %}breit{% endblock %}
+{% block inhalt %}
+{% include "laufbahn/_kopf.html" %}
+
+<section class="karte" id="faellig">
+  <h2>{% translate "Fällige Löschungen" %} <small class="leise">· {% translate "einschließlich der nächsten 30 Tage" %}</small></h2>
+  {% if faellig %}
+  <div class="tabellenrahmen"><table class="liste lb-faelligliste">
+    <thead><tr><th>{% translate "Person" %}</th><th>{% translate "Austritt" %}</th><th>{% translate "Daten" %}</th><th class="zahl">{% translate "Einträge" %}</th><th>{% translate "Fällig" %}</th>{% if darf_loeschen %}<th>{% translate "Aktion" %}</th>{% endif %}</tr></thead>
+    <tbody>
+    {% for e in faellig %}
+      <tr>
+        <td><a href="{% url 'laufbahn_schueler' e.schueler.pk %}">{{ e.schueler.person.nachname }}, {{ e.schueler.person.vorname }}</a><small class="leise blockzeile">{{ e.schueler.schuelernummer }}</small></td>
+        <td class="nowrap">{{ e.schueler.austrittsdatum|kurzdatum }}</td>
+        <td>{{ e.frist.get_kategorie_display }}{% if e.frist.aktion == "erinnern" %} <span class="etikett">{% translate "nur Erinnerung" %}</span>{% endif %}
+          {% if e.vorgang and e.vorgang.status == "aufgeschoben" %}<small class="leise blockzeile">{% blocktranslate with bis=e.vorgang.bis|kurzdatum grund=e.vorgang.grund %}Aufschub bis {{ bis }} abgelaufen: {{ grund }}{% endblocktranslate %}</small>{% endif %}</td>
+        <td class="zahl">{{ e.anzahl }}</td>
+        <td class="nowrap"><span class="{% if e.ueberfaellig %}auffaellig{% endif %}">{{ e.faellig|kurzdatum }}</span></td>
+        {% if darf_loeschen %}
+        <td class="lb-loeschaktion">
+          {% if e.frist.aktion == "loeschen" %}
+          <form method="post">{% csrf_token %}<input type="hidden" name="aktion" value="loeschen"><input type="hidden" name="schueler" value="{{ e.schueler.pk }}"><input type="hidden" name="kategorie" value="{{ e.frist.kategorie }}">
+            <label class="haken"><input type="checkbox" name="bestaetigt" value="1" required> {% translate "endgültig" %}</label>
+            <button type="submit" class="knopf gefahr klein">{% translate "Löschen" %}</button></form>
+          {% endif %}
+          <details><summary>{% translate "Aufschieben" %}</summary>
+            <form method="post" class="lb-aufschub">{% csrf_token %}<input type="hidden" name="aktion" value="aufschieben"><input type="hidden" name="schueler" value="{{ e.schueler.pk }}"><input type="hidden" name="kategorie" value="{{ e.frist.kategorie }}">
+              <input type="date" name="bis" value="{{ aufschub_bis|date:'Y-m-d' }}" aria-label="{% translate 'Aufgeschoben bis' %}" required>
+              <input type="text" name="grund" maxlength="250" placeholder="{% translate 'Grund, z. B. laufendes Verfahren' %}" aria-label="{% translate 'Grund' %}" required>
+              <button type="submit" class="knopf zweitrangig klein">{% translate "Aufschieben" %}</button></form>
+          </details>
+        </td>
+        {% endif %}
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  {% if darf_loeschen %}<p class="hinweistext">{% translate "Gelöscht werden die Einträge selbst, ihr Änderungsprotokoll und zugehörige Dateien. Der Nachweis enthält nur Schülernummer, Kategorie und Anzahl. Ältere Modulsicherungen enthalten die Daten weiterhin, bis sie selbst gelöscht werden." %}</p>{% endif %}
+  {% else %}<p class="leer">{% translate "Keine Löschung fällig." %}</p>{% endif %}
+</section>
+
+<section class="karte">
+  <h2>{% translate "Aufbewahrungsfristen" %}</h2>
+  <p class="hinweistext">{% translate "Die Fristen gelten für abgegangene Schüler:innen ab dem Austritt. Die Vorschlagswerte sind vorsichtig gewählt und ersetzen keine Festlegung durch die Schulleitung." %}</p>
+  <form method="post">{% csrf_token %}<input type="hidden" name="aktion" value="fristen">
+  <div class="tabellenrahmen"><table class="liste lb-fristen">
+    <thead><tr><th>{% translate "Daten" %}</th><th>{% translate "Jahre" %}</th><th>{% translate "Frist beginnt mit" %}</th><th>{% translate "Bei Fristablauf" %}</th><th>{% translate "Aktiv" %}</th><th>{% translate "Grundlage / Hinweis" %}</th></tr></thead>
+    <tbody>
+    {% for f in fristen %}
+      <tr>
+        <td>{{ f.get_kategorie_display }}</td>
+        {% if darf_aendern %}
+        <td><input type="number" name="jahre-{{ f.pk }}" value="{{ f.jahre }}" min="0" max="100" class="lb-jahre" aria-label="{% translate 'Jahre' %}"></td>
+        <td><select name="bezug-{{ f.pk }}" aria-label="{% translate 'Frist beginnt mit' %}">{% for k, n in bezuege %}<option value="{{ k }}"{% if k == f.bezug %} selected{% endif %}>{{ n }}</option>{% endfor %}</select></td>
+        <td><select name="aktion-{{ f.pk }}" aria-label="{% translate 'Bei Fristablauf' %}">{% for k, n in aktionen %}<option value="{{ k }}"{% if k == f.aktion %} selected{% endif %}>{{ n }}</option>{% endfor %}</select></td>
+        <td><input type="checkbox" name="aktiv-{{ f.pk }}" value="1"{% if f.aktiv %} checked{% endif %} aria-label="{% translate 'Aktiv' %}"></td>
+        <td><input type="text" name="hinweis-{{ f.pk }}" value="{{ f.hinweis }}" maxlength="250" class="lb-hinweis" aria-label="{% translate 'Grundlage / Hinweis' %}"></td>
+        {% else %}
+        <td>{{ f.jahre }}</td><td>{{ f.get_bezug_display }}</td><td>{{ f.get_aktion_display }}</td><td>{{ f.aktiv|yesno:_("ja,nein") }}</td><td><small>{{ f.hinweis }}</small></td>
+        {% endif %}
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  {% if darf_aendern %}<p><button type="submit" class="knopf">{% translate "Fristen speichern" %}</button></p>{% endif %}
+  </form>
+</section>
+
+<section class="karte">
+  <h2>{% translate "Nachweise" %}</h2>
+  {% if vorgaenge %}
+  <div class="tabellenrahmen"><table class="liste kompakt">
+    <thead><tr><th>{% translate "Am" %}</th><th>{% translate "Schülernummer" %}</th><th>{% translate "Daten" %}</th><th>{% translate "Status" %}</th><th class="zahl">{% translate "Einträge" %}</th><th>{% translate "Von" %}</th></tr></thead>
+    <tbody>{% for v in vorgaenge %}<tr><td class="nowrap">{{ v.am|date:"SHORT_DATETIME_FORMAT" }}</td><td>{{ v.schuelernummer }}</td><td>{{ v.get_kategorie_display }}</td>
+      <td>{{ v.get_status_display }}{% if v.bis %} <small class="leise">({{ v.bis|kurzdatum }})</small>{% endif %}</td><td class="zahl">{{ v.anzahl }}</td><td>{% if v.von %}{{ v.von|benutzername }}{% else %}–{% endif %}</td></tr>{% endfor %}</tbody>
+  </table></div>
+  {% else %}<p class="leer">{% translate "Noch keine Löschungen." %}</p>{% endif %}
+</section>
+{% endblock %}

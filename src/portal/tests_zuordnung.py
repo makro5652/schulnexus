@@ -90,7 +90,7 @@ class ZuordnungTest(TestCase):
         self.assertEqual(m.rolle, "Klassensprecher:in")
 
     def test_vorgaenger_uebernehmen(self):
-        neu_sj = Schuljahr.objects.create(name="2027/28", beginn=date(2027, 8, 16), ende=date(2028, 6, 23))
+        neu_sj, _neu = Schuljahr.objects.get_or_create(name="2027/28", defaults={"beginn": date(2027, 8, 16), "ende": date(2028, 6, 23)})
         kl10a = Gruppe.objects.create(schuljahr=neu_sj, name="10a", jahrgang=10, vorgaenger=self.kl9a)
         self.anmelden("verwaltung")
         r = self.client.get(reverse("zuordnung") + f"?sj={neu_sj.pk}&gruppe={kl10a.pk}")

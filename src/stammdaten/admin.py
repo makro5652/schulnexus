@@ -273,6 +273,14 @@ class SchuelerprofilAdmin(ZusatzfelderAdminMixin, SimpleHistoryAdmin):
         (_("Organisatorisches"), {"fields": ["lebt_bei", ("schulweg", "buslinie"), "abholhinweise", "bemerkungen"]}),
     ]
 
+    def has_change_permission(self, request, obj=None):
+        """Archiv (abgegangen): nur lesend; Korrekturen nur durch Schulleitung und IT."""
+        if obj is not None and obj.archiviert:
+            from portal.rechte import ist_it, ist_schulleitung
+            if not (ist_schulleitung(request.user) or ist_it(request.user)):
+                return False
+        return super().has_change_permission(request, obj)
+
     def get_inlines(self, request, obj):
         inlines = [LaufbahnInline, MitgliedschaftInline, BeziehungInline, AbschlussInline,
                    SprachenfolgeInline, VorherigeSchuleInline, EinwilligungInline]

@@ -1,0 +1,37 @@
+{% extends "portal/base.html" %}
+{% load i18n formate %}
+{% block title %}{% translate "Archiv" %}{% endblock %}
+{% block inhaltsklasse %}breit{% endblock %}
+{% block inhalt %}
+{% include "laufbahn/_kopf.html" %}
+<p class="hinweistext">{% translate "Abgegangene Schüler:innen. Die Akten sind nur lesbar und erscheinen in keiner Klassenliste mehr; nach Ablauf der Löschfristen erinnert die Startseite die Schulleitung." %}</p>
+
+<form method="get" class="lb-filter">
+  <label class="sy-feld">{% translate "Suche" %} <input type="search" name="q" value="{{ q }}" placeholder="{% translate 'Name oder Schülernummer' %}"></label>
+  <label class="sy-feld">{% translate "Austrittsjahr" %} <select name="jahr"><option value="">{% translate "alle" %}</option>{% for j in jahre %}<option{% if j|stringformat:"s" == jahr %} selected{% endif %}>{{ j }}</option>{% endfor %}</select></label>
+  <button type="submit" class="knopf zweitrangig">{% translate "Filtern" %}</button>
+</form>
+
+<p class="leise">{% blocktranslate count n=gesamt %}{{ n }} Eintrag{% plural %}{{ n }} Einträge{% endblocktranslate %}</p>
+{% if eintraege %}
+<div class="tabellenrahmen"><table class="liste">
+  <thead><tr><th>{% translate "Name" %}</th><th>{% translate "Nr." %}</th><th>{% translate "Zuletzt" %}</th><th>{% translate "Austritt" %}</th>
+    <th>{% translate "Abgangszeugnis" %}</th><th>{% translate "Nächste Löschung" %}</th></tr></thead>
+  <tbody>
+  {% for s in eintraege %}
+    <tr>
+      <td><a href="{% url 'laufbahn_schueler' s.pk %}"><strong>{{ s.person.nachname }}, {{ s.person.vorname }}</strong></a>
+        <small class="blockzeile"><a href="{% url 'schuelerakte' s.pk %}">{% translate "Schülerakte" %}</a></small></td>
+      <td>{{ s.schuelernummer }}</td>
+      <td>{% if s.letzte %}{{ s.letzte.schuljahr }} · {% blocktranslate with jg=s.letzte.jahrgang %}Jg. {{ jg }}{% endblocktranslate %}{% if s.letzte.stammklasse %} · {{ s.letzte.stammklasse.name }}{% endif %}
+        <small class="leise blockzeile">{{ s.letzte.get_ergebnis_display }}</small>{% else %}–{% endif %}</td>
+      <td class="nowrap">{{ s.austrittsdatum|kurzdatum|default:"–" }}<small class="leise blockzeile">{{ s.austrittsgrund }}</small></td>
+      <td>{% if s.abgangszeugnis %}<a href="{% url 'zeugnis' s.abgangszeugnis.pk %}">{{ s.abgangszeugnis.get_status_display }}</a>{% else %}<span class="leise">–</span>{% endif %}</td>
+      <td class="nowrap">{% if s.naechste_loeschung %}<span class="{% if s.loeschung_faellig %}auffaellig{% endif %}">{{ s.naechste_loeschung.0|kurzdatum }}</span>
+        <small class="leise blockzeile">{{ s.naechste_loeschung.1.get_kategorie_display|truncatechars:38 }}</small>{% else %}–{% endif %}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table></div>
+{% else %}<section class="karte"><p class="leer">{% translate "Keine Einträge im Archiv." %}</p></section>{% endif %}
+{% endblock %}

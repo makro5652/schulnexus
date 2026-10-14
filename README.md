@@ -1,8 +1,9 @@
-# Schulverwaltung (Version 0.4.3.0, Entwicklungsstand)
+# Schulverwaltung (Version 0.4.4.0, Entwicklungsstand)
 
 Open-Source-Schulverwaltung für die DSN: Stammdaten, Klassen und Lerngruppen,
 Noten mit Gewichtung, Fehlzeiten, Nachmittagsprogramm, Anhänge zur Schülerakte,
-Förderpläne und Nachteilsausgleiche, Neuanmeldungen, Zeugnisse und Konferenzen. Läuft im Browser,
+Förderpläne und Nachteilsausgleiche, Neuanmeldungen, Zeugnisse und Konferenzen, Schuljahreswechsel,
+Abgänge mit Abgangszeugnis, Archiv und Löschfristen. Läuft im Browser,
 betrieben mit Docker.
 
 > Nur mit **erfundenen Testdaten** verwenden. Für echte Schülerdaten fehlen noch
@@ -226,7 +227,8 @@ Das Sekretariat erhält dabei die neuen, engeren Standardrechte.
 **Menüband › Verwaltung › System** – nur Schulleitung und IT-Administration.
 
 - **Sicherung je Modul:** Stammdaten, Unterricht und Noten, Fehlzeiten, Nachmittag/AGs, Förderung, Neuanmeldungen,
-  Zeugnisse und Konferenzen, Elternkommunikation, Startseite/Einstellungen, Benutzerkonten und Rollen – einzeln oder
+  Zeugnisse und Konferenzen, Elternkommunikation, Schuljahreswechsel/Abgänge/Löschfristen, Startseite/Einstellungen,
+  Benutzerkonten und Rollen – einzeln oder
   alle zusammen, auf Wunsch mit den hochgeladenen Dateien. Jede Sicherung ist eine ZIP-Datei (Daten als JSON,
   Prüfsummen, Programmversion) zum Herunterladen; Sicherungen anderer Systeme lassen sich hochladen und werden geprüft.
 - **Wiederherstellen** setzt die gewählten Module auf den Stand der Sicherung zurück. Die **Vorschau** zeigt je Modul,
@@ -248,6 +250,59 @@ Das Sekretariat erhält dabei die neuen, engeren Standardrechte.
   Sicherungen auf). Die tägliche Gesamtsicherung der Datenbank (pg_dump, Unraid) bleibt davon unabhängig bestehen.
 - Sicherungen und PDFs enthalten personenbezogene Daten: heruntergeladene Dateien verschlüsselt und zugriffsgeschützt
   aufbewahren.
+
+## Schuljahre, Schuljahreswechsel, Abgang und Archiv
+
+Ablauf der Schullaufbahn: **Aufnahme → Klasse → Versetzung → Schuljahreswechsel → Abgang mit Abgangszeugnis → Archiv.**
+
+- **Schuljahre** (Menüband › Verwaltung › Schuljahr › Schuljahreswechsel; Sekretariat, Verwaltungsleitung,
+  Schulleitung): neues Schuljahr anlegen (Vorschlag: gleiche Lage ein Jahr später, Halbjahre werden verschoben
+  übernommen), ein Schuljahr als **aktuelles** setzen.
+- **Schuljahreswechsel in drei Schritten:**
+  1. *Klassen planen:* Für jede Stammklasse wird eine Nachfolgeklasse vorgeschlagen (9a → 10a, Klassenleitung bleibt,
+     Vorgängerklasse wird verknüpft); Klassen der höchsten Jahrgangsstufe laufen aus. Weitere Klassen (z. B. neue
+     Eingangsklassen, Klassen für Wiederholer:innen) lassen sich ergänzen.
+  2. *Entscheidungen:* je Schüler:in versetzt, nicht versetzt (Wiederholung), freiwillige Wiederholung, Überspringen,
+     Zurückstufung, Abschluss oder Abgang – vorgeschlagen aus dem Beschluss der **Versetzungskonferenz**, sonst aus dem
+     Vermerk im **Jahreszeugnis**, sonst aus der Schullaufbahn. Die Zielklasse wird passend zum neuen Jahrgang
+     vorgeschlagen; Unvollständiges wird markiert.
+  3. *Durchführen:* Alte Klassen und Gruppen enden mit dem letzten Schultag, die neuen Klassen gelten ab dem ersten
+     Schultag des neuen Schuljahres; je Schüler:in entsteht ein neuer Laufbahnabschnitt (Bildungsgang wird bei Bedarf
+     angepasst, z. B. Sek I → Oberstufe). Wer die Schule verlässt, geht ins Archiv. Optional wird das neue Schuljahr
+     zugleich das aktuelle.
+- **Zurücknehmen:** für einzelne Schüler:innen (danach Entscheidung ändern und erneut übertragen) oder für den ganzen
+  Wechsel (stellt Klassen, Laufbahn, Status und das aktuelle Schuljahr wieder her; leere, neu angelegte Klassen
+  werden entfernt). Bereits erfasste Noten, Fehlzeiten und Zeugnisse bleiben erhalten.
+- **Im laufenden Schuljahr** (Schülerakte › Laufbahn und Abgang): Klassenwechsel, Höherstufung (Überspringen) oder
+  Zurückstufung zu einem Datum; der Laufbahnabschnitt wird geteilt. Die jeweils letzte Änderung lässt sich zurücknehmen.
+- **Abgang:** letzter Schultag, Art (Schulwechsel, Umzug, Abschluss, Sonstiges), Grund/Zielschule. Klassen und Gruppen
+  enden, ein Schülerkonto wird gesperrt, die Akte geht ins **Archiv**. Das **Abgangszeugnis** entsteht als Entwurf im
+  Zeugnismodul (Noten des laufenden Halbjahres, im 2. Halbjahr einschließlich epochaler Fächer des 1. Halbjahres,
+  Abgangsvermerk) und wird dort wie jedes Zeugnis freigegeben und gedruckt. Rücknahme = Wiederaufnahme.
+- **Archiv** (Schüler:innen › Schülerakten › Archiv): abgegangene Schüler:innen mit letzter Klasse, Austritt,
+  Abgangszeugnis und nächster Löschung. Archivierte Akten sind nur lesbar (Änderungen in der Verwaltungsoberfläche nur
+  durch Schulleitung und IT) und erscheinen in keiner Klassenliste.
+- **Schuljahre beachten:** Die Schülerakte zeigt Fehlzeiten, Noten und Klasse für ein wählbares Schuljahr der Laufbahn;
+  Klassenlisten vergangener und künftiger Schuljahre zeigen die Mitglieder zum passenden Stichtag; ein Klassenwechsel
+  über „Zuordnen“ führt die Schullaufbahn mit.
+- **Erinnerung:** Ab sechs Wochen vor Ende des aktuellen Schuljahres erinnert die Startseite an den Schuljahreswechsel.
+
+## Löschfristen
+
+**Menüband › Verwaltung › System › Löschfristen** – festlegen und löschen: Schulleitung und IT; lesen: Verwaltungsleitung.
+
+- Aufbewahrungsfristen je Datenkategorie für **abgegangene** Schüler:innen (Fehlzeiten und AG-Teilnahme,
+  Elternnachrichten, Gesundheitsangaben, Förderung, Noten, Anhänge, Anmeldeunterlagen, Halbjahres-/Jahreszeugnisse,
+  Kontaktdaten, gesamte Akte). Frist in Jahren ab Austritt oder ab Ende des Kalenderjahres des Austritts; je Kategorie
+  „erinnern und nach Bestätigung löschen“ oder „nur erinnern“; abschaltbar; Feld für Grundlage/Hinweis.
+- Die **Vorschlagswerte** (1 bis 5 Jahre, gesamte Akte mit Abgangszeugnis 50 Jahre) sind bewusst vorsichtig und
+  ersetzen keine Festlegung durch die Schulleitung.
+- Ist eine Frist abgelaufen, zeigt die **Startseite der Schulleitung** die Zahl fälliger Löschungen. Auf der Seite
+  Löschfristen: endgültig löschen (mit Bestätigung) oder mit Datum und Grund aufschieben. Gelöscht werden die Einträge,
+  ihr Änderungsprotokoll und zugehörige Dateien; „Kontaktdaten“ leert Anschrift und Telefon, löst Elternverknüpfungen,
+  entfernt Elternpersonen ohne weitere Kinder und das Schülerkonto. Der Nachweis enthält nur Schülernummer,
+  Kategorie, Anzahl, Zeitpunkt und Person. **Ältere Modulsicherungen enthalten gelöschte Daten weiterhin**, bis sie
+  selbst gelöscht werden.
 
 ## Noten mit Bewertungsordnern
 
@@ -488,6 +543,7 @@ und fehlende Beispiele (z. B. Neuanmeldungen) ergänzt. Checklisten-Vorlagen wer
 | `src/zeugnisse` | Zeugnisse, Kommentare mit Abzeichnung, Konferenzen; Versetzungsregeln in `versetzung.py` |
 | `src/sicherung` | Modulsicherung und Wiederherstellung (`archiv.py`), PDF-Export (`pdf.py`), Benutzer und Einzelrechte (`konten.py`), Protokoll |
 | `src/elternkontakt` | Elternkommunikation: Gespräche, Empfänger:innen, Links und E-Mail (`versand.py`), Fehlzeitenregeln (`pruefung.py`), Elternseite (`eltern.py`) |
+| `src/laufbahn` | Schuljahreswechsel (`wechsel.py`), Klassenwechsel und Abgang (`ereignisse.py`), Archiv, Löschfristen (`loeschung.py`) |
 | `src/aufnahme` | Neuanmeldungen: Bewerbungsakte, Checklisten, Unterlagen, Übernahme (`uebernahme.py`), Rechte (`rechte.py`) |
 | `src/locale` | Übersetzungen (Englisch) |
 | `unraid/` | Betrieb auf Unraid: `docker-compose.yml`, `.env.example`, `einrichten.sh` |

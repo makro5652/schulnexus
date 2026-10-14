@@ -96,7 +96,8 @@
       <form method="post" class="formular zg-angaben">
         {% csrf_token %}<input type="hidden" name="aktion" value="speichern">
         <label>{{ form.bemerkungen.label }} {{ form.bemerkungen }}<small class="leise">{{ form.bemerkungen.help_text }}</small></label>
-        {% if z.art == "jahr" %}<label>{{ form.versetzung.label }} {{ form.versetzung }}<small class="leise">{% translate "Wird beim Abschluss der Versetzungskonferenz eingetragen." %}</small></label>{% endif %}
+        {% if z.art == "jahr" or z.art == "abgang" %}<label>{{ form.versetzung.label }} {{ form.versetzung }}<small class="leise">{% translate "Wird beim Abschluss der Versetzungskonferenz eingetragen." %}</small></label>{% endif %}
+        {% if z.art == "abgang" %}<label>{{ form.abgangsvermerk.label }} {{ form.abgangsvermerk }}<small class="leise">{{ form.abgangsvermerk.help_text }}</small></label>{% endif %}
         <div class="formzeile zwei"><label>{{ form.zeugnisdatum.label }} {{ form.zeugnisdatum }}</label><label>{{ form.ort.label }} {{ form.ort }}</label></div>
         <div class="formzeile zwei"><label>{{ form.fehltage_entschuldigt.label }} {{ form.fehltage_entschuldigt }}</label><label>{{ form.fehltage_unentschuldigt.label }} {{ form.fehltage_unentschuldigt }}</label></div>
         <label class="haken">{{ form.kommentar_drucken }} {{ form.kommentar_drucken.label }}</label>
@@ -116,7 +117,8 @@
       {% else %}
       <dl class="daten">
         <dt>{% translate "Bemerkungen" %}</dt><dd>{{ z.bemerkungen|linebreaksbr|default:"–" }}</dd>
-        {% if z.art == "jahr" %}<dt>{% translate "Vermerk" %}</dt><dd>{{ z.get_versetzung_display|default:"–" }}</dd>{% endif %}
+        {% if z.art == "jahr" or z.art == "abgang" %}<dt>{% translate "Vermerk" %}</dt><dd>{{ z.get_versetzung_display|default:"–" }}</dd>{% endif %}
+        {% if z.art == "abgang" %}<dt>{% translate "Abgangsvermerk" %}</dt><dd>{{ z.abgangsvermerk|default:"–" }}</dd>{% endif %}
         <dt>{% translate "Datum" %}</dt><dd>{{ z.ort }}, {{ z.zeugnisdatum|kurzdatum }}</dd>
       </dl>
       {% endif %}

@@ -1,0 +1,99 @@
+{% extends "portal/base.html" %}
+{% load i18n formate %}
+{% block title %}{% blocktranslate with name=titel %}Laufbahn {{ name }}{% endblocktranslate %}{% endblock %}
+{% block inhalt %}
+<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › <a href="{% url 'schuelerakte' s.pk %}">{% blocktranslate with name=p.anzeigename %}Schülerakte {{ name }}{% endblocktranslate %}</a> › {% translate "Laufbahn" %}</p>
+<h1>{% blocktranslate with name=p.anzeigename %}Schullaufbahn {{ name }}{% endblocktranslate %}</h1>
+<p class="unterzeile">{% blocktranslate with nr=s.schuelernummer %}Nr. {{ nr }}{% endblocktranslate %}{% if klasse %} · {% blocktranslate with k=klasse.name %}Klasse {{ k }}{% endblocktranslate %}{% endif %} · <span class="marke-status status-{{ s.status }}">{{ s.get_status_display }}</span></p>
+{% if s.archiviert %}<p class="lb-archivhinweis">{% blocktranslate with datum=s.austrittsdatum|kurzdatum %}Im Archiv seit dem Austritt am {{ datum }}. Änderungen sind nur über die Rücknahme des Abgangs möglich.{% endblocktranslate %}</p>{% endif %}
+
+<ol class="lb-zeitstrahl">
+  {% for st in stationen %}
+  <li class="lb-st-{{ st.schritt }}{% if st.laufend %} laufend{% endif %}">
+    <span class="lb-punkt" aria-hidden="true"></span>
+    <div><strong>{{ st.titel }}</strong>{% if st.datum %} <span class="leise">· {{ st.datum|kurzdatum }}</span>{% endif %}
+      {% if st.text %}<span class="blockzeile">{{ st.text }}</span>{% endif %}
+      {% if st.ergebnis %}<span class="etikett">{{ st.ergebnis }}</span>{% elif st.laufend %}<span class="etikett">{% translate "laufend" %}</span>{% endif %}</div>
+  </li>
+  {% endfor %}
+</ol>
+
+<div class="sy-raster">
+  <div>
+  {% if darf %}
+  <section class="karte" id="umstufen">
+    <h2>{% translate "Klasse wechseln, versetzen oder zurückstufen" %}</h2>
+    <p class="hinweistext">{% translate "Im laufenden Schuljahr: Ist die neue Klasse in einem höheren Jahrgang, gilt das als Überspringen; in einem niedrigeren als Zurückstufung. Der Laufbahnabschnitt wird geteilt." %}</p>
+    <form method="post" class="sy-formular">{% csrf_token %}<input type="hidden" name="aktion" value="umstufen">
+      {% if umstufung.non_field_errors %}<p class="sy-fehler">{{ umstufung.non_field_errors|join:" " }}</p>{% endif %}
+      <div class="sy-zeitraum lb-zwei">
+        <label class="sy-feld">{{ umstufung.klasse.label }} {{ umstufung.klasse }}{% for e in umstufung.klasse.errors %}<small class="fehler">{{ e }}</small>{% endfor %}</label>
+        <label class="sy-feld">{{ umstufung.datum.label }} {{ umstufung.datum }}{% for e in umstufung.datum.errors %}<small class="fehler">{{ e }}</small>{% endfor %}</label>
+      </div>
+      <label class="sy-feld">{{ umstufung.bemerkung.label }} {{ umstufung.bemerkung }}<small class="leise">{{ umstufung.bemerkung.help_text }}</small></label>
+      <button type="submit" class="knopf zweitrangig">{% translate "Übernehmen" %}</button>
+    </form>
+  </section>
+
+  <section class="karte" id="abgang">
+    <h2>{% translate "Abgang erfassen" %}</h2>
+    <form method="post" class="sy-formular">{% csrf_token %}<input type="hidden" name="aktion" value="abgang">
+      {% if abgang.non_field_errors %}<p class="sy-fehler">{{ abgang.non_field_errors|join:" " }}</p>{% endif %}
+      <div class="sy-zeitraum lb-zwei">
+        <label class="sy-feld">{{ abgang.datum.label }} {{ abgang.datum }}</label>
+        <label class="sy-feld">{{ abgang.art.label }} {{ abgang.art }}</label>
+      </div>
+      <label class="sy-feld">{{ abgang.grund.label }} {{ abgang.grund }}</label>
+      <label class="haken">{{ abgang.zeugnis }} {{ abgang.zeugnis.label }}</label>
+      <label class="sy-feld">{{ abgang.vermerk.label }} {{ abgang.vermerk }}<small class="leise">{{ abgang.vermerk.help_text }}</small></label>
+      <p class="hinweistext">{% translate "Alle Klassen und Gruppen enden mit dem letzten Schultag, ein Benutzerkonto wird gesperrt, die Akte geht ins Archiv. Das Abgangszeugnis entsteht als Entwurf im Zeugnismodul (Noten des laufenden Halbjahres) und wird dort freigegeben und gedruckt." %}</p>
+      <button type="submit" class="knopf">{% translate "Abgang erfassen" %}</button>
+    </form>
+  </section>
+  {% endif %}
+
+  {% if abgangszeugnisse %}
+  <section class="karte">
+    <h2>{% translate "Abgangszeugnis" %}</h2>
+    {% for z in abgangszeugnisse %}
+      <p><a href="{% url 'zeugnis' z.pk %}"><strong>{{ z.get_art_display }}</strong> {{ z.abschnitt }}</a>
+        <span class="zg-status zg-status-{{ z.status }}">{{ z.get_status_display }}</span>
+        <a class="knopf zweitrangig klein" href="{% url 'zeugnis_druck' z.pk %}" target="_blank" rel="noopener">{% translate "Drucken" %}</a></p>
+    {% endfor %}
+  </section>
+  {% endif %}
+
+  {% if faellig %}
+  <section class="karte">
+    <h2>{% translate "Löschplan" %}</h2>
+    <div class="tabellenrahmen"><table class="liste kompakt">
+      <thead><tr><th>{% translate "Daten" %}</th><th>{% translate "Löschung ab" %}</th></tr></thead>
+      <tbody>{% for e in faellig %}<tr><td>{{ e.frist.get_kategorie_display }}</td><td class="nowrap{% if e.ueberfaellig %} auffaellig{% endif %}">{{ e.faellig|kurzdatum }}</td></tr>{% endfor %}</tbody>
+    </table></div>
+  </section>
+  {% endif %}
+  </div>
+
+  <section class="karte">
+    <h2>{% translate "Änderungen" %}</h2>
+    {% for e in ereignisse %}
+      <div class="lb-ereignis{% if e.zurueckgenommen_am %} zurueck{% endif %}">
+        <strong>{{ e.text }}</strong>
+        <span class="leise blockzeile">{{ e.get_art_display }} · {% blocktranslate with d=e.datum|kurzdatum %}wirksam ab {{ d }}{% endblocktranslate %} · {{ e.erstellt_am|date:"SHORT_DATETIME_FORMAT" }}{% if e.erstellt_von %} · {{ e.erstellt_von|benutzername }}{% endif %}</span>
+        {% if e.bemerkung %}<span class="blockzeile">{{ e.bemerkung }}</span>{% endif %}
+        {% if e.zurueckgenommen_am %}<span class="etikett">{% blocktranslate with d=e.zurueckgenommen_am|date:"SHORT_DATE_FORMAT" %}zurückgenommen am {{ d }}{% endblocktranslate %}</span>
+        {% elif e == letztes and darf_zuruecknehmen %}
+          {% translate "Diese Änderung zurücknehmen?" as frage %}
+          <form method="post" onsubmit="return confirm('{{ frage|escapejs }}')">{% csrf_token %}<input type="hidden" name="aktion" value="zuruecknehmen"><input type="hidden" name="ereignis" value="{{ e.pk }}">
+            <button type="submit" class="knopf zweitrangig klein">{% if e.art == "abgang" %}{% translate "Abgang zurücknehmen (Wiederaufnahme)" %}{% else %}{% translate "Zurücknehmen" %}{% endif %}</button></form>
+        {% endif %}
+      </div>
+    {% empty %}<p class="leer">{% translate "Keine Änderungen im laufenden Schuljahr erfasst." %}</p>{% endfor %}
+    {% if posten %}
+    <h3>{% translate "Schuljahreswechsel" %}</h3>
+    {% for p in posten %}<p><a href="{% url 'schuljahreswechsel' p.wechsel.pk %}?schritt=schueler">{{ p.wechsel }}</a>: {{ p.get_entscheidung_display }}{% if p.neue_klasse %} → {{ p.neue_klasse.name }}{% endif %}
+      <span class="zg-status zg-status-{% if p.status == 'durchgefuehrt' %}abgeschlossen{% else %}entwurf{% endif %}">{{ p.get_status_display }}</span></p>{% endfor %}
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

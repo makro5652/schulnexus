@@ -87,7 +87,7 @@ def fachnoten(schueler, abschnitt, art):
     from .models import Zeugnis
 
     abschnitte = [abschnitt]
-    if art == Zeugnis.JAHR:
+    if art in (Zeugnis.JAHR, Zeugnis.ABGANG):
         abschnitte = list(abschnitt.schuljahr.abschnitte.filter(nummer__lt=abschnitt.nummer).order_by("-nummer")) + abschnitte
     je_fach = {}
     for a in abschnitte:                               # spätere Halbjahre überschreiben frühere

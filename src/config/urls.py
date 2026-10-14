@@ -22,6 +22,7 @@ urlpatterns = [
     path("elternkontakt/", include("elternkontakt.urls")),
     path("eltern/", include("elternkontakt.urls_eltern")),
     path("system/", include("sicherung.urls")),
+    path("laufbahn/", include("laufbahn.urls")),
     path("suche/", startseite.suche, name="suche"),
     path("stufe/<slug:schluessel>/", startseite.stufe, name="stufe"),
     path("rollen/", startseite.rollenuebersicht, name="rollen"),

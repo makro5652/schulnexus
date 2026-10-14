@@ -11,7 +11,7 @@ from django.db import transaction
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.utils import timezone, translation
+from django.utils import formats, timezone, translation
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext, ngettext
 from django.views.decorators.http import require_POST
@@ -349,8 +349,9 @@ class ZeugnisForm(forms.ModelForm):
     class Meta:
         model = Zeugnis
         fields = ["bemerkungen", "versetzung", "zeugnisdatum", "ort", "fehltage_entschuldigt", "fehltage_unentschuldigt",
-                  "kommentar_drucken"]
-        widgets = {"bemerkungen": forms.Textarea(attrs={"rows": 3}), "zeugnisdatum": DATUM}
+                  "kommentar_drucken", "abgangsvermerk"]
+        widgets = {"bemerkungen": forms.Textarea(attrs={"rows": 3}), "zeugnisdatum": DATUM,
+                   "abgangsvermerk": forms.Textarea(attrs={"rows": 2})}
 
 
 def freigabe_hindernisse(z, zeilen=None):
@@ -501,7 +502,7 @@ def druckdaten(z):
     paare = [(links[i] if i < len(links) else None, rechts[i] if i < len(rechts) else None) for i in range(max(len(links), len(rechts)))]
     p = z.schueler.person
     vermerk = ""
-    if z.art == Zeugnis.JAHR and z.versetzung:
+    if z.art in (Zeugnis.JAHR, Zeugnis.ABGANG) and z.versetzung:
         pron = _geschlecht_text(p)
         vermerk = {
             "versetzt": gettext("Versetzt in die Jahrgangsstufe %(jg)s.") % {"jg": (z.jahrgang or 0) + 1} if z.jahrgang else gettext("Versetzt."),
@@ -511,9 +512,19 @@ def druckdaten(z):
             "qp_nein": gettext("Die Berechtigung zum Übergang in die Qualifikationsphase hat %(pron)s nicht erhalten.") % {"pron": pron},
             "wiederholung": gettext("Die Jahrgangsstufe wird freiwillig wiederholt."),
         }.get(z.versetzung, "")
+    abgang = ""
+    if z.art == Zeugnis.ABGANG:
+        s = z.schueler
+        if s.austrittsdatum:
+            abgang = gettext("%(name)s verlässt die Schule am %(datum)s.") % {
+                "name": f"{p.rufname or p.vorname} {p.nachname}", "datum": formats.date_format(s.austrittsdatum, "SHORT_DATE_FORMAT")}
+        else:
+            abgang = gettext("%(name)s verlässt die Schule.") % {"name": f"{p.rufname or p.vorname} {p.nachname}"}
+        if z.abgangsvermerk:
+            abgang += " " + z.abgangsvermerk
     bg = z.bildungsgang
     return {
-        "z": z, "p": p, "paare": paare, "vermerk": vermerk,
+        "z": z, "p": p, "paare": paare, "vermerk": vermerk, "abgang": abgang,
         "bildungsgang": BILDUNGSGANG_TEXT.get(getattr(bg, "kuerzel", ""), getattr(bg, "lokal_name", "")) if bg else "",
         "kommentar": z.kommentar if z.kommentar and z.kommentar_drucken else "",
         "entwurf": not z.freigegeben, "fehlzeiten": settings.ZEUGNIS_FEHLZEITEN,

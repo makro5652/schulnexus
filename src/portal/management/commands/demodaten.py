@@ -158,6 +158,10 @@ class Command(BaseCommand):
                 call_command("grundeinrichtung", stdout=self.stdout)
                 self.elternkontakt_anlegen()
                 self.stdout.write("Beispiele für Elternnachrichten und Benachrichtigungsregeln ergänzt.")
+            if not Schuljahr.objects.filter(name="2027/28").exists():
+                call_command("grundeinrichtung", stdout=self.stdout)
+                self.laufbahn_anlegen()
+                self.stdout.write("Folgeschuljahr, Archiv-Beispiele und Löschfristen ergänzt.")
             return
 
         call_command("grundeinrichtung", stdout=self.stdout)
@@ -515,6 +519,7 @@ class Command(BaseCommand):
         self.aufnahme_anlegen()
         self.zeugnisse_anlegen()
         self.elternkontakt_anlegen()
+        self.laufbahn_anlegen()
 
         self.stdout.write(self.style.SUCCESS(
             f"Demo-Daten angelegt: {len(alle)} Schüler:innen, {Person.objects.count()} Personen, "
@@ -1123,6 +1128,41 @@ class Command(BaseCommand):
             bestaetigung_erbeten=False, aktiv=False, erstellt_von=schulleitung)
         for r in (r1, r2):
             regel_anwenden(r, benachrichtigen=True)
+
+
+    # ------------------------------------------------------------ Schuljahre, Archiv, Löschfristen (ab 0.4.4.0)
+    def laufbahn_anlegen(self):
+        from fehlzeiten.models import Fehlzeit
+        from laufbahn import loeschung, wechsel as W
+
+        sj = Schuljahr.objects.get(name="2026/27")
+        if not Schuljahr.objects.filter(name="2027/28").exists():
+            W.schuljahr_anlegen("2027/28", date(2027, 8, 16), date(2028, 6, 23), vorlage=sj)
+        loeschung.fristen_sicherstellen()
+        alt, _neu = Schuljahr.objects.get_or_create(name="2018/19", defaults={"beginn": date(2018, 8, 20), "ende": date(2019, 6, 28)})
+        vorjahr = Schuljahr.objects.get(name="2025/26")
+        gym = Bildungsgang.objects.get(kuerzel="GYM")
+
+        def ehemalig(vorname, nachname, geschlecht, nr, schuljahr, jg, austritt, grund, ergebnis="abgang"):
+            p = Person.objects.create(vorname=vorname, nachname=nachname, geschlecht=geschlecht, ort="Nairobi",
+                                      geburtsdatum=date(austritt.year - jg - 6, 4, 11), geburtsort="Nairobi",
+                                      strasse="Lavington Estate, House 12", postfach="P.O. Box 40123-00100")
+            s = Schuelerprofil.objects.create(person=p, schuelernummer=nr, eintrittsdatum=date(schuljahr.beginn.year - 2, 8, 20),
+                                              eintritt_jahrgang=jg - 2, status="abgang", austrittsdatum=austritt,
+                                              austrittsgrund=grund, lebt_bei="beiden Eltern")
+            Laufbahnabschnitt.objects.create(schueler=s, schuljahr=schuljahr, jahrgang=jg, bildungsgang=gym, ergebnis=ergebnis,
+                                             bis=austritt if austritt < schuljahr.ende else None)
+            return s
+
+        s1 = ehemalig("Jonas", "Kamau-Richter", "m", "A-2019-01", alt, 8, date(2019, 6, 28), "Schulwechsel nach Hamburg")
+        for tag in (date(2018, 11, 5), date(2019, 2, 12)):
+            Fehlzeit.objects.create(schueler=s1, datum_von=tag, status="entschuldigt", grund="Krankheit")
+        mutter = Person.objects.create(anrede="Frau", vorname="Grace", nachname="Kamau-Richter", email="grace.kr@privat.example",
+                                       mobil="+254 700 000 019")
+        Beziehung.objects.create(schueler=s1, person=mutter, art="mutter", sorgerecht=True, auskunftsrecht=True)
+        ehemalig("Amani", "Otieno", "w", "A-2026-01", vorjahr, 9, date(2026, 3, 20), "Umzug nach Mombasa")
+        ehemalig("Felix", "Brandt", "m", "A-2022-01", Schuljahr.objects.get(name="2024/25"), 10, date(2025, 6, 27),
+                 "Mittlerer Schulabschluss", "abschluss")
 
 
 def beispiel_pdf(titel, name):

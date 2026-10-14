@@ -18,7 +18,7 @@
   {% if d.entwurf %}<div class="wasserzeichen" aria-hidden="true">{% translate "ENTWURF" %}</div>{% endif %}
   {% if sprache == "en" %}<p class="uebersetzung">{% translate "Translation – only the German original is the official document." %}</p>{% endif %}
   <p class="schule">{{ SCHULNAME }}</p>
-  <h1>{% if d.z.art == "halbjahr" %}{% translate "HALBJAHRESZEUGNIS" %}{% else %}{% translate "ZEUGNIS" %}{% endif %}</h1>
+  <h1>{% if d.z.art == "halbjahr" %}{% translate "HALBJAHRESZEUGNIS" %}{% elif d.z.art == "abgang" %}{% translate "ABGANGSZEUGNIS" %}{% else %}{% translate "ZEUGNIS" %}{% endif %}</h1>
   <div class="zeile zwei">
     <span>{% translate "Schuljahr" %} <span class="feld">{{ d.z.abschnitt.schuljahr }}{% if d.z.art == "halbjahr" %} · {{ d.z.abschnitt.lokal_name }}{% endif %}</span></span>
     <span>{% translate "Jahrgangsstufe" %} <span class="feld kurz">{{ d.z.jahrgang|default:"" }}</span></span>
@@ -62,6 +62,7 @@
   {% endif %}
 
   {% if d.vermerk %}<p class="vermerk">{{ d.vermerk }}</p>{% endif %}
+  {% if d.abgang %}<p class="vermerk">{{ d.abgang }}</p>{% endif %}
 
   <p class="ortdatum">{% blocktranslate with ort=d.z.ort datum=d.z.zeugnisdatum|kurzdatum %}<span class="feld">{{ ort }}</span>, den <span class="feld">{{ datum }}</span>{% endblocktranslate %}</p>
   <div class="unterschriften">

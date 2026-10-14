@@ -31,8 +31,8 @@ VERSETZUNG = [
 
 
 class Zeugnis(models.Model):
-    HALBJAHR, JAHR = "halbjahr", "jahr"
-    ARTEN = [(HALBJAHR, _("Halbjahreszeugnis")), (JAHR, _("Jahreszeugnis"))]
+    HALBJAHR, JAHR, ABGANG = "halbjahr", "jahr", "abgang"
+    ARTEN = [(HALBJAHR, _("Halbjahreszeugnis")), (JAHR, _("Jahreszeugnis")), (ABGANG, _("Abgangszeugnis"))]
     ENTWURF, FREIGEGEBEN = "entwurf", "freigegeben"
     STATUS = [(ENTWURF, _("Entwurf")), (FREIGEGEBEN, _("Freigegeben"))]
     # GeR-Tabelle wie im Muster (Anlage 11)
@@ -59,6 +59,8 @@ class Zeugnis(models.Model):
     fehltage_entschuldigt = models.PositiveSmallIntegerField(_("Fehltage entschuldigt"), null=True, blank=True)
     fehltage_unentschuldigt = models.PositiveSmallIntegerField(_("Fehltage unentschuldigt"), null=True, blank=True)
     zeugnisdatum = models.DateField(_("Datum des Zeugnisses"), null=True, blank=True)
+    abgangsvermerk = models.TextField(_("Abgangsvermerk"), blank=True,
+                                      help_text=_("Nur beim Abgangszeugnis, z. B. „Grund: Umzug der Familie nach Mombasa.“"))
     ort = models.CharField(_("Ort"), max_length=60, blank=True)
 
     kommentar = models.TextField(_("Zeugniskommentar"), blank=True)

@@ -12,6 +12,7 @@ from django.utils import timezone
 from aufnahme.ansichten import start_hinweise as aufnahme_hinweise
 from elternkontakt.ansichten import akte_kontext as eltern_akte, gruppe_erlaubt as eltern_gruppe_erlaubt
 from elternkontakt.ansichten import start_hinweise as eltern_hinweise
+from laufbahn.ansichten import start_hinweise as laufbahn_hinweise
 from zeugnisse.ansichten import start_hinweise as zeugnis_hinweise
 from fehlzeiten.models import Fehlzeit
 from foerderung.ansichten import aktive_nta_je_schueler, foerder_hinweise, foerder_kontext, nta_kurztext
@@ -101,7 +102,7 @@ def start(request):
          "klassen": klassen_info, "kennzahlen": kennzahlen, "hr": hr,
          "foerderung": foerder_hinweise(request.user), "ist_verwaltung": ist_verwaltung(request.user),
          "aufnahme": aufnahme_hinweise(request.user), "zeugnisse": zeugnis_hinweise(request.user),
-         "elternkontakt": eltern_hinweise(request.user),
+         "elternkontakt": eltern_hinweise(request.user), "laufbahn": laufbahn_hinweise(request.user),
          "begruessung": begruessung(jetzt), "heute": jetzt.date(), "kalenderwoche": jetzt.isocalendar()[1],
          "schnellzugriff": schnellzugriff(request.user, sj), "geburtstage": geburtstage(request.user, jetzt.date()),
          "notizen": notizen_fuer(request.user, jetzt.date())},
@@ -221,7 +222,19 @@ def schuelerakte(request, pk):
     )
     gesundheit = getattr(schueler, "gesundheit", None) if darf_gesundheit else None
 
-    sj = Schuljahr.aktuelles()
+    # Schuljahr der Anzeige: wählbar aus den Jahren der Schullaufbahn; im Archiv standardmäßig das letzte
+    jahre = list(Schuljahr.objects.filter(Q(laufbahnabschnitte__schueler=schueler) | Q(gruppen__mitgliedschaften__schueler=schueler))
+                 .distinct().order_by("-beginn"))
+    sj = next((j for j in jahre if str(j.pk) == request.GET.get("sj")), None)
+    if sj is None:
+        aktuell = Schuljahr.aktuelles()
+        sj = jahre[0] if schueler.archiviert and jahre else aktuell
+    if sj and sj not in jahre:
+        jahre.insert(0, sj)
+    stichtag = sj.stichtag() if sj else None
+    if sj and schueler.austrittsdatum and schueler.archiviert:
+        stichtag = max(min(stichtag, schueler.austrittsdatum), sj.beginn)
+    klasse_im_jahr = schueler.stammklasse(sj, stichtag) if sj else None
     fehlzeiten = list(schueler.fehlzeiten.filter(datum_von__gte=sj.beginn, datum_von__lte=sj.ende)) if sj else []
     stunden_pro_tag = sj.zeitraster.count() if sj else 0
     fz = {
@@ -256,11 +269,15 @@ def schuelerakte(request, pk):
     if anmeldung and not anmeldung_sichtbar(request.user, anmeldung):
         anmeldung = None
 
+    from laufbahn.rechte import darf_abgang
+
     return render(request, "portal/schuelerakte.html", {
         "s": schueler,
         "anmeldung": anmeldung,
         "p": schueler.person,
-        "klasse": klasse,
+        "klasse": klasse_im_jahr,
+        "sj": sj, "jahre": jahre,
+        "darf_laufbahn": darf_abgang(request.user),
         "alter": alter,
         "laufbahn": schueler.laufbahn.select_related("schuljahr", "bildungsgang", "stammklasse").order_by("schuljahr__beginn", "von"),
         "aktuell": schueler.aktueller_laufbahnabschnitt(),
@@ -283,7 +300,7 @@ def schuelerakte(request, pk):
         "anhang_kategorie": kategorie,
         "anhang_aelteste_zuerst": aelteste_zuerst,
         "anhang_kategorien": KATEGORIE_FILTER,
-        "anhang_form": anhang_form(request.user, schueler),
+        "anhang_form": None if schueler.archiviert else anhang_form(request.user, schueler),
         "foerderung": foerder_kontext(request.user, schueler),
     })
 

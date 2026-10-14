@@ -8,6 +8,7 @@ from django.urls import NoReverseMatch, reverse
 from django.utils.translation import gettext as _, pgettext
 
 from elternkontakt.rechte import darf_regeln
+from laufbahn.rechte import darf_archiv, darf_fristen_sehen, darf_schuljahre
 
 from .rechte import (
     darf_sichern, ist_finanzen, ist_foerderkoordination, ist_it, ist_personalverwaltung, ist_schulleitung, ist_systemverwaltung,
@@ -106,14 +107,16 @@ def menueband(request):
         stufen,
         neuanmeldung,
         Gruppe(_("Schülerakten"))
-        .add(_("Alle Schüler:innen"), _url("admin:stammdaten_schuelerprofil_changelist"), "personen", gross=True,
+        .add(_("Alle Schüler:innen"), _url("admin:stammdaten_schuelerprofil_changelist", query="?status__exact=aktiv"), "personen", gross=True,
              bedingung=alle_sehen and p("stammdaten.view_schuelerprofil"))
         .add(_("Direkt anlegen"), _url("admin:stammdaten_schuelerprofil_add"), "plus",
              bedingung=verwaltung and p("stammdaten.add_schuelerprofil"),
              hinweis=_("Schüler:in ohne Anmeldeverfahren direkt anlegen"))
         .add(_("Eltern und Kontakte"), _url("admin:stammdaten_person_changelist", query="?rolle=eltern"), "personen",
              bedingung=verwaltung and p("stammdaten.view_person"))
-        .add(_("Anhänge"), _url("admin:stammdaten_dokument_changelist"), "klammer", bedingung=p("stammdaten.view_dokument")),
+        .add(_("Anhänge"), _url("admin:stammdaten_dokument_changelist"), "klammer", bedingung=p("stammdaten.view_dokument"))
+        .add(_("Archiv"), _url("archiv"), "archiv", bedingung=darf_archiv(user),
+             hinweis=_("Abgegangene Schüler:innen, Abgangszeugnisse, Löschfristen")),
         Gruppe(_("Eltern"))
         .add(_("Elternnachrichten"), _url("elternkontakt"), "brief", gross=True, bedingung=p("elternkontakt.view_gespraech"),
              hinweis=_("Nachrichten an Eltern, Antworten und Bestätigungen"))
@@ -245,7 +248,9 @@ def menueband(request):
         Gruppe(_("Übersicht"))
         .add(_("Alle Bereiche"), _url("admin:index"), "zahnrad", gross=True, bedingung=admin),
         Gruppe(_("Schuljahr"))
-        .add(_("Schuljahre"), _url("admin:stammdaten_schuljahr_changelist"), "kalender", gross=True,
+        .add(_("Schuljahreswechsel"), _url("schuljahre"), "kalender", gross=True, bedingung=darf_schuljahre(user),
+             hinweis=_("Schuljahre anlegen, Schüler:innen versetzen, Wechsel zurücknehmen"))
+        .add(_("Schuljahre"), _url("admin:stammdaten_schuljahr_changelist"), "liste",
              bedingung=verwaltung and p("stammdaten.view_schuljahr"))
         .add(_("Zeitraster"), _url("admin:fehlzeiten_stunde_changelist"), "uhr", bedingung=verwaltung and p("fehlzeiten.view_stunde"))
         .add(_("Bildungsgänge"), _url("admin:stammdaten_bildungsgang_changelist"), "treppe", bedingung=verwaltung and p("stammdaten.view_bildungsgang"))
@@ -264,7 +269,9 @@ def menueband(request):
         .add(_("Sicherung"), _url("sicherungen"), "archiv", gross=True, bedingung=darf_sichern(user),
              hinweis=_("Module sichern und wiederherstellen"))
         .add(_("PDF-Export"), _url("pdf_export"), "pdf", bedingung=darf_sichern(user), hinweis=_("Daten eines Zeitraums als PDF"))
-        .add(_("Protokoll"), _url("systemprotokoll"), "liste", bedingung=darf_sichern(user) or ist_it(user)),
+        .add(pgettext("System", "Protokoll"), _url("systemprotokoll"), "liste", bedingung=darf_sichern(user) or ist_it(user))
+        .add(_("Löschfristen"), _url("loeschfristen"), "glocke", bedingung=darf_fristen_sehen(user),
+             hinweis=_("Aufbewahrungsfristen für das Archiv und fällige Löschungen")),
     )
 
     karten = [k for k in (start, schueler, unterricht, foerderung, personal_karte, finanzen_karte, verwaltung_karte) if k]
@@ -279,9 +286,9 @@ def menueband(request):
     return {"karten": karten, "aktiv": aktiv, "rollen": rollen}
 
 
-PFAD_REGELN = [("/klassen/", "schueler"), ("/schueler/", "schueler"), ("/stufe/", "schueler"), ("/zuordnung/", "schueler"), ("/aufnahme/", "schueler"), ("/elternkontakt/", "schueler"),
+PFAD_REGELN = [("/laufbahn/schueler/", "schueler"), ("/laufbahn/archiv/", "schueler"), ("/klassen/", "schueler"), ("/schueler/", "schueler"), ("/stufe/", "schueler"), ("/zuordnung/", "schueler"), ("/aufnahme/", "schueler"), ("/elternkontakt/", "schueler"),
                ("/noten/", "unterricht"), ("/zeugnisse/", "unterricht"),
-               ("/rollen/", "verwaltung"), ("/system/", "verwaltung"),
+               ("/rollen/", "verwaltung"), ("/system/", "verwaltung"), ("/laufbahn/", "verwaltung"),
                ("/foerderung/", "foerderung"), ("/verwaltung/", "verwaltung")]
 
 

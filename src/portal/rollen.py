@@ -117,7 +117,10 @@ _AUFNAHME_FINANZEN = (r("view", *_AUFNAHME_MODELLE, "checklistenvorlage", "vorla
 
 _ZEUGNIS_VERWALTUNG = r(("view", "change"), "zeugnis") | r("view", "zeugnisfachnote", "abzeichnung", "anmerkung", "konferenz", "beschluss")
 
-_SEKRETARIAT = (_SCHUELERDATEN | _AUFNAHME_VOLL | _ZEUGNIS_VERWALTUNG | _ELTERNKONTAKT_VERWALTUNG | r("view", *_KATALOGE) | _NOTEN_LESEN | r("view", "personalprofil", "dienstleister")
+# Schuljahreswechsel, Abgänge und Archiv (App laufbahn); Löschfristen ändern nur Schulleitung und IT
+_LAUFBAHN = r(ALLE, "schuljahreswechsel", "klassenplan", "wechselposten", "laufbahnereignis")
+
+_SEKRETARIAT = (_SCHUELERDATEN | _LAUFBAHN | _AUFNAHME_VOLL | _ZEUGNIS_VERWALTUNG | _ELTERNKONTAKT_VERWALTUNG | r("view", *_KATALOGE) | _NOTEN_LESEN | r("view", "personalprofil", "dienstleister")
                 | r("view", "nachteilsausgleich", "foerderschwerpunkt", "ausgleichsmassnahme"))
 
 ROLLEN_RECHTE = {
@@ -127,7 +130,7 @@ ROLLEN_RECHTE = {
     SCHULLEITUNG: "__alle__",
     IT: "__alle__",
     SEKRETARIAT: _SEKRETARIAT,
-    VERWALTUNGSLEITUNG: _SEKRETARIAT | _REGELN | r(ALLE, *_KATALOGE) | _HR | r(ALLE, "user", "group") | {"view_permission"},
+    VERWALTUNGSLEITUNG: _SEKRETARIAT | _REGELN | r("view", "loeschfrist", "loeschvorgang") | r(ALLE, *_KATALOGE) | _HR | r(ALLE, "user", "group") | {"view_permission"},
     HR: _HR,
     FINANZEN: (r("view", "person", "schuelerprofil", "gruppe", "mitgliedschaft", "personalprofil", "personalbereich", "zusatzfeld")
                | r(("view", "change"), "beziehung", "elternprofil") | r(ALLE, "dienstleister") | r(("add", "view"), "dokument") | _AUFNAHME_FINANZEN),
@@ -141,7 +144,8 @@ FOERDERKOORDINATION_EXTRA = (r("view", "person", "schuelerprofil", "gruppe", "mi
                              | r(ALLE, "dokument"))
 
 # Apps, deren Rechte über Rollen vergeben werden
-APPS = ["stammdaten", "noten", "fehlzeiten", "nachmittag", "foerderung", "aufnahme", "zeugnisse", "elternkontakt", "sicherung", "auth"]
+APPS = ["stammdaten", "noten", "fehlzeiten", "nachmittag", "foerderung", "aufnahme", "zeugnisse", "elternkontakt", "sicherung",
+        "laufbahn", "auth"]
 
 # Rollen, die im Portal arbeiten (Beschäftigte). Schüler:innen und Eltern erhalten später eigene Oberflächen.
 PORTAL_ROLLEN = {LEHRER, MITTELSTUFE, OBERSTUFE, SCHULLEITUNG, SEKRETARIAT, VERWALTUNGSLEITUNG, HR, FINANZEN, FOERDERKOORDINATION, IT}
@@ -169,6 +173,8 @@ BEREICHE = [
     ("benutzer", _("Benutzerkonten und Rollen")),
     ("einzelrechte", _("Einzelrechte erteilen und entziehen")),
     ("sicherung", _("Sicherung, Wiederherstellung, PDF-Export")),
+    ("laufbahn", _("Schuljahreswechsel, Abgänge, Archiv")),
+    ("loeschfristen", _("Löschfristen und Löschung")),
 ]
 
 MATRIX = {
@@ -194,6 +200,8 @@ MATRIX[IT] = {k: "ja" for k, _n in BEREICHE}
 for _rolle, _werte in MATRIX.items():          # neue Bereiche: nur Schulleitung (Sicherung) und IT
     _werte.setdefault("einzelrechte", "ja" if _rolle == IT else "")
     _werte.setdefault("sicherung", "ja" if _rolle in (SCHULLEITUNG, IT) else "")
+    _werte.setdefault("laufbahn", "ja" if _rolle in (SCHULLEITUNG, IT, SEKRETARIAT, VERWALTUNGSLEITUNG) else "")
+    _werte.setdefault("loeschfristen", "ja" if _rolle in (SCHULLEITUNG, IT) else "lesen" if _rolle == VERWALTUNGSLEITUNG else "")
 MATRIX[OBERSTUFE] = dict(MATRIX[MITTELSTUFE])
 
 WERTE = {"ja": _("ja"), "teils": _("Checkliste"), "teils_ek": _("Zeugnis/Fehlzeiten"), "lesen": _("lesen"), "eigene": _("eigene"), "stufe": _("Stufe"), "": "–"}

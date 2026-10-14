@@ -43,6 +43,11 @@ class Schuljahr(models.Model):
     def aktuelles(cls):
         return cls.objects.filter(aktiv=True).first()
 
+    def stichtag(self, datum=None):
+        """Bezugstag innerhalb dieses Schuljahres: heute, aber nicht vor Beginn und nicht nach Ende."""
+        datum = datum or timezone.localdate()
+        return min(max(datum, self.beginn), self.ende)
+
 
 class Abschnitt(LokalerNameMixin, models.Model):
     """Halbjahr bzw. Term innerhalb eines Schuljahres."""
@@ -167,8 +172,15 @@ class Schuelerprofil(models.Model):
     def __str__(self):
         return str(self.person)
 
+    @property
+    def archiviert(self):
+        """Abgegangene Schüler:innen stehen im Archiv (nur lesend, Löschfristen laufen)."""
+        return self.status == "abgang"
+
     def stammklasse(self, schuljahr=None, stichtag=None):
         schuljahr = schuljahr or Schuljahr.aktuelles()
+        if schuljahr and stichtag is None:
+            stichtag = schuljahr.stichtag()
         qs = Mitgliedschaft.objects.aktiv(stichtag).filter(
             schueler=self, gruppe__typ=Gruppe.STAMMKLASSE, gruppe__schuljahr=schuljahr
         )
@@ -573,6 +585,7 @@ class Gruppe(models.Model):
         return f"{self.name} ({self.schuljahr})"
 
     def aktuelle_mitglieder(self, stichtag=None):
+        stichtag = stichtag or self.schuljahr.stichtag()
         return Schuelerprofil.objects.filter(
             mitgliedschaften__in=Mitgliedschaft.objects.aktiv(stichtag).filter(gruppe=self)
         ).select_related("person").distinct()
@@ -799,6 +812,8 @@ class Laufbahnabschnitt(models.Model):
         ("laufend", _("laufend")),
         ("versetzt", _("versetzt")),
         ("versetzt_auflage", _("versetzt mit Auflage / auf Probe")),
+        ("uebersprungen", _("Jahrgangsstufe übersprungen")),
+        ("zurueckgestuft", _("zurückgestuft")),
         ("nicht_versetzt", _("nicht versetzt (Wiederholung)")),
         ("freiwillig_wiederholt", _("freiwillige Wiederholung")),
         ("wechsel", _("Wechsel des Bildungsgangs")),

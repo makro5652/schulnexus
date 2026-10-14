@@ -14,7 +14,7 @@ from django.db.models import Q
 from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone, translation
-from django.utils.translation import gettext, gettext_lazy as _, ngettext
+from django.utils.translation import gettext, gettext_lazy as _, ngettext, pgettext_lazy
 from django.views.decorators.http import require_POST
 
 from portal import rollen as R
@@ -56,7 +56,7 @@ def _reiter(request, aktiv):
         reiter += [("sicherung", _("Sicherung und Wiederherstellung"), "sicherungen"), ("pdf", _("PDF-Export"), "pdf_export")]
     if ist_it(request.user):
         reiter.append(("benutzer", _("Benutzer und Rechte"), "benutzerverwaltung"))
-    reiter.append(("protokoll", _("Protokoll"), "systemprotokoll"))
+    reiter.append(("protokoll", pgettext_lazy("System", "Protokoll"), "systemprotokoll"))
     return [{"schluessel": s, "name": n, "url": u, "aktiv": s == aktiv} for s, n, u in reiter]
 
 

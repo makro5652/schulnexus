@@ -1,0 +1,164 @@
+{% extends "portal/base.html" %}
+{% load i18n formate %}
+{% block title %}{{ titel }}{% endblock %}
+{% block inhaltsklasse %}breit{% endblock %}
+{% block inhalt %}
+<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › <a href="{% url 'schuljahre' %}">{% translate "Schuljahre" %}</a> › {% translate "Schuljahreswechsel" %}</p>
+<h1>{{ titel }} <span class="zg-status gross zg-status-{% if w.durchgefuehrt %}abgeschlossen{% else %}entwurf{% endif %}">{{ w.get_status_display }}</span></h1>
+<p class="unterzeile">{% blocktranslate with von=w.von.ende|kurzdatum nach=w.nach.beginn|kurzdatum %}Letzter Schultag {{ von }} · erster Schultag {{ nach }}{% endblocktranslate %}
+  · {% blocktranslate count n=zaehler.gesamt %}{{ n }} Schüler:in{% plural %}{{ n }} Schüler:innen{% endblocktranslate %}
+  {% if zaehler.durchgefuehrt %} · {% blocktranslate with n=zaehler.durchgefuehrt %}{{ n }} übertragen{% endblocktranslate %}{% endif %}</p>
+
+<nav class="an-tabs lb-schritte" aria-label="{% translate 'Schritte' %}">
+  {% for k, name in schritte %}<a href="?schritt={{ k }}"{% if schritt == k %} class="aktiv" aria-current="step"{% endif %}>{{ name }}{% if k == "schueler" and zaehler.hindernisse %} <span>{{ zaehler.hindernisse }}</span>{% endif %}</a>{% endfor %}
+</nav>
+
+{% if schritt == "klassen" %}
+<section class="karte">
+  <h2>{% translate "Nachfolgeklassen" %}</h2>
+  <p class="hinweistext">{% translate "Jede Klasse des alten Schuljahres erhält eine Nachfolgeklasse im neuen. Vorschlag: Jahrgangszahl im Namen um eins erhöht, Klassenleitung bleibt. Klassen der höchsten Jahrgangsstufe laufen aus." %}</p>
+  <form method="post">{% csrf_token %}<input type="hidden" name="aktion" value="klassen_anlegen">
+  <div class="tabellenrahmen"><table class="liste lb-plan">
+    <thead><tr><th>{% translate "Bisher" %}</th><th class="zahl">{% translate "Schüler:innen" %}</th><th>{% translate "Nachfolgeklasse" %}</th><th>{% translate "Klassenleitung" %}</th></tr></thead>
+    <tbody>
+    {% for z in plan %}
+      <tr>
+        <td><strong>{{ z.plan.alt.name }}</strong> <small class="leise">{% blocktranslate with jg=z.plan.alt.jahrgang|default:"–" %}Jg. {{ jg }}{% endblocktranslate %}</small>
+          <small class="leise blockzeile">{{ z.plan.alt.leitung.person.anzeigename|default:"" }}</small></td>
+        <td class="zahl">{{ z.anzahl }}</td>
+        {% if z.plan.neu %}
+          <td><strong>{{ z.plan.neu.name }}</strong> <small class="leise">{% blocktranslate with jg=z.plan.neu.jahrgang|default:"–" %}Jg. {{ jg }}{% endblocktranslate %}</small>
+            {% if z.plan.neu_angelegt %}<span class="etikett">{% translate "neu angelegt" %}</span>{% else %}<span class="etikett">{% translate "vorhanden" %}</span>{% endif %}</td>
+          <td>{{ z.plan.neu.leitung.person.anzeigename|default:"–" }}</td>
+        {% elif z.auslaufend %}
+          <td colspan="2"><span class="leise">{% translate "läuft aus (höchste Jahrgangsstufe)" %}</span></td>
+        {% else %}
+          <td><label class="lb-zeile"><input type="checkbox" name="anlegen-{{ z.plan.pk }}" value="1" checked aria-label="{% translate 'anlegen' %}">
+            <input type="text" name="name-{{ z.plan.pk }}" value="{{ z.vorschlag }}" size="8" aria-label="{% translate 'Name der Nachfolgeklasse' %}">
+            <small class="leise">{% blocktranslate with jg=z.jahrgang|default:"–" %}Jg. {{ jg }}{% endblocktranslate %}</small></label></td>
+          <td><select name="leitung-{{ z.plan.pk }}" aria-label="{% translate 'Klassenleitung' %}"><option value="">–</option>
+            {% for l in lehrkraefte %}<option value="{{ l.pk }}"{% if l.pk == z.plan.alt.leitung_id %} selected{% endif %}>{{ l.person.nachname }}, {{ l.person.vorname }}</option>{% endfor %}</select></td>
+        {% endif %}
+      </tr>
+    {% empty %}<tr><td colspan="4" class="leer">{% translate "Im alten Schuljahr gibt es keine Stammklassen." %}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  {% if not w.durchgefuehrt %}<p><button type="submit" class="knopf">{% translate "Markierte Klassen anlegen" %}</button></p>{% endif %}
+  </form>
+</section>
+
+<div class="sy-raster">
+  <section class="karte">
+    <h2>{% translate "Weitere Klasse im neuen Schuljahr" %}</h2>
+    <p class="hinweistext">{% translate "z. B. eine neue Eingangsklasse oder eine Klasse für Wiederholer:innen." %}</p>
+    <form method="post" class="sy-formular">{% csrf_token %}<input type="hidden" name="aktion" value="zusatzklasse">
+      <div class="sy-zeitraum">
+        <label class="sy-feld">{% translate "Name" %} <input type="text" name="name" required maxlength="60"></label>
+        <label class="sy-feld">{% translate "Jahrgang" %} <input type="number" name="jahrgang" min="1" max="13"></label>
+        <label class="sy-feld">{% translate "Klassenleitung" %} <select name="leitung"><option value="">–</option>
+          {% for l in lehrkraefte %}<option value="{{ l.pk }}">{{ l.person.nachname }}, {{ l.person.vorname }}</option>{% endfor %}</select></label>
+      </div>
+      <button type="submit" class="knopf zweitrangig">{% translate "Klasse anlegen" %}</button>
+    </form>
+  </section>
+  <section class="karte">
+    <h2>{% blocktranslate with sj=w.nach %}Klassen in {{ sj }}{% endblocktranslate %}</h2>
+    {% if klassen_nach %}<ul class="lb-klassen">{% for g in klassen_nach %}<li><strong>{{ g.name }}</strong> <span class="leise">{% blocktranslate with jg=g.jahrgang|default:"–" %}Jg. {{ jg }}{% endblocktranslate %}{% if g.leitung %} · {{ g.leitung.person.anzeigename }}{% endif %}</span></li>{% endfor %}</ul>
+    {% else %}<p class="leer">{% translate "Noch keine Klassen angelegt." %}</p>{% endif %}
+    <p><a class="knopf klein" href="?schritt=schueler">{% translate "Weiter zu den Entscheidungen" %}</a></p>
+  </section>
+</div>
+
+{% elif schritt == "schueler" %}
+<div class="lb-leiste">
+  {% if alle_klassen|length > 1 %}
+  <form method="get" class="lb-jahrwahl"><input type="hidden" name="schritt" value="schueler">
+    <label for="lb-klasse">{% translate "Klasse" %}</label>
+    <select id="lb-klasse" name="klasse" onchange="this.form.submit()"><option value="">{% translate "alle" %}</option>
+      {% for k in alle_klassen %}<option{% if k == filter_klasse %} selected{% endif %}>{{ k }}</option>{% endfor %}</select>
+    <noscript><button type="submit" class="knopf zweitrangig klein">{% translate "Anzeigen" %}</button></noscript>
+  </form>{% endif %}
+  <form method="post" class="zg-inline">{% csrf_token %}<input type="hidden" name="aktion" value="aktualisieren">
+    <button type="submit" class="knopf zweitrangig klein">{% translate "Liste aktualisieren" %}</button></form>
+  <span class="leise">{% for e in je_entscheidung %}{{ e.name }}: {{ e.n }}{% if not forloop.last %} · {% endif %}{% endfor %}</span>
+</div>
+
+<form method="post">{% csrf_token %}<input type="hidden" name="aktion" value="entscheidungen"><input type="hidden" name="klasse" value="{{ filter_klasse }}">
+{% for g in gruppen %}
+<section class="karte lb-klasse">
+  <h2>{% blocktranslate with k=g.name %}Klasse {{ k }}{% endblocktranslate %} <small class="leise">· {{ g.posten|length }}</small></h2>
+  <div class="tabellenrahmen"><table class="liste lb-posten">
+    <thead><tr><th>{% translate "Schüler:in" %}</th><th class="zahl">{% translate "Jg." %}</th><th>{% translate "Grundlage" %}</th><th>{% translate "Entscheidung" %}</th><th>{% translate "Neue Klasse" %}</th><th>{% translate "Status" %}</th></tr></thead>
+    <tbody>
+    {% for p in g.posten %}
+      <tr class="{% if p.hindernis %}lb-hindernis{% endif %}{% if p.status == 'durchgefuehrt' %} lb-erledigt{% endif %}">
+        <td><a href="{% url 'laufbahn_schueler' p.schueler.pk %}">{{ p.schueler.person.nachname }}, {{ p.schueler.person.rufname|default:p.schueler.person.vorname }}</a></td>
+        <td class="zahl">{{ p.alter_jahrgang|default:"–" }}</td>
+        <td><small>{{ p.grundlage }}</small></td>
+        {% if p.status == "offen" %}
+        <td><select name="e-{{ p.pk }}" aria-label="{% translate 'Entscheidung' %}">{% for k, n in entscheidungen %}<option value="{{ k }}"{% if k == p.entscheidung %} selected{% endif %}>{{ n }}</option>{% endfor %}</select></td>
+        <td>{% if p.verlaesst_schule %}<span class="leise">{% translate "Archiv" %}</span>{% else %}
+          <select name="k-{{ p.pk }}" aria-label="{% translate 'Neue Klasse' %}"><option value="">–</option>
+            {% for k in klassen_nach %}<option value="{{ k.pk }}"{% if k.pk == p.neue_klasse_id %} selected{% endif %}>{{ k.name }} ({{ k.jahrgang|default:"–" }})</option>{% endfor %}</select>{% endif %}
+          {% if p.hindernis %}<small class="fehler blockzeile">{{ p.hindernis }}</small>{% endif %}</td>
+        <td><span class="zg-status zg-status-entwurf">{{ p.get_status_display }}</span></td>
+        {% else %}
+        <td>{{ p.get_entscheidung_display }}</td>
+        <td>{% if p.verlaesst_schule %}{% translate "Archiv" %}{% else %}{{ p.neue_klasse.name|default:"–" }}{% endif %}</td>
+        <td class="nowrap"><span class="zg-status zg-status-abgeschlossen">{{ p.get_status_display }}</span>
+          <button type="submit" form="zurueck-{{ p.pk }}" class="knopf zweitrangig klein">{% translate "Zurücknehmen" %}</button></td>
+        {% endif %}
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+</section>
+{% empty %}
+<section class="karte"><p class="leer">{% translate "Keine Schüler:innen im alten Schuljahr gefunden." %}</p></section>
+{% endfor %}
+{% if zaehler.offen %}<p class="lb-speichern"><button type="submit" class="knopf">{% translate "Entscheidungen speichern" %}</button>
+  <a class="knopf zweitrangig" href="?schritt=durchfuehren">{% translate "Weiter zum Durchführen" %}</a></p>{% endif %}
+</form>
+{% for g in gruppen %}{% for p in g.posten %}{% if p.status == "durchgefuehrt" %}
+<form method="post" id="zurueck-{{ p.pk }}" hidden>{% csrf_token %}<input type="hidden" name="aktion" value="posten_zuruecknehmen"><input type="hidden" name="posten" value="{{ p.pk }}"></form>
+{% endif %}{% endfor %}{% endfor %}
+
+{% else %}
+<div class="sy-raster">
+  <section class="karte">
+    <h2>{% translate "Durchführen" %}</h2>
+    <dl class="daten">
+      <dt>{% translate "Schüler:innen gesamt" %}</dt><dd>{{ zaehler.gesamt }}</dd>
+      <dt>{% translate "bereits übertragen" %}</dt><dd>{{ zaehler.durchgefuehrt }}</dd>
+      <dt>{% translate "offen" %}</dt><dd>{{ zaehler.offen }}</dd>
+      <dt>{% translate "davon unvollständig" %}</dt><dd class="{% if zaehler.hindernisse %}auffaellig{% endif %}">{{ zaehler.hindernisse }}</dd>
+    </dl>
+    {% for e in je_entscheidung %}<span class="etikett">{{ e.name }}: {{ e.n }}</span>{% endfor %}
+    {% if zaehler.offen %}
+      {% if zu_frueh %}<p class="sy-warnung">{% blocktranslate with ende=w.von.ende|kurzdatum %}Das alte Schuljahr endet erst am {{ ende }}. Der Wechsel lässt sich schon jetzt durchführen; die neuen Klassen gelten ab dem ersten Schultag des neuen Schuljahres.{% endblocktranslate %}</p>{% endif %}
+      {% if zaehler.hindernisse %}<p class="sy-warnung">{% blocktranslate count n=zaehler.hindernisse %}{{ n }} Schüler:in ist unvollständig (z. B. ohne Zielklasse) und bleibt offen.{% plural %}{{ n }} Schüler:innen sind unvollständig (z. B. ohne Zielklasse) und bleiben offen.{% endblocktranslate %} <a href="?schritt=schueler">{% translate "Zu den Entscheidungen" %}</a></p>{% endif %}
+      <form method="post" class="sy-bestaetigung">{% csrf_token %}<input type="hidden" name="aktion" value="durchfuehren">
+        {% if not w.durchgefuehrt and aktiv_vorher %}<label class="haken"><input type="checkbox" name="aktivieren" value="1" checked> {% blocktranslate with sj=w.nach %}{{ sj }} anschließend als aktuelles Schuljahr setzen{% endblocktranslate %}</label>{% endif %}
+        <label class="haken"><input type="checkbox" name="bestaetigt" value="1" required> {% translate "Ich habe die Entscheidungen geprüft." %}</label>
+        <button type="submit" class="knopf">{% if w.durchgefuehrt %}{% translate "Offene Schüler:innen übertragen" %}{% else %}{% translate "Schuljahreswechsel durchführen" %}{% endif %}</button>
+      </form>
+    {% else %}<p class="leer">{% translate "Alle Schüler:innen sind übertragen." %}</p>{% endif %}
+  </section>
+  <section class="karte">
+    <h2>{% translate "Zurücknehmen" %}</h2>
+    {% if w.durchgefuehrt or zaehler.durchgefuehrt %}
+    <p>{% translate "Setzt alle übertragenen Schüler:innen auf den Stand vor dem Wechsel zurück: neue Klassenzugehörigkeiten und Laufbahnabschnitte entfallen, die alten Klassen laufen weiter, Abgänge werden aufgehoben." %}</p>
+    {% if w.aktiv_umgestellt %}<p>{% blocktranslate with sj=w.von %}Aktuelles Schuljahr wird wieder {{ sj }}.{% endblocktranslate %}</p>{% endif %}
+    <p class="hinweistext">{% translate "Bereits erfasste Noten, Fehlzeiten und Zeugnisse bleiben erhalten. Einzelne Schüler:innen lassen sich unter „2. Entscheidungen“ zurücknehmen." %}</p>
+    <form method="post" class="sy-bestaetigung">{% csrf_token %}<input type="hidden" name="aktion" value="zuruecknehmen">
+      <label class="haken"><input type="checkbox" name="klassen_loeschen" value="1" checked> {% translate "Vom Wechsel angelegte, leere Klassen wieder entfernen" %}</label>
+      <label class="haken"><input type="checkbox" name="bestaetigt" value="1" required> {% translate "Den gesamten Wechsel zurücknehmen" %}</label>
+      <button type="submit" class="knopf gefahr">{% translate "Wechsel zurücknehmen" %}</button>
+    </form>
+    {% else %}<p class="leer">{% translate "Noch nichts durchgeführt." %}</p>{% endif %}
+    {% if w.durchgefuehrt_am %}<p class="hinweistext">{% blocktranslate with am=w.durchgefuehrt_am|date:"SHORT_DATETIME_FORMAT" %}Durchgeführt am {{ am }}{% endblocktranslate %}{% if w.durchgefuehrt_von %} · {{ w.durchgefuehrt_von|benutzername }}{% endif %}</p>{% endif %}
+  </section>
+</div>
+{% endif %}
+{% endblock %}
