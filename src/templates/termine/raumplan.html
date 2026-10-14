@@ -1,0 +1,74 @@
+{% extends "portal/base.html" %}
+{% load i18n formate %}
+{% block title %}{% translate "Räume" %}{% endblock %}
+{% block inhaltsklasse %}breit{% endblock %}
+{% block inhalt %}
+{% include "termine/_kopf.html" %}
+
+<div class="tm-leiste">
+  <div class="tm-monatwahl">
+    <a class="knopf zweitrangig klein" href="?datum={{ vortag|date:'Y-m-d' }}" aria-label="{% translate 'Vortag' %}">‹</a>
+    <h2>{{ tag|langdatum }}</h2>
+    <a class="knopf zweitrangig klein" href="?datum={{ folgetag|date:'Y-m-d' }}" aria-label="{% translate 'Folgetag' %}">›</a>
+    <a class="knopf zweitrangig klein" href="?datum={{ heute|date:'Y-m-d' }}">{% translate "Heute" %}</a>
+  </div>
+  <form method="get" class="lb-jahrwahl"><label for="tm-tag">{% translate "Datum" %}</label>
+    <input id="tm-tag" type="date" name="datum" value="{{ tag|date:'Y-m-d' }}" onchange="this.form.submit()"></form>
+  {% if darf_verwalten %}<a class="knopf zweitrangig" href="{% url 'admin:termine_raum_changelist' %}">{% translate "Räume verwalten" %}</a>{% endif %}
+</div>
+
+<section class="karte tm-raumplan">
+  <div class="tm-raster-kopf" aria-hidden="true"><span></span><div class="tm-stunden">{% for h in stunden %}<span>{{ h }}</span>{% endfor %}</div></div>
+  {% for z in zeilen %}
+  <div class="tm-raumzeile">
+    <div class="tm-raumname"><a href="?datum={{ tag|date:'Y-m-d' }}&raum={{ z.raum.pk }}#buchen">{{ z.raum.name }}</a>
+      <small class="leise">{{ z.raum.get_art_display }}{% if z.raum.plaetze %} · {% blocktranslate with n=z.raum.plaetze %}{{ n }} Plätze{% endblocktranslate %}{% endif %}{% if not z.raum.buchbar %} · {% translate "nicht buchbar" %}{% endif %}</small></div>
+    <div class="tm-bahn">
+      {% for b in z.buchungen %}
+      <div class="tm-buchung{% if b.sprechtag_id %} sprechtag{% elif b.termin_id %} termin{% endif %}" style="left: {{ b.links|stringformat:'s' }}%; width: {{ b.breite|stringformat:'s' }}%;"
+           title="{{ b.von|time:'H:i' }}–{{ b.bis|time:'H:i' }} {{ b.zweck }}{% if b.gebucht_von %} · {{ b.gebucht_von|benutzername }}{% endif %}">
+        <span>{{ b.von|time:"H:i" }} {{ b.zweck }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    <ul class="tm-buchungsliste">
+      {% for b in z.buchungen %}<li><strong>{{ b.von|time:"H:i" }}–{{ b.bis|time:"H:i" }}</strong> {{ b.zweck }}
+        <span class="leise">{% if b.gebucht_von %}· {{ b.gebucht_von|benutzername }}{% endif %}{% if b.serie %} · {% translate "wöchentlich" %}{% endif %}</span>
+        {% if b.darf_loeschen %}<form method="post" class="zg-inline">{% csrf_token %}<input type="hidden" name="aktion" value="loeschen"><input type="hidden" name="buchung" value="{{ b.pk }}">
+          <button type="submit" class="link">{% translate "löschen" %}</button>{% if b.serie %} <button type="submit" name="serie" value="1" class="link">{% translate "Serie ab hier löschen" %}</button>{% endif %}</form>{% endif %}</li>
+      {% empty %}<li class="leise tm-frei">{% translate "frei" %}</li>{% endfor %}
+    </ul>
+  </div>
+  {% empty %}<p class="leer">{% translate "Noch keine Räume angelegt." %}</p>
+  {% endfor %}
+</section>
+
+<div class="sy-raster">
+  {% if darf_buchen %}
+  <section class="karte" id="buchen">
+    <h2>{% translate "Raum buchen" %}</h2>
+    <form method="post" class="sy-formular">{% csrf_token %}<input type="hidden" name="aktion" value="buchen">
+      {% if form.non_field_errors %}<p class="sy-fehler">{{ form.non_field_errors|join:" " }}</p>{% endif %}
+      <div class="sy-zeitraum lb-zwei">
+        <label class="sy-feld">{{ form.raum.label }} {{ form.raum }}{% for e in form.raum.errors %}<small class="fehler">{{ e }}</small>{% endfor %}</label>
+        <label class="sy-feld">{{ form.datum.label }} {{ form.datum }}</label>
+      </div>
+      <div class="sy-zeitraum lb-zwei">
+        <label class="sy-feld">{{ form.von.label }} {{ form.von }}</label>
+        <label class="sy-feld">{{ form.bis.label }} {{ form.bis }}{% for e in form.bis.errors %}<small class="fehler">{{ e }}</small>{% endfor %}</label>
+      </div>
+      <label class="sy-feld">{{ form.zweck.label }} {{ form.zweck }}</label>
+      <label class="sy-feld">{{ form.woechentlich_bis.label }} {{ form.woechentlich_bis }}<small class="leise">{{ form.woechentlich_bis.help_text }}</small>{% for e in form.woechentlich_bis.errors %}<small class="fehler">{{ e }}</small>{% endfor %}</label>
+      <button type="submit" class="knopf">{% translate "Buchen" %}</button>
+    </form>
+  </section>
+  {% endif %}
+  <section class="karte">
+    <h2>{% translate "Meine Buchungen" %}</h2>
+    {% if meine %}<ul class="tm-liste">{% for b in meine %}<li><span class="tm-datum">{{ b.datum|date:"D" }} {{ b.datum|tagmonat }}</span>
+      <a href="?datum={{ b.datum|date:'Y-m-d' }}">{{ b.raum.name }}</a> <span class="leise">{{ b.von|time:"H:i" }}–{{ b.bis|time:"H:i" }} · {{ b.zweck }}</span></li>{% endfor %}</ul>
+    {% else %}<p class="leer">{% translate "Keine anstehenden Buchungen." %}</p>{% endif %}
+    <p class="hinweistext">{% translate "Überschneidungen im selben Raum sind ausgeschlossen. Bei wöchentlichen Buchungen wird nichts gebucht, wenn ein einziger Termin kollidiert." %}</p>
+  </section>
+</div>
+{% endblock %}

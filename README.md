@@ -1,9 +1,10 @@
-# Schulverwaltung (Version 0.4.4.1, Entwicklungsstand)
+# Schulverwaltung (Version 0.4.5.0, Entwicklungsstand)
 
 Open-Source-Schulverwaltung für die DSN: Stammdaten, Klassen und Lerngruppen,
 Noten mit Gewichtung, Fehlzeiten, Nachmittagsprogramm, Anhänge zur Schülerakte,
 Förderpläne und Nachteilsausgleiche, Neuanmeldungen, Zeugnisse und Konferenzen, Schuljahreswechsel,
-Abgänge mit Abgangszeugnis, Archiv und Löschfristen. Läuft im Browser,
+Abgänge mit Abgangszeugnis, Archiv und Löschfristen, Schulkalender, Raumbuchung, Elternsprechtage und
+Lern- und Entwicklungsgespräche. Läuft im Browser,
 betrieben mit Docker.
 
 > Nur mit **erfundenen Testdaten** verwenden. Für echte Schülerdaten fehlen noch
@@ -303,6 +304,35 @@ Ablauf der Schullaufbahn: **Aufnahme → Klasse → Versetzung → Schuljahreswe
   Kategorie, Anzahl, Zeitpunkt und Person. **Ältere Modulsicherungen enthalten gelöschte Daten weiterhin**, bis sie
   selbst gelöscht werden.
 
+## Schulkalender, Räume, Elternsprechtag und LEG
+
+**Menüband › Termine** – für alle Beschäftigten.
+
+- **Schulkalender:** Monatsansicht (auf dem Handy als Liste), Filter nach Art (Ferien, Feiertag, Schulveranstaltung,
+  Konferenz, Prüfung, Elternabend, Fahrt, Frist), Liste der nächsten 30 Tage, Startseitenkarte „Nächste Termine“.
+  Eintragen: Sekretariat, Verwaltungsleitung, Schulleitung, Stellvertretung, Stufenkoordination; Lehrkräfte lesen.
+  Termine können zweisprachig sein, als unterrichtsfrei markiert und im Elternportal angezeigt werden. Mit Raum und
+  Uhrzeit wird der Raum automatisch belegt. **Kalender abonnieren** lädt eine iCalendar-Datei (z. B. für Outlook).
+- **Räume:** Tagesplan aller Räume mit Zeitleiste, Buchung einmalig oder wöchentlich (z. B. AG); Überschneidungen im
+  selben Raum sind ausgeschlossen – bei einer Serie wird nichts gebucht, wenn ein Termin kollidiert. Eigene Buchungen
+  löscht man selbst, fremde nur die Verwaltung. Räume pflegt die Verwaltung (Termine › Räume verwalten).
+- **Elternsprechtag und Lern- und Entwicklungsgespräche (LEG):** plant die **Stellvertretende Schulleitung** (neue
+  Rolle, Demo-Konto `stellvertretung`) bzw. die Schulleitung:
+  1. *Entwurf:* Art, Jahrgänge, Gesprächsdauer, Wechselzeit, Höchstzahl je Kind; **flexibles Zeitraster** aus beliebig
+     vielen Zeitfenstern je Tag (Pausen ergeben sich aus Lücken) und mehreren Tagen. Teilnehmende Lehrkräfte werden
+     vorgeschlagen – beim Elternsprechtag alle Lehrkräfte, die die Jahrgänge unterrichten, und die Klassenleitungen;
+     beim LEG die Klassenleitungen. Raum je Lehrkraft, Räume werden auf Wunsch im Raumplan belegt.
+  2. *Verfügbarkeit:* Jede Lehrkraft sperrt einzelne Zeiten oder schränkt sich auf „nur von … bis …“ ein, gibt Raum und
+     einen Hinweis für Eltern an und bestätigt. Die Startseite erinnert daran.
+  3. *Buchung offen:* Eltern buchen im **Elternportal** (nur wenn `ELTERNPORTAL_AKTIV=1`; Anmeldung mit Elternkonto)
+     innerhalb des Buchungszeitraums – nur für ihre Kinder (Sorge- oder Auskunftsrecht) und nur bei deren Lehrkräften;
+     Absagen ebenso. Sekretariat und Planung tragen Gespräche für alle Lehrkräfte ein, Lehrkräfte für ihre
+     Schüler:innen.
+  4. *Buchung geschlossen:* Eltern sehen ihre Termine; die Schule kann weiter eintragen.
+  Regeln: eine Zeit je Lehrkraft nur einmal, kein Kind bzw. keine Kontaktperson zu zwei Gesprächen gleichzeitig,
+  je Lehrkraft und Kind höchstens ein Gespräch, Höchstzahl je Kind. Übersicht aller Gespräche zum Drucken, Liste je
+  Lehrkraft zum Drucken, beim LEG Liste der Schüler:innen ohne Termin.
+
 ## Noten mit Bewertungsordnern
 
 Jeder Unterricht hat eine frei gestaltbare Ordnerstruktur, z. B.:
@@ -399,7 +429,7 @@ Portal und Verwaltungsoberfläche haben oben dasselbe **Menüband** (wie in Word
 
 - **Titelleiste:** Schulname und Schuljahr, Personensuche, Sprache, Benutzermenü
   (Passwort ändern, Abmelden).
-- **Registerkarten:** Start · Schüler:innen · Unterricht · Förderung · Schulleitung · Verwaltung · Personal · System,
+- **Registerkarten:** Start · Termine · Schüler:innen · Unterricht · Förderung · Schulleitung · Verwaltung · Personal · System,
   jeweils mit beschrifteten Befehlsgruppen. Getrennt sind die **akademische Verwaltung** und die **Administration**:
   - *Schulleitung* (akademisch): Schuljahr (Schuljahreswechsel, Schuljahre, Zeitraster, Bildungsgänge, Abschlussarten),
     Unterrichtsorganisation (Unterrichtsverteilung, Fächer, Notenskalen, Gewichtungsvorlagen), Archiv und Löschfristen.
@@ -548,6 +578,7 @@ und fehlende Beispiele (z. B. Neuanmeldungen) ergänzt. Checklisten-Vorlagen wer
 | `src/sicherung` | Modulsicherung und Wiederherstellung (`archiv.py`), PDF-Export (`pdf.py`), Benutzer und Einzelrechte (`konten.py`), Protokoll |
 | `src/elternkontakt` | Elternkommunikation: Gespräche, Empfänger:innen, Links und E-Mail (`versand.py`), Fehlzeitenregeln (`pruefung.py`), Elternseite (`eltern.py`) |
 | `src/laufbahn` | Schuljahreswechsel (`wechsel.py`), Klassenwechsel und Abgang (`ereignisse.py`), Archiv, Löschfristen (`loeschung.py`) |
+| `src/termine` | Schulkalender, Räume und Raumbuchung, Sprechtage (`sprechtag.py`), Elternportal-Buchung (`eltern.py`) |
 | `src/aufnahme` | Neuanmeldungen: Bewerbungsakte, Checklisten, Unterlagen, Übernahme (`uebernahme.py`), Rechte (`rechte.py`) |
 | `src/locale` | Übersetzungen (Englisch) |
 | `unraid/` | Betrieb auf Unraid: `docker-compose.yml`, `.env.example`, `einrichten.sh` |

@@ -1,0 +1,51 @@
+{% extends "portal/base.html" %}
+{% load i18n formate %}
+{% block title %}{{ titel }}{% endblock %}
+{% block inhalt %}
+<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › <a href="{% url 'kalender' %}">{% translate "Schulkalender" %}</a> › {{ titel }}</p>
+<h1>{{ titel }}</h1>
+{% if darf %}
+<section class="karte">
+  <form method="post" class="formular">{% csrf_token %}
+    {% if form.non_field_errors %}<p class="sy-fehler">{{ form.non_field_errors|join:" " }}</p>{% endif %}
+    <div class="formzeile zwei">
+      <label>{{ form.titel.label }} {{ form.titel }}{% for e in form.titel.errors %}<small class="fehler">{{ e }}</small>{% endfor %}</label>
+      <label>{{ form.titel_en.label }} {{ form.titel_en }}</label>
+    </div>
+    <div class="formzeile vier">
+      <label>{{ form.art.label }} {{ form.art }}</label>
+      <label>{{ form.beginn.label }} {{ form.beginn }}{% for e in form.beginn.errors %}<small class="fehler">{{ e }}</small>{% endfor %}</label>
+      <label>{{ form.ende.label }} {{ form.ende }}{% for e in form.ende.errors %}<small class="fehler">{{ e }}</small>{% endfor %}</label>
+      <label>{{ form.zielgruppe.label }} {{ form.zielgruppe }}</label>
+    </div>
+    <div class="formzeile vier">
+      <label>{{ form.uhrzeit_von.label }} {{ form.uhrzeit_von }}<small class="leise">{{ form.uhrzeit_von.help_text }}</small>{% for e in form.uhrzeit_von.errors %}<small class="fehler">{{ e }}</small>{% endfor %}</label>
+      <label>{{ form.uhrzeit_bis.label }} {{ form.uhrzeit_bis }}{% for e in form.uhrzeit_bis.errors %}<small class="fehler">{{ e }}</small>{% endfor %}</label>
+      <label>{{ form.raum.label }} {{ form.raum }}{% for e in form.raum.errors %}<small class="fehler">{{ e }}</small>{% endfor %}</label>
+      <label>{{ form.ort.label }} {{ form.ort }}</label>
+    </div>
+    <label>{{ form.beschreibung.label }} {{ form.beschreibung }}</label>
+    <label class="haken">{{ form.unterrichtsfrei }} {{ form.unterrichtsfrei.label }}</label>
+    <label class="haken">{{ form.fuer_eltern }} {{ form.fuer_eltern.label }}</label>
+    <div class="knopfreihe"><button type="submit" class="knopf">{% translate "Speichern" %}</button>
+      <a class="knopf zweitrangig" href="{% url 'kalender' %}">{% translate "Abbrechen" %}</a></div>
+  </form>
+  {% if t %}
+  {% translate "Diesen Termin löschen?" as frage %}
+  <form method="post" class="tm-loeschen" onsubmit="return confirm('{{ frage|escapejs }}')">{% csrf_token %}<input type="hidden" name="aktion" value="loeschen">
+    <button type="submit" class="knopf gefahr klein">{% translate "Termin löschen" %}</button></form>
+  {% endif %}
+</section>
+{% else %}
+<section class="karte">
+  <dl class="daten">
+    <dt>{% translate "Art" %}</dt><dd>{{ t.get_art_display }}{% if t.unterrichtsfrei %} · <span class="etikett">{% translate "unterrichtsfrei" %}</span>{% endif %}</dd>
+    <dt>{% translate "Datum" %}</dt><dd>{{ t.beginn|langdatum }}{% if t.ende and t.ende != t.beginn %} – {{ t.ende|langdatum }}{% endif %}</dd>
+    {% if t.uhrzeit_von %}<dt>{% translate "Uhrzeit" %}</dt><dd>{{ t.uhrzeit_von|time:"H:i" }}{% if t.uhrzeit_bis %}–{{ t.uhrzeit_bis|time:"H:i" }}{% endif %}</dd>{% endif %}
+    {% if t.raum or t.ort %}<dt>{% translate "Ort" %}</dt><dd>{{ t.raum.name|default:t.ort }}</dd>{% endif %}
+    {% if t.zielgruppe %}<dt>{% translate "Für" %}</dt><dd>{{ t.zielgruppe }}</dd>{% endif %}
+    {% if t.beschreibung %}<dt>{% translate "Beschreibung" %}</dt><dd>{{ t.beschreibung|linebreaksbr }}</dd>{% endif %}
+  </dl>
+</section>
+{% endif %}
+{% endblock %}

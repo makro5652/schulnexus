@@ -1,0 +1,32 @@
+{% extends "elternkontakt/eltern_basis.html" %}
+{% load i18n formate %}
+{% block title %}{% translate "Gesprächstermine" %}{% endblock %}
+{% block sprachen %}<nav class="tm-elternnav"><a href="{% url 'elternportal' %}">{% translate "Nachrichten" %}</a>
+  <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit" class="link">{% translate "Abmelden" %}</button></form></nav>{% endblock %}
+{% block inhalt %}
+<h1>{% translate "Elternsprechtage und Gespräche" %}</h1>
+<section class="karte">
+  <h2>{% translate "Ihre gebuchten Gespräche" %}</h2>
+  {% for g in meine %}
+    <p class="ek-portalzeile"><strong>{{ g.beginn|date:"D" }} {{ g.beginn|kurzdatum }}, {{ g.beginn|time:"H:i" }}–{{ g.ende|time:"H:i" }}</strong>
+      · {{ g.teilnahme.lehrkraft.person.anzeigename }}{% if g.teilnahme.raum %} · {% blocktranslate with r=g.teilnahme.raum.name %}Raum {{ r }}{% endblocktranslate %}{% endif %}
+      <span class="leise">· {{ g.schueler.person.vorname }} · {{ g.sprechtag.titel }}</span></p>
+  {% empty %}<p class="leer">{% translate "Keine Gespräche gebucht." %}</p>{% endfor %}
+</section>
+<section class="karte">
+  <h2>{% translate "Sprechtage" %}</h2>
+  {% for e in sprechtage %}
+    <p class="ek-portalzeile"><a href="{% url 'eltern_sprechtag' e.st.pk %}"><strong>{{ e.st.titel }}</strong></a>
+      <span class="leise">· {% for d in e.st.tage %}{{ d|kurzdatum }}{% if not forloop.last %}, {% endif %}{% endfor %}</span>
+      {% if e.offen %}<span class="etikett">{% translate "Buchung offen" %}</span>{% else %}<span class="etikett warnend">{% translate "Buchung geschlossen" %}</span>{% endif %}
+      {% if e.st.buchung_bis and e.offen %}<span class="leise blockzeile">{% blocktranslate with d=e.st.buchung_bis|date:"SHORT_DATETIME_FORMAT" %}Buchung bis {{ d }}{% endblocktranslate %}</span>{% endif %}</p>
+  {% empty %}<p class="leer">{% translate "Derzeit sind keine Sprechtage zur Buchung freigegeben." %}</p>{% endfor %}
+</section>
+{% if termine %}
+<section class="karte">
+  <h2>{% translate "Termine der Schule" %}</h2>
+  <ul class="tm-liste">{% for t in termine %}<li><span class="tm-datum">{{ t.beginn|kurzdatum }}{% if t.ende and t.ende != t.beginn %}–{{ t.ende|kurzdatum }}{% endif %}</span>
+    {{ t.lokal_titel }}{% if t.uhrzeit_von %} <span class="leise">{{ t.uhrzeit_von|time:"H:i" }}</span>{% endif %}{% if t.unterrichtsfrei %} <span class="etikett">{% translate "unterrichtsfrei" %}</span>{% endif %}</li>{% endfor %}</ul>
+</section>
+{% endif %}
+{% endblock %}

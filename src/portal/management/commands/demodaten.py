@@ -8,6 +8,7 @@ from datetime import date, time, timedelta
 from decimal import ROUND_HALF_UP, Decimal
 
 from django.contrib.auth.models import Group, User
+from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.db import transaction
@@ -162,6 +163,12 @@ class Command(BaseCommand):
                 call_command("grundeinrichtung", stdout=self.stdout)
                 self.laufbahn_anlegen()
                 self.stdout.write("Folgeschuljahr, Archiv-Beispiele und Löschfristen ergänzt.")
+            from termine.models import Raum
+
+            if not Raum.objects.exists():
+                call_command("grundeinrichtung", stdout=self.stdout)
+                self.termine_anlegen(opts["passwort"])
+                self.stdout.write("Räume, Schulkalender, Elternsprechtag und LEG ergänzt.")
             return
 
         call_command("grundeinrichtung", stdout=self.stdout)
@@ -520,6 +527,7 @@ class Command(BaseCommand):
         self.zeugnisse_anlegen()
         self.elternkontakt_anlegen()
         self.laufbahn_anlegen()
+        self.termine_anlegen(pw)
 
         self.stdout.write(self.style.SUCCESS(
             f"Demo-Daten angelegt: {len(alle)} Schüler:innen, {Person.objects.count()} Personen, "
@@ -1163,6 +1171,132 @@ class Command(BaseCommand):
         ehemalig("Amani", "Otieno", "w", "A-2026-01", vorjahr, 9, date(2026, 3, 20), "Umzug nach Mombasa")
         ehemalig("Felix", "Brandt", "m", "A-2022-01", Schuljahr.objects.get(name="2024/25"), 10, date(2025, 6, 27),
                  "Mittlerer Schulabschluss", "abschluss")
+
+
+    # ------------------------------------------------------------ Kalender, Räume, Sprechtage (ab 0.4.5.0)
+    def termine_anlegen(self, pw):
+        from datetime import datetime as dt
+
+        from portal import rollen as R
+        from termine import sprechtag as S
+        from termine.models import Gespraechstermin, Raum, Raumbuchung, Sprechtag, Termin, Zeitfenster
+
+        tz = timezone.get_current_timezone()
+        sj = Schuljahr.objects.get(name="2026/27")
+        sl_user = User.objects.filter(username="schulleitung").first()
+
+        # Stellvertretende Schulleitung (plant Sprechtage)
+        if not User.objects.filter(username="stellvertretung").exists():
+            p = Person.objects.create(anrede="Herr", titel="Dr.", vorname="Tobias", nachname="Lindner", ort="Nairobi",
+                                      email="tobias.lindner@privat.example", geburtsdatum=date(1979, 9, 2))
+            Personalprofil.objects.create(person=p, bereich=Personalbereich.objects.get(kuerzel="SL"), kuerzel="LIN",
+                                          stellenbezeichnung="Stellvertretender Schulleiter", anstellungsart="adlk",
+                                          dienstbeginn=date(2024, 8, 1), dienst_email="tobias.lindner@schule.example",
+                                          personalnummer="P-2024STV")
+            u = User.objects.create_user("stellvertretung", password=pw, is_staff=True, first_name="Tobias", last_name="Lindner")
+            u.groups.add(Group.objects.get(name=R.STELLVERTRETUNG), Group.objects.get(name=R.LEHRER))
+            p.benutzer = u
+            p.save(update_fields=["benutzer"])
+        stv = User.objects.get(username="stellvertretung")
+
+        raeume = {}
+        for name, kuerzel, art, plaetze, ausstattung in [
+            ("A101", "A101", "klassenraum", 28, "Beamer"), ("A102", "A102", "klassenraum", 28, "Beamer"),
+            ("A103", "A103", "klassenraum", 26, "Smartboard"), ("A104", "A104", "klassenraum", 26, "Beamer"),
+            ("B201 Chemie", "CH", "fachraum", 24, "Abzug, Gasanschluss, Beamer"), ("B202 Biologie", "BIO", "fachraum", 24, "Mikroskope"),
+            ("B203 Physik", "PH", "fachraum", 24, "Experimentiertisch"), ("Computerraum", "PC", "fachraum", 26, "26 Rechner"),
+            ("Aula", "AULA", "aula", 220, "Bühne, Tonanlage"), ("Sporthalle", "SH", "sport", None, ""),
+            ("Besprechungsraum", "BES", "besprechung", 12, "Bildschirm"), ("Bibliothek", "BIB", "sonstiges", 30, ""),
+        ]:
+            raeume[kuerzel] = Raum.objects.create(name=name, kuerzel=kuerzel, art=art, plaetze=plaetze, ausstattung=ausstattung)
+        Raum.objects.create(name="Werkraum (Renovierung)", kuerzel="WERK", art="fachraum", buchbar=False)
+
+        def termin(titel, titel_en, art, beginn, ende=None, von=None, bis=None, raum=None, **mehr):
+            t = Termin.objects.create(titel=titel, titel_en=titel_en, art=art, beginn=beginn, ende=ende, uhrzeit_von=von, uhrzeit_bis=bis,
+                                      raum=raum, erstellt_von=sl_user, **mehr)
+            if raum and von and bis:
+                Raumbuchung.objects.create(raum=raum, datum=beginn, von=von, bis=bis, zweck=titel[:150], gebucht_von=sl_user, termin=t)
+            return t
+
+        termin("Mashujaa Day", "Mashujaa Day", "feiertag", date(2026, 10, 20), unterrichtsfrei=True, fuer_eltern=True)
+        termin("Herbstferien", "Autumn break", "ferien", date(2026, 10, 26), date(2026, 10, 30), unterrichtsfrei=True, fuer_eltern=True)
+        termin("Gesamtkonferenz", "Staff conference", "konferenz", date(2026, 10, 15), von=time(14, 30), bis=time(16, 30),
+               raum=raeume["AULA"], zielgruppe="Kollegium")
+        termin("Elternabend Jahrgang 9", "Parents' evening year 9", "eltern", date(2026, 10, 22), von=time(18, 0), bis=time(19, 30),
+               raum=raeume["A101"], zielgruppe="Eltern Jahrgang 9", fuer_eltern=True)
+        termin("Klassenfahrt 8a nach Naivasha", "Class trip 8a to Naivasha", "fahrt", date(2026, 11, 4), date(2026, 11, 6), zielgruppe="8a")
+        termin("Abgabe Zeugnisnoten 1. Halbjahr", "Deadline semester grades", "frist", date(2027, 1, 15), zielgruppe="Lehrkräfte")
+        termin("Mathematik-Vergleichsarbeit Jg. 9", "Maths comparison test year 9", "pruefung", date(2026, 11, 12), von=time(7, 40),
+               bis=time(9, 15), raum=raeume["AULA"], zielgruppe="Jahrgang 9")
+        termin("Sankt-Martins-Fest", "St Martin's festival", "veranstaltung", date(2026, 11, 11), von=time(17, 0), bis=time(19, 0),
+               ort="Schulhof", fuer_eltern=True)
+        termin("Jamhuri Day", "Jamhuri Day", "feiertag", date(2026, 12, 12), unterrichtsfrei=True, fuer_eltern=True)
+        termin("Weihnachtsferien", "Christmas break", "ferien", date(2026, 12, 19), date(2027, 1, 6), unterrichtsfrei=True, fuer_eltern=True)
+
+        # Raumbuchungen (einmalig und wöchentlich)
+        from termine.ansichten import serie_buchen
+        heute = timezone.localdate()
+        montag = heute - timezone.timedelta(days=heute.weekday())
+        lk = User.objects.filter(username="lehrkraft").first() or sl_user
+        serie_buchen({"raum": raeume["PC"], "datum": montag + timezone.timedelta(days=1), "von": time(14, 0), "bis": time(15, 30),
+                      "zweck": "AG Robotik", "woechentlich_bis": montag + timezone.timedelta(days=1 + 7 * 10)}, lk)
+        for tag, raum, von, bis, zweck in [(0, "CH", time(9, 35), time(11, 10), "Schülerexperimente 9a"), (0, "BES", time(13, 0), time(14, 0), "Förderkonferenz"),
+                                           (1, "BIB", time(10, 25), time(11, 10), "Recherche 8a"), (2, "SH", time(15, 0), time(17, 0), "Volleyball-Turnier"),
+                                           (2, "CH", time(7, 40), time(9, 15), "Klausur Chemie Q1")]:
+            Raumbuchung.objects.create(raum=raeume[raum], datum=heute + timezone.timedelta(days=tag), von=von, bis=bis, zweck=zweck, gebucht_von=lk)
+
+        # Elternsprechtag (Buchung offen)
+        jetzt = timezone.now()
+        est = Sprechtag.objects.create(art=Sprechtag.ELTERNSPRECHTAG, titel="Elternsprechtag November 2026", schuljahr=sj,
+                                       jahrgang_von=5, jahrgang_bis=10, slot_minuten=10, puffer_minuten=0, max_je_kind=4,
+                                       buchung_ab=jetzt - timezone.timedelta(days=2), buchung_bis=timezone.make_aware(dt(2026, 11, 17, 18, 0), tz),
+                                       hinweis="Bitte buchen Sie höchstens vier Gespräche je Kind. Die Räume finden Sie im Erdgeschoss von Haus A.",
+                                       status=Sprechtag.BUCHUNG, erstellt_von=stv)
+        Zeitfenster.objects.create(sprechtag=est, datum=date(2026, 11, 19), von=time(14, 0), bis=time(16, 0))
+        Zeitfenster.objects.create(sprechtag=est, datum=date(2026, 11, 19), von=time(16, 30), bis=time(18, 30))
+        S.teilnahmen_ergaenzen(est)
+        freie = [raeume[k] for k in ("A101", "A102", "A103", "A104", "CH", "BIO", "PH", "BIB", "BES")]
+        for i, t in enumerate(est.teilnahmen.select_related("lehrkraft").order_by("lehrkraft__person__nachname")):
+            t.raum = freie[i % len(freie)]
+            if i % 3 == 1:
+                S.nur_verfuegbar(t, date(2026, 11, 19), time(14, 0), time(17, 0))
+                t.bemerkung = "Nur bis 17 Uhr verfügbar"
+            t.bestaetigt_am = jetzt
+            t.save()
+        S.raeume_buchen(est, stv)
+        # einige Buchungen: über das Portal (Demo-Elternkonto) und durch die Schule
+        eltern_user = User.objects.filter(username="eltern").select_related("person").first()
+        gebucht = 0
+        if eltern_user and getattr(eltern_user, "person", None):
+            for kind in S.kinder_von(eltern_user.person)[:1]:
+                for t in S.teilnahmen_fuer_schueler(est, kind)[:2]:
+                    frei = S.freie_zeiten(t)
+                    if frei:
+                        S.buchen(t, frei[gebucht * 3]["beginn"], kind, eltern=eltern_user.person, user=eltern_user,
+                                 ueber=Gespraechstermin.PORTAL, anliegen="Leistungsstand im Fach")
+                        gebucht += 1
+        sek = User.objects.filter(username="verwaltung").first()
+        for t in est.teilnahmen.order_by("lehrkraft__person__nachname")[:6]:
+            for s_ in list(S.schueler_fuer_teilnahme(t))[:3]:
+                frei = S.freie_zeiten(t)
+                if not frei:
+                    break
+                for z in frei[2:]:
+                    try:
+                        kontakt = s_.beziehungen.filter(sorgerecht=True).select_related("person").first()
+                        S.buchen(t, z["beginn"], s_, eltern=kontakt.person if kontakt else None, user=sek)
+                        break
+                    except ValidationError:
+                        continue
+
+        # LEG Jahrgang 8 (Lehrkräfte tragen Verfügbarkeit ein)
+        leg = Sprechtag.objects.create(art=Sprechtag.LEG, titel="Lern- und Entwicklungsgespräche Jahrgang 8", schuljahr=sj,
+                                       jahrgang_von=8, jahrgang_bis=8, slot_minuten=20, puffer_minuten=5, max_je_kind=1,
+                                       hinweis="Das Gespräch findet gemeinsam mit Ihrem Kind statt. Bitte bringen Sie den Selbsteinschätzungsbogen mit.",
+                                       status=Sprechtag.VERFUEGBARKEIT, erstellt_von=stv)
+        for tag in (date(2026, 12, 2), date(2026, 12, 3)):
+            Zeitfenster.objects.create(sprechtag=leg, datum=tag, von=time(14, 0), bis=time(17, 30))
+        S.teilnahmen_ergaenzen(leg)
 
 
 def beispiel_pdf(titel, name):

@@ -73,6 +73,25 @@ def menueband(request):
         .add(_("Passwort ändern"), _url("admin:password_change"), "schluessel", bedingung=admin and user.has_usable_password()),
     )
 
+    # ------------------------------------------------------------ Termine
+    from termine import rechte as TR
+
+    termine_karte = _karte(
+        "termine", _("Termine"),
+        Gruppe(_("Kalender"))
+        .add(_("Schulkalender"), _url("kalender"), "kalender", gross=True, bedingung=TR.darf_kalender_sehen(user))
+        .add(_("Neuer Termin"), _url("termin_neu"), "plus", bedingung=TR.darf_kalender_bearbeiten(user))
+        .add(_("Kalender abonnieren"), _url("kalender_ics"), "liste", bedingung=TR.darf_kalender_sehen(user),
+             hinweis=_("Termine als iCalendar-Datei, z. B. für Outlook")),
+        Gruppe(_("Räume"))
+        .add(_("Raumplan"), _url("raumplan"), "gebaeude", gross=True, bedingung=TR.darf_raum_buchen(user) or TR.darf_raeume_verwalten(user),
+             hinweis=_("Belegung ansehen und Räume buchen"))
+        .add(_("Räume verwalten"), _url("admin:termine_raum_changelist"), "regler", bedingung=TR.darf_raeume_verwalten(user)),
+        Gruppe(_("Sprechtage"))
+        .add(_("Sprechtage"), _url("sprechtage"), "personen", gross=True, bedingung=TR.ist_beschaeftigt(user)
+             and p("termine.view_sprechtag"), hinweis=_("Elternsprechtage und Lern- und Entwicklungsgespräche")),
+    )
+
     # ------------------------------------------------------------ Schüler:innen
     meine_klassen = Gruppe(_("Meine Klassen"))
     if personal and sj:
@@ -283,7 +302,7 @@ def menueband(request):
         .add(pgettext("System", "Protokoll"), _url("systemprotokoll"), "liste", bedingung=darf_sichern(user) or ist_it(user)),
     )
 
-    karten = [k for k in (start, schueler, unterricht, foerderung, schulleitung_karte, verwaltung_karte, personal_karte, system_karte) if k]
+    karten = [k for k in (start, termine_karte, schueler, unterricht, foerderung, schulleitung_karte, verwaltung_karte, personal_karte, system_karte) if k]
     aktiv = _aktive_karte(request.path, karten)
     _aktiven_befehl_markieren(request.get_full_path(), karten)
     from . import rollen as R
@@ -295,7 +314,7 @@ def menueband(request):
     return {"karten": karten, "aktiv": aktiv, "rollen": rollen}
 
 
-PFAD_REGELN = [("/laufbahn/archiv/", "schulleitung"), ("/laufbahn/archiv/", "verwaltung"), ("/laufbahn/schueler/", "schueler"),
+PFAD_REGELN = [("/termine/", "termine"), ("/laufbahn/archiv/", "schulleitung"), ("/laufbahn/archiv/", "verwaltung"), ("/laufbahn/schueler/", "schueler"),
                ("/klassen/", "schueler"), ("/schueler/", "schueler"), ("/stufe/", "schueler"), ("/zuordnung/", "schueler"),
                ("/aufnahme/", "schueler"), ("/elternkontakt/", "schueler"),
                ("/noten/", "unterricht"), ("/zeugnisse/", "unterricht"),

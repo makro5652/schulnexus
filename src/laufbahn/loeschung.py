@@ -56,13 +56,15 @@ def querysets(kategorie, s):
     from foerderung.models import Foerdereintrag, Foerderplan, Nachteilsausgleich
     from nachmittag.models import AGWahl, AGZuteilung
     from noten.models import Note, Zeugnisnote
+    from termine.models import Gespraechstermin
     from stammdaten.models import Beziehung, Dokument, Einwilligung, Gesundheitsangaben
     from zeugnisse.models import Beschluss, Zeugnis
 
     p = s.person
     return {
         "fehlzeiten": [Fehlzeit.objects.filter(schueler=s), AGWahl.objects.filter(schueler=s), AGZuteilung.objects.filter(schueler=s)],
-        "elternkontakt": [Gespraech.objects.filter(schueler=s), Ausloesung.objects.filter(schueler=s)],
+        "elternkontakt": [Gespraech.objects.filter(schueler=s), Ausloesung.objects.filter(schueler=s),
+                          Gespraechstermin.objects.filter(schueler=s)],
         "gesundheit": [Gesundheitsangaben.objects.filter(schueler=s)],
         "foerderung": [Foerderplan.objects.filter(schueler=s), Foerdereintrag.objects.filter(schueler=s),
                        Nachteilsausgleich.objects.filter(schueler=s)],

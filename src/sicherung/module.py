@@ -13,6 +13,7 @@ MODULE = [
     ("zeugnisse", _("Zeugnisse und Konferenzen"), ["zeugnisse"]),
     ("elternkontakt", _("Elternkommunikation"), ["elternkontakt"]),
     ("laufbahn", _("Schuljahreswechsel, Abgänge und Löschfristen"), ["laufbahn"]),
+    ("termine", _("Kalender, Räume und Sprechtage"), ["termine"]),
     ("portal", _("Startseite und persönliche Einstellungen"), ["portal"]),
     ("konten", _("Benutzerkonten und Rollen"), ["auth"]),
 ]

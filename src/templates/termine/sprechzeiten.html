@@ -1,0 +1,99 @@
+{% extends "portal/base.html" %}
+{% load i18n formate %}
+{% block title %}{{ st.titel }} · {{ titel }}{% endblock %}
+{% block inhaltsklasse %}breit{% endblock %}
+{% block inhalt %}
+<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › <a href="{% url 'sprechtage' %}">{% translate "Sprechtage" %}</a> ›
+  {% if planer or fuer_alle %}<a href="{% url 'sprechtag_uebersicht' st.pk %}">{{ st.titel }}</a>{% else %}{{ st.titel }}{% endif %} › {{ titel }}</p>
+<h1>{{ st.titel }} <span class="tm-status gross tm-status-{{ st.status }}">{{ st.get_status_display }}</span></h1>
+<p class="unterzeile">{{ t.lehrkraft.person.anzeigename }}{% if t.raum %} · {% blocktranslate with r=t.raum.name %}Raum {{ r }}{% endblocktranslate %}{% endif %}
+  · {% blocktranslate with n=st.slot_minuten %}{{ n }} Minuten je Gespräch{% endblocktranslate %}
+  · {% blocktranslate count n=n_gebucht %}{{ n }} Gespräch{% plural %}{{ n }} Gespräche{% endblocktranslate %}, {% blocktranslate with f=n_frei g=n_gesperrt %}{{ f }} frei, {{ g }} gesperrt{% endblocktranslate %}</p>
+{% if not t.nimmt_teil %}<p class="sy-warnung">{% translate "Diese Lehrkraft nimmt laut Planung nicht teil; alle Zeiten sind gesperrt." %}</p>{% endif %}
+{% if st.status == "verfuegbarkeit" and eigen and not t.bestaetigt_am %}<p class="sy-warnung">{% translate "Bitte sperren Sie die Zeiten, in denen Sie nicht können, und bestätigen Sie anschließend Ihre Verfügbarkeit." %}</p>{% endif %}
+
+<div class="tm-zweispaltig">
+  <section class="karte tm-zeiten">
+    <div class="karte-kopf">
+      <h2>{% translate "Gesprächszeiten" %}</h2>
+      <button type="button" class="knopf zweitrangig klein nicht-drucken" onclick="window.print()">{% translate "Gesprächsliste drucken" %}</button>
+    </div>
+    <form method="post" id="sperren">{% csrf_token %}<input type="hidden" name="aktion" value="sperren">
+    {% for tag in tage %}
+      <h3>{{ tag.datum|langdatum }}</h3>
+      <div class="tabellenrahmen"><table class="liste kompakt tm-raster">
+        <thead><tr><th>{% translate "Zeit" %}</th><th>{% translate "Gespräch" %}</th>{% if eigen %}<th class="nicht-drucken">{% translate "gesperrt" %}</th>{% endif %}</tr></thead>
+        <tbody>
+        {% for z in tag.zeilen %}
+          <tr class="tm-z-{{ z.status }}">
+            <td class="nowrap">{{ z.beginn|time:"H:i" }}–{{ z.ende|time:"H:i" }}</td>
+            <td>{% if z.termin %}<strong>{{ z.termin.schueler.person.anzeigename }}</strong>
+                {% if z.termin.eltern %}<span class="leise"> · {{ z.termin.eltern.anzeigename }}</span>{% endif %}
+                {% if z.termin.anliegen %}<span class="blockzeile leise">{{ z.termin.anliegen }}</span>{% endif %}
+                <span class="blockzeile leise">{{ z.termin.get_ueber_display }}</span>
+                {% if perms.termine.delete_gespraechstermin %}<button type="submit" form="absagen-{{ z.termin.pk }}" class="link nicht-drucken">{% translate "absagen" %}</button>{% endif %}
+              {% elif z.status == "gesperrt" %}<span class="leise">{% translate "gesperrt" %}</span>{% else %}<span class="leise">{% translate "frei" %}</span>{% endif %}</td>
+            {% if eigen %}<td class="nicht-drucken">{% if z.status != "gebucht" %}<input type="hidden" name="zeit" value="{{ z.schluessel }}">
+              <input type="checkbox" name="gesperrt" value="{{ z.schluessel }}"{% if z.status == "gesperrt" %} checked{% endif %} aria-label="{% translate 'gesperrt' %} {{ z.beginn|time:'H:i' }}">{% endif %}</td>{% endif %}
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table></div>
+    {% empty %}<p class="leer">{% translate "Für diesen Sprechtag ist noch kein Zeitraster festgelegt." %}</p>
+    {% endfor %}
+    {% if eigen and tage %}<p class="nicht-drucken"><button type="submit" class="knopf">{% translate "Verfügbarkeit speichern" %}</button></p>{% endif %}
+    </form>
+    {% for tag in tage %}{% for z in tag.zeilen %}{% if z.termin %}
+      <form method="post" id="absagen-{{ z.termin.pk }}" hidden>{% csrf_token %}<input type="hidden" name="aktion" value="absagen"><input type="hidden" name="termin" value="{{ z.termin.pk }}"></form>
+    {% endif %}{% endfor %}{% endfor %}
+  </section>
+
+  <div class="nicht-drucken">
+    {% if eigen %}
+    <section class="karte">
+      <h2>{% translate "Verfügbarkeit einschränken" %}</h2>
+      <form method="post" class="sy-formular">{% csrf_token %}<input type="hidden" name="aktion" value="einschraenken">
+        <label class="sy-feld">{% translate "Tag" %} <select name="datum">{% for tag in tage %}<option value="{{ tag.datum|date:'Y-m-d' }}">{{ tag.datum|date:"D" }} {{ tag.datum|kurzdatum }}</option>{% endfor %}</select></label>
+        <div class="sy-zeitraum lb-zwei">
+          <label class="sy-feld">{% translate "verfügbar von" %} <input type="time" name="von" required></label>
+          <label class="sy-feld">{% translate "bis" %} <input type="time" name="bis" required></label>
+        </div>
+        <button type="submit" class="knopf zweitrangig">{% translate "Nur in dieser Zeit verfügbar" %}</button>
+      </form>
+      <form method="post" class="tm-zeile">{% csrf_token %}<input type="hidden" name="aktion" value="alle_frei">
+        <button type="submit" class="link">{% translate "Alle Sperren aufheben" %}</button></form>
+      <form method="post" class="tm-zeile">{% csrf_token %}<input type="hidden" name="aktion" value="bestaetigen">
+        <button type="submit" class="knopf">{% translate "Verfügbarkeit bestätigen" %}</button>
+        {% if t.bestaetigt_am %}<small class="leise">{% blocktranslate with d=t.bestaetigt_am|date:"SHORT_DATETIME_FORMAT" %}zuletzt bestätigt {{ d }}{% endblocktranslate %}</small>{% endif %}</form>
+    </section>
+
+    <section class="karte">
+      <h2>{% translate "Raum und Hinweis" %}</h2>
+      <form method="post" class="sy-formular">{% csrf_token %}<input type="hidden" name="aktion" value="angaben">
+        <label class="sy-feld">{% translate "Raum" %} <select name="raum"><option value="">–</option>{% for r in raeume %}<option value="{{ r.pk }}"{% if r.pk == t.raum_id %} selected{% endif %}>{{ r.name }}</option>{% endfor %}</select></label>
+        <label class="sy-feld">{% translate "Hinweis für Eltern" %} <input type="text" name="bemerkung" value="{{ t.bemerkung }}" maxlength="200"></label>
+        <button type="submit" class="knopf zweitrangig">{% translate "Speichern" %}</button>
+      </form>
+    </section>
+    {% endif %}
+
+    {% if st.status != "entwurf" and perms.termine.add_gespraechstermin %}
+    <section class="karte">
+      <h2>{% translate "Gespräch eintragen" %}</h2>
+      {% if frei and schueler %}
+      <form method="post" class="sy-formular">{% csrf_token %}<input type="hidden" name="aktion" value="buchen">
+        <label class="sy-feld">{% translate "Zeit" %} <select name="zeit" required>{% for z in frei %}<option value="{{ z.schluessel }}">{{ z.beginn|date:"D" }} {{ z.beginn|time:"H:i" }}</option>{% endfor %}</select></label>
+        <label class="sy-feld">{% translate "Schüler:in" %} <select name="schueler" required><option value="">–</option>{% for s in schueler %}<option value="{{ s.pk }}">{{ s.person.nachname }}, {{ s.person.rufname|default:s.person.vorname }}</option>{% endfor %}</select></label>
+        <label class="sy-feld">{% translate "Eltern / Kontaktperson (optional)" %} <select name="eltern"><option value="">–</option>
+          {% for s in schueler %}{% if s.kontakte %}<optgroup label="{{ s.person.anzeigename }}">{% for k in s.kontakte %}<option value="{{ k.pk }}">{{ k.anzeigename }}</option>{% endfor %}</optgroup>{% endif %}{% endfor %}</select></label>
+        <label class="sy-feld">{% translate "Anliegen" %} <input type="text" name="anliegen" maxlength="300"></label>
+        <button type="submit" class="knopf">{% translate "Eintragen" %}</button>
+      </form>
+      {% elif not frei %}<p class="leer">{% translate "Keine freie Zeit." %}</p>
+      {% else %}<p class="leer">{% translate "Keine Schüler:innen zugeordnet." %}</p>{% endif %}
+      <p class="hinweistext">{% if st.ist_leg %}{% translate "LEG: Gespräch der Klassenleitung mit Kind und Eltern." %}{% else %}{% translate "Zur Auswahl stehen die Schüler:innen, die Sie unterrichten oder deren Klasse Sie leiten." %}{% endif %}</p>
+    </section>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

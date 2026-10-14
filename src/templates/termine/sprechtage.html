@@ -1,0 +1,57 @@
+{% extends "portal/base.html" %}
+{% load i18n formate %}
+{% block title %}{% translate "Elternsprechtage und LEG" %}{% endblock %}
+{% block inhaltsklasse %}breit{% endblock %}
+{% block inhalt %}
+{% include "termine/_kopf.html" %}
+
+<div class="sy-raster">
+  <section class="karte">
+    <h2>{% translate "Sprechtage" %}</h2>
+    {% for st in liste %}
+    <div class="tm-st">
+      <div class="tm-st-kopf">
+        <a href="{% if planer %}{% url 'sprechtag' st.pk %}{% elif fuer_alle %}{% url 'sprechtag_uebersicht' st.pk %}{% elif st.eigene %}{% url 'sprechzeiten' st.pk st.eigene.pk %}{% endif %}"><strong>{{ st.titel }}</strong></a>
+        <span class="tm-status tm-status-{{ st.status }}">{{ st.get_status_display }}</span>
+      </div>
+      <p class="leise">{{ st.get_art_display }} · {{ st.schuljahr }}{% if st.jahrgang_von or st.jahrgang_bis %} · {% blocktranslate with von=st.jahrgang_von|default:"…" bis=st.jahrgang_bis|default:"…" %}Jahrgang {{ von }}–{{ bis }}{% endblocktranslate %}{% endif %}
+        · {% blocktranslate with n=st.slot_minuten %}{{ n }} Minuten je Gespräch{% endblocktranslate %}</p>
+      <p>{% for z in st.zeitfenster.all %}<span class="etikett">{{ z.datum|date:"D" }} {{ z.datum|kurzdatum }} {{ z.von|time:"H:i" }}–{{ z.bis|time:"H:i" }}</span>{% empty %}<span class="leise">{% translate "Noch kein Zeitfenster." %}</span>{% endfor %}</p>
+      <p class="tm-st-zahlen leise">{% blocktranslate count n=st.n_lehrkraefte %}{{ n }} Lehrkraft{% plural %}{{ n }} Lehrkräfte{% endblocktranslate %} ·
+        {% blocktranslate count n=st.n_termine %}{{ n }} Gespräch gebucht{% plural %}{{ n }} Gespräche gebucht{% endblocktranslate %}</p>
+      <div class="knopfreihe">
+        {% if st.eigene %}<a class="knopf klein{% if st.status == 'verfuegbarkeit' and not st.eigene.bestaetigt_am %}{% else %} zweitrangig{% endif %}" href="{% url 'sprechzeiten' st.pk st.eigene.pk %}">{% translate "Meine Zeiten und Gespräche" %}</a>{% endif %}
+        {% if fuer_alle %}<a class="knopf zweitrangig klein" href="{% url 'sprechtag_uebersicht' st.pk %}">{% translate "Alle Gespräche" %}</a>{% endif %}
+        {% if planer %}<a class="knopf zweitrangig klein" href="{% url 'sprechtag' st.pk %}">{% translate "Planen" %}</a>{% endif %}
+      </div>
+    </div>
+    {% empty %}<p class="leer">{% translate "Keine Sprechtage." %}</p>{% endfor %}
+  </section>
+
+  {% if planer %}
+  <section class="karte">
+    <h2>{% translate "Neuer Sprechtag" %}</h2>
+    <form method="post" class="sy-formular">{% csrf_token %}
+      {% if form.non_field_errors %}<p class="sy-fehler">{{ form.non_field_errors|join:" " }}</p>{% endif %}
+      <div class="sy-zeitraum lb-zwei">
+        <label class="sy-feld">{{ form.art.label }} {{ form.art }}</label>
+        <label class="sy-feld">{{ form.schuljahr.label }} {{ form.schuljahr }}</label>
+      </div>
+      <label class="sy-feld">{{ form.titel.label }} {{ form.titel }}{% for e in form.titel.errors %}<small class="fehler">{{ e }}</small>{% endfor %}</label>
+      <div class="sy-zeitraum lb-zwei">
+        <label class="sy-feld">{{ form.jahrgang_von.label }} {{ form.jahrgang_von }}</label>
+        <label class="sy-feld">{{ form.jahrgang_bis.label }} {{ form.jahrgang_bis }}{% for e in form.jahrgang_bis.errors %}<small class="fehler">{{ e }}</small>{% endfor %}</label>
+      </div>
+      <div class="sy-zeitraum lb-zwei">
+        <label class="sy-feld">{{ form.slot_minuten.label }} {{ form.slot_minuten }}{% for e in form.slot_minuten.errors %}<small class="fehler">{{ e }}</small>{% endfor %}</label>
+        <label class="sy-feld">{{ form.puffer_minuten.label }} {{ form.puffer_minuten }}</label>
+      </div>
+      <input type="hidden" name="max_je_kind" value="{{ form.max_je_kind.value|default_if_none:'' }}">
+      <input type="hidden" name="eltern_buchen" value="on">
+      <p class="hinweistext">{% translate "Danach: Zeitfenster je Tag festlegen, Lehrkräfte prüfen, Verfügbarkeit abfragen und die Buchung öffnen." %}</p>
+      <button type="submit" class="knopf">{% translate "Anlegen" %}</button>
+    </form>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

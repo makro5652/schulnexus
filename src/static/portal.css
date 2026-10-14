@@ -796,3 +796,123 @@ a.klein, .klein { font-size: 0.85rem; }
   .formzeile > * { min-width: 0; }
   .formzeile select, .formzeile input { max-width: 100%; min-width: 0; }
 }
+
+/* ---------------------------------------------------------------- Kalender, Räume, Sprechtage (tm-) */
+.nur-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.tm-leiste { display: flex; gap: 0.8rem 1.2rem; align-items: center; flex-wrap: wrap; margin-bottom: 0.9rem; }
+.tm-leiste .lb-jahrwahl { margin: 0; }
+.tm-monatwahl { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+.tm-monatwahl h2 { margin: 0 0.3rem; min-width: 11rem; text-align: center; font-size: 1.15rem; }
+.tm-monat { border: 1px solid var(--linie); border-radius: var(--radius); background: var(--flaeche); overflow: hidden; }
+.tm-kopfzeile, .tm-woche { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.tm-kopfzeile div { padding: 0.4rem 0.5rem; font-size: 0.78rem; font-weight: 700; color: var(--leise); border-bottom: 1px solid var(--linie); }
+.tm-tag { min-height: 6.2rem; padding: 0.3rem 0.35rem 0.4rem; border-right: 1px solid var(--linie); border-bottom: 1px solid var(--linie); min-width: 0; display: flex; flex-direction: column; gap: 0.2rem; }
+.tm-woche .tm-tag:last-child { border-right: 0; }
+.tm-woche:last-child .tm-tag { border-bottom: 0; }
+.tm-tag.fremd { background: var(--grund); }
+.tm-tag.fremd .tm-zahl { color: var(--leise); }
+.tm-tag.heute .tm-zahl { background: var(--akzent); color: var(--flaeche); border-radius: 999px; padding: 0 0.4rem; }
+.tm-tagkopf { display: flex; align-items: center; gap: 0.3rem; font-size: 0.85rem; font-weight: 700; }
+.tm-wt, .tm-mon { display: none; }
+.tm-plus { margin-left: auto; text-decoration: none; color: var(--leise); font-weight: 700; padding: 0 0.3rem; border-radius: 4px; opacity: 0; }
+.tm-tag:hover .tm-plus, .tm-plus:focus { opacity: 1; background: var(--akzent-hell); color: var(--akzent); }
+.tm-eintrag { display: block; font-size: 0.74rem; line-height: 1.25; padding: 0.12rem 0.35rem; border-radius: 5px; text-decoration: none; color: var(--text);
+  background: var(--linie); border-left: 3px solid var(--leise); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tm-zeit { font-variant-numeric: tabular-nums; font-weight: 700; }
+.tm-art-ferien, .tm-punkt.tm-art-ferien { background: var(--info-flaeche); border-color: var(--info-text); }
+.tm-art-feiertag, .tm-punkt.tm-art-feiertag { background: var(--gefahr-flaeche); border-color: var(--warnung); }
+.tm-art-veranstaltung, .tm-punkt.tm-art-veranstaltung { background: var(--akzent-hell); border-color: var(--akzent); }
+.tm-art-konferenz, .tm-punkt.tm-art-konferenz { background: var(--lila-flaeche); border-color: var(--lila-text); }
+.tm-art-pruefung, .tm-punkt.tm-art-pruefung { background: var(--hinweis-flaeche); border-color: var(--hinweis-text); }
+.tm-art-eltern, .tm-art-sprechtag, .tm-punkt.tm-art-eltern, .tm-punkt.tm-art-sprechtag { background: var(--info-flaeche); border-color: var(--akzent); }
+.tm-art-fahrt, .tm-punkt.tm-art-fahrt { background: var(--akzent-hell); border-color: var(--ok); }
+.tm-art-frist, .tm-punkt.tm-art-frist { background: var(--hinweis-flaeche); border-color: var(--warnung); }
+.tm-punkt { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 3px; border-left: 3px solid; flex: 0 0 auto; }
+.tm-unten { margin-top: 1.2rem; }
+.tm-liste { list-style: none; margin: 0.3rem 0 0; padding: 0; display: grid; gap: 0.35rem; }
+.tm-liste li { display: flex; gap: 0.5rem; align-items: baseline; flex-wrap: wrap; font-size: 0.92rem; }
+.tm-liste .tm-punkt { align-self: center; }
+.tm-datum { min-width: 5.6rem; font-variant-numeric: tabular-nums; color: var(--leise); font-size: 0.85rem; }
+.tm-legende { list-style: none; padding: 0; margin: 0 0 0.8rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(12rem, 100%), 1fr)); gap: 0.3rem 1rem; font-size: 0.88rem; }
+.tm-legende li { display: flex; gap: 0.45rem; align-items: center; }
+.tm-aufgabe { padding: 0.5rem 0.7rem; border-radius: 8px; background: var(--grund); }
+.tm-aufgabe.offen { background: var(--hinweis-flaeche); color: var(--hinweis-text); }
+.tm-loeschen { margin-top: 1rem; }
+/* Raumplan */
+.tm-raumplan { padding-top: 0.6rem; }
+.tm-raster-kopf, .tm-raumzeile { display: grid; grid-template-columns: minmax(9rem, 13rem) minmax(0, 1fr); gap: 0.8rem; align-items: center; }
+.tm-stunden { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); font-size: 0.72rem; color: var(--leise); }
+.tm-stunden span { border-left: 1px solid var(--linie); padding-left: 0.2rem; }
+.tm-raumzeile { padding: 0.45rem 0; border-top: 1px solid var(--linie); }
+.tm-raumname { display: flex; flex-direction: column; font-size: 0.9rem; }
+.tm-bahn { position: relative; height: 2.1rem; border-radius: 6px; background: repeating-linear-gradient(90deg, var(--grund) 0, var(--grund) calc(100% / 12 - 1px), var(--linie) calc(100% / 12 - 1px), var(--linie) calc(100% / 12)); }
+.tm-buchung { position: absolute; top: 0.2rem; bottom: 0.2rem; border-radius: 5px; background: var(--akzent); color: var(--flaeche); font-size: 0.72rem; padding: 0.15rem 0.3rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.tm-buchung.termin { background: var(--lila-text); }
+.tm-buchung.sprechtag { background: var(--info-text); }
+.tm-buchung span { display: block; overflow: hidden; text-overflow: ellipsis; }
+.tm-frei { display: none; }
+.tm-buchungsliste:empty { display: none; }
+.tm-buchungsliste { grid-column: 2; list-style: none; margin: 0.25rem 0 0; padding: 0; font-size: 0.82rem; display: grid; gap: 0.1rem; }
+/* Sprechtage */
+.tm-st { padding: 0.7rem 0; border-bottom: 1px solid var(--linie); }
+.tm-st:last-child { border-bottom: 0; }
+.tm-st p { margin: 0.25rem 0; }
+.tm-st-kopf { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }
+.tm-status { display: inline-block; padding: 0.1rem 0.55rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; background: var(--linie); color: var(--text); white-space: nowrap; vertical-align: middle; }
+.tm-status.gross { font-size: 0.8rem; padding: 0.15rem 0.7rem; margin-left: 0.4rem; }
+.tm-status-entwurf { background: var(--hinweis-flaeche); color: var(--hinweis-text); }
+.tm-status-verfuegbarkeit { background: var(--lila-flaeche); color: var(--lila-text); }
+.tm-status-buchung { background: var(--akzent-hell); color: var(--akzent); }
+.tm-status-geschlossen { background: var(--info-flaeche); color: var(--info-text); }
+.tm-ablauf { list-style: none; margin: 0.6rem 0 0.4rem; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(12rem, 100%), 1fr)); gap: 0.4rem; }
+.tm-ablauf form { margin: 0; height: 100%; }
+.tm-schritt { width: 100%; height: 100%; text-align: left; font: inherit; font-size: 0.85rem; padding: 0.5rem 0.7rem; border-radius: 8px; border: 1px solid var(--linie); background: var(--flaeche); color: var(--text); cursor: pointer; }
+.tm-schritt span { display: inline-grid; place-items: center; width: 1.2rem; height: 1.2rem; border-radius: 50%; background: var(--linie); font-size: 0.72rem; font-weight: 700; margin-right: 0.3rem; }
+.tm-schritt:hover { border-color: var(--akzent); }
+.tm-ablauf li.hier .tm-schritt { border-color: var(--akzent); background: var(--akzent-hell); font-weight: 700; cursor: default; }
+.tm-ablauf li.hier .tm-schritt span { background: var(--akzent); color: var(--flaeche); }
+.tm-knoepfe { margin: 0.4rem 0 1rem; }
+.tm-fensterform { margin-top: 0.8rem; }
+.tm-dazu { margin-top: 0.8rem; flex-wrap: wrap; }
+.tm-dazu select { max-width: 100%; }
+#lehrkraefte select { font: inherit; font-size: 0.88rem; padding: 0.25rem 0.4rem; border: 1px solid var(--linie); border-radius: 6px; background: var(--grund); color: var(--text); max-width: 100%; }
+.tm-zweispaltig { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 1.2rem; align-items: start; }
+.tm-zweispaltig > * { min-width: 0; }
+.tm-zweispaltig > div { display: grid; gap: 1rem; }
+.tm-zeiten h3 { margin: 1rem 0 0.4rem; }
+.tm-raster td { vertical-align: top; }
+.tm-z-gebucht td { background: var(--akzent-hell); }
+.tm-z-gesperrt td { color: var(--leise); background: var(--grund); }
+.tm-zeile { margin-top: 0.7rem; display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }
+.tm-lehrkraefte { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(22rem, 100%), 1fr)); gap: 1rem; align-items: start; }
+/* Elternportal */
+.tm-elternnav { display: flex; gap: 1rem; align-items: center; font-size: 0.9rem; }
+.tm-elternnav form { margin: 0; }
+.tm-elternliste { display: grid; gap: 0.6rem; }
+.tm-elternbuchung { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr) minmax(0, 1.5fr) auto; gap: 0.5rem; align-items: center; padding: 0.55rem 0; border-top: 1px solid var(--linie); }
+.tm-elternbuchung select, .tm-elternbuchung input { font: inherit; padding: 0.35rem 0.5rem; border: 1px solid var(--linie); border-radius: 6px; background: var(--grund); color: var(--text); width: 100%; min-width: 0; }
+@media (max-width: 860px) {
+  .tm-zweispaltig { grid-template-columns: minmax(0, 1fr); }
+  .tm-elternbuchung { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 700px) {
+  .tm-kopfzeile { display: none; }
+  .tm-woche { display: block; }
+  .tm-tag { min-height: 0; border-right: 0; flex-direction: row; flex-wrap: wrap; align-items: baseline; padding: 0.45rem 0.6rem; }
+  .tm-tag.leer, .tm-tag.fremd { display: none; }
+  .tm-tagkopf { width: 100%; }
+  .tm-wt, .tm-mon { display: inline; font-weight: 400; color: var(--leise); }
+  .tm-eintrag { white-space: normal; font-size: 0.85rem; width: 100%; }
+  .tm-plus { opacity: 1; }
+  .tm-raster-kopf { display: none; }
+  .tm-raumzeile { grid-template-columns: minmax(0, 1fr); gap: 0.3rem; }
+  .tm-bahn { display: none; }
+  .tm-buchungsliste { grid-column: 1; }
+  .tm-frei { display: list-item; }
+}
+@media print {
+  #menueband, .an-tabs, .tm-leiste { display: none !important; }
+  .tm-zweispaltig { display: block; }
+  .tm-z-gesperrt { display: none; }
+}
+.tm-zeiten .link, .tm-zeile .link, .tm-liste .link, .tm-buchungsliste .link, .tm-elternliste .link, #raster .link { color: var(--akzent); text-decoration: underline; font-size: 0.85rem; }

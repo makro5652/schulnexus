@@ -1,0 +1,59 @@
+{% extends "portal/base.html" %}
+{% load i18n formate %}
+{% block title %}{% translate "Schulkalender" %}{% endblock %}
+{% block inhaltsklasse %}breit{% endblock %}
+{% block inhalt %}
+{% include "termine/_kopf.html" %}
+
+<div class="tm-leiste">
+  <div class="tm-monatwahl">
+    <a class="knopf zweitrangig klein" href="?monat={{ vor|date:'Y-m' }}{% if art %}&art={{ art }}{% endif %}" aria-label="{% translate 'Vormonat' %}">‹</a>
+    <h2>{{ erster|date:"F Y" }}</h2>
+    <a class="knopf zweitrangig klein" href="?monat={{ nach|date:'Y-m' }}{% if art %}&art={{ art }}{% endif %}" aria-label="{% translate 'Folgemonat' %}">›</a>
+    <a class="knopf zweitrangig klein" href="?monat={{ heute|date:'Y-m' }}">{% translate "Heute" %}</a>
+  </div>
+  <form method="get" class="lb-jahrwahl"><input type="hidden" name="monat" value="{{ erster|date:'Y-m' }}">
+    <label for="tm-art">{% translate "Art" %}</label>
+    <select id="tm-art" name="art" onchange="this.form.submit()"><option value="">{% translate "alle" %}</option>
+      {% for k, n in arten %}<option value="{{ k }}"{% if k == art %} selected{% endif %}>{{ n }}</option>{% endfor %}</select>
+    <noscript><button type="submit" class="knopf zweitrangig klein">{% translate "Anzeigen" %}</button></noscript>
+  </form>
+  {% if darf_bearbeiten %}<a class="knopf" href="{% url 'termin_neu' %}">{% translate "Neuer Termin" %}</a>{% endif %}
+</div>
+
+<div class="tm-monat" role="table" aria-label="{{ erster|date:'F Y' }}">
+  <div class="tm-kopfzeile" role="row">{% for w in wochen.0 %}<div role="columnheader">{{ w.datum|date:"D" }}</div>{% endfor %}</div>
+  {% for woche in wochen %}
+  <div class="tm-woche" role="row">
+    {% for tag in woche %}
+    <div class="tm-tag{% if tag.fremd %} fremd{% endif %}{% if tag.datum == heute %} heute{% endif %}{% if not tag.eintraege %} leer{% endif %}" role="cell">
+      <div class="tm-tagkopf"><span class="tm-wt">{{ tag.datum|date:"D" }}</span> <span class="tm-zahl">{{ tag.datum|date:"j" }}</span><span class="tm-mon">{{ tag.datum|date:"M" }}</span>
+        {% if darf_bearbeiten and not tag.fremd %}<a class="tm-plus" href="{% url 'termin_neu' %}?datum={{ tag.datum|date:'Y-m-d' }}" aria-label="{% translate 'Termin an diesem Tag eintragen' %}">+</a>{% endif %}</div>
+      {% for e in tag.eintraege %}
+        <a class="tm-eintrag tm-art-{{ e.art }}{% if e.frei %} frei{% endif %}" href="{{ e.url }}" title="{{ e.titel }}{% if e.ort %} · {{ e.ort }}{% endif %}">
+          {% if e.zeit %}<span class="tm-zeit">{{ e.zeit|time:"H:i" }}</span> {% endif %}{{ e.titel }}</a>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endfor %}
+</div>
+
+<div class="sy-raster tm-unten">
+  <section class="karte">
+    <h2>{% translate "Die nächsten 30 Tage" %}</h2>
+    {% if kommend %}<ul class="tm-liste">
+      {% for e in kommend %}<li><span class="tm-datum">{{ e.datum|date:"D" }} {{ e.datum|tagmonat }}</span>
+        <span class="tm-punkt tm-art-{{ e.art }}" aria-hidden="true"></span>
+        <a href="{{ e.url }}">{{ e.titel }}</a>{% if e.zeit %} <span class="leise">{{ e.zeit|time:"H:i" }}{% if e.bis %}–{{ e.bis|time:"H:i" }}{% endif %}</span>{% endif %}
+        {% if e.ort %}<span class="leise"> · {{ e.ort }}</span>{% endif %}{% if e.frei %} <span class="etikett">{% translate "unterrichtsfrei" %}</span>{% endif %}</li>{% endfor %}
+    </ul>{% else %}<p class="leer">{% translate "Keine Termine." %}</p>{% endif %}
+  </section>
+  <section class="karte">
+    <h2>{% translate "Legende" %}</h2>
+    <ul class="tm-legende">{% for k, n in arten %}<li><span class="tm-punkt tm-art-{{ k }}" aria-hidden="true"></span>{{ n }}</li>{% endfor %}</ul>
+    <p class="hinweistext">{% translate "Über „Kalender abonnieren“ lassen sich die Termine als Datei in Outlook oder einen anderen Kalender übernehmen." %}
+      <a href="{% url 'kalender_ics' %}">{% translate "Kalenderdatei herunterladen" %}</a></p>
+  </section>
+</div>
+{% endblock %}

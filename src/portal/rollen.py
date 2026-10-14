@@ -14,6 +14,7 @@ LEHRER = "Lehrer:in"
 MITTELSTUFE = "Mittelstufenkoordination"
 OBERSTUFE = "Oberstufenkoordination"
 SCHULLEITUNG = "Schulleitung"
+STELLVERTRETUNG = "Stellvertretende Schulleitung"
 SEKRETARIAT = "Sekretariat"
 VERWALTUNGSLEITUNG = "Verwaltungsleitung"
 HR = "HR-Management"
@@ -28,7 +29,7 @@ ALTE_NAMEN = {"Lehrkraft": LEHRER, "Verwaltung": SEKRETARIAT, "Personalverwaltun
 
 ANZEIGE = {
     LEHRER: _("Lehrer:in"), MITTELSTUFE: _("Mittelstufenkoordination"), OBERSTUFE: _("Oberstufenkoordination"),
-    SCHULLEITUNG: _("Schulleitung"), SEKRETARIAT: _("Sekretariat"), VERWALTUNGSLEITUNG: _("Verwaltungsleitung"),
+    SCHULLEITUNG: _("Schulleitung"), STELLVERTRETUNG: _("Stellvertretende Schulleitung"), SEKRETARIAT: _("Sekretariat"), VERWALTUNGSLEITUNG: _("Verwaltungsleitung"),
     HR: _("HR-Management"), FINANZEN: _("Finanzen"), FOERDERKOORDINATION: _("Förderkoordination"),
     SCHUELER: _("Schüler:in"), ELTERN: _("Eltern"), IT: _("IT-Administration"),
 }
@@ -43,6 +44,8 @@ BESCHREIBUNG = {
                    "Klassen und Lerngruppen der Stufe bilden und Schüler:innen zuordnen, Neuanmeldungen der Stufe bearbeiten."),
     OBERSTUFE: _("Wie Mittelstufenkoordination, bezogen auf die Jahrgänge der Oberstufe."),
     SCHULLEITUNG: _("Alle Rechte, einschließlich Genehmigung von Nachteilsausgleichen, HR-Daten und Benutzerverwaltung."),
+    STELLVERTRETUNG: _("Wie Stufenkoordination für alle Jahrgänge; plant Elternsprechtage und Lern- und Entwicklungsgespräche "
+                        "(Zeitraster, Teilnahme, Buchungszeitraum), pflegt Schulkalender und Räume."),
     SEKRETARIAT: _("Schüler- und Elternstammdaten, Klassen und Gruppen, Fehlzeiten, AGs, Einwilligungen, Anhänge, "
                    "Gesundheitsangaben, Neuanmeldungen einschließlich Übernahme, Zeugnisse vorbereiten und drucken. Noten, Unterrichtsverteilung, Kataloge und Personal nur lesend; keine Förderpläne, keine HR-Daten."),
     VERWALTUNGSLEITUNG: _("Wie Sekretariat, zusätzlich Schuljahre, Zeitraster, Fächer, Notenskalen, Unterrichtsverteilung, "
@@ -60,7 +63,7 @@ BESCHREIBUNG = {
           "(erteilen und entziehen), Sicherung, Wiederherstellung und PDF-Export."),
 }
 
-REIHENFOLGE = [LEHRER, MITTELSTUFE, OBERSTUFE, SCHULLEITUNG, SEKRETARIAT, VERWALTUNGSLEITUNG, HR, FINANZEN,
+REIHENFOLGE = [LEHRER, MITTELSTUFE, OBERSTUFE, SCHULLEITUNG, STELLVERTRETUNG, SEKRETARIAT, VERWALTUNGSLEITUNG, HR, FINANZEN,
                FOERDERKOORDINATION, IT, SCHUELER, ELTERN]
 
 ALLE = ("add", "change", "view", "delete")
@@ -71,6 +74,13 @@ def r(aktionen, *modelle):
         aktionen = (aktionen,)
     return {f"{a}_{m}" for a in aktionen for m in modelle}
 
+
+# Schulkalender, Räume, Sprechtage (App termine). Zeilenweise: Lehrkräfte nur eigene Verfügbarkeit und eigene Gespräche.
+_TERMINE_LESEN = r("view", "termin", "raum", "raumbuchung", "sprechtag", "zeitfenster", "teilnahme", "gespraechstermin")
+_TERMINE_LEHRER = _TERMINE_LESEN | r("add", "raumbuchung") | r("change", "teilnahme") | r(("add", "delete"), "gespraechstermin")
+_TERMINE_KALENDER = r(("add", "change", "view"), "termin")
+_TERMINE_VERWALTUNG = r(ALLE, "termin", "raum", "raumbuchung", "gespraechstermin") | _TERMINE_LESEN
+_TERMINE_PLANUNG = r(ALLE, "termin", "raum", "raumbuchung", "sprechtag", "zeitfenster", "teilnahme", "gespraechstermin")
 
 # ---------------------------------------------------------------- Bausteine
 _LEHRER = (
@@ -88,6 +98,7 @@ _LEHRER = (
     | r("view", "konferenz", "beschluss", "zeugnisfachnote")
     # Elternkommunikation: an Eltern der eigenen Schüler:innen schreiben (zeilenweise geprüft, elternkontakt/rechte.py)
     | r(("add", "view"), "gespraech", "beitrag") | r("view", "empfaenger")
+    | _TERMINE_LEHRER
 )
 # Benachrichtigungsregeln für Fehlzeiten: erweiterte Schulleitung (Koordinationen nur für ihre Jahrgänge)
 _REGELN = r(ALLE, "benachrichtigungsregel") | r("view", "ausloesung")
@@ -96,7 +107,7 @@ _ELTERNKONTAKT_VERWALTUNG = r(ALLE, "gespraech", "beitrag", "empfaenger") | r("v
 # Gesundheitshinweise der eigenen Stufe: zeilenweise über view_gesundheit_klasse (siehe portal/rechte.py)
 _STUFE = (_LEHRER | r(("add", "change", "view"), "laufbahnabschnitt", "abschluss", "gruppe") | r(ALLE, "mitgliedschaft")
           | {"view_gesundheit_klasse", "freigeben_zeugnis"} | r(ALLE, "konferenz", "beschluss")
-          | r(("view", "change"), "gespraech", "empfaenger") | _REGELN)
+          | r(("view", "change"), "gespraech", "empfaenger") | _REGELN | _TERMINE_KALENDER)
 
 _SCHUELERDATEN = r(ALLE, "person", "schuelerprofil", "elternprofil", "beziehung", "gruppe", "mitgliedschaft", "einwilligung",
                    "dokument", "laufbahnabschnitt", "abschluss", "vorherigeschule", "sprachenfolge", "gesundheitsangaben",
@@ -121,7 +132,7 @@ _ZEUGNIS_VERWALTUNG = r(("view", "change"), "zeugnis") | r("view", "zeugnisfachn
 # (akademische Verwaltung), Löschfristen ändern nur Schulleitung und IT.
 _LAUFBAHN = r(ALLE, "laufbahnereignis") | r("view", "schuljahreswechsel", "wechselposten")
 
-_SEKRETARIAT = (_SCHUELERDATEN | _LAUFBAHN | _AUFNAHME_VOLL | _ZEUGNIS_VERWALTUNG | _ELTERNKONTAKT_VERWALTUNG | r("view", *_KATALOGE) | _NOTEN_LESEN | r("view", "personalprofil", "dienstleister")
+_SEKRETARIAT = (_SCHUELERDATEN | _LAUFBAHN | _TERMINE_VERWALTUNG | _AUFNAHME_VOLL | _ZEUGNIS_VERWALTUNG | _ELTERNKONTAKT_VERWALTUNG | r("view", *_KATALOGE) | _NOTEN_LESEN | r("view", "personalprofil", "dienstleister")
                 | r("view", "nachteilsausgleich", "foerderschwerpunkt", "ausgleichsmassnahme"))
 
 ROLLEN_RECHTE = {
@@ -129,27 +140,28 @@ ROLLEN_RECHTE = {
     MITTELSTUFE: _STUFE | _AUFNAHME_STUFE,
     OBERSTUFE: _STUFE | _AUFNAHME_STUFE,
     SCHULLEITUNG: "__alle__",
+    STELLVERTRETUNG: _STUFE | _AUFNAHME_STUFE | _TERMINE_PLANUNG | r("view", "laufbahnereignis", "schuljahreswechsel", "wechselposten"),
     IT: "__alle__",
     SEKRETARIAT: _SEKRETARIAT,
     VERWALTUNGSLEITUNG: _SEKRETARIAT | _REGELN | r("view", "loeschfrist", "loeschvorgang") | r(ALLE, *_KATALOGE) | _HR | r(ALLE, "user", "group") | {"view_permission"},
-    HR: _HR,
-    FINANZEN: (r("view", "person", "schuelerprofil", "gruppe", "mitgliedschaft", "personalprofil", "personalbereich", "zusatzfeld")
+    HR: _HR | _TERMINE_LESEN | r("add", "raumbuchung"),
+    FINANZEN: _TERMINE_LESEN | r("add", "raumbuchung") | (r("view", "person", "schuelerprofil", "gruppe", "mitgliedschaft", "personalprofil", "personalbereich", "zusatzfeld")
                | r(("view", "change"), "beziehung", "elternprofil") | r(ALLE, "dienstleister") | r(("add", "view"), "dokument") | _AUFNAHME_FINANZEN),
     FOERDERKOORDINATION: "__foerderung__",
     SCHUELER: set(),
     ELTERN: set(),
 }
 
-FOERDERKOORDINATION_EXTRA = (r("view", "person", "schuelerprofil", "gruppe", "mitgliedschaft", "fach", "beziehung", "elternprofil",
+FOERDERKOORDINATION_EXTRA = _TERMINE_LESEN | r("add", "raumbuchung") | (r("view", "person", "schuelerprofil", "gruppe", "mitgliedschaft", "fach", "beziehung", "elternprofil",
                                 "laufbahnabschnitt", "bildungsgang", "sprachenfolge", "personalprofil", "unterricht")
                              | r(ALLE, "dokument"))
 
 # Apps, deren Rechte über Rollen vergeben werden
 APPS = ["stammdaten", "noten", "fehlzeiten", "nachmittag", "foerderung", "aufnahme", "zeugnisse", "elternkontakt", "sicherung",
-        "laufbahn", "auth"]
+        "laufbahn", "termine", "auth"]
 
 # Rollen, die im Portal arbeiten (Beschäftigte). Schüler:innen und Eltern erhalten später eigene Oberflächen.
-PORTAL_ROLLEN = {LEHRER, MITTELSTUFE, OBERSTUFE, SCHULLEITUNG, SEKRETARIAT, VERWALTUNGSLEITUNG, HR, FINANZEN, FOERDERKOORDINATION, IT}
+PORTAL_ROLLEN = {LEHRER, MITTELSTUFE, OBERSTUFE, SCHULLEITUNG, STELLVERTRETUNG, SEKRETARIAT, VERWALTUNGSLEITUNG, HR, FINANZEN, FOERDERKOORDINATION, IT}
 
 
 # ---------------------------------------------------------------- Übersicht (Seite „Rollen und Rechte“)
@@ -177,6 +189,10 @@ BEREICHE = [
     ("laufbahn", _("Schuljahreswechsel")),
     ("abgang", _("Abgänge, Klassenwechsel, Archiv")),
     ("loeschfristen", _("Löschfristen und Löschung")),
+    ("kalender", _("Schulkalender und Termine eintragen")),
+    ("raeume", _("Räume buchen")),
+    ("sprechtage", _("Elternsprechtage und LEG planen")),
+    ("sprechzeiten", _("Eigene Sprechzeiten und Gesprächstermine")),
 ]
 
 MATRIX = {
@@ -205,6 +221,15 @@ for _rolle, _werte in MATRIX.items():          # neue Bereiche: nur Schulleitung
     _werte.setdefault("laufbahn", "ja" if _rolle in (SCHULLEITUNG, IT) else "")
     _werte.setdefault("abgang", "ja" if _rolle in (SCHULLEITUNG, IT, SEKRETARIAT, VERWALTUNGSLEITUNG) else "")
     _werte.setdefault("loeschfristen", "ja" if _rolle in (SCHULLEITUNG, IT) else "lesen" if _rolle == VERWALTUNGSLEITUNG else "")
+    _werte.setdefault("kalender", "ja" if _rolle in (SCHULLEITUNG, IT, SEKRETARIAT, VERWALTUNGSLEITUNG, MITTELSTUFE)
+                      else "lesen" if _rolle not in (SCHUELER, ELTERN) else "")
+    _werte.setdefault("raeume", "" if _rolle in (SCHUELER, ELTERN) else "ja")
+    _werte.setdefault("sprechtage", "ja" if _rolle in (SCHULLEITUNG, IT) else "lesen" if _rolle in (SEKRETARIAT, VERWALTUNGSLEITUNG) else "")
+    _werte.setdefault("sprechzeiten", "eigene" if _rolle in (LEHRER, MITTELSTUFE) else "ja" if _rolle in (SCHULLEITUNG, IT, SEKRETARIAT, VERWALTUNGSLEITUNG) else "")
 MATRIX[OBERSTUFE] = dict(MATRIX[MITTELSTUFE])
+MATRIX[STELLVERTRETUNG] = dict(MATRIX[MITTELSTUFE], sprechtage="ja", sprechzeiten="ja", kalender="ja", raeume="ja",
+                               laufbahn="", abgang="lesen", akten="ja", zeugnisse="ja", noten="ja", gesundheit="ja",
+                               foerderung="ja", nta="ja", fehlzeiten="ja", aufnahme="ja", zuordnung="ja", regeln="ja",
+                               elternkontakt="ja")
 
 WERTE = {"ja": _("ja"), "teils": _("Checkliste"), "teils_ek": _("Zeugnis/Fehlzeiten"), "lesen": _("lesen"), "eigene": _("eigene"), "stufe": _("Stufe"), "": "–"}

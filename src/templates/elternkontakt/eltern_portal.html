@@ -5,6 +5,14 @@
 {% block inhalt %}
 <h1>{% blocktranslate with name=person.anzeigename %}Nachrichten für {{ name }}{% endblocktranslate %}</h1>
 <section class="karte">
+  <div class="karte-kopf"><h2>{% translate "Elternsprechtage und Gespräche" %}</h2>
+    <a class="knopf klein" href="{% url 'eltern_sprechtage' %}">{% translate "Gesprächstermine" %}</a></div>
+  {% for e in sprechtage %}<p class="ek-portalzeile"><a href="{% url 'eltern_sprechtag' e.st.pk %}"><strong>{{ e.st.titel }}</strong></a>
+    {% if e.offen %}<span class="etikett">{% translate "Buchung offen" %}</span>{% endif %}
+    {% if e.termine %}<span class="leise">· {% blocktranslate count n=e.termine %}{{ n }} Gespräch gebucht{% plural %}{{ n }} Gespräche gebucht{% endblocktranslate %}</span>{% endif %}</p>
+  {% empty %}<p class="leer">{% translate "Derzeit sind keine Sprechtage zur Buchung freigegeben." %}</p>{% endfor %}
+</section>
+<section class="karte">
   {% for e in eintraege %}
   <p class="ek-portalzeile"><a href="{% url 'elternportal_gespraech' e.gespraech_id %}"><strong>{{ e.gespraech.titel }}</strong></a>
     <span class="leise">· {{ e.gespraech.schueler.person.anzeigename }} · {{ e.gespraech.letzte_aktivitaet|date:"SHORT_DATE_FORMAT" }}</span>

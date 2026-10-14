@@ -208,12 +208,13 @@ class MenuebandTest(TestCase):
 
     def test_karten_je_rolle(self):
         erwartet = {
-            "lehrkraft": {"start", "schueler", "unterricht", "foerderung"},
-            "verwaltung": {"start", "schueler", "unterricht", "foerderung", "personal", "verwaltung"},
-            "personal": {"start", "schueler", "personal", "verwaltung", "system"},
-            "foerderung": {"start", "schueler", "unterricht", "foerderung"},
-            "schulleitung": {"start", "schueler", "unterricht", "foerderung", "schulleitung", "verwaltung", "personal", "system"},
-            "finanzen": {"start", "schueler", "verwaltung"},
+            "lehrkraft": {"start", "termine", "schueler", "unterricht", "foerderung"},
+            "verwaltung": {"start", "termine", "schueler", "unterricht", "foerderung", "personal", "verwaltung"},
+            "personal": {"start", "termine", "schueler", "personal", "verwaltung", "system"},
+            "foerderung": {"start", "termine", "schueler", "unterricht", "foerderung"},
+            "schulleitung": {"start", "termine", "schueler", "unterricht", "foerderung", "schulleitung", "verwaltung", "personal", "system"},
+            "finanzen": {"start", "termine", "schueler", "verwaltung"},
+            "stellvertretung": {"start", "termine", "schueler", "unterricht", "foerderung"},
         }
         for name, karten in erwartet.items():
             self.anmelden(name)
@@ -270,7 +271,7 @@ class MenuebandTest(TestCase):
         self.anmelden("lehrkraft")
         self.client.post(reverse("sprache_wechseln"), {"sprache": "en", "next": "/"})
         mb, r = self.band()
-        self.assertEqual([k["titel"] for k in mb["karten"]][:3], ["Home", "Students", "Teaching"])
+        self.assertEqual([k["titel"] for k in mb["karten"]][:3], ["Home", "Calendar", "Students"])
         self.assertContains(r, "Hide ribbon")
 
     def test_begriff_unterricht(self):

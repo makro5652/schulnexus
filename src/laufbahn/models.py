@@ -152,7 +152,7 @@ class Loeschfrist(models.Model):
 
     KATEGORIEN = [
         ("fehlzeiten", _("Fehlzeiten, Entschuldigungen und AG-Teilnahme")),
-        ("elternkontakt", _("Elternnachrichten und automatische Benachrichtigungen")),
+        ("elternkontakt", _("Elternnachrichten, Gesprächstermine und automatische Benachrichtigungen")),
         ("gesundheit", _("Gesundheitsangaben")),
         ("foerderung", _("Förderpläne, Förderverlauf und Nachteilsausgleiche")),
         ("noten", _("Einzelnoten und Zeugnisnoten des Notenmoduls")),

@@ -1,0 +1,122 @@
+{% extends "portal/base.html" %}
+{% load i18n formate %}
+{% block title %}{{ st.titel }}{% endblock %}
+{% block inhaltsklasse %}breit{% endblock %}
+{% block inhalt %}
+<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › <a href="{% url 'sprechtage' %}">{% translate "Sprechtage" %}</a> › {{ st.titel }}</p>
+<h1>{{ st.titel }} <span class="tm-status gross tm-status-{{ st.status }}">{{ st.get_status_display }}</span></h1>
+<p class="unterzeile">{{ st.get_art_display }} · {{ st.schuljahr }} · {% blocktranslate count n=slots %}{{ n }} Gesprächszeit je Lehrkraft{% plural %}{{ n }} Gesprächszeiten je Lehrkraft{% endblocktranslate %} · {% blocktranslate count n=n_termine %}{{ n }} Gespräch gebucht{% plural %}{{ n }} Gespräche gebucht{% endblocktranslate %}</p>
+
+<ol class="tm-ablauf">
+  {% for k, n in status_folge %}
+  <li class="{% if st.status == k %}hier{% endif %}">
+    <form method="post">{% csrf_token %}<input type="hidden" name="aktion" value="status"><input type="hidden" name="status" value="{{ k }}">
+      <button type="submit" class="tm-schritt"{% if st.status == k %} aria-current="step" disabled{% endif %}><span>{{ forloop.counter }}</span> {{ n }}</button></form>
+  </li>
+  {% endfor %}
+</ol>
+<p class="hinweistext">{% translate "Ablauf: Zeitraster festlegen (Entwurf) → Lehrkräfte schränken ihre Verfügbarkeit ein und sperren Zeiten → Buchung öffnen (Eltern im Elternportal, Sekretariat und Lehrkräfte) → Buchung schließen. Die Schule kann auch nach dem Schließen noch Gespräche eintragen." %}</p>
+<div class="knopfreihe tm-knoepfe">
+  <a class="knopf zweitrangig" href="{% url 'sprechtag_uebersicht' st.pk %}">{% translate "Alle Gespräche" %}</a>
+</div>
+
+<div class="sy-raster">
+  <section class="karte" id="raster">
+    <h2>{% translate "Zeitraster" %}</h2>
+    {% if fenster %}
+    <div class="tabellenrahmen"><table class="liste kompakt">
+      <thead><tr><th>{% translate "Tag" %}</th><th>{% translate "Von" %}</th><th>{% translate "Bis" %}</th><th class="zahl">{% translate "Gespräche" %}</th><th></th></tr></thead>
+      <tbody>{% for z in fenster %}<tr><td>{{ z.datum|date:"D" }} {{ z.datum|kurzdatum }}</td><td>{{ z.von|time:"H:i" }}</td><td>{{ z.bis|time:"H:i" }}</td>
+        <td class="zahl">{{ z.anzahl }}</td>
+        <td><form method="post" class="zg-inline">{% csrf_token %}<input type="hidden" name="aktion" value="fenster_loeschen"><input type="hidden" name="fenster" value="{{ z.pk }}">
+          <button type="submit" class="link">{% translate "entfernen" %}</button></form></td></tr>{% endfor %}</tbody>
+    </table></div>
+    {% else %}<p class="leer">{% translate "Noch kein Zeitfenster. Mehrere Fenster je Tag ergeben Pausen, mehrere Tage sind möglich." %}</p>{% endif %}
+    <form method="post" class="sy-formular tm-fensterform">{% csrf_token %}<input type="hidden" name="aktion" value="fenster">
+      {% if fenster_form.non_field_errors %}<p class="sy-fehler">{{ fenster_form.non_field_errors|join:" " }}</p>{% endif %}
+      <div class="sy-zeitraum">
+        <label class="sy-feld">{{ fenster_form.datum.label }} {{ fenster_form.datum }}</label>
+        <label class="sy-feld">{{ fenster_form.von.label }} {{ fenster_form.von }}</label>
+        <label class="sy-feld">{{ fenster_form.bis.label }} {{ fenster_form.bis }}{% for e in fenster_form.bis.errors %}<small class="fehler">{{ e }}</small>{% endfor %}</label>
+      </div>
+      <button type="submit" class="knopf zweitrangig">{% translate "Zeitfenster hinzufügen" %}</button>
+    </form>
+  </section>
+
+  <section class="karte">
+    <h2>{% translate "Einstellungen" %}</h2>
+    <form method="post" class="sy-formular">{% csrf_token %}<input type="hidden" name="aktion" value="einstellungen">
+      {% if form.non_field_errors %}<p class="sy-fehler">{{ form.non_field_errors|join:" " }}</p>{% endif %}
+      <div class="sy-zeitraum lb-zwei">
+        <label class="sy-feld">{{ form.art.label }} {{ form.art }}</label>
+        <label class="sy-feld">{{ form.schuljahr.label }} {{ form.schuljahr }}</label>
+      </div>
+      <label class="sy-feld">{{ form.titel.label }} {{ form.titel }}</label>
+      <div class="sy-zeitraum lb-zwei">
+        <label class="sy-feld">{{ form.jahrgang_von.label }} {{ form.jahrgang_von }}</label>
+        <label class="sy-feld">{{ form.jahrgang_bis.label }} {{ form.jahrgang_bis }}{% for e in form.jahrgang_bis.errors %}<small class="fehler">{{ e }}</small>{% endfor %}</label>
+      </div>
+      <div class="sy-zeitraum">
+        <label class="sy-feld">{{ form.slot_minuten.label }} {{ form.slot_minuten }}{% for e in form.slot_minuten.errors %}<small class="fehler">{{ e }}</small>{% endfor %}</label>
+        <label class="sy-feld">{{ form.puffer_minuten.label }} {{ form.puffer_minuten }}</label>
+        <label class="sy-feld">{{ form.max_je_kind.label }} {{ form.max_je_kind }}</label>
+      </div>
+      <label class="haken">{{ form.eltern_buchen }} {{ form.eltern_buchen.label }}</label>
+      <div class="sy-zeitraum lb-zwei">
+        <label class="sy-feld">{{ form.buchung_ab.label }} {{ form.buchung_ab }}</label>
+        <label class="sy-feld">{{ form.buchung_bis.label }} {{ form.buchung_bis }}{% for e in form.buchung_bis.errors %}<small class="fehler">{{ e }}</small>{% endfor %}</label>
+      </div>
+      <label class="sy-feld">{{ form.hinweis.label }} {{ form.hinweis }}</label>
+      <p class="hinweistext">{% translate "Eine geänderte Gesprächsdauer verschiebt das Raster; bereits gebuchte Gespräche bleiben zu ihrer Zeit bestehen." %}</p>
+      <button type="submit" class="knopf">{% translate "Speichern" %}</button>
+    </form>
+  </section>
+</div>
+
+<section class="karte" id="lehrkraefte">
+  <div class="karte-kopf">
+    <h2>{% translate "Lehrkräfte" %}</h2>
+    <div class="knopfreihe">
+      <form method="post" class="zg-inline">{% csrf_token %}<input type="hidden" name="aktion" value="lehrkraefte">
+        <button type="submit" class="knopf zweitrangig klein">{% if st.ist_leg %}{% translate "Klassenleitungen ergänzen" %}{% else %}{% translate "Unterrichtende Lehrkräfte ergänzen" %}{% endif %}</button></form>
+      <form method="post" class="zg-inline">{% csrf_token %}<input type="hidden" name="aktion" value="raeume_belegen">
+        <button type="submit" class="knopf zweitrangig klein">{% translate "Räume im Raumplan belegen" %}</button></form>
+    </div>
+  </div>
+  {% if teilnahmen %}
+  <form method="post">{% csrf_token %}<input type="hidden" name="aktion" value="teilnahmen">
+  <div class="tabellenrahmen"><table class="liste">
+    <thead><tr><th>{% translate "Lehrkraft" %}</th><th>{% translate "Nimmt teil" %}</th><th>{% translate "Raum" %}</th><th class="zahl">{% translate "frei" %}</th><th class="zahl">{% translate "gesperrt" %}</th><th class="zahl">{% translate "gebucht" %}</th><th>{% translate "Verfügbarkeit" %}</th></tr></thead>
+    <tbody>
+    {% for t in teilnahmen %}
+      <tr{% if not t.nimmt_teil %} class="lb-erledigt"{% endif %}>
+        <td><a href="{% url 'sprechzeiten' st.pk t.pk %}">{{ t.lehrkraft.person.nachname }}, {{ t.lehrkraft.person.vorname }}</a>{% if t.lehrkraft.kuerzel %} <span class="leise">({{ t.lehrkraft.kuerzel }})</span>{% endif %}
+          {% if t.bemerkung %}<small class="leise blockzeile">{{ t.bemerkung }}</small>{% endif %}</td>
+        <td><input type="checkbox" name="teil-{{ t.pk }}" value="1"{% if t.nimmt_teil %} checked{% endif %} aria-label="{% translate 'Nimmt teil' %}"></td>
+        <td><select name="raum-{{ t.pk }}" aria-label="{% translate 'Raum' %}"><option value="">–</option>{% for r in raeume %}<option value="{{ r.pk }}"{% if r.pk == t.raum_id %} selected{% endif %}>{{ r.name }}</option>{% endfor %}</select></td>
+        <td class="zahl">{{ t.n_frei }}</td><td class="zahl">{{ t.n_gesperrt }}</td><td class="zahl">{{ t.n_termine }}</td>
+        <td>{% if t.bestaetigt_am %}<span class="etikett">{% blocktranslate with d=t.bestaetigt_am|date:"SHORT_DATE_FORMAT" %}bestätigt {{ d }}{% endblocktranslate %}</span>{% else %}<span class="leise">{% translate "offen" %}</span>{% endif %}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  <p><button type="submit" class="knopf">{% translate "Teilnahme und Räume speichern" %}</button></p>
+  </form>
+  {% else %}<p class="leer">{% translate "Noch keine Lehrkräfte. Über die Schaltfläche oben werden sie aus Klassen und Unterricht der gewählten Jahrgänge übernommen." %}</p>{% endif %}
+  {% if weitere %}
+  <form method="post" class="inline-form tm-dazu">{% csrf_token %}<input type="hidden" name="aktion" value="lehrkraft_dazu">
+    <label for="tm-lk">{% translate "Weitere Person hinzufügen" %}</label>
+    <select id="tm-lk" name="lehrkraft">{% for p in weitere %}<option value="{{ p.pk }}">{{ p.person.nachname }}, {{ p.person.vorname }}{% if p.kuerzel %} ({{ p.kuerzel }}){% endif %}</option>{% endfor %}</select>
+    <button type="submit" class="knopf zweitrangig klein">{% translate "Hinzufügen" %}</button>
+  </form>
+  {% endif %}
+</section>
+
+<section class="karte">
+  <h2>{% translate "Sprechtag löschen" %}</h2>
+  <form method="post" class="inline-form">{% csrf_token %}<input type="hidden" name="aktion" value="loeschen">
+    {% if n_termine %}<label class="haken"><input type="checkbox" name="bestaetigt" value="1" required> {% blocktranslate count n=n_termine %}auch {{ n }} gebuchtes Gespräch löschen{% plural %}auch {{ n }} gebuchte Gespräche löschen{% endblocktranslate %}</label>{% endif %}
+    <button type="submit" class="knopf gefahr klein">{% translate "Löschen" %}</button>
+  </form>
+</section>
+{% endblock %}

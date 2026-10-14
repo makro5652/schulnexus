@@ -1,0 +1,48 @@
+{% extends "elternkontakt/eltern_basis.html" %}
+{% load i18n formate %}
+{% block title %}{{ st.titel }}{% endblock %}
+{% block sprachen %}<nav class="tm-elternnav"><a href="{% url 'eltern_sprechtage' %}">{% translate "Übersicht" %}</a>
+  <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit" class="link">{% translate "Abmelden" %}</button></form></nav>{% endblock %}
+{% block inhalt %}
+<h1>{{ st.titel }}</h1>
+<p class="unterzeile">{% for d in st.tage %}{{ d|langdatum }}{% if not forloop.last %} · {% endif %}{% endfor %}
+  · {% blocktranslate with n=st.slot_minuten %}{{ n }} Minuten je Gespräch{% endblocktranslate %}</p>
+{% if st.hinweis %}<div class="ek-vorschau">{{ st.hinweis|linebreaks }}</div>{% endif %}
+{% if gebucht %}<p class="ek-meldung">{% translate "Das Gespräch ist gebucht." %}</p>{% endif %}
+{% if abgesagt %}<p class="ek-meldung">{% translate "Das Gespräch ist abgesagt." %}</p>{% endif %}
+{% if fehler %}<p class="ek-vorschau">{{ fehler }}</p>{% endif %}
+{% if not offen %}<p class="sy-warnung">{% translate "Die Buchung ist derzeit nicht geöffnet. Bitte wenden Sie sich bei Fragen an das Sekretariat." %}</p>{% endif %}
+
+{% for b in bereiche %}
+<section class="karte">
+  <h2>{{ b.kind.person.vorname }} {{ b.kind.person.nachname }}</h2>
+  {% if b.gebucht %}
+  <h3>{% translate "Gebucht" %}</h3>
+  <ul class="tm-liste">{% for g in b.gebucht %}<li><span class="tm-datum">{{ g.beginn|date:"D" }} {{ g.beginn|time:"H:i" }}</span>
+    <strong>{{ g.teilnahme.lehrkraft.person.anzeigename }}</strong>{% if g.teilnahme.raum %} <span class="leise">· {% blocktranslate with r=g.teilnahme.raum.name %}Raum {{ r }}{% endblocktranslate %}</span>{% endif %}
+    {% if offen %}<form method="post" class="zg-inline">{% csrf_token %}<input type="hidden" name="aktion" value="absagen"><input type="hidden" name="termin" value="{{ g.pk }}">
+      <button type="submit" class="link">{% translate "absagen" %}</button></form>{% endif %}</li>{% endfor %}</ul>
+  {% endif %}
+  {% if b.alle_gebucht %}<p class="leise">{% translate "Mit allen vorgesehenen Lehrkräften ist ein Gespräch gebucht." %}</p>{% endif %}
+  {% if b.voll %}<p class="leise">{% blocktranslate with n=st.max_je_kind %}Für dieses Kind sind bereits {{ n }} Gespräche gebucht (Höchstzahl).{% endblocktranslate %}</p>
+  {% elif offen and not b.alle_gebucht %}
+  <h3>{% if st.ist_leg %}{% translate "Termin für das Lern- und Entwicklungsgespräch" %}{% else %}{% translate "Gespräch buchen" %}{% endif %}</h3>
+  <div class="tm-elternliste">
+  {% for l in b.lehrkraefte %}{% if not l.gebucht %}
+    <form method="post" class="tm-elternbuchung">{% csrf_token %}<input type="hidden" name="aktion" value="buchen">
+      <input type="hidden" name="teilnahme" value="{{ l.t.pk }}"><input type="hidden" name="schueler" value="{{ b.kind.pk }}">
+      <div><strong>{{ l.t.lehrkraft.person.anzeigename }}</strong>{% if l.t.raum %} <span class="leise">· {{ l.t.raum.name }}</span>{% endif %}
+        {% if l.t.bemerkung %}<span class="blockzeile leise">{{ l.t.bemerkung }}</span>{% endif %}</div>
+      {% if l.frei %}
+      <label class="sy-feld"><span class="nur-sr">{% translate "Uhrzeit" %}</span>
+        <select name="zeit" aria-label="{% translate 'Uhrzeit' %}">{% for z in l.frei %}<option value="{{ z.schluessel }}">{{ z.beginn|date:"D" }} {{ z.beginn|time:"H:i" }}</option>{% endfor %}</select></label>
+      <label class="sy-feld"><span class="nur-sr">{% translate "Anliegen (optional)" %}</span><input type="text" name="anliegen" maxlength="300" placeholder="{% translate 'Anliegen (optional)' %}"></label>
+      <button type="submit" class="knopf klein">{% translate "Buchen" %}</button>
+      {% else %}<span class="leise">{% translate "keine freien Zeiten" %}</span>{% endif %}
+    </form>
+  {% endif %}{% empty %}<p class="leer">{% translate "Für dieses Kind ist keine Lehrkraft vorgesehen." %}</p>{% endfor %}
+  </div>
+  {% endif %}
+</section>
+{% endfor %}
+{% endblock %}

@@ -61,11 +61,16 @@ def ist_systemverwaltung(user) -> bool:
     return _in_gruppen(user, SYSTEMGRUPPEN)
 
 
+def ist_stellvertretung(user) -> bool:
+    """Stellvertretende Schulleitung: plant Sprechtage, sieht als erweiterte Schulleitung alle Jahrgänge."""
+    return _in_gruppen(user, {R.STELLVERTRETUNG})
+
+
 def koordinierte_stufen(user) -> list:
-    """Schlüssel der Stufen, die die Person koordiniert (Schulleitung: alle)."""
+    """Schlüssel der Stufen, die die Person koordiniert (Schulleitung und Stellvertretung: alle)."""
     if not user.is_authenticated:
         return []
-    if ist_schulleitung(user):
+    if ist_schulleitung(user) or ist_stellvertretung(user):
         return list(settings.STUFEN)
     return [stufe for gruppe, stufe in STUFENGRUPPEN.items() if _in_gruppen(user, {gruppe})]
 

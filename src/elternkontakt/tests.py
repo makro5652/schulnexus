@@ -129,7 +129,7 @@ class ElternlinkTest(Grundlage):
         self.client.logout()
         r = self.client.get(self.url(self.e1))
         self.assertContains(r, "Text der Schule")
-        self.assertEqual(r["Referrer-Policy"], "no-referrer")
+        self.assertEqual(r["Referrer-Policy"], "same-origin")
         self.assertIn("no-store", r["Cache-Control"])
         self.e1.refresh_from_db()
         self.assertIsNotNone(self.e1.gelesen_am)

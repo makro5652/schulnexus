@@ -13,6 +13,7 @@ from aufnahme.ansichten import start_hinweise as aufnahme_hinweise
 from elternkontakt.ansichten import akte_kontext as eltern_akte, gruppe_erlaubt as eltern_gruppe_erlaubt
 from elternkontakt.ansichten import start_hinweise as eltern_hinweise
 from laufbahn.ansichten import start_hinweise as laufbahn_hinweise
+from termine.ansichten import start_hinweise as termine_hinweise
 from zeugnisse.ansichten import start_hinweise as zeugnis_hinweise
 from fehlzeiten.models import Fehlzeit
 from foerderung.ansichten import aktive_nta_je_schueler, foerder_hinweise, foerder_kontext, nta_kurztext
@@ -103,6 +104,7 @@ def start(request):
          "foerderung": foerder_hinweise(request.user), "ist_verwaltung": ist_verwaltung(request.user),
          "aufnahme": aufnahme_hinweise(request.user), "zeugnisse": zeugnis_hinweise(request.user),
          "elternkontakt": eltern_hinweise(request.user), "laufbahn": laufbahn_hinweise(request.user),
+         "termine": termine_hinweise(request.user),
          "begruessung": begruessung(jetzt), "heute": jetzt.date(), "kalenderwoche": jetzt.isocalendar()[1],
          "schnellzugriff": schnellzugriff(request.user, sj), "geburtstage": geburtstage(request.user, jetzt.date()),
          "notizen": notizen_fuer(request.user, jetzt.date())},

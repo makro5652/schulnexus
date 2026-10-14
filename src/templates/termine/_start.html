@@ -1,0 +1,22 @@
+{% load i18n formate %}
+<section class="karte" id="termine">
+  <div class="karte-kopf">
+    <h2>{% translate "Nächste Termine" %}</h2>
+    <a class="knopf zweitrangig klein" href="{% url 'kalender' %}">{% translate "Schulkalender" %}</a>
+  </div>
+  {% for a in termine.aufgaben %}
+    <p class="tm-aufgabe{% if a.offen %} offen{% endif %}"><a href="{% url 'sprechzeiten' a.st.pk a.t.pk %}"><strong>{{ a.st.titel }}</strong></a>
+      {% if a.datum %}<span class="leise">· {{ a.datum|kurzdatum }}</span>{% endif %}
+      {% if a.offen %}<span class="blockzeile">{% translate "Bitte Ihre Verfügbarkeit eintragen und bestätigen." %}</span>
+      {% else %}<span class="blockzeile">{% blocktranslate count n=a.termine %}{{ n }} Gespräch gebucht{% plural %}{{ n }} Gespräche gebucht{% endblocktranslate %}</span>{% endif %}</p>
+  {% endfor %}
+  {% if termine.kommend %}
+  <ul class="tm-liste">
+    {% for e in termine.kommend %}
+    <li><span class="tm-datum">{{ e.datum|date:"D" }} {{ e.datum|tagmonat }}</span>
+      <span class="tm-punkt tm-art-{{ e.art }}" aria-hidden="true"></span>
+      <a href="{{ e.url }}">{{ e.titel }}</a>{% if e.zeit %} <span class="leise">{{ e.zeit|time:"H:i" }}{% if e.bis %}–{{ e.bis|time:"H:i" }}{% endif %}</span>{% endif %}</li>
+    {% endfor %}
+  </ul>
+  {% elif not termine.aufgaben %}<p class="leer">{% translate "Keine Termine in den nächsten zwei Wochen." %}</p>{% endif %}
+</section>

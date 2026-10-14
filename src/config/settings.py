@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "elternkontakt",
     "sicherung",
     "laufbahn",
+    "termine",
     "portal",
 ]
 
