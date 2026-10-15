@@ -112,6 +112,12 @@ Entfernen samt aller Daten: `docker compose -f docker-compose.yml -f vps/traefik
 > Ein öffentlich erreichbarer Server ist für **Demo-Daten** gedacht. Das Elternportal bleibt aus
 > (`ELTERNPORTAL_AKTIV=0`); für Leitung und IT die Zwei-Faktor-Anmeldung verpflichtend machen.
 
+**Traefik im Host-Netzwerk** (ab 0.4.9.5): Läuft Traefik mit `network_mode: host` – so beim Traefik aus dem
+Docker-Manager eines Hostinger-VPS (erkennbar daran, dass `docker ps` beim Traefik-Container keine Ports anzeigt,
+`ss -ltnp` aber `traefik` auf 80 und 443) –, erkennt das Skript dies, fragt nicht nach einem Netzwerk und verwendet
+`vps/traefik-host.yml` (nur Labels, kein gemeinsames Netzwerk). Das Skript trägt die verwendeten Dateien als
+`COMPOSE_FILE` in die `.env` ein; danach genügen im Projektordner einfache Befehle wie `docker compose logs -f web`.
+
 Ohne Traefik: siehe nächsten Abschnitt (mitgelieferter Caddy). Alternativ einen eigenen Reverse-Proxy
 (z. B. Nginx Proxy Manager) auf `127.0.0.1:8000` zeigen lassen; die Einstellungen in der `.env` sind dieselben.
 

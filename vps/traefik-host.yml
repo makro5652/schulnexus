@@ -1,0 +1,17 @@
+# Schulnexus hinter einem Traefik, der im Host-Netzwerk läuft (network_mode: host),
+# z. B. der Traefik aus dem Docker-Manager eines Hostinger-VPS. Traefik erreicht den Container dann direkt über
+# dessen interne Adresse; ein gemeinsames Docker-Netzwerk ist weder nötig noch möglich.
+#
+# Wird von vps/einrichten.sh automatisch gewählt, wenn Traefik im Host-Netzwerk läuft:
+#   docker compose -f docker-compose.yml -f vps/traefik-host.yml up -d --build
+# Benötigte Werte in der .env wie bei vps/traefik.yml (ohne TRAEFIK_NETZWERK).
+
+services:
+  web:
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.schulnexus.rule=Host(`${DOMAIN:?Bitte DOMAIN in .env setzen}`)
+      - traefik.http.routers.schulnexus.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}
+      - traefik.http.routers.schulnexus.tls=true
+      - traefik.http.routers.schulnexus.tls.certresolver=${TRAEFIK_RESOLVER:-letsencrypt}
+      - traefik.http.services.schulnexus.loadbalancer.server.port=8000

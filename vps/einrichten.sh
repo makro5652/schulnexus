@@ -39,6 +39,8 @@ if [ -z "$TRAEFIK" ]; then
   echo "Ohne Traefik (mitgelieferter Caddy-Proxy): sh vps/einrichten-caddy.sh"
   exit 1
 fi
+# Läuft Traefik im Host-Netzwerk (z. B. Docker-Manager von Hostinger), braucht es kein gemeinsames Netzwerk
+TRAEFIK_MODUS="$(docker inspect -f '{{.HostConfig.NetworkMode}}' "$TRAEFIK" 2>/dev/null || true)"
 NETZ_VORSCHLAG="$(docker inspect -f '{{range $k, $v := .NetworkSettings.Networks}}{{$k}}{{"\n"}}{{end}}' "$TRAEFIK" \
   | grep -vE '^(bridge|host|none)?$' | head -n 1)"
 LABELS="$(docker ps -q | xargs -r docker inspect -f '{{range $k, $v := .Config.Labels}}{{$k}}={{$v}}{{"\n"}}{{end}}' 2>/dev/null || true)"
@@ -66,7 +68,12 @@ if [ ! -f .env ]; then
     read -r DOMAIN || exit 1
   done
   echo "Gefundener Traefik-Container: $TRAEFIK"
-  NETZ="$(fragen "Docker-Netzwerk von Traefik" "${NETZ_VORSCHLAG:-traefik}")"
+  if [ "$TRAEFIK_MODUS" = "host" ]; then
+    echo "Traefik läuft im Host-Netzwerk – ein gemeinsames Docker-Netzwerk ist nicht nötig."
+    NETZ="host"
+  else
+    NETZ="$(fragen "Docker-Netzwerk von Traefik" "${NETZ_VORSCHLAG:-traefik}")"
+  fi
   EP="$(fragen "Entrypoint für https" "${EP_VORSCHLAG:-websecure}")"
   RES="$(fragen "Zertifikats-Resolver" "${RES_VORSCHLAG:-letsencrypt}")"
   LPORT="$(fragen "Lokaler Port (nur auf dem Server selbst erreichbar)" "8000")"
@@ -93,7 +100,16 @@ DOMAIN="$(wert DOMAIN)"; NETZ="$(wert TRAEFIK_NETZWERK)"
 for n in DOMAIN TRAEFIK_NETZWERK; do
   if [ -z "$(wert $n)" ]; then echo "$n ist in .env nicht gesetzt."; exit 1; fi
 done
-if ! docker network inspect "$NETZ" >/dev/null 2>&1; then
+# Traefik im Host-Netzwerk: eigene Zusatzdatei ohne Netzwerkangabe (ein Beitritt zu „host“ ist nicht möglich)
+if [ "$TRAEFIK_MODUS" = "host" ] || [ "$NETZ" = "host" ]; then
+  setzen TRAEFIK_NETZWERK host
+  ZUSATZ="vps/traefik-host.yml"
+else
+  ZUSATZ="vps/traefik.yml"
+fi
+# Damit auch später einfache Befehle wie „docker compose logs web“ die richtigen Dateien verwenden
+setzen COMPOSE_FILE "docker-compose.yml:$ZUSATZ"
+if [ "$ZUSATZ" = "vps/traefik.yml" ] && ! docker network inspect "$NETZ" >/dev/null 2>&1; then
   echo "Das Docker-Netzwerk „$NETZ“ gibt es nicht. Vorhandene Netzwerke:"
   docker network ls --format '  {{.Name}}'
   echo "Bitte in .env bei TRAEFIK_NETZWERK den richtigen Namen eintragen und das Skript erneut starten."
@@ -102,19 +118,19 @@ fi
 
 echo ""
 echo "Baue und starte die Container (beim ersten Mal einige Minuten) ..."
-docker compose -f docker-compose.yml -f vps/traefik.yml up -d --build --remove-orphans
+docker compose -f docker-compose.yml -f "$ZUSATZ" up -d --build --remove-orphans
 
 printf "Warte, bis die Anwendung bereit ist "
 i=0
 while :; do
-  ID="$(docker compose -f docker-compose.yml -f vps/traefik.yml ps -q web 2>/dev/null || true)"
+  ID="$(docker compose -f docker-compose.yml -f "$ZUSATZ" ps -q web 2>/dev/null || true)"
   STATUS="$(docker inspect -f '{{if .State.Health}}{{.State.Health.Status}}{{end}}' "$ID" 2>/dev/null || true)"
   [ "$STATUS" = "healthy" ] && break
   i=$((i+1))
   if [ "$i" -gt 120 ]; then
     echo ""
     echo "Die Anwendung meldet sich nicht. Protokoll ansehen mit:"
-    echo "  docker compose -f docker-compose.yml -f vps/traefik.yml logs web"
+    echo "  docker compose logs web"
     exit 1
   fi
   printf "."
