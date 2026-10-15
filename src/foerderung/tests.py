@@ -326,7 +326,7 @@ class PortalFoerderTest(Grundlage):
 
         self.anmelden("lehrkraft")
         # Chemie 9a: Nachteilsausgleich gilt nur für Deutsch und Englisch -> keine Markierung
-        u = Unterricht.objects.get(fach__kuerzel="CH", gruppe__name="9a")
+        u = Unterricht.objects.get(fach__kuerzel="CH", gruppe__name="9a", abschnitt__nummer=1)
         zeilen = self.client.get(reverse("notenuebersicht", args=[u.pk])).context["zeilen"]
         self.assertFalse([z for z in zeilen if z["nta"]])
         # Chemie 9b: DaZ-Nachteilsausgleich gilt für alle Fächer -> Markierung

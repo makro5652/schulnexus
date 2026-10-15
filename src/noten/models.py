@@ -10,7 +10,7 @@ Notenmodul.
 - Leistungsnachweis + Note: einzelne Bewertungen mit freier Bezeichnung, Datum und Gewicht im Ordner.
 - Zeugnisnote: von der Lehrkraft festgesetzt; Abweichung vom Vorschlag braucht Begründung.
 """
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import ROUND_HALF_DOWN, ROUND_HALF_UP, Decimal
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -29,6 +29,12 @@ from stammdaten.models import Abschnitt, Fach, Gruppe, Personalprofil, Schuelerp
 RELATIV, PROZENT = "relativ", "prozent"
 GEWICHTSARTEN = [(RELATIV, _("relativ (z. B. 2 : 1)")), (PROZENT, _("in Prozent (Summe 100)"))]
 
+# Rundung eines Schnitts auf eine Note (ab 0.4.8.0). „Zugunsten“: bei Gleichstand (x,50) die bessere Note.
+HUNDERT = Decimal(100)
+ZUGUNSTEN, KAUFMAENNISCH = "zugunsten", "kaufmaennisch"
+RUNDUNGEN = [(ZUGUNSTEN, _("bei Gleichstand zur besseren Note (z. B. 2,50 → 2)")),
+             (KAUFMAENNISCH, _("kaufmännisch (x,50 aufrunden)"))]
+
 
 class Notenskala(LokalerNameMixin, models.Model):
     name = models.CharField(_("Bezeichnung"), max_length=60, unique=True)
@@ -41,7 +47,14 @@ class Notenskala(LokalerNameMixin, models.Model):
     nachkommastellen = models.PositiveSmallIntegerField(_("Nachkommastellen im Schnitt"), default=2)
     gefaehrdung_ab = models.DecimalField(
         _("Gefährdung ab Wert"), max_digits=5, decimal_places=2, null=True, blank=True,
-        help_text=_("Ab diesem Durchschnitt wird eine Gefährdung markiert, z. B. 4,50 (Sek I) oder 4,49 Punkte (Sek II)."),
+        help_text=_("Grenze zur nicht mehr ausreichenden Leistung, z. B. 4,50 (Sek I) oder 4,49 Punkte (Sek II). Gefährdet ist, "
+                    "wessen auf eine ganze Note gerundeter Schnitt jenseits dieser Grenze liegt (Rundung siehe unten)."),
+    )
+    rundung = models.CharField(_("Rundung auf ganze Noten"), max_length=14, choices=RUNDUNGEN, default=ZUGUNSTEN)
+    unentschuldigt_stufe = models.ForeignKey(
+        "Notenstufe", null=True, blank=True, on_delete=models.SET_NULL, related_name="+",
+        verbose_name=_("Note bei unentschuldigtem Versäumnis"),
+        help_text=_("Gilt, wenn „unentschuldigt“ ohne eigene Note eingetragen ist, z. B. 6 bzw. 0 Punkte. Leer = zählt nicht."),
     )
 
     class Meta:
@@ -52,17 +65,36 @@ class Notenskala(LokalerNameMixin, models.Model):
         quant = Decimal(1).scaleb(-self.nachkommastellen)
         return wert.quantize(quant, rounding=ROUND_HALF_UP)
 
+    def ganz_runden(self, wert: Decimal | None) -> Decimal | None:
+        """Schnitt → ganze Note bzw. ganze Punktzahl; bei x,50 je nach Einstellung zur besseren Note oder aufgerundet."""
+        if wert is None:
+            return None
+        if self.rundung == ZUGUNSTEN:
+            art = ROUND_HALF_UP if self.hoeher_ist_besser else ROUND_HALF_DOWN
+        else:
+            art = ROUND_HALF_UP
+        return Decimal(wert).quantize(Decimal(1), rounding=art)
+
     def ist_gefaehrdet(self, wert: Decimal | None) -> bool:
+        """Gefährdet ist, wessen auf eine ganze Note gerundeter Schnitt jenseits der Grenze liegt (gleiche Rundung wie Zeugnis)."""
         if wert is None or self.gefaehrdung_ab is None:
             return False
-        return wert <= self.gefaehrdung_ab if self.hoeher_ist_besser else wert >= self.gefaehrdung_ab
+        ganz = self.ganz_runden(wert)
+        if self.hoeher_ist_besser:
+            return ganz <= self.gefaehrdung_ab
+        return ganz >= self.gefaehrdung_ab
 
     def naechste_stufe(self, wert: Decimal):
-        """Notenstufe, deren interner Wert dem Schnitt am nächsten liegt."""
+        """Notenstufe, deren interner Wert dem Schnitt am nächsten liegt; bei Gleichstand nach der Rundungsregel."""
         stufen = list(self.stufen.all())
         if not stufen or wert is None:
             return None
-        return min(stufen, key=lambda s: (abs(s.wert - wert), s.reihenfolge))
+        zur_besseren = self.rundung == ZUGUNSTEN
+        if zur_besseren:
+            vorzug = (lambda s: -s.wert) if self.hoeher_ist_besser else (lambda s: s.wert)
+        else:
+            vorzug = lambda s: -s.wert           # kaufmännisch: der höhere Wert
+        return min(stufen, key=lambda s: (abs(s.wert - wert), vorzug(s), s.reihenfolge))
 
 
 class Notenstufe(models.Model):
@@ -165,6 +197,14 @@ class Unterricht(models.Model):
         help_text=_("Beim Anlegen werden daraus die obersten Ordner erzeugt. Danach sind die Ordner frei änderbar."),
     )
     gewichtsart = models.CharField(_("Gewichte der obersten Ebene"), max_length=8, choices=GEWICHTSARTEN, default=RELATIV)
+    SCHNITT, ZEUGNISNOTE = "schnitt", "zeugnis"
+    BASEN = [(SCHNITT, _("rechnerischer Schnitt des 1. Halbjahres")), (ZEUGNISNOTE, _("Halbjahreszeugnisnote"))]
+    anteil_vorhalbjahr = models.DecimalField(
+        _("Anteil 1. Halbjahr an der Jahresnote (%)"), max_digits=5, decimal_places=2, null=True, blank=True,
+        validators=[MinValueValidator(Decimal("0")), MaxValueValidator(Decimal("100"))],
+        help_text=_("Nur im 2. Halbjahr: so viel Prozent zählt das 1. Halbjahr im Vorschlag, z. B. 40. Leer oder 0 = nur 2. Halbjahr."),
+    )
+    vorhalbjahr_basis = models.CharField(_("Grundlage 1. Halbjahr"), max_length=8, choices=BASEN, default=SCHNITT)
 
     class Meta:
         verbose_name = _("Unterricht")
@@ -192,9 +232,28 @@ class Unterricht(models.Model):
 
     def save(self, *args, **kwargs):
         neu = self._state.adding
+        if neu and self.anteil_vorhalbjahr is None and self.abschnitt_id and self.gruppe_id:
+            if self.abschnitt.nummer == 2 and self.gruppe.jahrgang in settings.JAHRESNOTE_JAHRGAENGE:
+                self.anteil_vorhalbjahr = Decimal(settings.JAHRESNOTE_ANTEIL_HJ1)
         super().save(*args, **kwargs)
         if neu:
             self.ordner_aus_vorlage()
+            regel = Klausurregel.fuer(self)
+            if regel is not None:
+                regel.anwenden(self)
+
+    @property
+    def mit_jahresnote(self):
+        return self.abschnitt.nummer == 2 and bool(self.anteil_vorhalbjahr)
+
+    def vorhalbjahr(self):
+        """1. Halbjahr desselben Schuljahres (nur für einen Unterricht im 2. Halbjahr)."""
+        if self.abschnitt.nummer != 2:
+            return None
+        return Abschnitt.objects.filter(schuljahr_id=self.abschnitt.schuljahr_id, nummer=1).first()
+
+    def klausurregel(self):
+        return Klausurregel.fuer(self)
 
     def ordner_aus_vorlage(self):
         """Legt die obersten Bewertungsordner aus der Startvorlage an, falls noch keine existieren."""
@@ -229,6 +288,10 @@ class Bewertungsordner(models.Model):
     reihenfolge = models.PositiveSmallIntegerField(_("Reihenfolge"), default=10)
     beschreibung = models.CharField(_("Beschreibung"), max_length=200, blank=True)
     gewichtsart = models.CharField(_("Gewichte der Einträge in diesem Ordner"), max_length=8, choices=GEWICHTSARTEN, default=RELATIV)
+    KLAUSUR, MITARBEIT = "klausur", "mitarbeit"
+    VORGABEN = [("", "—"), (KLAUSUR, _("Klausuren (Vorgabe der Schulleitung)")), (MITARBEIT, _("Sonstige Mitarbeit (Vorgabe der Schulleitung)"))]
+    vorgegeben = models.CharField(_("Vorgegeben"), max_length=10, choices=VORGABEN, blank=True, default="", editable=False,
+                                  help_text=_("Von einer Klausurregel der Schulleitung festgelegt: Name und Gewicht sind gesperrt."))
     history = HistoricalRecords(verbose_name=_("Änderungsprotokoll Bewertungsordner"))
 
     class Meta:
@@ -311,6 +374,10 @@ class Leistungsnachweis(models.Model):
     def clean(self):
         if self.ordner_id:
             self.unterricht_id = self.ordner.unterricht_id
+            a = self.ordner.unterricht.abschnitt
+            if self.datum and not (a.beginn <= self.datum <= a.ende):
+                raise ValidationError({"datum": gettext("Das Datum muss im Halbjahr liegen (%(von)s bis %(bis)s).") % {
+                    "von": a.beginn.strftime("%d.%m.%Y"), "bis": a.ende.strftime("%d.%m.%Y")}})
         if self.schluessel_id and not self.max_be:
             raise ValidationError(_("Bei Verwendung eines Notenschlüssels bitte die maximalen BE angeben."))
         if self.schluessel_id and self.unterricht_id and self.schluessel.skala_id != self.unterricht.skala_id:
@@ -441,7 +508,7 @@ class Zeugnisnote(models.Model):
             vorgeschlagen = self.unterricht.skala.naechste_stufe(self.vorschlag)
             if not self.unterricht.skala.hoeher_ist_besser and vorgeschlagen:
                 # Zeugnisnoten sind ganze Noten (Rili Sek I 3.5): verglichen wird die gerundete Note, nicht die Tendenz.
-                ganz = self.vorschlag.quantize(Decimal(1), rounding=ROUND_HALF_UP)
+                ganz = self.unterricht.skala.ganz_runden(self.vorschlag)
                 abweichung = self.stufe.wert.quantize(Decimal(1), rounding=ROUND_HALF_UP) != ganz
                 vorgeschlagen = next((s for s in self.unterricht.skala.stufen.all() if s.wert == ganz), vorgeschlagen)
             else:
@@ -515,3 +582,130 @@ class Leistungsvorgabe(models.Model):
         if self.pk and self.faecher.exists():
             qs = qs.filter(fach__in=self.faecher.all())
         return qs.select_related("fach", "gruppe", "lehrkraft__person", "abschnitt")
+
+
+class Klausurregel(models.Model):
+    """
+    Klausuren bzw. Klassenarbeiten je Fach und Jahrgangsbereich (ab 0.4.8.0), festgelegt von der Schulleitung
+    (z. B. nach Beschluss der Fachkonferenz). Betroffene Kurse erhalten zwei vorgegebene oberste Ordner
+    „Klausuren“ und „Sonstige Mitarbeit“ mit festem Prozentanteil (Standard 50 / 50); darunter gliedert die Lehrkraft frei.
+    """
+
+    faecher = models.ManyToManyField(Fach, related_name="klausurregeln", verbose_name=_("Fächer"))
+    jahrgang_von = models.PositiveSmallIntegerField(_("ab Jahrgang"))
+    jahrgang_bis = models.PositiveSmallIntegerField(_("bis Jahrgang"))
+    anteil_klausur = models.DecimalField(_("Anteil Klausuren (%)"), max_digits=5, decimal_places=2, default=Decimal(50),
+                                         validators=[MinValueValidator(Decimal("1")), MaxValueValidator(Decimal("99"))])
+    name_klausur = models.CharField(_("Name des Klausurordners"), max_length=60, default="Klausuren")
+    name_mitarbeit = models.CharField(_("Name des Ordners für die übrigen Leistungen"), max_length=60, default="Sonstige Mitarbeit")
+    bemerkung = models.CharField(_("Bemerkung"), max_length=200, blank=True, help_text=_("z. B. Beschluss der Fachkonferenz vom …"))
+    angelegt_von = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="+",
+                                     verbose_name=_("Angelegt von"))
+    geaendert_am = models.DateTimeField(_("Geändert am"), auto_now=True)
+    history = HistoricalRecords(verbose_name=_("Änderungsprotokoll Klausurregel"))
+
+    class Meta:
+        verbose_name = _("Klausurregel")
+        verbose_name_plural = _("Klausurregeln")
+        ordering = ["jahrgang_von", "jahrgang_bis"]
+
+    def __str__(self):
+        return gettext("Klausuren Jahrgang %(von)s–%(bis)s") % {"von": self.jahrgang_von, "bis": self.jahrgang_bis}
+
+    @property
+    def anteil_mitarbeit(self):
+        return HUNDERT - self.anteil_klausur
+
+    def clean(self):
+        if self.jahrgang_von and self.jahrgang_bis and self.jahrgang_von > self.jahrgang_bis:
+            raise ValidationError({"jahrgang_bis": _("„bis Jahrgang“ darf nicht kleiner sein als „ab Jahrgang“.")})
+        if (self.name_klausur or "").strip().lower() == (self.name_mitarbeit or "").strip().lower():
+            raise ValidationError({"name_mitarbeit": _("Die beiden Ordner brauchen verschiedene Namen.")})
+
+    @classmethod
+    def fuer(cls, unterricht):
+        j = unterricht.gruppe.jahrgang
+        if j is None:
+            return None
+        return cls.objects.filter(faecher=unterricht.fach_id, jahrgang_von__lte=j, jahrgang_bis__gte=j).order_by("-geaendert_am").first()
+
+    def unterrichte(self):
+        """Betroffener Unterricht des laufenden und künftiger Schuljahre."""
+        from stammdaten.models import Schuljahr
+
+        sj = Schuljahr.aktuelles()
+        qs = Unterricht.objects.filter(fach__in=self.faecher.all(), gruppe__jahrgang__gte=self.jahrgang_von,
+                                       gruppe__jahrgang__lte=self.jahrgang_bis)
+        if sj is not None:
+            qs = qs.filter(abschnitt__schuljahr__beginn__gte=sj.beginn)
+        return qs.select_related("fach", "gruppe", "abschnitt")
+
+    def anwenden(self, unterricht):
+        """
+        Legt die beiden vorgegebenen Ordner an bzw. übernimmt passende vorhandene, setzt Prozentgewichte und verschiebt
+        weitere Ordner der obersten Ebene in den Mitarbeitsordner. Gibt die Zahl verschobener Ordner zurück.
+        """
+        oben = list(Bewertungsordner.objects.filter(unterricht=unterricht, eltern=None))
+        def finden(art, name, *alternativ):
+            for o in oben:
+                if o.vorgegeben == art:
+                    return o
+            namen = [n.lower() for n in (name, *alternativ)]
+            for o in oben:
+                if o.name.strip().lower() in namen and not o.vorgegeben:
+                    return o
+            return None
+        klausur = finden(Bewertungsordner.KLAUSUR, self.name_klausur, "schriftlich", "klassenarbeiten", "klausuren")
+        mitarbeit = finden(Bewertungsordner.MITARBEIT, self.name_mitarbeit, "sonstige mitarbeit", "mündlich", "sonstige leistungen")
+        if mitarbeit is not None and mitarbeit == klausur:
+            mitarbeit = None
+        if klausur is None:
+            klausur = Bewertungsordner(unterricht=unterricht, eltern=None, name=self.name_klausur)
+        if mitarbeit is None:
+            mitarbeit = Bewertungsordner(unterricht=unterricht, eltern=None, name=self.name_mitarbeit)
+        for o, art, anteil, rf in ((klausur, Bewertungsordner.KLAUSUR, self.anteil_klausur, 10),
+                                   (mitarbeit, Bewertungsordner.MITARBEIT, self.anteil_mitarbeit, 20)):
+            o.vorgegeben, o.gewicht = art, anteil
+            if not o.pk:
+                o.reihenfolge = rf
+            o.save()
+        verschoben = 0
+        for o in oben:
+            if o.pk not in (klausur.pk, mitarbeit.pk):
+                o.eltern, o.vorgegeben = mitarbeit, ""
+                o.save(update_fields=["eltern", "vorgegeben"])
+                verschoben += 1
+        if unterricht.gewichtsart != PROZENT:
+            unterricht.gewichtsart = PROZENT
+            Unterricht.objects.filter(pk=unterricht.pk).update(gewichtsart=PROZENT)
+        return verschoben
+
+    @staticmethod
+    def freigeben(unterricht):
+        """Hebt die Vorgabe auf (z. B. wenn die Regel gelöscht wird); die Ordner bleiben frei bearbeitbar erhalten."""
+        Bewertungsordner.objects.filter(unterricht=unterricht).exclude(vorgegeben="").update(vorgegeben="")
+
+
+class Notensperre(models.Model):
+    """
+    Ausdrückliche Sperre bzw. Freigabe der Noten einer Klasse in einem Halbjahr (ab 0.4.8.0).
+    Ohne Eintrag gilt: gesperrt, sobald die Zeugniskonferenz durchgeführt bzw. das Zeugnis freigegeben ist.
+    Ein Eintrag (durch Stufenkoordination, Schulleitung oder Stellvertretung) geht dieser Automatik vor.
+    """
+
+    abschnitt = models.ForeignKey(Abschnitt, on_delete=models.CASCADE, related_name="notensperren", verbose_name=_("Halbjahr"))
+    klasse = models.ForeignKey(Gruppe, on_delete=models.CASCADE, related_name="notensperren", verbose_name=_("Klasse"))
+    gesperrt = models.BooleanField(_("Gesperrt"), default=True)
+    grund = models.CharField(_("Grund"), max_length=200, blank=True)
+    geaendert_von = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="+",
+                                      verbose_name=_("Geändert von"))
+    geaendert_am = models.DateTimeField(_("Geändert am"), auto_now=True)
+    history = HistoricalRecords(verbose_name=_("Änderungsprotokoll Notensperre"))
+
+    class Meta:
+        verbose_name = _("Notensperre")
+        verbose_name_plural = _("Notensperren")
+        unique_together = [("abschnitt", "klasse")]
+
+    def __str__(self):
+        return f"{self.klasse} {self.abschnitt}: {'gesperrt' if self.gesperrt else 'offen'}"

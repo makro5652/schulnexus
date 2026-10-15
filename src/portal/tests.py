@@ -21,7 +21,7 @@ class PortalTest(TestCase):
 
     def test_lehrkraft_sieht_eigenen_unterricht(self):
         self.client.login(username="lehrkraft", password="Test-Passwort-123")
-        u = Unterricht.objects.get(fach__kuerzel="CH", gruppe__name="9a")
+        u = Unterricht.objects.get(fach__kuerzel="CH", gruppe__name="9a", abschnitt__nummer=1)
         r = self.client.get(reverse("notenuebersicht", args=[u.pk]))
         self.assertEqual(r.status_code, 200)
         self.assertContains(r, "Vorschlag")

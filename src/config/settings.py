@@ -149,6 +149,10 @@ def _jahrgaenge(name, standard):
 
 
 STUFEN = {"mittelstufe": _jahrgaenge("MITTELSTUFE", "5-10"), "oberstufe": _jahrgaenge("OBERSTUFE", "11-12")}
+# Jahresnote (ab 0.4.8.0): In diesen Jahrgängen fließt das 1. Halbjahr mit diesem Anteil (%) in den Vorschlag des
+# 2. Halbjahres ein; die Lehrkraft kann den Anteil je Kurs ändern (0 = aus).
+JAHRESNOTE_JAHRGAENGE = _jahrgaenge("JAHRESNOTE_JAHRGAENGE", "5-10")
+JAHRESNOTE_ANTEIL_HJ1 = int(os.environ.get("JAHRESNOTE_ANTEIL_HJ1", "40"))
 
 # Höchstgröße je Anhang in Megabyte (in .env änderbar).
 DOKUMENT_MAX_MB = int(os.environ.get("DOKUMENT_MAX_MB", "25"))

@@ -196,6 +196,8 @@ class Command(BaseCommand):
             Notenstufe.objects.bulk_create(
                 [Notenstufe(skala=sek1, bezeichnung=b, wert=Decimal(w), reihenfolge=i) for i, (b, w) in enumerate(SEK1)]
             )
+            sek1.unentschuldigt_stufe = sek1.stufen.get(bezeichnung="6")
+            sek1.save(update_fields=["unentschuldigt_stufe"])
         englisch_ergaenzen(sek1, name_en="Lower secondary – grades 1 to 6 with +/-")
 
         sek2, neu = Notenskala.objects.get_or_create(
@@ -206,6 +208,8 @@ class Command(BaseCommand):
             Notenstufe.objects.bulk_create(
                 [Notenstufe(skala=sek2, bezeichnung=str(p), wert=Decimal(p), reihenfolge=15 - p) for p in range(15, -1, -1)]
             )
+            sek2.unentschuldigt_stufe = sek2.stufen.get(bezeichnung="0")
+            sek2.save(update_fields=["unentschuldigt_stufe"])
         englisch_ergaenzen(sek2, name_en="Upper secondary – points 0 to 15")
         self.stdout.write(self.style.SUCCESS("Notenskalen eingerichtet."))
 

@@ -5,7 +5,7 @@ Niemals auf einem System mit echten Schülerdaten ausführen.
 import os
 import random
 from datetime import date, time, timedelta
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import Decimal
 
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ValidationError
@@ -175,6 +175,11 @@ class Command(BaseCommand):
                 call_command("grundeinrichtung", stdout=self.stdout)
                 self.vorgaben_anlegen()
                 self.stdout.write("Leistungsvorgaben und Beispiel für Prozent-Gewichte ergänzt.")
+            from noten.models import Klausurregel
+
+            if not Klausurregel.objects.exists():
+                self.klausurregeln_anlegen()
+                self.stdout.write("Klausurregeln und Beispielkurs im 2. Halbjahr ergänzt.")
             return
 
         call_command("grundeinrichtung", stdout=self.stdout)
@@ -535,7 +540,9 @@ class Command(BaseCommand):
         self.laufbahn_anlegen()
         self.termine_anlegen(pw)
         self.vorgaben_anlegen()
+        self.klausurregeln_anlegen()
 
+        self.statistik_aktualisieren()
         self.stdout.write(self.style.SUCCESS(
             f"Demo-Daten angelegt: {len(alle)} Schüler:innen, {Person.objects.count()} Personen, "
             f"{Fehlzeit.objects.count()} Fehlzeiten, AG-Zuteilung {ergebnis.zugeteilt} "
@@ -971,7 +978,7 @@ class Command(BaseCommand):
             for s in u.schueler():
                 v = vorschlagsnote(u, s)
                 if v.schnitt is not None:
-                    note = int(v.schnitt.quantize(Decimal(1), rounding=ROUND_HALF_UP))
+                    note = int(u.skala.ganz_runden(v.schnitt))
                 else:
                     note = rng.choices([1, 2, 3, 4], weights=[2, 4, 4, 2])[0]
                 begruendung = ""
@@ -1206,6 +1213,37 @@ class Command(BaseCommand):
             o.gewichtsart = PROZENT
             o.save(update_fields=["gewichtsart"])
             o.unterordner.update(gewicht=Decimal(50))
+
+    @staticmethod
+    def statistik_aktualisieren():
+        """Planerstatistik der Datenbank auffrischen: Nach dem Massenanlegen wählt PostgreSQL sonst teils sehr
+        langsame Abfragepläne (beobachtet bei der Notenliste der Verwaltungsoberfläche in frischen Testdatenbanken)."""
+        from django.db import connection
+
+        if connection.vendor == "postgresql":
+            with connection.cursor() as c:
+                c.execute("ANALYZE")
+
+    # ------------------------------------------------------------ Klausurregeln, Jahresnote (ab 0.4.8.0)
+    def klausurregeln_anlegen(self):
+        from noten.models import Klausurregel, Notenskala, Unterricht
+
+        sl = User.objects.filter(username="schulleitung").first()
+        faecher = [f for f in Fach.objects.filter(kuerzel__in=["D", "M", "E", "F", "CH", "BIO", "PH"])]
+        if faecher:
+            r = Klausurregel.objects.create(jahrgang_von=5, jahrgang_bis=10, anteil_klausur=Decimal(50), name_klausur="Klassenarbeiten",
+                                            name_mitarbeit="Sonstige Mitarbeit", angelegt_von=sl,
+                                            bemerkung="Beispiel: Beschluss der Fachkonferenzen vom 01.09.2026")
+            r.faecher.set(faecher)
+            for u in r.unterrichte():
+                r.anwenden(u)
+        # Beispiel Jahresnote: Chemie 9a im 2. Halbjahr (noch ohne Noten – der Vorschlag beruht zunächst auf dem 1. Halbjahr)
+        sj = Schuljahr.objects.filter(name="2026/27").first()
+        hj2 = Abschnitt.objects.filter(schuljahr=sj, nummer=2).first() if sj else None
+        vorbild = Unterricht.objects.filter(abschnitt__schuljahr=sj, abschnitt__nummer=1, fach__kuerzel="CH", gruppe__name="9a").first()
+        if hj2 and vorbild and not Unterricht.objects.filter(abschnitt=hj2, gruppe=vorbild.gruppe, fach=vorbild.fach).exists():
+            Unterricht.objects.create(abschnitt=hj2, gruppe=vorbild.gruppe, fach=vorbild.fach, lehrkraft=vorbild.lehrkraft,
+                                      skala=Notenskala.objects.get(pk=vorbild.skala_id), gewichtung=vorbild.gewichtung)
 
     # ------------------------------------------------------------ Kalender, Räume, Sprechtage (ab 0.4.5.0)
     def termine_anlegen(self, pw):

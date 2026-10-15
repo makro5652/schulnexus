@@ -1,10 +1,11 @@
-# Schulverwaltung (Version 0.4.7.1, Entwicklungsstand)
+# Schulverwaltung (Version 0.4.8.0, Entwicklungsstand)
 
 Open-Source-Schulverwaltung für die DSN: Stammdaten, Klassen und Lerngruppen,
 Noten mit Gewichtung, Fehlzeiten, Nachmittagsprogramm, Anhänge zur Schülerakte,
 Förderpläne und Nachteilsausgleiche, Neuanmeldungen, Zeugnisse und Konferenzen, Schuljahreswechsel,
 Abgänge mit Abgangszeugnis, Archiv und Löschfristen, Schulkalender, Raumbuchung, Elternsprechtage und
-Lern- und Entwicklungsgespräche, Office-Startseite für Microsoft 365, Noten-Schnelleingabe und Pflichtnoten mit Frist. Verschlüsselte Ablage von Anhängen und
+Lern- und Entwicklungsgespräche, Office-Startseite für Microsoft 365, Noten-Schnelleingabe, Pflichtnoten mit Frist,
+Jahresnote, Klausurregeln, Notensperre sowie Notenübersicht als Excel und Notenbogen als PDF. Verschlüsselte Ablage von Anhängen und
 Sicherungen, Zwei-Faktor-Anmeldung, HTTPS-Betrieb. Läuft im Browser, betrieben mit Docker.
 
 > Nur mit **erfundenen Testdaten** verwenden. Vor echten Schülerdaten: HTTPS einrichten (`HTTPS=1`),
@@ -403,6 +404,52 @@ Quartal 2 (50)
 - Die Gewichtungsvorlage legt beim Anlegen eines Unterrichts nur die **Start-Ordner** an.
 - **Notenformat:** je Unterricht eine Skala – Sek I „1 bis 6 mit Tendenzen“ (1+ … 6) oder Sek II „0 bis 15 Punkte“;
   zusätzlich je Leistungsnachweis optional BE mit Notenschlüssel.
+- **Ordner verschieben** (ab 0.4.8.0): In der Bewertungsstruktur legt „Liegt in“ fest, in welchem Ordner ein Ordner
+  liegt; Zyklen und mehr als fünf Ebenen werden abgelehnt.
+
+**Berechnung und Rundung** (ab 0.4.8.0)
+
+- **Rundung zugunsten der Schüler:innen:** Liegt ein Schnitt genau zwischen zwei Noten (x,50), gilt überall die
+  bessere Note – in der Tendenzanzeige der Notenübersicht, im Zeugnisvorschlag und bei der Gefährdungsprüfung.
+  Beispiele: Ø 2,50 → 2− bzw. Zeugnisnote 2; Ø 4,50 → 4, nicht gefährdet; Sek II 4,50 Punkte → 5 Punkte.
+  Je Notenskala umstellbar auf „kaufmännisch“ (Schulleitung › Notenskalen).
+- **Unentschuldigt ohne Note** zählt als 6 bzw. 0 Punkte (je Skala einstellbar, leer = zählt nicht). Die
+  Notenübersicht zeigt das als „unentsch. (6)“.
+- **Datum** eines Leistungsnachweises muss im Halbjahr liegen.
+- **Vorläufige Schnitte:** Ist ein Prozent-Ordner noch nicht zu 100 % belegt, weist die Notenübersicht darauf hin
+  („Sonstige Mitarbeit ist erst zu 24 % belegt“); fehlende Anteile werden übersprungen. Ob ein Ordner Prozent oder
+  relative Gewichte verwendet, wählt die Lehrkraft je Ordner.
+- **Jahresnote (Jahrgang 5–10):** Im 2. Halbjahr verrechnet der Vorschlag das 1. Halbjahr mit 40 % und das
+  2. Halbjahr mit 60 %. Die Lehrkraft ändert den Anteil je Kurs in der Bewertungsstruktur (0 = nur 2. Halbjahr) und
+  wählt als Grundlage den rechnerischen Schnitt oder die festgesetzte Halbjahreszeugnisnote. Die Notenübersicht
+  zeigt dann „Ø 2. Halbjahr“, „1. Halbjahr (40 %)“ und den „Jahresvorschlag“. Jahrgänge und Anteil:
+  `JAHRESNOTE_JAHRGAENGE` (Standard 5-10) und `JAHRESNOTE_ANTEIL_HJ1` (Standard 40) in der `.env`.
+- **Klausuren je Fach** (Schulleitung › Unterrichtsorganisation › Klausuren je Fach; Schulleitung und
+  Stellvertretung): Nach Beschluss der Fachkonferenz legt die Schulleitung fest, in welchen Fächern und Jahrgängen
+  Klausuren bzw. Klassenarbeiten geschrieben werden, mit festem Anteil (Standard 50 % Klausuren / 50 % Sonstige
+  Mitarbeit). Betroffene Kurse erhalten diese beiden obersten Ordner; vorhandene passende Ordner („Schriftlich“,
+  „Sonstige Mitarbeit“) werden übernommen, weitere oberste Ordner in „Sonstige Mitarbeit“ verschoben. Lehrkräfte können
+  die beiden Ordner nicht umbenennen, umgewichten oder löschen, gliedern darunter aber frei. Fächer ohne Regel bleiben
+  frei gestaltbar. Abgeschlossene Halbjahre werden nicht verändert.
+
+**Notensperre** (ab 0.4.8.0; Unterricht › Zeugnis › Notensperre)
+
+- Automatisch gesperrt sind die Noten einer Klasse und eines Halbjahres, sobald die **Zeugniskonferenz durchgeführt**
+  bzw. abgeschlossen ist, und die Noten einer Schülerin / eines Schülers, sobald ihr bzw. sein **Zeugnis freigegeben**
+  ist. Gesperrt heißt: keine Noten, Einzelgewichte oder Zeugnisnoten ändern; keine Gewichte, Gliederung oder
+  Jahresanteile ändern; keine Leistungsnachweise mit gesperrten Noten löschen; Gewicht, Ordner, Datum und
+  Notenschlüssel solcher Leistungsnachweise bleiben unverändert. Das gilt auch in der Verwaltungsoberfläche.
+- **Stufenkoordination** (für ihre Jahrgänge), **Schulleitung** und **Stellvertretung** sehen je Klasse den Stand
+  (Konferenz, freigegebene Zeugnisse) und können eine Klasse von Hand **sperren**, **zur Korrektur freigeben** oder
+  **zurück zur Automatik** stellen – mit Grund und Eintrag im Protokoll.
+
+**Druck und Export** (ab 0.4.8.0): In der Notenübersicht
+- **Excel:** Notenübersicht mit allen Noten, Ordnerschnitten, Vorschlag und Zeugnisnote; dazu die Blätter
+  „Leistungsnachweise“ (mit Schnitt je Arbeit) und „Bewertungsstruktur“.
+- **Notenbogen (PDF):** zuerst die Kursübersicht (quer), dann je Schüler:in ein Bogen mit allen Noten, Gewichten,
+  Anteilen, Kommentaren und dem Rechenweg bis zum Vorschlag sowie Unterschriftszeile. Der Knopf „PDF“ neben einem
+  Namen erzeugt nur den Bogen dieser Schülerin bzw. dieses Schülers.
+- Die Dateien werden nicht auf dem Server gespeichert; jeder Abruf steht im Protokoll.
 
 **Schnelleingabe** (ab 0.4.7.0): Notenübersicht › „Noten eintragen“ oder Klick auf einen Leistungsnachweis.
 Oben Ordner, Bezeichnung (mit Vorschlägen aus früheren Einträgen), Datum und Gewicht; bei einem Prozent-Ordner wird

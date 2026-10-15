@@ -3,7 +3,7 @@ from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse
 
-from stammdaten.models import Fach, Gruppe, Personalprofil
+from stammdaten.models import Fach, Gruppe
 
 from . import kurswahl
 from .models import Notenskala, Unterricht
@@ -15,7 +15,7 @@ class KurswahlTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         call_command("demodaten", passwort=PW, stdout=open("/dev/null", "w"))
-        cls.u1 = Unterricht.objects.select_related("lehrkraft", "abschnitt").get(fach__kuerzel="CH", gruppe__name="9a")
+        cls.u1 = Unterricht.objects.select_related("lehrkraft", "abschnitt").get(fach__kuerzel="CH", gruppe__name="9a", abschnitt__nummer=1)
         cls.lk = cls.u1.lehrkraft
         # viele Kurse: dieselbe Lehrkraft unterrichtet zusätzlich weitere Fächer in 9a und 9b
         skala = Notenskala.objects.get(name__startswith="Sek I –")
@@ -36,7 +36,7 @@ class KurswahlTest(TestCase):
         self.assertContains(r, 'id="kw-start"')                              # Startseite
         self.assertContains(r, 'id="kw-band"')                               # Menüband
         self.assertContains(r, f'<option value="{self.neu[-1].pk}"', count=2)
-        self.assertContains(r, "<optgroup", count=2)
+        self.assertContains(r, "<optgroup", count=4)          # 1. und 2. Halbjahr, Startseite und Menüband
         self.assertNotContains(r, 'class="mb-gross" href="/noten/unterricht/')  # keine Kachel je Kurs mehr
 
     def test_oeffnen_merkt_letzten_kurs(self):

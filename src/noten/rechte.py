@@ -38,3 +38,21 @@ def darf_vorgabe_aendern(user, vorgabe) -> bool:
 
 def darf_vorgaben_sehen(user) -> bool:
     return user.is_authenticated and user.has_perm("noten.view_leistungsvorgabe")
+
+
+def darf_klausurregeln(user) -> bool:
+    """Klausurregeln je Fach (ab 0.4.8.0): Schulleitung und Stellvertretung (nach Beschluss der Fachkonferenz)."""
+    return user.is_authenticated and (user.is_superuser or ist_schulleitung(user) or ist_stellvertretung(user))
+
+
+def darf_noten_sperren(user, jahrgang) -> bool:
+    """Notensperre setzen oder aufheben: Schulleitung, Stellvertretung, Stufenkoordination für ihre Jahrgänge."""
+    if not user.is_authenticated:
+        return False
+    if user.is_superuser or ist_schulleitung(user) or ist_stellvertretung(user):
+        return True
+    return jahrgang is not None and jahrgang in koordinierte_jahrgaenge(user)
+
+
+def ist_koordination(user) -> bool:
+    return bool(koordinierte_jahrgaenge(user)) if user.is_authenticated else False

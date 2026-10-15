@@ -95,6 +95,10 @@ class VorschlagsnoteTest(NotenFixture):
         Note.objects.create(leistungsnachweis=self.ln(self.sonst), schueler=self.s1, stufe=self.st["4"])
         v = vorschlagsnote(self.u, self.s1)
         self.assertEqual(v.schnitt, Decimal("4.50"))
+        self.assertFalse(v.gefaehrdet)       # ab 0.4.8.0: Gleichstand zugunsten → gerundet 4 (ausreichend)
+        Note.objects.create(leistungsnachweis=self.ln(self.sonst), schueler=self.s1, stufe=self.st["6"])
+        v = vorschlagsnote(self.u, self.s1)
+        self.assertGreater(v.schnitt, Decimal("4.50"))
         self.assertTrue(v.gefaehrdet)
 
     def test_keine_noten(self):

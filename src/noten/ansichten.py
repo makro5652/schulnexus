@@ -18,6 +18,7 @@ from stammdaten.models import Abschnitt, Fach, Schuljahr
 
 from . import eingabe as E
 from . import kurswahl
+from . import sperre as S
 from . import rechte
 from . import vorgaben as V
 from .berechnung import Baum, nominale_anteile
@@ -118,17 +119,35 @@ def noten_eintragen(request, pk, ln_pk=None):
         messages.info(request, gettext("Bitte zuerst einen Ordner anlegen, z. B. „Schriftlich“ oder „Sonstige Mitarbeit“."))
         return redirect("bewertungsstruktur", pk=u.pk)
     schueler = list(u.schueler())
+    gesperrt = S.gesperrte_schueler(u, [s.pk for s in schueler])
+    if schueler and len(gesperrt) == len(schueler):
+        messages.error(request, gettext("Die Noten dieses Kurses sind gesperrt (Zeugnisfreigabe bzw. Konferenz). "
+                                        "Änderungen nur nach Freigabe durch Stufenkoordination oder Schulleitung."))
+        return redirect("notenuebersicht", pk=u.pk)
     instanz = ln or Leistungsnachweis(unterricht=u, datum=timezone.localdate())
+    # Kopfdaten eines Leistungsnachweises mit Noten gesperrter Schüler:innen dürfen sich nicht mehr ändern
+    kopf_gesperrt = bool(ln and gesperrt and Note.objects.filter(leistungsnachweis=ln, schueler_id__in=gesperrt)
+                         .exclude(stufe__isnull=True, sonderstatus="").exists())
+    kopf_vorher = (ln.gewicht, ln.ordner_id, ln.schluessel_id, ln.max_be, ln.datum) if ln else None
     fehler, werte = {}, {}
 
     if request.method == "POST":
         form = NachweisForm(request.POST, instance=instanz, unterricht=u, baum=baum)
         eingaben = {s.pk: {"note": request.POST.get(f"n_{s.pk}", ""), "kommentar": request.POST.get(f"k_{s.pk}", ""),
                            "gewicht": request.POST.get(f"g_{s.pk}", ""), "begruendung": request.POST.get(f"b_{s.pk}", "")}
-                    for s in schueler}
-        werte = eingaben
+                    for s in schueler if s.pk not in gesperrt}
+        werte = dict(eingaben)
+        if ln:
+            for n in Note.objects.filter(leistungsnachweis=ln, schueler_id__in=gesperrt).select_related("stufe", "leistungsnachweis"):
+                werte[n.schueler_id] = {"note": E.anzeige(n), "kommentar": n.kommentar,
+                                        "gewicht": _zahl(n.gewicht_individuell), "begruendung": n.gewicht_begruendung}
         if form.is_valid():
             vorlaeufig = form.save(commit=False)
+            if kopf_gesperrt and (vorlaeufig.gewicht, vorlaeufig.ordner_id, vorlaeufig.schluessel_id, vorlaeufig.max_be,
+                                  vorlaeufig.datum) != kopf_vorher:
+                (vorlaeufig.gewicht, vorlaeufig.ordner_id, vorlaeufig.schluessel_id, vorlaeufig.max_be, vorlaeufig.datum) = kopf_vorher
+                messages.warning(request, gettext("Gewicht, Ordner, Datum und Notenschlüssel bleiben unverändert, "
+                                                  "weil Noten gesperrter Schüler:innen daran hängen."))
             ergebnisse, fehler = E.pruefen(vorlaeufig, eingaben, schueler)
             if not fehler:
                 with transaction.atomic():
@@ -159,7 +178,7 @@ def noten_eintragen(request, pk, ln_pk=None):
     ordner_optionen = [{"pk": o.pk, "name": o.name, "pfad": pfad, "ebene": ebene, "art": o.gewichtsart,
                         "einzug": "\u00a0\u00a0\u00a0" * ebene + ("└ " if ebene else ""),
                         "summe": _zahl(summe.get(o.pk, Decimal(0)))} for o, ebene, pfad in baum.in_reihenfolge()]
-    zeilen = [{"s": s, "w": werte.get(s.pk, {}), "fehler": fehler.get(s.pk)} for s in schueler]
+    zeilen = [{"s": s, "w": werte.get(s.pk, {}), "fehler": fehler.get(s.pk), "gesperrt": s.pk in gesperrt} for s in schueler]
     schluessel = {str(k.pk): [[float(sw.min_prozent), sw.stufe.bezeichnung] for sw in k.schwellen.select_related("stufe").order_by("-min_prozent")]
                   for k in Notenschluessel.objects.filter(skala=u.skala).prefetch_related("schwellen")}
     return render(request, "noten/eingabe.html", {
@@ -177,6 +196,7 @@ def noten_eintragen(request, pk, ln_pk=None):
         "titel_vorschlaege": sorted({t for t in Leistungsnachweis.objects.filter(unterricht=u).values_list("titel", flat=True)}),
         "einzelgewichte": any(z["w"].get("gewicht") for z in zeilen),
         "kurswahl": kurswahl.auswahl(request, u, nur_wenn_enthalten=True),
+        "gesperrt_anzahl": len(gesperrt), "kopf_gesperrt": kopf_gesperrt,
     })
 
 
@@ -185,15 +205,22 @@ def noten_eintragen(request, pk, ln_pk=None):
 @login_required
 def struktur(request, pk):
     u = _unterricht(request, pk)
+    gesperrt = S.gesperrte_schueler(u)
     if request.method == "POST":
         aktion, _sep, ziel = (request.POST.get("aktion") or "").partition(":")
         try:
             with transaction.atomic():
+                if gesperrt and aktion == "speichern":
+                    raise ValidationError(gettext("Gewichte und Gliederung lassen sich nicht mehr ändern: Die Noten von "
+                                                  "Schüler:innen dieses Kurses sind gesperrt (Zeugnisfreigabe bzw. Konferenz)."))
                 if aktion == "speichern":
                     _struktur_speichern(request, u)
                     messages.success(request, gettext("Bewertungsstruktur gespeichert."))
                 elif aktion == "ordner_neu":
                     eltern = Bewertungsordner.objects.filter(pk=request.POST.get("eltern") or 0, unterricht=u).first()
+                    if eltern is None and u.klausurregel() is not None:
+                        raise ValidationError(gettext("Die oberste Ebene ist durch die Klausurregel der Schulleitung vorgegeben. "
+                                                      "Bitte den neuen Ordner in einen der vorgegebenen Ordner legen."))
                     art = eltern.gewichtsart if eltern else u.gewichtsart
                     gewicht = _dezimal(request.POST.get("gewicht")) if request.POST.get("gewicht", "").strip() else Decimal(1)
                     _gewicht_pruefen(gewicht, art, request.POST.get("name", ""))
@@ -204,12 +231,16 @@ def struktur(request, pk):
                     messages.success(request, gettext("Ordner „%(name)s“ angelegt.") % {"name": o.name})
                 elif aktion == "ordner_loeschen":
                     o = get_object_or_404(Bewertungsordner, pk=ziel or request.POST.get("ordner"), unterricht=u)
+                    if o.vorgegeben:
+                        raise ValidationError(gettext("Dieser Ordner ist von der Schulleitung vorgegeben."))
                     if o.unterordner.exists() or o.leistungsnachweise.exists():
                         raise ValidationError(gettext("Nur leere Ordner lassen sich löschen."))
                     o.delete()
                     messages.success(request, gettext("Ordner „%(name)s“ gelöscht.") % {"name": o.name})
                 elif aktion == "ln_loeschen":
                     ln = get_object_or_404(Leistungsnachweis, pk=ziel or request.POST.get("ln"), unterricht=u)
+                    if ln.noten.filter(schueler_id__in=gesperrt).exclude(stufe__isnull=True, sonderstatus="").exists():
+                        raise ValidationError(gettext("„%(titel)s“ enthält gesperrte Noten und kann nicht gelöscht werden.") % {"titel": ln.titel})
                     n = ln.noten.exclude(stufe__isnull=True, sonderstatus="").count()
                     ln.delete()
                     messages.success(request, ngettext("„%(titel)s“ mit %(n)s Note gelöscht.", "„%(titel)s“ mit %(n)s Noten gelöscht.", n)
@@ -241,8 +272,11 @@ def struktur(request, pk):
         for ln in baum.nachweise_in[o.pk]:
             zeilen.append({"typ": "ln", "ln": ln, "ebene": ebene + 1, "einzug": (ebene + 1) * 1.4, "eltern_art": o.gewichtsart,
                            "anteil": anteil_ln.get(ln.pk), "noten": noten_je_ln.get(ln.pk, 0)})
+    regel = u.klausurregel()
+    ziele = [(o, "\u00a0\u00a0\u00a0" * ebene + o.name) for o, ebene, _p in baum.in_reihenfolge()]
     return render(request, "noten/struktur.html", {
         "u": u, "zeilen": zeilen, "wurzel": ebene_info(None, u.gewichtsart), "gewichtsarten": GEWICHTSARTEN,
+        "regel": regel, "ziele": ziele, "basen": Unterricht.BASEN, "gesperrt_anzahl": len(gesperrt),
         "ordner_liste": [(o, "\u00a0\u00a0\u00a0" * ebene + o.name) for o, ebene, _p in baum.in_reihenfolge() if ebene < Bewertungsordner.MAX_TIEFE - 1],
         "kurswahl": kurswahl.auswahl(request, u, nur_wenn_enthalten=True),
     })
@@ -255,13 +289,56 @@ def _gewicht_pruefen(gewicht, art, wo):
         raise ValidationError(gettext("%(wo)s: In einem Prozent-Ordner höchstens 100.") % {"wo": wo})
 
 
+def _baum_pruefen(eltern_von):
+    """eltern_von: {ordner_pk: eltern_pk oder None}. Prüft auf Zyklen und die höchste Tiefe."""
+    for pk in eltern_von:
+        tiefe, o, gesehen = 1, eltern_von[pk], {pk}
+        while o is not None:
+            if o in gesehen:
+                raise ValidationError(gettext("Ein Ordner kann nicht in sich selbst oder einem seiner Unterordner liegen."))
+            gesehen.add(o)
+            tiefe += 1
+            o = eltern_von.get(o)
+        if tiefe > Bewertungsordner.MAX_TIEFE:
+            raise ValidationError(gettext("Höchstens %(n)s Ordnerebenen sind möglich.") % {"n": Bewertungsordner.MAX_TIEFE})
+
+
 def _struktur_speichern(request, u):
     P = request.POST
     arten = dict(GEWICHTSARTEN)
-    if P.get("art_wurzel") in arten:
+    regel = u.klausurregel()
+    if regel is not None:
+        u.gewichtsart = PROZENT
+        u.save(update_fields=["gewichtsart"])
+    elif P.get("art_wurzel") in arten:
         u.gewichtsart = P["art_wurzel"]
         u.save(update_fields=["gewichtsart"])
+    if u.abschnitt.nummer == 2 and "anteil_vorhalbjahr" in P:
+        anteil = _dezimal(P.get("anteil_vorhalbjahr")) if P.get("anteil_vorhalbjahr", "").strip() else Decimal(0)
+        if anteil is None or not (0 <= anteil <= HUNDERT):
+            raise ValidationError(gettext("Der Anteil des 1. Halbjahres muss zwischen 0 und 100 liegen."))
+        u.anteil_vorhalbjahr = anteil
+        if P.get("vorhalbjahr_basis") in dict(Unterricht.BASEN):
+            u.vorhalbjahr_basis = P["vorhalbjahr_basis"]
+        u.save(update_fields=["anteil_vorhalbjahr", "vorhalbjahr_basis"])
     ordner = list(Bewertungsordner.objects.filter(unterricht=u))
+    nach_pk = {o.pk: o for o in ordner}
+    # Verschieben („Liegt in“): erst alle neuen Eltern bestimmen und den Baum als Ganzes prüfen
+    eltern_von = {o.pk: o.eltern_id for o in ordner}
+    for o in ordner:
+        feld = f"eltern_{o.pk}"
+        if feld not in P or o.vorgegeben:
+            continue
+        ziel = int(P[feld]) if P[feld].isdigit() and int(P[feld]) in nach_pk else None
+        if ziel is None and regel is not None:
+            if o.eltern_id is not None:
+                raise ValidationError(gettext("„%(name)s“: Die oberste Ebene ist durch die Klausurregel vorgegeben.") % {"name": o.name})
+            continue
+        eltern_von[o.pk] = ziel
+    _baum_pruefen(eltern_von)
+    for o in ordner:
+        if eltern_von[o.pk] != o.eltern_id:
+            o.eltern = nach_pk.get(eltern_von[o.pk])
     for o in ordner:
         if P.get(f"art_{o.pk}") in arten:
             o.gewichtsart = P[f"art_{o.pk}"]
@@ -270,13 +347,18 @@ def _struktur_speichern(request, u):
         name = (P.get(f"name_{o.pk}") or o.name).strip()
         if not name:
             raise ValidationError(gettext("Ein Ordner braucht einen Namen."))
+        if o.vorgegeben:
+            o.save()
+            continue
         o.name = name
         if f"gewicht_{o.pk}" in P:
             o.gewicht = _dezimal(P[f"gewicht_{o.pk}"])
             _gewicht_pruefen(o.gewicht, art_von.get(o.eltern_id) if o.eltern_id else u.gewichtsart, name)
         if (P.get(f"reihenfolge_{o.pk}") or "").strip().isdigit():
             o.reihenfolge = int(P[f"reihenfolge_{o.pk}"])
-        o.full_clean()
+        # Baum (Zyklen, Tiefe) ist oben als Ganzes geprüft; hier nur Felder und Eindeutigkeit des Namens je Ebene
+        o.clean_fields()
+        o.validate_constraints()
         o.save()
     for ln in Leistungsnachweis.objects.filter(unterricht=u).select_related("ordner"):
         if f"lgewicht_{ln.pk}" in P:

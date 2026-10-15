@@ -63,7 +63,7 @@ class Grundlage(TestCase):
     @classmethod
     def setUpTestData(cls):
         call_command("demodaten", passwort=PW, stdout=open("/dev/null", "w"))
-        cls.u = Unterricht.objects.get(fach__kuerzel="CH", gruppe__name="9a")
+        cls.u = Unterricht.objects.get(fach__kuerzel="CH", gruppe__name="9a", abschnitt__nummer=1)
         cls.q1 = Bewertungsordner.objects.get(unterricht=cls.u, name="Quartal 1")
         cls.schriftlich = Bewertungsordner.objects.get(unterricht=cls.u, name="Schriftlich", eltern=None)
         cls.schueler = list(cls.u.schueler())
@@ -216,9 +216,11 @@ class StrukturTest(Grundlage):
     def test_ordner_anlegen_loeschen_und_ln_loeschen(self):
         url = reverse("bewertungsstruktur", args=[self.u.pk])
         self.anmelden("lehrkraft")
-        self.client.post(url, {"aktion": "ordner_neu", "name": "Referate", "eltern": "", "gewicht": "10"})
+        # oberste Ebene ist durch die Klausurregel der Demo-Daten vorgegeben (ab 0.4.8.0) – daher in „Sonstige Mitarbeit“
+        mitarbeit = Bewertungsordner.objects.get(unterricht=self.u, name="Sonstige Mitarbeit", eltern=None)
+        self.client.post(url, {"aktion": "ordner_neu", "name": "Referate", "eltern": str(mitarbeit.pk), "gewicht": "10"})
         neu = Bewertungsordner.objects.get(unterricht=self.u, name="Referate")
-        self.assertEqual((neu.eltern, neu.gewicht), (None, Decimal(10)))
+        self.assertEqual((neu.eltern, neu.gewicht), (mitarbeit, Decimal(10)))
         r = self.client.post(url, {"aktion": f"ordner_loeschen:{self.q1.pk}"}, follow=True)
         self.assertContains(r, "Nur leere Ordner")
         self.client.post(url, {"aktion": f"ordner_loeschen:{neu.pk}"})

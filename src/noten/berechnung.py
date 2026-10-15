@@ -19,7 +19,12 @@ Jede einzelne Note kann ein individuelles Gewicht haben (z. B. Nachschreibarbeit
 sonst gilt das Gewicht des Leistungsnachweises.
 
 Noten mit Sonderstatus (entschuldigt, befreit, nicht bewertbar) zählen nicht.
-"Unentschuldigt" zählt nur, wenn die Lehrkraft eine Note eingetragen hat.
+"Unentschuldigt" zählt mit der eingetragenen Note, sonst mit der Note der Skala für unentschuldigtes Versäumnis
+(Voreinstellung 6 bzw. 0 Punkte; ab 0.4.8.0).
+
+Jahresnote (ab 0.4.8.0): Im 2. Halbjahr kann das 1. Halbjahr mit einem Anteil (Voreinstellung 40 % in Jg. 5–10)
+einfließen:  Jahr = a · Wert(1. Hj.) + (1 − a) · Schnitt(2. Hj.).  Wert(1. Hj.) ist der rechnerische Schnitt oder
+– je nach Einstellung des Unterrichts – die festgesetzte Halbjahreszeugnisnote.
 """
 from collections import defaultdict
 from dataclasses import dataclass, field
@@ -47,6 +52,9 @@ class Vorschlag:
     alle_ordner: list[OrdnerErgebnis] = field(default_factory=list)
     warnungen: list[str] = field(default_factory=list)
     gefaehrdet: bool = False
+    halbjahr_schnitt: Decimal | None = None      # nur 2. Halbjahr (ohne Anteil des 1. Halbjahres)
+    vorhalbjahr: Decimal | None = None           # Wert des 1. Halbjahres, falls eingerechnet
+    anteil_vorhalbjahr: Decimal | None = None    # in Prozent
 
 
 def gewichteter_schnitt(paare):
@@ -122,10 +130,52 @@ def nominale_anteile(ordner, nachweise):
     return anteil_o, anteil_ln
 
 
-def vorschlagsnote(unterricht, schueler, noten=None, baum=None) -> Vorschlag:
+class Vorhalbjahr:
+    """Werte des 1. Halbjahres für die Jahresnote eines Unterrichts im 2. Halbjahr (einmal geladen, je Schüler:in abrufbar)."""
+
+    def __init__(self, unterricht):
+        from .models import Note, Unterricht, Zeugnisnote
+
+        self.unterricht = unterricht
+        self.anteil = (unterricht.anteil_vorhalbjahr or Decimal(0)) / 100
+        self.kurse, self.mitglieder, self._baum, self._noten, self._zeugnis = [], {}, {}, {}, {}
+        hj1 = unterricht.vorhalbjahr() if unterricht.mit_jahresnote else None
+        if hj1 is None:
+            return
+        kurse = list(Unterricht.objects.filter(abschnitt=hj1, fach=unterricht.fach, skala=unterricht.skala)
+                     .select_related("skala", "abschnitt", "gruppe"))
+        # derselbe Kurs (gleiche Gruppe) zuerst, dann andere Kurse desselben Fachs (z. B. nach Klassenwechsel)
+        kurse.sort(key=lambda k: k.gruppe_id != unterricht.gruppe_id)
+        self.kurse = kurse
+        for k in kurse:
+            self.mitglieder[k.pk] = set(k.schueler().values_list("pk", flat=True))
+        ids = [k.pk for k in kurse]
+        for n in Note.objects.filter(leistungsnachweis__unterricht__in=ids).select_related("stufe", "leistungsnachweis"):
+            self._noten.setdefault((n.leistungsnachweis.unterricht_id, n.schueler_id), []).append(n)
+        for z in Zeugnisnote.objects.filter(unterricht__in=ids).select_related("stufe"):
+            self._zeugnis[(z.unterricht_id, z.schueler_id)] = z
+
+    def kurs_fuer(self, schueler):
+        return next((k for k in self.kurse if schueler.pk in self.mitglieder.get(k.pk, ())), None)
+
+    def wert(self, schueler):
+        k = self.kurs_fuer(schueler)
+        if k is None:
+            return None
+        if self.unterricht.vorhalbjahr_basis == "zeugnis":
+            z = self._zeugnis.get((k.pk, schueler.pk))
+            if z is not None and z.stufe_id:
+                return z.stufe.wert
+        if k.pk not in self._baum:
+            self._baum[k.pk] = Baum(k)
+        return vorschlagsnote(k, schueler, self._noten.get((k.pk, schueler.pk), []), self._baum[k.pk], jahr=False).schnitt
+
+
+def vorschlagsnote(unterricht, schueler, noten=None, baum=None, jahr=None) -> Vorschlag:
     """
     Berechnet die Vorschlagsnote einer Schülerin / eines Schülers in einem Unterricht.
-    `noten` und `baum` können vorab geladen übergeben werden (vermeidet viele Datenbankabfragen).
+    `noten` und `baum` können vorab geladen übergeben werden (vermeidet viele Datenbankabfragen),
+    ebenso `jahr` (Vorhalbjahr) für die Jahresnote; `jahr=False` rechnet nur das eigene Halbjahr.
     """
     from .models import Note
 
@@ -133,8 +183,14 @@ def vorschlagsnote(unterricht, schueler, noten=None, baum=None) -> Vorschlag:
     baum = baum or Baum(unterricht)
     if noten is None:
         noten = Note.objects.filter(leistungsnachweis__unterricht=unterricht, schueler=schueler).select_related("stufe")
+    ersatz = skala.unentschuldigt_stufe
     # Wert und ggf. individuelles Gewicht je Leistungsnachweis
-    wert_je_ln = {n.leistungsnachweis_id: (n.stufe.wert, n.gewicht_individuell) for n in noten if n.stufe is not None}
+    wert_je_ln = {}
+    for n in noten:
+        if n.stufe is not None:
+            wert_je_ln[n.leistungsnachweis_id] = (n.stufe.wert, n.gewicht_individuell)
+        elif n.sonderstatus == "unentschuldigt" and ersatz is not None:
+            wert_je_ln[n.leistungsnachweis_id] = (ersatz.wert, n.gewicht_individuell)
 
     ergebnisse: dict[int, OrdnerErgebnis] = {}
 
@@ -169,6 +225,19 @@ def vorschlagsnote(unterricht, schueler, noten=None, baum=None) -> Vorschlag:
     haupt = [ergebnisse[w.pk] for w in baum.wurzeln()]
 
     gesamt = gewichteter_schnitt(gesamt_paare)
+    halbjahr = skala.runden(gesamt) if gesamt is not None else None
+    vorher = anteil = None
+    if jahr is not False and unterricht.mit_jahresnote:
+        jahr = jahr or Vorhalbjahr(unterricht)
+        vorher = jahr.wert(schueler)
+        if vorher is not None:
+            anteil = unterricht.anteil_vorhalbjahr
+            a = anteil / 100
+            if gesamt is None:
+                gesamt = vorher
+                warnungen = [gettext("Noch keine Note im 2. Halbjahr – der Vorschlag beruht nur auf dem 1. Halbjahr.")]
+            else:
+                gesamt = a * vorher + (1 - a) * gesamt
     if gesamt is None:
         return Vorschlag(None, None, haupt, alle, warnungen or [gettext("Noch keine Noten vorhanden.")])
 
@@ -180,4 +249,7 @@ def vorschlagsnote(unterricht, schueler, noten=None, baum=None) -> Vorschlag:
         alle_ordner=alle,
         warnungen=warnungen,
         gefaehrdet=skala.ist_gefaehrdet(gesamt),
+        halbjahr_schnitt=halbjahr,
+        vorhalbjahr=skala.runden(vorher) if vorher is not None else None,
+        anteil_vorhalbjahr=anteil,
     )

@@ -11,6 +11,8 @@ from portal.rechte import ist_verwaltung
 from .berechnung import nominale_anteile
 from .models import (
     Bewertungsordner,
+    Klausurregel,
+    Notensperre,
     Gewichtungsvorlage,
     Leistungskategorie,
     Leistungsnachweis,
@@ -108,6 +110,18 @@ class OberordnerInline(admin.TabularInline):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
+@admin.register(Klausurregel)
+class KlausurregelAdmin(SimpleHistoryAdmin):
+    list_display = ["__str__", "anteil_klausur", "bemerkung"]
+    filter_horizontal = ["faecher"]
+
+
+@admin.register(Notensperre)
+class NotensperreAdmin(SimpleHistoryAdmin):
+    list_display = ["klasse", "abschnitt", "gesperrt", "geaendert_von", "geaendert_am"]
+    list_filter = ["abschnitt", "gesperrt"]
+
+
 @admin.register(Unterricht)
 class UnterrichtAdmin(admin.ModelAdmin):
     list_display = ["__str__", "gruppe", "fach", "lehrkraft", "links"]
@@ -143,6 +157,17 @@ class LeistungsnachweisInline(admin.TabularInline):
 @admin.register(Bewertungsordner)
 class BewertungsordnerAdmin(SimpleHistoryAdmin):
     list_display = ["pfad_anzeige", "unterricht", "gewicht", "anteil", "anzahl_nachweise"]
+
+    def get_readonly_fields(self, request, obj=None):
+        # Vorgaben der Schulleitung (Klausurregel) und Kurse mit gesperrten Noten (ab 0.4.8.0)
+        if obj is not None and (obj.vorgegeben or _kurs_gesperrt(obj.unterricht)):
+            return ["unterricht", "eltern", "name", "gewicht"] + (["gewichtsart", "reihenfolge"] if _kurs_gesperrt(obj.unterricht) else [])
+        return []
+
+    def has_delete_permission(self, request, obj=None):
+        if obj is not None and (obj.vorgegeben or _kurs_gesperrt(obj.unterricht)):
+            return False
+        return super().has_delete_permission(request, obj)
     list_filter = [EigenerUnterrichtFilter]
     search_fields = ["name", "unterricht__gruppe__name", "unterricht__fach__name"]
     fields = ["unterricht", "eltern", "name", "gewicht", "gewichtsart", "reihenfolge", "beschreibung"]
@@ -220,6 +245,20 @@ class NoteInline(admin.TabularInline):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
+def _kurs_gesperrt(unterricht):
+    from .sperre import gesperrte_schueler
+
+    return bool(gesperrte_schueler(unterricht))
+
+
+def _ln_gesperrt(ln):
+    """Hängen an diesem Leistungsnachweis Noten gesperrter Schüler:innen?"""
+    from .sperre import gesperrte_schueler
+
+    ids = list(ln.noten.exclude(stufe__isnull=True, sonderstatus="").values_list("schueler_id", flat=True))
+    return bool(ids and gesperrte_schueler(ln.unterricht, ids))
+
+
 @admin.register(Leistungsnachweis)
 class LeistungsnachweisAdmin(EigeneDatenMixin, SimpleHistoryAdmin):
     list_display = ["titel", "ordner_pfad", "unterricht", "datum", "gewicht", "anzahl_noten"]
@@ -247,6 +286,16 @@ class LeistungsnachweisAdmin(EigeneDatenMixin, SimpleHistoryAdmin):
             kwargs["queryset"] = eigene_ordner(request)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
+    def has_change_permission(self, request, obj=None):
+        if obj is not None and _ln_gesperrt(obj):
+            return False
+        return super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        if obj is not None and _ln_gesperrt(obj):
+            return False
+        return super().has_delete_permission(request, obj)
+
     def save_related(self, request, form, formsets, change):
         super().save_related(request, form, formsets, change)
         neu = form.instance.notenzeilen_anlegen()
@@ -262,6 +311,20 @@ class NoteAdmin(EigeneDatenMixin, SimpleHistoryAdmin):
     search_fields = ["schueler__person__nachname", "leistungsnachweis__titel"]
     autocomplete_fields = ["schueler", "leistungsnachweis"]
 
+    def has_change_permission(self, request, obj=None):
+        from .sperre import ist_gesperrt
+
+        if obj is not None and ist_gesperrt(obj, obj.leistungsnachweis.unterricht):
+            return False
+        return super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        from .sperre import ist_gesperrt
+
+        if obj is not None and ist_gesperrt(obj, obj.leistungsnachweis.unterricht):
+            return False
+        return super().has_delete_permission(request, obj)
+
 
 @admin.register(Zeugnisnote)
 class ZeugnisnoteAdmin(EigeneDatenMixin, SimpleHistoryAdmin):
@@ -269,3 +332,10 @@ class ZeugnisnoteAdmin(EigeneDatenMixin, SimpleHistoryAdmin):
     list_filter = ["unterricht__abschnitt", "unterricht__fach", "unterricht__gruppe"]
     search_fields = ["schueler__person__nachname"]
     autocomplete_fields = ["schueler", "unterricht"]
+
+    def has_change_permission(self, request, obj=None):
+        from .sperre import ist_gesperrt
+
+        if obj is not None and ist_gesperrt(obj, obj.unterricht):
+            return False
+        return super().has_change_permission(request, obj)

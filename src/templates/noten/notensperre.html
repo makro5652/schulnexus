@@ -1,0 +1,41 @@
+{% extends "portal/base.html" %}
+{% load i18n formate %}
+{% block title %}{% translate "Notensperre" %}{% endblock %}
+{% block inhaltsklasse %}breit{% endblock %}
+{% block inhalt %}
+<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › {% translate "Unterricht" %} › {% translate "Notensperre" %}</p>
+<div class="zo-kopf">
+  <div>
+    <h1>{% translate "Notensperre" %}</h1>
+    <p class="unterzeile">{% translate "Nach der Zeugniskonferenz bzw. der Zeugnisfreigabe sind die Noten einer Klasse automatisch gesperrt: Lehrkräfte können dann keine Noten, Gewichte oder Zeugnisnoten mehr ändern. Hier lässt sich eine Klasse zusätzlich von Hand sperren oder für Korrekturen wieder freigeben." %}</p>
+  </div>
+  {% if abschnitte %}<form method="get" class="zo-sj"><label>{% translate "Halbjahr" %}
+    <select name="abschnitt" onchange="this.form.submit()">{% for x in abschnitte %}<option value="{{ x.pk }}"{% if x.pk == a.pk %} selected{% endif %}>{{ x.schuljahr }} · {{ x.lokal_name }}</option>{% endfor %}</select></label>
+    <noscript><button class="knopf klein">{% translate "Anzeigen" %}</button></noscript></form>{% endif %}
+</div>
+
+<section class="karte">
+  {% if zeilen %}
+  <div class="rollbar"><table class="liste ns-tabelle">
+    <thead><tr><th>{% translate "Klasse" %}</th><th>{% translate "Konferenz" %}</th><th class="zahl">{% translate "Zeugnisse freigegeben" %}</th>
+      <th>{% translate "Noten" %}</th><th>{% translate "Ändern" %}</th></tr></thead>
+    <tbody>{% for z in zeilen %}
+      <tr>
+        <th scope="row">{{ z.k.name }}</th>
+        <td>{% if z.konferenz %}{{ z.konferenz.get_status_display }}{% if z.konferenz.datum %} · {{ z.konferenz.datum|kurzdatum }}{% endif %}{% else %}<span class="leise">–</span>{% endif %}</td>
+        <td class="zahl">{{ z.freigegeben }}/{{ z.anzahl }}</td>
+        <td>{% if z.gesperrt %}<span class="etikett warnend">{% translate "gesperrt" %}</span>{% elif z.teilweise %}<span class="etikett">{% translate "teilweise gesperrt" %}</span>{% else %}<span class="etikett">{% translate "offen" %}</span>{% endif %}
+          <small class="blockzeile leise">{% if z.explizit %}{% if z.explizit.gesperrt %}{% translate "von Hand gesperrt" %}{% else %}{% translate "von Hand freigegeben" %}{% endif %} · {{ z.explizit.geaendert_von.get_username|default:"" }} · {{ z.explizit.geaendert_am|date:"SHORT_DATETIME_FORMAT" }}{% if z.explizit.grund %} · {{ z.explizit.grund }}{% endif %}{% elif z.konferenz_gehalten %}{% translate "automatisch: Konferenz durchgeführt" %}{% elif z.teilweise %}{% translate "automatisch: einzelne Zeugnisse freigegeben" %}{% else %}{% translate "automatisch" %}{% endif %}</small></td>
+        <td>
+          <form method="post" class="ns-form">{% csrf_token %}<input type="hidden" name="abschnitt" value="{{ a.pk }}"><input type="hidden" name="klasse" value="{{ z.k.pk }}">
+            <input name="grund" maxlength="200" placeholder="{% translate 'Grund (optional)' %}" aria-label="{% translate 'Grund' %}">
+            {% if not z.gesperrt %}<button type="submit" name="aktion" value="sperren" class="knopf klein">{% translate "Sperren" %}</button>{% endif %}
+            {% if z.gesperrt or z.teilweise %}<button type="submit" name="aktion" value="freigeben" class="knopf zweitrangig klein">{% translate "Zur Korrektur freigeben" %}</button>{% endif %}
+            {% if z.explizit %}<button type="submit" name="aktion" value="automatik" class="link">{% translate "zurück zur Automatik" %}</button>{% endif %}
+          </form></td>
+      </tr>{% endfor %}</tbody>
+  </table></div>
+  {% else %}<p class="leer">{% translate "Keine Klassen in Ihrem Bereich für dieses Halbjahr." %}</p>{% endif %}
+  <p class="hinweistext">{% translate "„Zur Korrektur freigeben“ hebt die automatische Sperre auf, bis die Klasse wieder gesperrt oder auf Automatik gestellt wird. Eine einzelne bereits freigegebene Zeugnisnote ändert man weiterhin über die Rücknahme der Zeugnisfreigabe. Alle Schritte stehen im Protokoll." %}</p>
+</section>
+{% endblock %}

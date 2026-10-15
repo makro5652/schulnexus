@@ -8,6 +8,7 @@ from django.db.models import Count, Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
+from django.utils.translation import gettext
 
 from aufnahme.ansichten import start_hinweise as aufnahme_hinweise
 from elternkontakt.ansichten import akte_kontext as eltern_akte, gruppe_erlaubt as eltern_gruppe_erlaubt
@@ -140,20 +141,35 @@ def notenuebersicht(request, pk):
         else:
             gruppen.append({"pfad": sp["pfad"], "breite": 1})
 
+    from noten.ansichten import summen
+    from noten.models import PROZENT
+
+    summe = summen(baum)
     struktur = [
         {"ordner": o, "ebene": ebene, "pfad": pfad, "anteil": anteil_ordner.get(o.pk),
          "anzahl": len(baum.nachweise_in[o.pk]), "einzug": ebene * 1.4,
-         "gewicht": gewicht_text(o.gewicht, art_von.get(o.eltern_id) if o.eltern_id else unterricht.gewichtsart)}
+         "gewicht": gewicht_text(o.gewicht, art_von.get(o.eltern_id) if o.eltern_id else unterricht.gewichtsart),
+         "belegt": summe.get(o.pk) if o.gewichtsart == PROZENT and summe.get(o.pk, 0) < 100 else None}
         for o, ebene, pfad in baum.in_reihenfolge()
     ]
+    # Prozent-Ebenen, deren Summe noch unter 100 liegt: der Schnitt ist vorläufig (fehlende Anteile werden übersprungen)
+    vorlaeufig = [{"pfad": e["pfad"], "belegt": e["belegt"]} for e in struktur if e["belegt"] is not None]
+    if unterricht.gewichtsart == PROZENT and summe.get(None, 0) < 100:
+        vorlaeufig.insert(0, {"pfad": gettext("oberste Ebene"), "belegt": summe.get(None, 0)})
 
     alle_noten = Note.objects.filter(leistungsnachweis__unterricht=unterricht).select_related("stufe")
     noten_je_schueler = defaultdict(list)
     for n in alle_noten:
         noten_je_schueler[n.schueler_id].append(n)
 
+    from noten.berechnung import Vorhalbjahr
+
+    jahr = Vorhalbjahr(unterricht) if unterricht.mit_jahresnote else False
     zeilen = []
     schueler_liste = list(unterricht.schueler())
+    from noten.sperre import gesperrte_schueler
+
+    gesperrt = gesperrte_schueler(unterricht, [s.pk for s in schueler_liste])
     nta = aktive_nta_je_schueler([s.pk for s in schueler_liste])
     for s in schueler_liste:
         noten = noten_je_schueler[s.pk]
@@ -162,9 +178,9 @@ def notenuebersicht(request, pk):
         zeilen.append({
             "nta": eigene_nta if eigene_nta and darf_nachteilsausgleich_sehen(request.user, s) else None,
             "nta_text": nta_kurztext(eigene_nta),
-            "schueler": s,
+            "schueler": s, "gesperrt": s.pk in gesperrt,
             "zellen": [nach_ln.get(sp["ln"].pk) for sp in spalten],
-            "vorschlag": vorschlagsnote(unterricht, s, noten, baum),
+            "vorschlag": vorschlagsnote(unterricht, s, noten, baum, jahr=jahr),
         })
 
     return render(
@@ -172,7 +188,8 @@ def notenuebersicht(request, pk):
         "portal/notenuebersicht.html",
         {"unterricht": unterricht, "spalten": spalten, "gruppen": gruppen, "zeilen": zeilen, "struktur": struktur,
          "darf_eintragen": noten_rechte.darf_noten_eintragen(request.user, unterricht),
-         "kurswahl": kurswahl_auswahl(request, unterricht, nur_wenn_enthalten=True),
+         "kurswahl": kurswahl_auswahl(request, unterricht, nur_wenn_enthalten=True), "vorlaeufig": vorlaeufig,
+         "jahresnote": unterricht.mit_jahresnote, "gesperrt_anzahl": len(gesperrt),
          "vorgaben": noten_vorgaben.staende_fuer_unterricht(unterricht) if noten_rechte.darf_vorgaben_sehen(request.user) else []},
     )
 

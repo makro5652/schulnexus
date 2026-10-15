@@ -8,11 +8,15 @@
 <p class="knopfreihe ne-kopfknoepfe">
   {% if darf_eintragen %}<a class="knopf" href="{% url 'noten_eintragen' unterricht.pk %}">{% translate "Noten eintragen" %}</a>
   <a class="knopf zweitrangig" href="{% url 'bewertungsstruktur' unterricht.pk %}">{% translate "Bewertungsstruktur" %}</a>{% endif %}
-  <a class="knopf zweitrangig" href="{% url 'zeugnis_unterricht' unterricht.pk %}">{% translate "Zeugnisnoten und Kommentare" %}</a></p>
+  <a class="knopf zweitrangig" href="{% url 'zeugnis_unterricht' unterricht.pk %}">{% translate "Zeugnisnoten und Kommentare" %}</a>
+  {% if spalten %}<a class="knopf zweitrangig" href="{% url 'noten_excel' unterricht.pk %}" title="{% translate 'Notenübersicht als Excel-Datei herunterladen' %}">{% translate "Excel" %}</a>
+  <a class="knopf zweitrangig" href="{% url 'notenbogen' unterricht.pk %}" title="{% translate 'Kursübersicht und Notenbogen je Schüler:in als PDF' %}">{% translate "Notenbogen (PDF)" %}</a>{% endif %}</p>
+{% if gesperrt_anzahl %}<p class="ne-sperre">{% blocktranslate count n=gesperrt_anzahl %}Die Noten von {{ n }} Schüler:in sind gesperrt (Zeugnisfreigabe bzw. Konferenz).{% plural %}Die Noten von {{ n }} Schüler:innen sind gesperrt (Zeugnisfreigabe bzw. Konferenz).{% endblocktranslate %}</p>{% endif %}
 <p class="unterzeile">{{ unterricht.abschnitt }} · {% blocktranslate with name=unterricht.lehrkraft.person.anzeigename %}Lehrkraft {{ name }}{% endblocktranslate %} · {% blocktranslate with skala=unterricht.skala %}Skala „{{ skala }}“{% endblocktranslate %}</p>
 {% if vorgaben %}{% include "noten/_vorgaben_unterricht.html" %}{% endif %}
 
-{% if spalten %}
+{% if vorlaeufig %}<p class="ne-vorlaeufig">{% translate "Vorläufig:" %} {% for v in vorlaeufig %}{% blocktranslate with pfad=v.pfad belegt=v.belegt|floatformat:-2 %}„{{ pfad }}“ ist erst zu {{ belegt }} % belegt{% endblocktranslate %}{% if not forloop.last %}; {% endif %}{% endfor %}. {% translate "Fehlende Anteile werden übersprungen, die vorhandenen zählen entsprechend mehr." %}</p>{% endif %}
+{% if spalten or jahresnote %}
 <div class="tabellenrahmen">
 <table class="noten">
   <thead>
@@ -20,7 +24,9 @@
       <th rowspan="2" class="links">{% translate "Schüler:in" %}</th>
       {% for g in gruppen %}<th colspan="{{ g.breite }}" class="ordnerkopf">{{ g.pfad }}</th>{% endfor %}
       <th colspan="{{ struktur|length }}" class="ordnerkopf kat">{% translate "Ordnerschnitte" %}</th>
-      <th rowspan="2" class="vorschlag">{% translate "Vorschlag" %}</th>
+      {% if jahresnote %}<th rowspan="2" class="kat">{% translate "Ø 2. Halbjahr" %}</th>
+      <th rowspan="2" class="kat">{% blocktranslate with a=unterricht.anteil_vorhalbjahr|floatformat:-2 %}1. Halbjahr ({{ a }} %){% endblocktranslate %}</th>{% endif %}
+      <th rowspan="2" class="vorschlag">{% if jahresnote %}{% translate "Jahresvorschlag" %}{% else %}{% translate "Vorschlag" %}{% endif %}</th>
     </tr>
     <tr>
       {% for sp in spalten %}
@@ -36,11 +42,13 @@
   <tbody>
   {% for z in zeilen %}
     <tr class="{% if z.vorschlag.gefaehrdet %}gefaehrdet{% endif %}">
-      <th class="links">{{ z.schueler.person }}{% if z.nta %}<a class="nta-marke" href="{% url 'nachteilsausgleich' z.nta.0.pk %}" title="{% translate 'Nachteilsausgleich' %}: {{ z.nta_text }}">{% translate "NTA" %}</a>{% endif %}</th>
+      <th class="links">{{ z.schueler.person }}{% if z.gesperrt %} <span class="ne-schloss" title="{% translate 'Noten gesperrt' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-schluessel"/></svg><span class="mb-unsichtbar">{% translate "gesperrt" %}</span></span>{% endif %}<a class="ne-bogen" href="{% url 'notenbogen' unterricht.pk %}?schueler={{ z.schueler.pk }}" title="{% translate 'Notenbogen (PDF)' %}">PDF</a>{% if z.nta %}<a class="nta-marke" href="{% url 'nachteilsausgleich' z.nta.0.pk %}" title="{% translate 'Nachteilsausgleich' %}: {{ z.nta_text }}">{% translate "NTA" %}</a>{% endif %}</th>
       {% for n in z.zellen %}
-        <td>{% if n %}{% if n.stufe %}{{ n.stufe }}{% if n.gewicht_individuell is not None %}<span class="einzelgewicht" title="{% blocktranslate with grund=n.gewicht_begruendung %}Individuelles Gewicht: {{ grund }}{% endblocktranslate %}">×{{ n.gewicht_individuell|floatformat:-2 }}</span>{% endif %}{% if n.prozent is not None %}<small>{{ n.prozent }} %</small>{% endif %}{% elif n.sonderstatus %}<span class="sonder" title="{{ n.get_sonderstatus_display }}">{{ n.sonderstatus_kurz }}</span>{% else %}<span class="leer">–</span>{% endif %}{% else %}<span class="leer">–</span>{% endif %}</td>
+        <td>{% if n %}{% if n.stufe %}{{ n.stufe }}{% if n.gewicht_individuell is not None %}<span class="einzelgewicht" title="{% blocktranslate with grund=n.gewicht_begruendung %}Individuelles Gewicht: {{ grund }}{% endblocktranslate %}">×{{ n.gewicht_individuell|floatformat:-2 }}</span>{% endif %}{% if n.prozent is not None %}<small>{{ n.prozent }} %</small>{% endif %}{% elif n.sonderstatus %}<span class="sonder" title="{{ n.get_sonderstatus_display }}">{{ n.sonderstatus_kurz }}{% if n.sonderstatus == "unentschuldigt" and unterricht.skala.unentschuldigt_stufe %} ({{ unterricht.skala.unentschuldigt_stufe }}){% endif %}</span>{% else %}<span class="leer">–</span>{% endif %}{% else %}<span class="leer">–</span>{% endif %}</td>
       {% endfor %}
       {% for k in z.vorschlag.alle_ordner %}<td class="kat">{{ k.schnitt|default_if_none:"–" }}</td>{% endfor %}
+      {% if jahresnote %}<td class="kat">{{ z.vorschlag.halbjahr_schnitt|default_if_none:"–" }}</td>
+      <td class="kat">{{ z.vorschlag.vorhalbjahr|default_if_none:"–" }}</td>{% endif %}
       <td class="vorschlag">
         {% if z.vorschlag.schnitt is not None %}<strong>{{ z.vorschlag.stufe }}</strong><small>Ø {{ z.vorschlag.schnitt }}</small>{% else %}–{% endif %}
         {% if z.vorschlag.warnungen %}<span class="warnung" title="{{ z.vorschlag.warnungen|join:' ' }}">!</span>{% endif %}
@@ -52,7 +60,9 @@
   </tbody>
 </table>
 </div>
-<p class="hinweistext">{% translate "Der Vorschlag ist rechnerisch ermittelt; die Zeugnisnote setzt die Lehrkraft in pädagogischer Gesamtwürdigung fest. Rot markierte Zeilen liegen im Gefährdungsbereich. Ein Ausrufezeichen zeigt einen Ordner ohne Note an. Die Prozentangaben gelten, wenn alle Einträge bewertet sind; leere Ordner werden übersprungen." %}</p>
+<p class="hinweistext">{% translate "Der Vorschlag ist rechnerisch ermittelt; die Zeugnisnote setzt die Lehrkraft in pädagogischer Gesamtwürdigung fest. Rot markierte Zeilen liegen im Gefährdungsbereich. Ein Ausrufezeichen zeigt einen Ordner ohne Note an. Die Prozentangaben gelten, wenn alle Einträge bewertet sind; leere Ordner werden übersprungen." %}
+  {% if jahresnote %}{% blocktranslate with a=unterricht.anteil_vorhalbjahr|floatformat:-2 %}Jahresvorschlag: 1. Halbjahr {{ a }} %, 2. Halbjahr den Rest; ändern unter „Bewertungsstruktur“.{% endblocktranslate %}{% endif %}
+  {% translate "Gerundet wird bei Gleichstand zur besseren Note." as r %}{% if unterricht.skala.rundung == "zugunsten" %}{{ r }}{% endif %}</p>
 {% else %}
 <p class="leer">{% translate "Noch keine Leistungsnachweise angelegt." %}</p>
 {% endif %}

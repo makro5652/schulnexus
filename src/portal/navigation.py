@@ -9,6 +9,7 @@ from django.utils.translation import gettext as _, pgettext
 
 from elternkontakt.rechte import darf_regeln
 from laufbahn.rechte import darf_archiv, darf_fristen_sehen, darf_schuljahre
+from noten import rechte as noten_rechte
 
 from .rechte import (
     darf_sichern, ist_finanzen, ist_foerderkoordination, ist_it, ist_personalverwaltung, ist_schulleitung, ist_systemverwaltung,
@@ -176,7 +177,10 @@ def menueband(request):
         .add(_("Zeugnisnoten (Liste)"), _url("admin:noten_zeugnisnote_changelist"), "liste",
              bedingung=admin and p("noten.view_zeugnisnote"))
         .add(_("Konferenzen"), _url("admin:zeugnisse_konferenz_changelist"), "gruppen",
-             bedingung=admin and p("zeugnisse.change_konferenz")),
+             bedingung=admin and p("zeugnisse.change_konferenz"))
+        .add(_("Notensperre"), _url("notensperre"), "schild",
+             bedingung=noten_rechte.darf_noten_sperren(user, None) or noten_rechte.ist_koordination(user),
+             hinweis=_("Noten einer Klasse nach Zeugnisfreigabe bzw. Konferenz sperren oder wieder freigeben")),
     )
 
     # ------------------------------------------------------------ Förderung
@@ -242,7 +246,9 @@ def menueband(request):
         .add(_("Fächer"), _url("admin:stammdaten_fach_changelist"), "buch", bedingung=leitung and p("stammdaten.view_fach"))
         .add(_("Notenskalen"), _url("admin:noten_notenskala_changelist"), "lineal", bedingung=leitung and p("noten.view_notenskala"))
         .add(_("Gewichtungsvorlagen"), _url("admin:noten_gewichtungsvorlage_changelist"), "regler",
-             bedingung=leitung and p("noten.view_gewichtungsvorlage")),
+             bedingung=leitung and p("noten.view_gewichtungsvorlage"))
+        .add(_("Klausuren je Fach"), _url("klausurregeln"), "stift", bedingung=noten_rechte.darf_klausurregeln(user),
+             hinweis=_("Klausuren bzw. Klassenarbeiten mit festem Anteil (z. B. 50 / 50), festgelegt nach Fachkonferenz")),
         Gruppe(_("Archiv"))
         .add(_("Archiv"), _url("archiv"), "archiv", gross=True, bedingung=leitung and darf_archiv(user),
              hinweis=_("Abgegangene Schüler:innen, Abgangszeugnisse, Löschfristen"))

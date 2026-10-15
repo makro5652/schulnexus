@@ -1,6 +1,6 @@
 """Portalansichten: Zeugnisnoten und Kommentare je Unterricht, Zeugnisse je Klasse, Zeugnis, Druck, Konferenzen."""
 from collections import Counter
-from decimal import ROUND_DOWN, ROUND_HALF_UP, Decimal
+from decimal import ROUND_DOWN, Decimal
 
 from django import forms
 from django.conf import settings
@@ -16,7 +16,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext, ngettext
 from django.views.decorators.http import require_POST
 
-from noten.berechnung import Baum, vorschlagsnote
+from noten.berechnung import Baum, Vorhalbjahr, vorschlagsnote
 from noten.models import Note, Unterricht, Zeugnisnote
 from portal.rechte import ist_schulleitung, ist_verwaltung, personal_von
 from stammdaten.models import Abschnitt, Gruppe, Personalprofil
@@ -164,8 +164,11 @@ def unterricht(request, pk):
     zeugnisse = {}
     for s in schueler:
         zeugnisse[s.pk] = zeugnis_fuer(s, u.abschnitt)
-    gesperrt = {sid for sid, z in zeugnisse.items() if z.freigegeben}
+    from noten.sperre import gesperrte_schueler
+
+    gesperrt = {sid for sid, z in zeugnisse.items() if z.freigegeben} | gesperrte_schueler(u, [s.pk for s in schueler])
     baum = Baum(u)
+    jahr = Vorhalbjahr(u) if u.mit_jahresnote else False
     alle = Note.objects.filter(leistungsnachweis__unterricht=u).select_related("stufe")
     noten_je = {}
     for n in alle:
@@ -188,7 +191,7 @@ def unterricht(request, pk):
                         bestehend.pop(s.pk).delete()
                     continue
                 z = bestehend.get(s.pk) or Zeugnisnote(unterricht=u, schueler=s)
-                v = vorschlagsnote(u, s, noten_je.get(s.pk, []), baum)
+                v = vorschlagsnote(u, s, noten_je.get(s.pk, []), baum, jahr=jahr)
                 z.vorschlag = v.schnitt
                 z.begruendung = begruendung
                 if wert in ("nb", "befreit"):
@@ -219,7 +222,7 @@ def unterricht(request, pk):
     zeilen = []
     for s in schueler:
         z = zeugnisse[s.pk]
-        v = vorschlagsnote(u, s, noten_je.get(s.pk, []), baum)
+        v = vorschlagsnote(u, s, noten_je.get(s.pk, []), baum, jahr=jahr)
         zn = bestehend.get(s.pk)
         if s.pk not in lehrkraefte:
             lehrkraefte[s.pk] = rechte.lehrkraefte_ids(s, u.abschnitt)
@@ -231,7 +234,7 @@ def unterricht(request, pk):
         elif zn:
             gewaehlt = zn.vermerk or str(zn.stufe_id)
         elif v.schnitt is not None and auswahl:
-            ziel = v.schnitt if u.skala.hoeher_ist_besser else v.schnitt.quantize(Decimal(1), rounding=ROUND_HALF_UP)
+            ziel = u.skala.ganz_runden(v.schnitt)
             naechste = min(auswahl, key=lambda st: abs(st.wert - ziel))
             gewaehlt, vorgeschlagen = str(naechste.pk), True
         zeilen.append({

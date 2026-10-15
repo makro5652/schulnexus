@@ -54,7 +54,7 @@ class RollenTest(TestCase):
         r = self.client.get(reverse("schuelerakte", args=[self.s9a.pk]))
         self.assertEqual(r.status_code, 200)
         self.assertContains(r, "Testallergie Haselnuss")  # Gesundheitshinweise der Stufe
-        u = Unterricht.objects.get(fach__kuerzel="CH", gruppe__name="9a")  # fremder Unterricht in der Stufe
+        u = Unterricht.objects.get(fach__kuerzel="CH", gruppe__name="9a", abschnitt__nummer=1)  # fremder Unterricht in der Stufe
         self.assertEqual(self.status(reverse("notenuebersicht", args=[u.pk])), 200)
         self.assertEqual(self.status(reverse("klassenliste", args=[Gruppe.objects.get(name="9b").pk])), 200)
         self.assertEqual(self.status(reverse("stufe", args=["mittelstufe"])), 200)
@@ -110,7 +110,7 @@ class RollenTest(TestCase):
         self.anmelden("finanzen")
         self.assertEqual(self.status(reverse("start")), 200)
         self.assertEqual(self.status(reverse("schuelerakte", args=[self.s9a.pk])), 403)
-        u = Unterricht.objects.get(fach__kuerzel="CH", gruppe__name="9a")
+        u = Unterricht.objects.get(fach__kuerzel="CH", gruppe__name="9a", abschnitt__nummer=1)
         self.assertEqual(self.status(reverse("notenuebersicht", args=[u.pk])), 403)
         self.assertEqual(self.status(reverse("admin:stammdaten_beziehung_changelist") + "?rechnungsempfaenger__exact=1"), 200)
         self.assertEqual(self.status(reverse("admin:foerderung_foerderplan_changelist")), 403)

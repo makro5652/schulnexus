@@ -125,7 +125,7 @@ class SprachwahlTest(TestCase):
     def test_portalseiten_englisch(self):
         self.client.login(username="lehrkraft", password=PW)
         self.englisch_waehlen()
-        u = Unterricht.objects.get(fach__kuerzel="CH", gruppe__name="9a")
+        u = Unterricht.objects.get(fach__kuerzel="CH", gruppe__name="9a", abschnitt__nummer=1)
         r = self.client.get(reverse("notenuebersicht", args=[u.pk]))
         self.assertContains(r, "Chemistry")
         self.assertContains(r, "Suggestion")

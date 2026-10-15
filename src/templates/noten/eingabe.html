@@ -8,6 +8,7 @@
 <div class="kw-kopf"><h1>{% if ln %}{% blocktranslate with titel=ln.titel %}Noten: {{ titel }}{% endblocktranslate %}{% else %}{% translate "Noten eintragen" %}{% endif %}</h1>{% if not ln %}{% include "noten/_kurswahl.html" with kw=kurswahl stil="wechsel" ziel="eintragen" %}{% endif %}</div>
 <p class="unterzeile">{{ u.fach.lokal_name }} · {{ u.gruppe.name }} · {{ u.abschnitt }} · {% blocktranslate with skala=u.skala %}Skala „{{ skala }}“{% endblocktranslate %}</p>
 
+{% if gesperrt_anzahl %}<p class="ne-sperre">{% blocktranslate count n=gesperrt_anzahl %}Die Noten von {{ n }} Schüler:in sind gesperrt (Zeugnisfreigabe bzw. Konferenz).{% plural %}Die Noten von {{ n }} Schüler:innen sind gesperrt (Zeugnisfreigabe bzw. Konferenz).{% endblocktranslate %}{% if kopf_gesperrt %} {% translate "Gewicht, Ordner, Datum und Notenschlüssel dieses Leistungsnachweises bleiben deshalb unverändert." %}{% endif %}</p>{% endif %}
 <form method="post" id="ne-form" class="ne-form" novalidate>{% csrf_token %}
   {{ erlaubt_liste|json_script:"ne-erlaubt" }}
   {{ schluessel|json_script:"ne-schluessel" }}
@@ -50,14 +51,15 @@
         <th class="ne-einzel">{% translate "Einzelgewicht" %}</th><th class="ne-einzel">{% translate "Begründung" %}</th></tr></thead>
       <tbody>
       {% for z in zeilen %}
-        <tr{% if z.fehler %} class="ne-falsch"{% endif %}>
+        <tr class="{% if z.fehler %}ne-falsch{% endif %}{% if z.gesperrt %} ne-gesperrt{% endif %}">
           <td class="ne-nr">{{ forloop.counter }}</td>
           <th scope="row"><label for="n_{{ z.s.pk }}">{{ z.s.person }}</label></th>
-          <td class="ne-zelle"><input class="ne-note" id="n_{{ z.s.pk }}" name="n_{{ z.s.pk }}" value="{{ z.w.note|default:'' }}" autocomplete="off" autocapitalize="off" spellcheck="false" size="6">
+          <td class="ne-zelle"><input class="ne-note" id="n_{{ z.s.pk }}" name="n_{{ z.s.pk }}" value="{{ z.w.note|default:'' }}" autocomplete="off" autocapitalize="off" spellcheck="false" size="6"{% if z.gesperrt %} disabled title="{% translate 'Noten gesperrt (Zeugnisfreigabe bzw. Konferenz)' %}"{% endif %}>
+            {% if z.gesperrt %}<span class="etikett warnend">{% translate "gesperrt" %}</span>{% endif %}
             <span class="ne-deutung" aria-live="polite"></span>{% if z.fehler %}<small class="fehler ne-fehlertext">{{ z.fehler }}</small>{% endif %}</td>
-          <td><input class="ne-kommentar" name="k_{{ z.s.pk }}" value="{{ z.w.kommentar|default:'' }}" maxlength="200" aria-label="{% translate 'Kommentar' %} {{ z.s.person }}"></td>
-          <td class="ne-einzel"><input name="g_{{ z.s.pk }}" value="{{ z.w.gewicht|default:'' }}" inputmode="decimal" size="4" aria-label="{% translate 'Einzelgewicht' %} {{ z.s.person }}"></td>
-          <td class="ne-einzel"><input name="b_{{ z.s.pk }}" value="{{ z.w.begruendung|default:'' }}" maxlength="200" aria-label="{% translate 'Begründung' %} {{ z.s.person }}"></td>
+          <td><input class="ne-kommentar" name="k_{{ z.s.pk }}" value="{{ z.w.kommentar|default:'' }}" maxlength="200" aria-label="{% translate 'Kommentar' %} {{ z.s.person }}"{% if z.gesperrt %} disabled{% endif %}></td>
+          <td class="ne-einzel"><input name="g_{{ z.s.pk }}" value="{{ z.w.gewicht|default:'' }}" inputmode="decimal" size="4" aria-label="{% translate 'Einzelgewicht' %} {{ z.s.person }}"{% if z.gesperrt %} disabled{% endif %}></td>
+          <td class="ne-einzel"><input name="b_{{ z.s.pk }}" value="{{ z.w.begruendung|default:'' }}" maxlength="200" aria-label="{% translate 'Begründung' %} {{ z.s.person }}"{% if z.gesperrt %} disabled{% endif %}></td>
         </tr>
       {% empty %}<tr><td colspan="6" class="leer">{% translate "Keine Schüler:innen in dieser Gruppe." %}</td></tr>
       {% endfor %}

@@ -56,7 +56,7 @@
     return verzeichnis[t] ? { ok: true, text: "" } : { ok: false, text: T.ungueltig };
   }
 
-  var felder = Array.prototype.slice.call(form.querySelectorAll(".ne-note"));
+  var felder = Array.prototype.slice.call(form.querySelectorAll(".ne-note:not([disabled])"));
   var geaendert = false;
 
   function pruefen(feld) {

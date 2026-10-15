@@ -25,7 +25,7 @@
   <tbody class="zg-schueler{% if r.fehler %} fehlerhaft{% endif %}">
     <tr>
       <th scope="row"><a href="{% url 'zeugnis' r.z.pk %}">{{ r.s.person.nachname }}, {{ r.s.person.rufname|default:r.s.person.vorname }}</a>
-        {% if r.gesperrt %}<span class="etikett">{% translate "freigegeben" %}</span>{% endif %}</th>
+        {% if r.gesperrt %}<span class="etikett">{% if r.z.freigegeben %}{% translate "freigegeben" %}{% else %}{% translate "gesperrt" %}{% endif %}</span>{% endif %}</th>
       <td class="nowrap">{% if r.vorschlag.schnitt is not None %}<strong>{{ r.vorschlag.stufe }}</strong> <small class="leise">Ø {{ r.vorschlag.schnitt }}</small>{% else %}<span class="leer">–</span>{% endif %}</td>
       <td>
         {% if darf_noten and not r.gesperrt %}

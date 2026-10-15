@@ -214,7 +214,7 @@ class MenuebandTest(TestCase):
             "foerderung": {"start", "termine", "schueler", "unterricht", "foerderung"},
             "schulleitung": {"start", "termine", "schueler", "unterricht", "foerderung", "schulleitung", "verwaltung", "personal", "system"},
             "finanzen": {"start", "termine", "schueler", "verwaltung"},
-            "stellvertretung": {"start", "termine", "schueler", "unterricht", "foerderung"},
+            "stellvertretung": {"start", "termine", "schueler", "unterricht", "foerderung", "schulleitung"},  # Klausuren je Fach
         }
         for name, karten in erwartet.items():
             self.anmelden(name)
@@ -254,7 +254,7 @@ class MenuebandTest(TestCase):
         from noten.models import Unterricht
 
         self.anmelden("lehrkraft")
-        u = Unterricht.objects.get(fach__kuerzel="CH", gruppe__name="9a")
+        u = Unterricht.objects.get(fach__kuerzel="CH", gruppe__name="9a", abschnitt__nummer=1)
         self.assertEqual(self.band(reverse("notenuebersicht", args=[u.pk]))[0]["aktiv"], "unterricht")
         self.assertEqual(self.band(reverse("admin:noten_leistungsnachweis_changelist"))[0]["aktiv"], "unterricht")
         self.assertEqual(self.band(reverse("admin:foerderung_foerderplan_changelist"))[0]["aktiv"], "foerderung")

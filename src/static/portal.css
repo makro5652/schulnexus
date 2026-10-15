@@ -1061,3 +1061,18 @@ p.zf-status { margin: 0 0 0.6rem; }
   .kw-wechsel { width: 100%; }
   .kw-wechsel select { flex: 1; max-width: none; }
 }
+.ne-vorlaeufig { background: var(--akzent-hell); border-left: 4px solid var(--akzent); padding: 0.55rem 0.8rem; border-radius: 6px; font-size: 0.9rem; }
+.ne-vorgabe { font-weight: 600; }
+.ne-liegt-in { max-width: 12rem; }
+.ne-jahresnote { border: 1px solid var(--linie); border-radius: var(--radius); padding: 0.6rem 1rem 0.2rem; margin: 1rem 0; display: flex; gap: 0.6rem 1.4rem; flex-wrap: wrap; align-items: flex-end; }
+.ne-jahresnote legend { font-weight: 600; padding: 0 0.3rem; }
+.ne-jahresnote .hinweistext { flex-basis: 100%; }
+.ns-form { display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap; margin: 0; }
+.ns-form input { font: inherit; font-size: 0.85rem; padding: 0.3rem 0.45rem; border: 1px solid var(--linie); border-radius: 6px; background: var(--grund); color: var(--text); width: 12rem; max-width: 100%; }
+.ne-gesperrt td, .ne-gesperrt th { color: var(--leise); }
+.ne-gesperrt input { opacity: 0.55; cursor: not-allowed; border-style: dashed !important; }
+.ne-sperre { background: var(--gefahr-flaeche); color: var(--warnung); border-radius: 6px; padding: 0.55rem 0.8rem; font-size: 0.9rem; }
+.ne-bogen { margin-left: 0.4rem; font-size: 0.68rem; font-weight: 600; color: var(--leise); text-decoration: none; border: 1px solid var(--linie); border-radius: 4px; padding: 0 0.25rem; }
+.ne-bogen:hover { color: var(--akzent); border-color: var(--akzent); }
+.ne-schloss svg { width: 0.85rem; height: 0.85rem; vertical-align: -0.1rem; color: var(--warnung); }
+@media print { .ne-bogen { display: none; } }
