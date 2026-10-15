@@ -154,12 +154,18 @@ class SprachwahlTest(TestCase):
         """Alle Listen- und Hinzufügen-Seiten müssen auch auf Englisch fehlerfrei rendern."""
         from django.contrib import admin
 
-        User.objects.create_superuser("chef", "", PW)
+        from django.test import RequestFactory
+
+        chef = User.objects.create_superuser("chef", "", PW)
         self.client.login(username="chef", password=PW)
         self.englisch_waehlen()
-        for model in admin.site._registry:
+        anfrage = RequestFactory().get("/")
+        anfrage.user = chef
+        for model, model_admin in admin.site._registry.items():
             info = (model._meta.app_label, model._meta.model_name)
             for name in ("changelist", "add"):
+                if name == "add" and not model_admin.has_add_permission(anfrage):
+                    continue          # z. B. fehlgeschlagene Anmeldungen: nur ansehen und löschen
                 url = reverse(f"admin:{info[0]}_{info[1]}_{name}")
                 self.assertEqual(self.client.get(url).status_code, 200, url)
 

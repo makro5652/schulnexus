@@ -12,8 +12,8 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext, gettext_lazy as _, ngettext
 from django.views.decorators.cache import never_cache
 
-from . import zweifaktor as Z
-from .formulare import AnmeldeFormular
+from . import anmeldeschutz, zweifaktor as Z
+from .formulare import AnmeldeFormular, sperrmeldung
 
 SITZUNG = "zweifaktor_anmeldung"
 GUELTIG_SEKUNDEN = 300
@@ -55,6 +55,11 @@ def anmelden_code(request):
         return redirect("login")
     form = CodeForm()
     if request.method == "POST":
+        ip = anmeldeschutz.client_ip(request)
+        if anmeldeschutz.gesperrt(user.get_username(), ip):
+            request.session.pop(SITZUNG, None)
+            messages.error(request, sperrmeldung())
+            return redirect("login")
         form = CodeForm(request.POST)
         if form.is_valid():
             art = Z.code_pruefen(Z.eintrag(user), form.cleaned_data["code"])
@@ -70,6 +75,7 @@ def anmelden_code(request):
                 if not url_has_allowed_host_and_scheme(weiter, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
                     weiter = reverse("start")
                 return redirect(weiter)
+            anmeldeschutz.fehlversuch(user.get_username(), ip)
             daten["versuche"] = daten.get("versuche", 0) + 1
             if daten["versuche"] >= VERSUCHE:
                 request.session.pop(SITZUNG, None)

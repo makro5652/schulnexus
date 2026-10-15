@@ -78,10 +78,9 @@ def deuten(text, ln, verzeichnis):
             raise EingabeFehler(gettext("„%(text)s“ ist keine Note dieser Skala.") % {"text": text.strip()})
         return Gedeutet(stufe=s)
     if ln.schluessel_id and ln.max_be:
-        try:
-            be = Decimal(t.replace(",", "."))
-        except InvalidOperation:
-            raise EingabeFehler(gettext("„%(text)s“: Bitte erreichte BE als Zahl eingeben (oder =Note).") % {"text": text.strip()}) from None
+        be = zahl_lesen(t)
+        if be is None:
+            raise EingabeFehler(gettext("„%(text)s“: Bitte erreichte BE als Zahl eingeben (oder =Note).") % {"text": text.strip()})
         if be < 0 or be > ln.max_be:
             raise EingabeFehler(gettext("%(be)s BE liegt nicht zwischen 0 und %(max)s.") % {
                 "be": text.strip(), "max": _zahl(ln.max_be)})
@@ -116,14 +115,29 @@ def anzeige(note):
     return ""
 
 
-def gewicht_deuten(text):
+HOECHSTWERT = Decimal("9999.99")      # passt zu den Dezimalfeldern (6 Stellen, davon 2 nach dem Komma)
+
+
+def zahl_lesen(text, hoechstens=HOECHSTWERT):
+    """Zahl aus einer Eingabe (Komma oder Punkt). None bei Unsinn, NaN/Unendlich oder zu großen Werten."""
     t = (text or "").strip().replace(",", ".")
     if not t:
         return None
     try:
         wert = Decimal(t)
     except InvalidOperation:
-        raise EingabeFehler(gettext("Das Gewicht muss eine Zahl sein.")) from None
+        return None
+    if not wert.is_finite() or abs(wert) > hoechstens:
+        return None
+    return wert
+
+
+def gewicht_deuten(text):
+    if not (text or "").strip():
+        return None
+    wert = zahl_lesen(text)
+    if wert is None:
+        raise EingabeFehler(gettext("Das Gewicht muss eine Zahl sein."))
     if wert < 0:
         raise EingabeFehler(gettext("Das Gewicht darf nicht negativ sein."))
     return wert

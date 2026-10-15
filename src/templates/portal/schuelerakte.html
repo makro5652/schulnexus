@@ -2,7 +2,7 @@
 {% load i18n formate %}
 {% block title %}{% blocktranslate with name=p.anzeigename %}Schülerakte {{ name }}{% endblocktranslate %}{% endblock %}
 {% block inhalt %}
-<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a>{% if klasse %} › <a href="{% url 'klassenliste' klasse.pk %}">{% blocktranslate with name=klasse.name %}Klasse {{ name }}{% endblocktranslate %}</a>{% endif %} › {% translate "Schülerakte" %}</p>
+<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a>{% if klasse %} › {% if darf_klasse %}<a href="{% url 'klassenliste' klasse.pk %}">{% blocktranslate with name=klasse.name %}Klasse {{ name }}{% endblocktranslate %}</a>{% else %}{% blocktranslate with name=klasse.name %}Klasse {{ name }}{% endblocktranslate %}{% endif %}{% endif %} › {% translate "Schülerakte" %}</p>
 <div class="akte-kopf">
   <div>
     <h1>{{ p.vorname }} {{ p.nachname }}{% if p.rufname %} <span class="leise">({{ p.rufname }})</span>{% endif %}</h1>
@@ -135,7 +135,7 @@
       <tbody>
       {% for n in noten %}
         <tr class="{% if n.vorschlag.gefaehrdet %}auffaellig{% endif %}">
-          <td><a href="{% url 'notenuebersicht' n.unterricht.pk %}">{{ n.unterricht.fach.lokal_name }}</a></td>
+          <td>{% if n.darf_oeffnen %}<a href="{% url 'notenuebersicht' n.unterricht.pk %}">{{ n.unterricht.fach.lokal_name }}</a>{% else %}{{ n.unterricht.fach.lokal_name }}{% endif %}</td>
           <td>{{ n.unterricht.abschnitt.lokal_name }}</td>
           <td class="zahl">{{ n.vorschlag.schnitt|default_if_none:"–" }}</td>
           <td class="zahl"><strong>{{ n.vorschlag.stufe|default_if_none:"–" }}</strong></td>

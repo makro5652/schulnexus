@@ -30,8 +30,8 @@ from stammdaten.zusatzfelder import anzeige as zusatz_anzeige
 
 from .anhaenge import KATEGORIE_FILTER, anhaenge_fuer, anhang_form
 from .rechte import (
-    darf_akte_sehen, darf_nachteilsausgleich_sehen, darf_unterricht_sehen, ist_personalverwaltung, ist_stufenkoordination_von,
-    ist_verwaltung, koordinierte_jahrgaenge,
+    darf_akte_sehen, darf_klassenliste_sehen, darf_nachteilsausgleich_sehen, darf_unterricht_sehen, ist_personalverwaltung, ist_stufenkoordination_von,
+    ist_verwaltung,
 )
 from .startseite import begruessung, geburtstage, notizen_fuer, schnellzugriff
 
@@ -205,10 +205,7 @@ def notenuebersicht(request, pk):
 @login_required
 def klassenliste(request, pk):
     gruppe = get_object_or_404(Gruppe.objects.select_related("leitung__person", "schuljahr"), pk=pk)
-    person = getattr(request.user, "person", None)
-    ist_leitung = person and gruppe.leitung and gruppe.leitung.person_id == person.pk
-    stufe = gruppe.jahrgang is not None and gruppe.jahrgang in koordinierte_jahrgaenge(request.user)
-    if not (ist_verwaltung(request.user) or ist_leitung or stufe):
+    if not darf_klassenliste_sehen(request.user, gruppe):
         raise PermissionDenied
 
     schueler = gruppe.aktuelle_mitglieder().annotate(
@@ -218,9 +215,13 @@ def klassenliste(request, pk):
     nta = aktive_nta_je_schueler([s.pk for s in schueler])
     aktive_plaene = set(Foerderplan.objects.filter(schueler__in=schueler, status=Foerderplan.AKTIV).values_list("schueler_id", flat=True))
     zeilen = []
+    stunden_pro_tag = gruppe.schuljahr.zeitraster.count()
+    fz_je = defaultdict(list)
+    for f in Fehlzeit.objects.filter(schueler__in=schueler, datum_von__gte=gruppe.schuljahr.beginn,
+                                     datum_von__lte=gruppe.schuljahr.ende):
+        fz_je[f.schueler_id].append(f)
     for s in schueler:
-        fz = list(s.fehlzeiten.filter(datum_von__gte=gruppe.schuljahr.beginn, datum_von__lte=gruppe.schuljahr.ende))
-        stunden_pro_tag = gruppe.schuljahr.zeitraster.count()
+        fz = fz_je[s.pk]
         zeilen.append({
             "schueler": s,
             "fehlstunden": sum(f.fehlstunden(stunden_pro_tag) for f in fz),
@@ -231,6 +232,9 @@ def klassenliste(request, pk):
             "nta": nta.get(s.pk),
             "nta_text": nta_kurztext(nta.get(s.pk, [])),
             "foerderplan": s.pk in aktive_plaene,
+            # Links nur, wenn die Zielseite für diese Person auch geöffnet werden darf (ab 0.4.9.2)
+            "darf_akte": darf_akte_sehen(request.user, s),
+            "darf_nta": darf_nachteilsausgleich_sehen(request.user, s),
         })
     from .zuordnung import darf_gruppe_bearbeiten
 
@@ -288,7 +292,8 @@ def schuelerakte(request, pk):
         for u in Unterricht.objects.filter(abschnitt__schuljahr=sj, gruppe__mitgliedschaften__schueler=schueler).select_related(
             "fach", "abschnitt", "lehrkraft", "skala"
         ).distinct().order_by("abschnitt__nummer", "fach__reihenfolge"):
-            noten.append({"unterricht": u, "vorschlag": vorschlagsnote(u, schueler)})
+            noten.append({"unterricht": u, "vorschlag": vorschlagsnote(u, schueler),
+                          "darf_oeffnen": darf_unterricht_sehen(request.user, u)})
 
     kategorie = request.GET.get("kategorie") or None
     if kategorie not in dict(Dokument.KATEGORIEN):
@@ -315,6 +320,7 @@ def schuelerakte(request, pk):
         "anmeldung": anmeldung,
         "p": schueler.person,
         "klasse": klasse_im_jahr,
+        "darf_klasse": bool(klasse_im_jahr) and darf_klassenliste_sehen(request.user, klasse_im_jahr),
         "sj": sj, "jahre": jahre,
         "darf_laufbahn": darf_abgang(request.user),
         "alter": alter,

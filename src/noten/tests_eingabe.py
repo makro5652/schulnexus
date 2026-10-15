@@ -3,7 +3,6 @@ from datetime import date, timedelta
 from decimal import Decimal
 from types import SimpleNamespace
 
-from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse

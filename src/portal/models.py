@@ -94,6 +94,23 @@ class Zweifaktor(models.Model):
         return str(self.benutzer)
 
 
+class Anmeldeversuch(models.Model):
+    """Fehlgeschlagene Anmeldung (Passwort oder zweiter Faktor) – Grundlage der vorübergehenden Sperre (ab 0.4.9.2).
+    Einträge werden nach einem Tag gelöscht und nach erfolgreicher Anmeldung des Kontos entfernt."""
+
+    benutzername = models.CharField(_("Benutzername"), max_length=150, db_index=True)
+    ip = models.GenericIPAddressField(_("IP-Adresse"), null=True, blank=True, db_index=True)
+    zeit = models.DateTimeField(_("Zeitpunkt"), auto_now_add=True, db_index=True)
+
+    class Meta:
+        verbose_name = _("Fehlgeschlagene Anmeldung")
+        verbose_name_plural = _("Fehlgeschlagene Anmeldungen")
+        ordering = ["-zeit"]
+
+    def __str__(self):
+        return f"{self.benutzername} · {self.ip or '–'} · {self.zeit:%Y-%m-%d %H:%M}"
+
+
 class OfficeKachel(models.Model):
     """
     Kachel auf der Seite „Office“: Verknüpfung zu einer Microsoft-365-Anwendung (öffnet in neuem Tab).

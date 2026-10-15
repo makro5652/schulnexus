@@ -347,7 +347,7 @@ def schueler(request, pk):
         "posten": s.wechselposten.select_related("wechsel__von", "wechsel__nach", "neue_klasse").order_by("-wechsel__von__beginn"),
         "abgangszeugnisse": Zeugnis.objects.filter(schueler=s, art=Zeugnis.ABGANG).select_related("abschnitt__schuljahr"),
         "faellig": loeschung.faellige(schueler=s, vorlauf_tage=365 * 60) if s.archiviert else [],
-        "klasse": s.stammklasse(),
+        "klasse": s.stammklasse(), "darf_schuljahre": rechte.darf_schuljahre(user),
     })
 
 

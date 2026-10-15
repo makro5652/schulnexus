@@ -20,7 +20,8 @@ from collections import Counter, defaultdict
 from django.conf import settings
 from django.core import serializers
 from django.core.management.color import no_style
-from django.db import IntegrityError, connection, transaction
+from django.core.serializers.base import DeserializationError
+from django.db import DatabaseError, connection, transaction
 from django.db.migrations.loader import MigrationLoader
 from django.db.models import FileField, ProtectedError, RestrictedError
 from django.db.models.deletion import Collector
@@ -408,7 +409,7 @@ def wiederherstellen(sicherung, module, benutzer):
             with connection.cursor() as cursor:
                 for befehl in befehle:
                     cursor.execute(befehl)
-    except IntegrityError as fehler:
+    except (DatabaseError, DeserializationError) as fehler:   # auch Datenfehler, nicht nur Konflikte (ab 0.4.9.2)
         raise SicherungFehler(_("Die Wiederherstellung wurde abgebrochen, es wurde nichts verändert: %(f)s") % {"f": fehler}) from None
     n_dateien = _dateien_wiederherstellen(sicherung.pfad, gewaehlt)
     Protokoll.schreiben(benutzer, "wiederhergestellt", _("%(module)s aus %(datei)s; vorher gesichert in %(vorher)s; %(n)d Dateien ergänzt") % {

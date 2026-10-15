@@ -1,6 +1,6 @@
 """Noten im Portal (ab 0.4.7.0): Schnelleingabe, Bewertungsstruktur, Leistungsvorgaben."""
 from datetime import timedelta
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 
 from django import forms
 from django.contrib import messages
@@ -44,10 +44,8 @@ def _zahl(wert):
 
 
 def _dezimal(text):
-    try:
-        return Decimal((text or "").strip().replace(",", "."))
-    except InvalidOperation:
-        return None
+    """Zahl aus einem Formularfeld; None bei Unsinn, NaN/Unendlich oder zu großen Werten (sonst Serverfehler)."""
+    return E.zahl_lesen(text)
 
 
 def summen(baum, ohne_ln=None):

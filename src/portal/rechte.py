@@ -172,6 +172,16 @@ def foerder_schueler_filter(user, feld="schueler"):
     return Q(**{f"{feld}__in": ids})
 
 
+def darf_klassenliste_sehen(user, gruppe) -> bool:
+    """Klassen- bzw. Gruppenliste: Verwaltung, Leitung der Gruppe, Stufenkoordination des Jahrgangs."""
+    if ist_verwaltung(user):
+        return True
+    person = getattr(user, "person", None) if user.is_authenticated else None
+    if person and gruppe.leitung_id and gruppe.leitung.person_id == person.pk:
+        return True
+    return gruppe.jahrgang is not None and gruppe.jahrgang in koordinierte_jahrgaenge(user)
+
+
 def darf_unterricht_sehen(user, unterricht) -> bool:
     if ist_verwaltung(user):
         return True

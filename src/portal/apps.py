@@ -10,7 +10,7 @@ class PortalConfig(AppConfig):
     def ready(self):
         from django.contrib import admin
 
-        from . import checks, signals  # noqa: F401 – Systemprüfungen; Sprachübernahme beim Anmelden
+        from . import anmeldeschutz, checks, signals  # noqa: F401 – Anmeldesperre; Systemprüfungen; Sprachübernahme beim Anmelden
         from .sicherheit import admin_anmeldung
 
         # Die Verwaltungsoberfläche hat keine eigene Anmeldung (sonst ließe sich der zweite Faktor umgehen).

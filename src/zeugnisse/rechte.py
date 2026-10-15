@@ -50,6 +50,12 @@ def darf_zeugnis_sehen(user, z):
             or unterrichtet(user, z.schueler, z.abschnitt))
 
 
+def darf_drucken(user, z):
+    """Druckansicht: wer das Zeugnis sieht und es verantwortet (Verwaltung, Bearbeitung, Klassenleitung, Stufe)."""
+    return darf_zeugnis_sehen(user, z) and (ist_verwaltung(user) or darf_zeugnis_bearbeiten(user, z)
+                                            or ist_klassenleitung(user, z.klasse) or ist_stufe(user, z.jahrgang))
+
+
 def darf_zeugnis_bearbeiten(user, z):
     if z.freigegeben or not user.has_perm("zeugnisse.change_zeugnis"):
         return False

@@ -18,7 +18,7 @@ from django.views.decorators.http import require_POST
 
 from noten.berechnung import Baum, Vorhalbjahr, vorschlagsnote
 from noten.models import Note, Unterricht, Zeugnisnote
-from portal.rechte import ist_schulleitung, ist_verwaltung, personal_von
+from portal.rechte import darf_akte_sehen, darf_unterricht_sehen, ist_schulleitung, personal_von
 from stammdaten.models import Abschnitt, Gruppe, Personalprofil
 
 from . import rechte
@@ -422,7 +422,8 @@ def zeugnis(request, pk):
         z = zeugnis_fuer(z.schueler, z.abschnitt, z.klasse)
     darf = {"bearbeiten": rechte.darf_zeugnis_bearbeiten(user, z), "kommentar": rechte.darf_kommentar_schreiben(user, z),
             "abzeichnen": rechte.darf_abzeichnen(user, z), "anmerken": rechte.darf_anmerken(user, z),
-            "freigeben": rechte.darf_freigeben(user, z)}
+            "freigeben": rechte.darf_freigeben(user, z), "drucken": rechte.darf_drucken(user, z),
+            "klasse": bool(z.klasse) and rechte.darf_klasse_sehen(user, z.klasse), "akte": darf_akte_sehen(user, z.schueler)}
     form = ZeugnisForm(instance=z)
     if request.method == "POST":
         aktion = request.POST.get("aktion")
@@ -489,7 +490,8 @@ def zeugnis(request, pk):
                         geschwister.append((k, andere))
     personal = personal_von(user)
     return render(request, "zeugnisse/zeugnis.html", {
-        "z": z, "form": form, "darf": darf, "zeilen": zeilen, "kern": kern, "ergebnis": ergebnis, "vhinweis": hinweis,
+        "z": z, "form": form, "darf": darf, "zeilen": zeilen, "kern": kern,
+        "kurse_offen": {e["unterricht"].pk for e in zeilen if darf_unterricht_sehen(user, e["unterricht"])}, "ergebnis": ergebnis, "vhinweis": hinweis,
         "schnitt": schnitt(zeilen), "status": st, "unterzeichner": unterzeichner,
         "eigene": abz.get(personal.pk) if personal else None, "anmerkungen": z.anmerkungen.select_related("autor__person"),
         "hindernisse": freigabe_hindernisse(z, zeilen) if not z.freigegeben else [],
@@ -562,8 +564,7 @@ def _druck(request, zeugnisse, titel):
 @login_required
 def druck(request, pk):
     z = get_object_or_404(Zeugnis.objects.select_related("schueler__person", "abschnitt__schuljahr", "klasse", "bildungsgang"), pk=pk)
-    if not rechte.darf_zeugnis_sehen(request.user, z) or not (ist_verwaltung(request.user) or rechte.darf_zeugnis_bearbeiten(request.user, z)
-                                                              or rechte.ist_klassenleitung(request.user, z.klasse) or rechte.ist_stufe(request.user, z.jahrgang)):
+    if not rechte.darf_drucken(request.user, z):
         raise PermissionDenied
     return _druck(request, [z], z.schueler.person.anzeigename)
 
@@ -745,6 +746,7 @@ def konferenz(request, pk):
         "k": k, "form": form, "zeilen": zeilen, "spalten": spalten, "darf_leiten": darf_leiten,
         "entscheidungen": Beschluss.ENTSCHEIDUNGEN, "hindernisse": hindernisse,
         "darf_wiedereroeffnen": k.abgeschlossen and rechte.darf_konferenz_leiten(user, k.klasse),
+        "darf_klasse": rechte.darf_klasse_sehen(user, k.klasse),
         "gefaehrdet": sum(1 for zl in zeilen if zl["ergebnis"] and zl["ergebnis"].gefaehrdet),
         "statistik": Counter(zl["b"].entscheidung or zl["vorschlag_entscheidung"] for zl in zeilen),
     })

@@ -91,7 +91,7 @@
     {% empty %}<p class="leer">{% translate "Keine Änderungen im laufenden Schuljahr erfasst." %}</p>{% endfor %}
     {% if posten %}
     <h3>{% translate "Schuljahreswechsel" %}</h3>
-    {% for p in posten %}<p><a href="{% url 'schuljahreswechsel' p.wechsel.pk %}?schritt=schueler">{{ p.wechsel }}</a>: {{ p.get_entscheidung_display }}{% if p.neue_klasse %} → {{ p.neue_klasse.name }}{% endif %}
+    {% for p in posten %}<p>{% if darf_schuljahre %}<a href="{% url 'schuljahreswechsel' p.wechsel.pk %}?schritt=schueler">{{ p.wechsel }}</a>{% else %}{{ p.wechsel }}{% endif %}: {{ p.get_entscheidung_display }}{% if p.neue_klasse %} → {{ p.neue_klasse.name }}{% endif %}
       <span class="zg-status zg-status-{% if p.status == 'durchgefuehrt' %}abgeschlossen{% else %}entwurf{% endif %}">{{ p.get_status_display }}</span></p>{% endfor %}
     {% endif %}
   </section>

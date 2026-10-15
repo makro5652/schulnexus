@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-15 14:48+0300\n"
+"POT-Creation-Date: 2026-10-15 16:09+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -56,7 +56,7 @@ msgid "Kategorie"
 msgstr "Category"
 
 #: aufnahme/ansichten.py:114 aufnahme/models.py:259 aufnahme/models.py:306
-#: foerderung/models.py:86 nachmittag/models.py:20 portal/models.py:110
+#: foerderung/models.py:86 nachmittag/models.py:20 portal/models.py:127
 #: stammdaten/models.py:82 stammdaten/models.py:455 stammdaten/models.py:730
 #: templates/aufnahme/anmeldung.html:130 templates/portal/_anhaenge.html:25
 #: termine/models.py:54 termine/models.py:147
@@ -68,7 +68,7 @@ msgid "leer = Dateiname"
 msgstr "empty = file name"
 
 #: aufnahme/ansichten.py:116 aufnahme/models.py:312 portal/models.py:45
-#: portal/models.py:58 stammdaten/admin.py:517 stammdaten/models.py:731
+#: portal/models.py:58 stammdaten/admin.py:530 stammdaten/models.py:731
 msgid "Notiz"
 msgstr "Note"
 
@@ -221,7 +221,7 @@ msgstr "Name"
 msgid "Bezeichnung (Englisch)"
 msgstr "Name (English)"
 
-#: aufnahme/models.py:71 laufbahn/models.py:133 nachmittag/models.py:21
+#: aufnahme/models.py:71 laufbahn/models.py:136 nachmittag/models.py:21
 #: noten/models.py:42 noten/models.py:119 noten/models.py:289
 #: sicherung/models.py:96 stammdaten/models.py:367 stammdaten/models.py:688
 #: templates/sicherung/protokoll.html:14 templates/termine/termin.html:47
@@ -254,7 +254,7 @@ msgid "Wird bei jeder neuen Anmeldung vorausgewählt."
 msgstr "Preselected for every new application."
 
 #: aufnahme/models.py:77 elternkontakt/models.py:210 foerderung/models.py:26
-#: foerderung/models.py:45 foerderung/models.py:82 laufbahn/models.py:176
+#: foerderung/models.py:45 foerderung/models.py:82 laufbahn/models.py:179
 #: stammdaten/models.py:132 stammdaten/models.py:262 stammdaten/models.py:1005
 #: templates/laufbahn/loeschfristen.html:50
 #: templates/laufbahn/loeschfristen.html:59 termine/models.py:35
@@ -264,7 +264,7 @@ msgstr "Active"
 #: aufnahme/models.py:78 aufnahme/models.py:99 aufnahme/models.py:279
 #: aufnahme/models.py:350 foerderung/models.py:25 foerderung/models.py:44
 #: foerderung/models.py:155 noten/models.py:104 noten/models.py:288
-#: portal/models.py:120 stammdaten/models.py:207 stammdaten/models.py:366
+#: portal/models.py:137 stammdaten/models.py:207 stammdaten/models.py:366
 #: stammdaten/models.py:477 stammdaten/models.py:796 stammdaten/models.py:862
 #: stammdaten/models.py:1004 templates/noten/struktur.html:23
 #: templates/noten/struktur.html:41 zeugnisse/models.py:126
@@ -341,15 +341,15 @@ msgid "Anmeldenummer"
 msgstr "Application number"
 
 #: aufnahme/models.py:128 fehlzeiten/models.py:59 foerderung/models.py:88
-#: foerderung/models.py:229 laufbahn/models.py:41 laufbahn/models.py:96
-#: laufbahn/models.py:204 sicherung/models.py:62 stammdaten/admin.py:324
+#: foerderung/models.py:229 laufbahn/models.py:41 laufbahn/models.py:99
+#: laufbahn/models.py:207 sicherung/models.py:62 stammdaten/admin.py:337
 #: stammdaten/models.py:146 stammdaten/models.py:424
 #: templates/aufnahme/liste.html:15 templates/aufnahme/liste.html:38
 #: templates/elternkontakt/regeln.html:19 templates/foerderung/_akte.html:16
 #: templates/foerderung/_akte.html:36 templates/foerderung/plan.html:25
 #: templates/laufbahn/loeschfristen.html:76 templates/laufbahn/wechsel.html:92
 #: templates/sicherung/benutzer.html:17 templates/zeugnisse/klasse.html:31
-#: termine/models.py:160 zeugnisse/models.py:72 zeugnisse/models.py:193
+#: termine/models.py:160 zeugnisse/models.py:72 zeugnisse/models.py:196
 msgid "Status"
 msgstr "Status"
 
@@ -525,7 +525,7 @@ msgid "Status seit"
 msgstr "Status since"
 
 #: aufnahme/models.py:184 fehlzeiten/models.py:63 foerderung/models.py:321
-#: laufbahn/models.py:137
+#: laufbahn/models.py:140
 msgid "Erfasst von"
 msgstr "Recorded by"
 
@@ -645,7 +645,7 @@ msgstr "Contact (application)"
 msgid "Kontakte (Anmeldung)"
 msgstr "Contacts (application)"
 
-#: aufnahme/models.py:307 sicherung/models.py:20 stammdaten/admin.py:514
+#: aufnahme/models.py:307 sicherung/models.py:20 stammdaten/admin.py:527
 #: stammdaten/models.py:381 stammdaten/models.py:733
 #: templates/aufnahme/anmeldung.html:130 templates/portal/_anhaenge.html:26
 msgid "Datei"
@@ -692,7 +692,7 @@ msgid "Dateien (Anmeldung)"
 msgstr "Files (application)"
 
 #: aufnahme/models.py:351 portal/models.py:53
-#: templates/portal/_notizen.html:36 zeugnisse/models.py:162
+#: templates/portal/_notizen.html:36 zeugnisse/models.py:165
 msgid "Erledigt"
 msgstr "Done"
 
@@ -705,7 +705,7 @@ msgid "Erledigt von"
 msgstr "Completed by"
 
 #: aufnahme/models.py:355 foerderung/models.py:319 laufbahn/ansichten.py:261
-#: laufbahn/models.py:134 noten/models.py:605 noten/models.py:728
+#: laufbahn/models.py:137 noten/models.py:605 noten/models.py:728
 #: sicherung/ansichten.py:71 sicherung/models.py:27 stammdaten/models.py:382
 #: stammdaten/models.py:426 stammdaten/models.py:835 stammdaten/models.py:878
 #: templates/aufnahme/anmeldung.html:81 templates/noten/klausurregeln.html:59
@@ -998,8 +998,8 @@ msgstr "Absences (automatic)"
 
 #: elternkontakt/models.py:33 elternkontakt/models.py:252
 #: fehlzeiten/models.py:52 foerderung/admin.py:397 foerderung/models.py:84
-#: foerderung/models.py:185 foerderung/models.py:218 laufbahn/models.py:86
-#: laufbahn/models.py:130 nachmittag/models.py:68 nachmittag/models.py:93
+#: foerderung/models.py:185 foerderung/models.py:218 laufbahn/models.py:89
+#: laufbahn/models.py:133 nachmittag/models.py:68 nachmittag/models.py:93
 #: noten/export.py:128 noten/export.py:278 noten/models.py:409
 #: noten/models.py:486 portal/rollen.py:34 stammdaten/admin.py:151
 #: stammdaten/admin.py:269 stammdaten/models.py:168 stammdaten/models.py:529
@@ -1014,18 +1014,18 @@ msgstr "Absences (automatic)"
 #: templates/termine/sprechzeiten.html:86 templates/zeugnisse/klasse.html:30
 #: templates/zeugnisse/konferenz.html:51
 #: templates/zeugnisse/unterricht.html:23 termine/models.py:278
-#: zeugnisse/models.py:46 zeugnisse/models.py:229
+#: zeugnisse/models.py:46 zeugnisse/models.py:232
 msgid "Schüler:in"
 msgstr "Student"
 
 #: elternkontakt/models.py:34 fehlzeiten/models.py:53 foerderung/models.py:189
-#: laufbahn/models.py:131 sicherung/models.py:21 sicherung/pdf.py:235
+#: laufbahn/models.py:134 sicherung/models.py:21 sicherung/pdf.py:235
 #: stammdaten/models.py:420 stammdaten/models.py:531
 #: templates/elternkontakt/uebersicht.html:27
 #: templates/elternkontakt/uebersicht.html:39
 #: templates/sicherung/sicherungen.html:48 templates/termine/kalender.html:16
 #: templates/termine/termin.html:42 termine/models.py:31 termine/models.py:56
-#: termine/models.py:146 zeugnisse/models.py:48 zeugnisse/models.py:182
+#: termine/models.py:146 zeugnisse/models.py:48 zeugnisse/models.py:185
 msgid "Art"
 msgstr "Type"
 
@@ -1041,7 +1041,7 @@ msgstr "Template data"
 msgid "Lese-/Empfangsbestätigung erbeten"
 msgstr "Read/receipt confirmation requested"
 
-#: elternkontakt/models.py:41 zeugnisse/models.py:178
+#: elternkontakt/models.py:41 zeugnisse/models.py:181
 msgid "Abgeschlossen"
 msgstr "Closed"
 
@@ -1051,8 +1051,8 @@ msgstr "Closed conversations no longer accept replies."
 
 #: elternkontakt/models.py:44 noten/export.py:280 portal/navigation.py:174
 #: stammdaten/models.py:712 templates/zeugnisse/druck.html:6
-#: zeugnisse/models.py:79 zeugnisse/models.py:118 zeugnisse/models.py:137
-#: zeugnisse/models.py:158
+#: zeugnisse/models.py:79 zeugnisse/models.py:118 zeugnisse/models.py:140
+#: zeugnisse/models.py:161
 msgid "Zeugnis"
 msgstr "Report"
 
@@ -1327,7 +1327,7 @@ msgstr ""
 msgid "Angelegt von"
 msgstr "Created by"
 
-#: elternkontakt/models.py:213 laufbahn/models.py:180 noten/models.py:608
+#: elternkontakt/models.py:213 laufbahn/models.py:183 noten/models.py:608
 #: noten/models.py:706 noten/models.py:731 portal/models.py:55
 msgid "Geändert am"
 msgstr "Changed on"
@@ -1591,12 +1591,12 @@ msgid "Stunde"
 msgstr "Period"
 
 #: fehlzeiten/models.py:25 nachmittag/models.py:25 stammdaten/models.py:23
-#: stammdaten/models.py:59 termine/models.py:276 zeugnisse/models.py:184
+#: stammdaten/models.py:59 termine/models.py:276 zeugnisse/models.py:187
 msgid "Beginn"
 msgstr "Start"
 
 #: fehlzeiten/models.py:26 nachmittag/models.py:26 stammdaten/models.py:24
-#: stammdaten/models.py:60 termine/models.py:277 zeugnisse/models.py:185
+#: stammdaten/models.py:60 termine/models.py:277 zeugnisse/models.py:188
 msgid "Ende"
 msgstr "End"
 
@@ -1633,7 +1633,7 @@ msgstr "Unexcused"
 #: fehlzeiten/models.py:46 noten/models.py:193
 #: templates/noten/vorgaben.html:51 templates/portal/start.html:65
 #: templates/termine/sprechtag.html:89 templates/zeugnisse/zeugnis.html:39
-#: termine/models.py:245 termine/models.py:275 zeugnisse/models.py:138
+#: termine/models.py:245 termine/models.py:275 zeugnisse/models.py:141
 msgid "Lehrkraft"
 msgstr "Teacher"
 
@@ -1669,7 +1669,7 @@ msgstr "To period"
 msgid "Verspätung (Minuten)"
 msgstr "Late by (minutes)"
 
-#: fehlzeiten/models.py:60 laufbahn/models.py:207 noten/models.py:703
+#: fehlzeiten/models.py:60 laufbahn/models.py:210 noten/models.py:703
 #: templates/laufbahn/loeschfristen.html:32
 #: templates/noten/notensperre.html:31
 msgid "Grund"
@@ -1769,7 +1769,7 @@ msgstr "System"
 #: templates/noten/notensperre.html:20 templates/portal/schuelerakte.html:90
 #: templates/portal/stufe.html:22 templates/zeugnisse/druck.html:80
 #: templates/zeugnisse/uebersicht.html:36 zeugnisse/models.py:50
-#: zeugnisse/models.py:180
+#: zeugnisse/models.py:183
 msgid "Klasse"
 msgstr "Class"
 
@@ -1797,7 +1797,7 @@ msgstr "currently valid"
 msgid "läuft in 30 Tagen ab"
 msgstr "expires within 30 days"
 
-#: foerderung/admin.py:258 stammdaten/admin.py:337
+#: foerderung/admin.py:258 stammdaten/admin.py:350
 msgid "abgelaufen"
 msgstr "expired"
 
@@ -1845,29 +1845,29 @@ msgstr "Receipt confirmed on"
 msgid "Bestätigt durch"
 msgstr "Confirmed by"
 
-#: foerderung/ansichten.py:202
+#: foerderung/ansichten.py:210
 msgid "Verlaufseintrag gespeichert."
 msgstr "Progress entry saved."
 
-#: foerderung/ansichten.py:204
+#: foerderung/ansichten.py:212
 msgid "Eintrag nicht gespeichert – bitte Datum und Text angeben."
 msgstr "Entry not saved – please enter a date and text."
 
-#: foerderung/ansichten.py:219
+#: foerderung/ansichten.py:227
 #, python-format
 msgid "Aushändigung an %(person)s vermerkt."
 msgstr "Recorded as handed to %(person)s."
 
-#: foerderung/ansichten.py:221
+#: foerderung/ansichten.py:229
 msgid "Aushändigung nicht gespeichert – bitte Empfänger:in und Datum angeben."
 msgstr "Not saved – please choose a recipient and a date."
 
-#: foerderung/ansichten.py:237
+#: foerderung/ansichten.py:245
 #, python-format
 msgid "Erhalt durch %(person)s bestätigt."
 msgstr "Receipt confirmed by %(person)s."
 
-#: foerderung/ansichten.py:239
+#: foerderung/ansichten.py:247
 msgid "Bitte ein gültiges Datum angeben (nicht vor der Aushändigung)."
 msgstr "Please enter a valid date (not before the hand-out date)."
 
@@ -2025,7 +2025,7 @@ msgstr "The end must not be before the start."
 msgid "Fortgeschrieben werden kann nur ein Plan derselben Person."
 msgstr "Only a plan for the same student can be continued."
 
-#: foerderung/models.py:144 laufbahn/models.py:83 noten/vorgaben.py:25
+#: foerderung/models.py:144 laufbahn/models.py:86 noten/vorgaben.py:25
 #: templates/foerderung/_akte.html:22 templates/foerderung/_akte.html:40
 #: templates/foerderung/_aushaendigung.html:25
 #: templates/foerderung/plan.html:26 templates/laufbahn/wechsel.html:134
@@ -2143,7 +2143,7 @@ msgstr "Other"
 #: templates/termine/raumplan.html:15 templates/termine/termin.html:43
 #: templates/zeugnisse/protokoll.html:18 templates/zeugnisse/zeugnis.html:122
 #: termine/ansichten.py:219 termine/models.py:103 termine/models.py:213
-#: zeugnisse/models.py:183
+#: zeugnisse/models.py:186
 msgid "Datum"
 msgstr "Date"
 
@@ -2257,7 +2257,7 @@ msgid ""
 "Bei einem genehmigten Nachteilsausgleich bitte das Beschlussdatum angeben."
 msgstr "Please enter the decision date for approved access arrangements."
 
-#: foerderung/models.py:274 noten/ansichten.py:454 noten/klausurregeln.py:95
+#: foerderung/models.py:274 noten/ansichten.py:452 noten/klausurregeln.py:95
 #: templates/noten/klausurregeln.html:61
 msgid "alle Fächer"
 msgstr "all subjects"
@@ -2361,7 +2361,7 @@ msgstr "School years and transition"
 msgid "Archiv"
 msgstr "Archive"
 
-#: laufbahn/ansichten.py:30 laufbahn/ansichten.py:471 laufbahn/models.py:185
+#: laufbahn/ansichten.py:30 laufbahn/ansichten.py:471 laufbahn/models.py:188
 #: portal/navigation.py:255 templates/laufbahn/loeschfristen.html:3
 #: templates/laufbahn/schuljahre.html:14
 msgid "Löschfristen"
@@ -2528,12 +2528,12 @@ msgid ""
 msgstr ""
 "Transition reverted: %(n)s students reset, %(k)s empty classes removed."
 
-#: laufbahn/ansichten.py:259 laufbahn/models.py:95
+#: laufbahn/ansichten.py:259 laufbahn/models.py:98
 #: templates/laufbahn/wechsel.html:92 templates/laufbahn/wechsel.html:102
 msgid "Neue Klasse"
 msgstr "New class"
 
-#: laufbahn/ansichten.py:260 laufbahn/models.py:132
+#: laufbahn/ansichten.py:260 laufbahn/models.py:135
 msgid "Wirksam ab"
 msgstr "Effective from"
 
@@ -2736,7 +2736,7 @@ msgstr "joining year %(jg)s"
 msgid "Jahrgang %(jg)s · %(k)s · %(bg)s"
 msgstr "Grade %(jg)s · %(k)s · %(bg)s"
 
-#: laufbahn/ereignisse.py:262 laufbahn/models.py:127
+#: laufbahn/ereignisse.py:262 laufbahn/models.py:130
 #: templates/laufbahn/schuljahre.html:13
 msgid "Abgang"
 msgstr "Leaving"
@@ -2771,7 +2771,7 @@ msgstr "voluntary repetition"
 msgid "überspringt eine Jahrgangsstufe"
 msgstr "skips a grade"
 
-#: laufbahn/models.py:25 laufbahn/models.py:127
+#: laufbahn/models.py:25 laufbahn/models.py:130
 msgid "Zurückstufung"
 msgstr "Moved down a grade"
 
@@ -2787,7 +2787,7 @@ msgstr "Leaving – leaves the school"
 msgid "in Vorbereitung"
 msgstr "in preparation"
 
-#: laufbahn/models.py:37 laufbahn/models.py:83
+#: laufbahn/models.py:37 laufbahn/models.py:86
 msgid "durchgeführt"
 msgstr "carried out"
 
@@ -2811,7 +2811,7 @@ msgstr "Created on"
 msgid "Durchgeführt von"
 msgstr "Carried out by"
 
-#: laufbahn/models.py:48 laufbahn/models.py:98
+#: laufbahn/models.py:48 laufbahn/models.py:101
 msgid "Durchgeführt am"
 msgstr "Carried out on"
 
@@ -2825,12 +2825,12 @@ msgstr "Change log year-end transition"
 msgid "Schuljahreswechsel"
 msgstr "Year-end transition"
 
-#: laufbahn/models.py:68 laufbahn/models.py:85
+#: laufbahn/models.py:68 laufbahn/models.py:88
 #: templates/laufbahn/schuljahre.html:24
 msgid "Wechsel"
 msgstr "Transition"
 
-#: laufbahn/models.py:69 laufbahn/models.py:88
+#: laufbahn/models.py:69 laufbahn/models.py:91
 msgid "Bisherige Klasse"
 msgstr "Previous class"
 
@@ -2846,120 +2846,120 @@ msgstr "Created by the transition"
 msgid "Klassenplan"
 msgstr "Class plan"
 
-#: laufbahn/models.py:89
+#: laufbahn/models.py:92
 msgid "Bisheriger Jahrgang"
 msgstr "Previous grade"
 
-#: laufbahn/models.py:90 templates/laufbahn/wechsel.html:92
+#: laufbahn/models.py:93 templates/laufbahn/wechsel.html:92
 #: templates/laufbahn/wechsel.html:100 templates/zeugnisse/konferenz.html:70
-#: templates/zeugnisse/protokoll.html:32 zeugnisse/models.py:231
+#: templates/zeugnisse/protokoll.html:32 zeugnisse/models.py:234
 msgid "Entscheidung"
 msgstr "Decision"
 
-#: laufbahn/models.py:92 templates/laufbahn/wechsel.html:92
+#: laufbahn/models.py:95 templates/laufbahn/wechsel.html:92
 msgid "Grundlage"
 msgstr "Basis"
 
-#: laufbahn/models.py:93
+#: laufbahn/models.py:96
 msgid "z. B. Beschluss der Versetzungskonferenz"
 msgstr "e.g. decision of the promotion conference"
 
-#: laufbahn/models.py:97 laufbahn/models.py:135
+#: laufbahn/models.py:100 laufbahn/models.py:138
 msgid "Daten für die Rücknahme"
 msgstr "Data for reverting"
 
-#: laufbahn/models.py:99
+#: laufbahn/models.py:102
 msgid "Zuletzt zurückgenommen am"
 msgstr "Last reverted on"
 
-#: laufbahn/models.py:102 laufbahn/models.py:103
+#: laufbahn/models.py:105 laufbahn/models.py:106
 msgid "Wechselposten"
 msgstr "Transition entry"
 
-#: laufbahn/models.py:126
+#: laufbahn/models.py:129
 msgid "Klassenwechsel"
 msgstr "Class change"
 
-#: laufbahn/models.py:126
+#: laufbahn/models.py:129
 msgid "Höherstufung (Überspringen)"
 msgstr "Moved up (skipping a grade)"
 
-#: laufbahn/models.py:138
+#: laufbahn/models.py:141
 msgid "Erfasst am"
 msgstr "Recorded on"
 
-#: laufbahn/models.py:139
+#: laufbahn/models.py:142
 msgid "Zurückgenommen am"
 msgstr "Reverted on"
 
-#: laufbahn/models.py:142
+#: laufbahn/models.py:145
 msgid "Laufbahnereignis"
 msgstr "School career event"
 
-#: laufbahn/models.py:143
+#: laufbahn/models.py:146
 msgid "Laufbahnereignisse"
 msgstr "School career events"
 
-#: laufbahn/models.py:154
+#: laufbahn/models.py:157
 msgid "Fehlzeiten, Entschuldigungen und AG-Teilnahme"
 msgstr "Absences, excuses and club participation"
 
-#: laufbahn/models.py:155
+#: laufbahn/models.py:158
 msgid ""
 "Elternnachrichten, Gesprächstermine und automatische Benachrichtigungen"
 msgstr ""
 "Parent messages, consultation appointments and automatic notifications"
 
-#: laufbahn/models.py:156 portal/rollen.py:177 stammdaten/models.py:944
+#: laufbahn/models.py:159 portal/rollen.py:177 stammdaten/models.py:944
 #: stammdaten/models.py:945 templates/portal/schuelerakte.html:168
 msgid "Gesundheitsangaben"
 msgstr "Health information"
 
-#: laufbahn/models.py:157
+#: laufbahn/models.py:160
 msgid "Förderpläne, Förderverlauf und Nachteilsausgleiche"
 msgstr "Support plans, support records and accommodations"
 
-#: laufbahn/models.py:158
+#: laufbahn/models.py:161
 msgid "Einzelnoten und Zeugnisnoten des Notenmoduls"
 msgstr "Individual marks and report grades (grades module)"
 
-#: laufbahn/models.py:159
+#: laufbahn/models.py:162
 msgid "Anhänge (hochgeladene Dokumente)"
 msgstr "Attachments (uploaded documents)"
 
-#: laufbahn/models.py:160
+#: laufbahn/models.py:163
 msgid "Anmeldeunterlagen der Neuanmeldung"
 msgstr "Application documents of the admission"
 
-#: laufbahn/models.py:161
+#: laufbahn/models.py:164
 msgid "Halbjahres- und Jahreszeugnisse, Konferenzbeschlüsse"
 msgstr "Semester and annual reports, conference decisions"
 
-#: laufbahn/models.py:162
+#: laufbahn/models.py:165
 msgid "Kontaktdaten, Elternverknüpfungen und Benutzerkonto"
 msgstr "Contact details, parent links and user account"
 
-#: laufbahn/models.py:163
+#: laufbahn/models.py:166
 msgid "Gesamte Schülerakte einschließlich Abgangs- und Abschlusszeugnis"
 msgstr "Entire student record including leaving and final certificate"
 
-#: laufbahn/models.py:168
+#: laufbahn/models.py:171
 msgid "Ende des Kalenderjahres des Austritts"
 msgstr "End of the calendar year of leaving"
 
-#: laufbahn/models.py:168
+#: laufbahn/models.py:171
 msgid "Austrittsdatum"
 msgstr "Leaving date"
 
-#: laufbahn/models.py:170
+#: laufbahn/models.py:173
 msgid "Erinnern und nach Bestätigung löschen"
 msgstr "Remind and delete after confirmation"
 
-#: laufbahn/models.py:170
+#: laufbahn/models.py:173
 msgid "Nur erinnern (Löschung von Hand)"
 msgstr "Remind only (delete manually)"
 
-#: laufbahn/models.py:172 laufbahn/models.py:203
+#: laufbahn/models.py:175 laufbahn/models.py:206
 #: templates/laufbahn/loeschfristen.html:12
 #: templates/laufbahn/loeschfristen.html:50
 #: templates/laufbahn/loeschfristen.html:76
@@ -2967,84 +2967,84 @@ msgstr "Remind only (delete manually)"
 msgid "Daten"
 msgstr "Data"
 
-#: laufbahn/models.py:173
+#: laufbahn/models.py:176
 msgid "Aufbewahrung (Jahre)"
 msgstr "Retention (years)"
 
-#: laufbahn/models.py:174 templates/laufbahn/loeschfristen.html:50
+#: laufbahn/models.py:177 templates/laufbahn/loeschfristen.html:50
 #: templates/laufbahn/loeschfristen.html:57
 msgid "Frist beginnt mit"
 msgstr "Period starts with"
 
-#: laufbahn/models.py:175 templates/laufbahn/loeschfristen.html:50
+#: laufbahn/models.py:178 templates/laufbahn/loeschfristen.html:50
 #: templates/laufbahn/loeschfristen.html:58
 msgid "Bei Fristablauf"
 msgstr "When the period expires"
 
-#: laufbahn/models.py:177 templates/laufbahn/loeschfristen.html:50
+#: laufbahn/models.py:180 templates/laufbahn/loeschfristen.html:50
 #: templates/laufbahn/loeschfristen.html:60
 msgid "Grundlage / Hinweis"
 msgstr "Basis / note"
 
-#: laufbahn/models.py:179 noten/models.py:705
+#: laufbahn/models.py:182 noten/models.py:705
 msgid "Geändert von"
 msgstr "Changed by"
 
-#: laufbahn/models.py:181
+#: laufbahn/models.py:184
 msgid "Änderungsprotokoll Löschfrist"
 msgstr "Change log retention period"
 
-#: laufbahn/models.py:184
+#: laufbahn/models.py:187
 msgid "Löschfrist"
 msgstr "Retention period"
 
-#: laufbahn/models.py:186
+#: laufbahn/models.py:189
 msgid "Kann Daten aus dem Archiv endgültig löschen"
 msgstr "Can permanently delete data from the archive"
 
-#: laufbahn/models.py:200 sicherung/pdf.py:296
+#: laufbahn/models.py:203 sicherung/pdf.py:296
 #: templates/sicherung/wiederherstellen.html:23
 msgid "gelöscht"
 msgstr "deleted"
 
-#: laufbahn/models.py:200
+#: laufbahn/models.py:203
 msgid "aufgeschoben"
 msgstr "postponed"
 
-#: laufbahn/models.py:200
+#: laufbahn/models.py:203
 msgid "keine Daten vorhanden"
 msgstr "no data present"
 
-#: laufbahn/models.py:202 stammdaten/models.py:141
+#: laufbahn/models.py:205 stammdaten/models.py:141
 #: templates/laufbahn/loeschfristen.html:76
 msgid "Schülernummer"
 msgstr "Student number"
 
-#: laufbahn/models.py:205
+#: laufbahn/models.py:208
 msgid "Gelöschte Einträge"
 msgstr "Deleted entries"
 
-#: laufbahn/models.py:206 templates/laufbahn/loeschfristen.html:31
+#: laufbahn/models.py:209 templates/laufbahn/loeschfristen.html:31
 msgid "Aufgeschoben bis"
 msgstr "Postponed until"
 
-#: laufbahn/models.py:209 sicherung/ansichten.py:205 sicherung/models.py:56
+#: laufbahn/models.py:212 sicherung/ansichten.py:205 sicherung/models.py:56
 #: stammdaten/models.py:421 stammdaten/models.py:603 stammdaten/models.py:832
 #: stammdaten/models.py:896 templates/laufbahn/loeschfristen.html:76
 #: templates/termine/sprechtag.html:28 termine/ansichten.py:220
-#: termine/models.py:104 termine/models.py:214 zeugnisse/models.py:159
+#: termine/models.py:104 termine/models.py:214 zeugnisse/models.py:162
 msgid "Von"
 msgstr "From"
 
-#: laufbahn/models.py:210 templates/laufbahn/loeschfristen.html:76
+#: laufbahn/models.py:213 templates/laufbahn/loeschfristen.html:76
 msgid "Am"
 msgstr "On"
 
-#: laufbahn/models.py:213
+#: laufbahn/models.py:216
 msgid "Löschvorgang"
 msgstr "Deletion record"
 
-#: laufbahn/models.py:214
+#: laufbahn/models.py:217
 msgid "Löschvorgänge"
 msgstr "Deletion records"
 
@@ -3157,7 +3157,7 @@ msgstr "Saturday"
 #: noten/models.py:700 templates/noten/notensperre.html:12
 #: templates/noten/vorgaben.html:16 templates/portal/schuelerakte.html:134
 #: templates/portal/start.html:65 templates/zeugnisse/uebersicht.html:11
-#: zeugnisse/models.py:47 zeugnisse/models.py:181
+#: zeugnisse/models.py:47 zeugnisse/models.py:184
 msgid "Halbjahr"
 msgstr "Semester"
 
@@ -3280,7 +3280,7 @@ msgstr "Assessment in this folder"
 msgid "Leistungsnachweise in diesem Ordner (Noten über „Ändern“ eintragen)"
 msgstr "Assessments in this folder (enter grades via “Change”)"
 
-#: noten/admin.py:209 noten/admin.py:277 noten/ansichten.py:70
+#: noten/admin.py:209 noten/admin.py:277 noten/ansichten.py:68
 #: noten/export.py:178 noten/export.py:198 noten/export.py:314
 #: noten/export.py:326 noten/models.py:350 templates/noten/eingabe.html:20
 #: templates/portal/notenuebersicht.html:86
@@ -3313,22 +3313,22 @@ msgstr "Grades entered"
 msgid "%(n)s Notenzeilen angelegt – bitte jetzt die Noten eintragen."
 msgstr "%(n)s grade rows created – please enter the grades now."
 
-#: noten/ansichten.py:96
+#: noten/ansichten.py:94
 msgid "Bitte einen Ordner wählen."
 msgstr "Please choose a folder."
 
-#: noten/ansichten.py:103
+#: noten/ansichten.py:101
 msgid "In einem Prozent-Ordner höchstens 100."
 msgstr "At most 100 in a percentage folder."
 
-#: noten/ansichten.py:119
+#: noten/ansichten.py:117
 msgid ""
 "Bitte zuerst einen Ordner anlegen, z. B. „Schriftlich“ oder „Sonstige "
 "Mitarbeit“."
 msgstr ""
 "Please create a folder first, e.g. “Written” or “Class participation”."
 
-#: noten/ansichten.py:124
+#: noten/ansichten.py:122
 msgid ""
 "Die Noten dieses Kurses sind gesperrt (Zeugnisfreigabe bzw. Konferenz). "
 "Änderungen nur nach Freigabe durch Stufenkoordination oder Schulleitung."
@@ -3336,7 +3336,7 @@ msgstr ""
 "The grades of this course are locked (report release or conference). Changes"
 " only after release by the stage coordinator or school management."
 
-#: noten/ansichten.py:149
+#: noten/ansichten.py:147
 msgid ""
 "Gewicht, Ordner, Datum und Notenschlüssel bleiben unverändert, weil Noten "
 "gesperrter Schüler:innen daran hängen."
@@ -3344,55 +3344,55 @@ msgstr ""
 "Weight, folder, date and grading key remain unchanged because grades of "
 "locked students depend on them."
 
-#: noten/ansichten.py:157
+#: noten/ansichten.py:155
 #, python-format
 msgid "„%(titel)s“ gespeichert, %(n)s Note geändert."
 msgid_plural "„%(titel)s“ gespeichert, %(n)s Noten geändert."
 msgstr[0] "“%(titel)s” saved, %(n)s grade changed."
 msgstr[1] "“%(titel)s” saved, %(n)s grades changed."
 
-#: noten/ansichten.py:162
+#: noten/ansichten.py:160
 #, python-format
 msgid "%(n)s Eingabe ist nicht gültig – es wurde nichts gespeichert."
 msgid_plural "%(n)s Eingaben sind nicht gültig – es wurde nichts gespeichert."
 msgstr[0] "%(n)s entry is not valid – nothing was saved."
 msgstr[1] "%(n)s entries are not valid – nothing was saved."
 
-#: noten/ansichten.py:190
+#: noten/ansichten.py:188
 msgid "entschuldigt"
 msgstr "excused"
 
-#: noten/ansichten.py:190
+#: noten/ansichten.py:188
 msgid "unentschuldigt"
 msgstr "unexcused"
 
-#: noten/ansichten.py:190 noten/models.py:432 noten/models.py:488
+#: noten/ansichten.py:188 noten/models.py:432 noten/models.py:488
 #: templates/zeugnisse/unterricht.html:38 zeugnisse/noten.py:17
 msgid "befreit"
 msgstr "exempt"
 
-#: noten/ansichten.py:191
+#: noten/ansichten.py:189
 msgid "nicht bewertbar"
 msgstr "not assessable"
 
-#: noten/ansichten.py:191
+#: noten/ansichten.py:189
 msgid "keine gültige Note"
 msgstr "not a valid grade"
 
-#: noten/ansichten.py:192
+#: noten/ansichten.py:190
 msgid "BE ungültig"
 msgstr "invalid marks"
 
-#: noten/ansichten.py:192
+#: noten/ansichten.py:190
 #, python-brace-format
 msgid "In diesem Ordner bisher vergeben: {a} %, mit diesem Eintrag: {b} %"
 msgstr "Assigned in this folder so far: {a} %, with this entry: {b} %"
 
-#: noten/ansichten.py:194
+#: noten/ansichten.py:192
 msgid "Es gibt ungespeicherte Eingaben."
 msgstr "There are unsaved entries."
 
-#: noten/ansichten.py:214
+#: noten/ansichten.py:212
 msgid ""
 "Gewichte und Gliederung lassen sich nicht mehr ändern: Die Noten von "
 "Schüler:innen dieses Kurses sind gesperrt (Zeugnisfreigabe bzw. Konferenz)."
@@ -3400,11 +3400,11 @@ msgstr ""
 "Weights and structure can no longer be changed: the grades of students in "
 "this course are locked (report release or conference)."
 
-#: noten/ansichten.py:218
+#: noten/ansichten.py:216
 msgid "Bewertungsstruktur gespeichert."
 msgstr "Assessment structure saved."
 
-#: noten/ansichten.py:222
+#: noten/ansichten.py:220
 msgid ""
 "Die oberste Ebene ist durch die Klausurregel der Schulleitung vorgegeben. "
 "Bitte den neuen Ordner in einen der vorgegebenen Ordner legen."
@@ -3412,80 +3412,80 @@ msgstr ""
 "The top level is set by school management's exam rule. Please place the new "
 "folder inside one of the prescribed folders."
 
-#: noten/ansichten.py:231
+#: noten/ansichten.py:229
 #, python-format
 msgid "Ordner „%(name)s“ angelegt."
 msgstr "Folder “%(name)s” created."
 
-#: noten/ansichten.py:235
+#: noten/ansichten.py:233
 msgid "Dieser Ordner ist von der Schulleitung vorgegeben."
 msgstr "This folder is prescribed by school management."
 
-#: noten/ansichten.py:237
+#: noten/ansichten.py:235
 msgid "Nur leere Ordner lassen sich löschen."
 msgstr "Only empty folders can be deleted."
 
-#: noten/ansichten.py:239
+#: noten/ansichten.py:237
 #, python-format
 msgid "Ordner „%(name)s“ gelöscht."
 msgstr "Folder “%(name)s” deleted."
 
-#: noten/ansichten.py:243
+#: noten/ansichten.py:241
 #, python-format
 msgid "„%(titel)s“ enthält gesperrte Noten und kann nicht gelöscht werden."
 msgstr "“%(titel)s” contains locked grades and cannot be deleted."
 
-#: noten/ansichten.py:246
+#: noten/ansichten.py:244
 #, python-format
 msgid "„%(titel)s“ mit %(n)s Note gelöscht."
 msgid_plural "„%(titel)s“ mit %(n)s Noten gelöscht."
 msgstr[0] "“%(titel)s” deleted with %(n)s grade."
 msgstr[1] "“%(titel)s” deleted with %(n)s grades."
 
-#: noten/ansichten.py:287
+#: noten/ansichten.py:285
 #, python-format
 msgid "%(wo)s: Das Gewicht muss eine Zahl ab 0 sein."
 msgstr "%(wo)s: The weight must be a number of 0 or more."
 
-#: noten/ansichten.py:289
+#: noten/ansichten.py:287
 #, python-format
 msgid "%(wo)s: In einem Prozent-Ordner höchstens 100."
 msgstr "%(wo)s: At most 100 in a percentage folder."
 
-#: noten/ansichten.py:298 noten/models.py:341
+#: noten/ansichten.py:296 noten/models.py:341
 msgid ""
 "Ein Ordner kann nicht in sich selbst oder einem seiner Unterordner liegen."
 msgstr "A folder cannot be placed inside itself or one of its subfolders."
 
-#: noten/ansichten.py:303 noten/models.py:343
+#: noten/ansichten.py:301 noten/models.py:343
 #, python-format
 msgid "Höchstens %(n)s Ordnerebenen sind möglich."
 msgstr "A maximum of %(n)s folder levels is possible."
 
-#: noten/ansichten.py:319
+#: noten/ansichten.py:317
 msgid "Der Anteil des 1. Halbjahres muss zwischen 0 und 100 liegen."
 msgstr "The share of the 1st semester must be between 0 and 100."
 
-#: noten/ansichten.py:335
+#: noten/ansichten.py:333
 #, python-format
 msgid "„%(name)s“: Die oberste Ebene ist durch die Klausurregel vorgegeben."
 msgstr "“%(name)s”: the top level is set by the exam rule."
 
-#: noten/ansichten.py:349
+#: noten/ansichten.py:347
 msgid "Ein Ordner braucht einen Namen."
 msgstr "A folder needs a name."
 
-#: noten/ansichten.py:368
+#: noten/ansichten.py:366
 #, python-format
 msgid "%(wo)s: Das Gewicht eines Leistungsnachweises muss größer als 0 sein."
 msgstr "%(wo)s: The weight of an assessment must be greater than 0."
 
-#: noten/ansichten.py:403
+#: noten/ansichten.py:401
 #, python-format
 msgid "Sie können Vorgaben nur für die Jahrgänge %(j)s anlegen."
 msgstr "You can only create requirements for year groups %(j)s."
 
-#: noten/ansichten.py:482
+#: noten/ansichten.py:480
 #, python-format
 msgid "Vorgabe „%(titel)s“ gespeichert – sie gilt für %(n)s Unterricht."
 msgid_plural ""
@@ -3493,7 +3493,7 @@ msgid_plural ""
 msgstr[0] "Requirement “%(titel)s” saved – it applies to %(n)s course."
 msgstr[1] "Requirement “%(titel)s” saved – it applies to %(n)s courses."
 
-#: noten/ansichten.py:496
+#: noten/ansichten.py:494
 #, python-format
 msgid "Vorgabe „%(titel)s“ gelöscht."
 msgstr "Requirement “%(titel)s” deleted."
@@ -3519,38 +3519,38 @@ msgstr ""
 msgid "Noch keine Noten vorhanden."
 msgstr "No grades yet."
 
-#: noten/eingabe.py:78 noten/eingabe.py:93
+#: noten/eingabe.py:78 noten/eingabe.py:92
 #, python-format
 msgid "„%(text)s“ ist keine Note dieser Skala."
 msgstr "“%(text)s” is not a grade on this scale."
 
-#: noten/eingabe.py:84
+#: noten/eingabe.py:83
 #, python-format
 msgid "„%(text)s“: Bitte erreichte BE als Zahl eingeben (oder =Note)."
 msgstr "“%(text)s”: Please enter the marks achieved as a number (or =grade)."
 
-#: noten/eingabe.py:86
+#: noten/eingabe.py:85
 #, python-format
 msgid "%(be)s BE liegt nicht zwischen 0 und %(max)s."
 msgstr "%(be)s marks is not between 0 and %(max)s."
 
-#: noten/eingabe.py:89
+#: noten/eingabe.py:88
 msgid "Bitte höchstens zwei Nachkommastellen."
 msgstr "Please use at most two decimal places."
 
-#: noten/eingabe.py:126
+#: noten/eingabe.py:140
 msgid "Das Gewicht muss eine Zahl sein."
 msgstr "The weight must be a number."
 
-#: noten/eingabe.py:128
+#: noten/eingabe.py:142
 msgid "Das Gewicht darf nicht negativ sein."
 msgstr "The weight must not be negative."
 
-#: noten/eingabe.py:148
+#: noten/eingabe.py:162
 msgid "Abweichendes Gewicht bitte begründen."
 msgstr "Please give a reason for the different weight."
 
-#: noten/eingabe.py:150
+#: noten/eingabe.py:164
 msgid "Ein Einzelgewicht ohne Note ist nicht möglich."
 msgstr "An individual weight without a grade is not possible."
 
@@ -4381,7 +4381,15 @@ msgstr "Attachment “%(titel)s” deleted."
 msgid "Alle Kategorien"
 msgstr "All categories"
 
-#: portal/formulare.py:16 portal/middleware.py:59
+#: portal/formulare.py:10
+#, python-format
+msgid ""
+"Zu viele fehlgeschlagene Anmeldeversuche. Bitte warten Sie %(min)s Minuten "
+"und versuchen Sie es dann erneut."
+msgstr ""
+"Too many failed sign-in attempts. Please wait %(min)s minutes and try again."
+
+#: portal/formulare.py:37 portal/middleware.py:59
 msgid "Dieses Portal ist nur für Beschäftigte der Schule zugänglich."
 msgstr "This portal is only available to school staff."
 
@@ -4457,7 +4465,7 @@ msgstr "Pink"
 msgid "Grau"
 msgstr "Grey"
 
-#: portal/models.py:46 portal/models.py:119
+#: portal/models.py:46 portal/models.py:136
 msgid "Farbe"
 msgstr "Colour"
 
@@ -4525,76 +4533,97 @@ msgstr "Two-factor sign-in"
 msgid "Zwei-Faktor-Anmeldungen"
 msgstr "Two-factor sign-ins"
 
-#: portal/models.py:104
+#: portal/models.py:101 sicherung/models.py:94 templates/portal/login.html:10
+#: templates/sicherung/benutzer.html:16
+msgid "Benutzername"
+msgstr "Username"
+
+#: portal/models.py:102
+msgid "IP-Adresse"
+msgstr "IP address"
+
+#: portal/models.py:103 sicherung/pdf.py:235
+msgid "Zeitpunkt"
+msgstr "Time"
+
+#: portal/models.py:106
+msgid "Fehlgeschlagene Anmeldung"
+msgstr "Failed sign-in"
+
+#: portal/models.py:107
+msgid "Fehlgeschlagene Anmeldungen"
+msgstr "Failed sign-ins"
+
+#: portal/models.py:121
 msgid "Brief (E-Mail)"
 msgstr "Letter (email)"
 
-#: portal/models.py:104 portal/navigation.py:86
+#: portal/models.py:121 portal/navigation.py:86
 msgid "Kalender"
 msgstr "Calendar"
 
-#: portal/models.py:104
+#: portal/models.py:121
 msgid "Personen (Teams)"
 msgstr "People (Teams)"
 
-#: portal/models.py:105
+#: portal/models.py:122
 msgid "Ordner (Dateien)"
 msgstr "Folder (files)"
 
-#: portal/models.py:105
+#: portal/models.py:122
 msgid "Stift (Text)"
 msgstr "Pen (text)"
 
-#: portal/models.py:105
+#: portal/models.py:122
 msgid "Liste (Tabelle)"
 msgstr "List (spreadsheet)"
 
-#: portal/models.py:106
+#: portal/models.py:123
 msgid "Tafel (Präsentation)"
 msgstr "Board (presentation)"
 
-#: portal/models.py:106
+#: portal/models.py:123
 msgid "Buch (Notizbuch)"
 msgstr "Book (notebook)"
 
-#: portal/models.py:106
+#: portal/models.py:123
 msgid "Haken (Formulare)"
 msgstr "Tick (forms)"
 
-#: portal/models.py:107
+#: portal/models.py:124
 msgid "Gebäude (Intranet)"
 msgstr "Building (intranet)"
 
-#: portal/models.py:107
+#: portal/models.py:124
 msgid "Haus (Startseite)"
 msgstr "House (home page)"
 
-#: portal/models.py:107
+#: portal/models.py:124
 msgid "Klammer (Sonstiges)"
 msgstr "Clip (other)"
 
-#: portal/models.py:111
+#: portal/models.py:128
 msgid "Titel (englisch)"
 msgstr "Title (English)"
 
-#: portal/models.py:112
+#: portal/models.py:129
 msgid "Leer lassen, wenn der Titel in beiden Sprachen gleich ist."
 msgstr "Leave empty if the title is the same in both languages."
 
-#: portal/models.py:113
+#: portal/models.py:130
 msgid "Kurzbeschreibung"
 msgstr "Short description"
 
-#: portal/models.py:114
+#: portal/models.py:131
 msgid "Kurzbeschreibung (englisch)"
 msgstr "Short description (English)"
 
-#: portal/models.py:115 templates/aufnahme/anmeldung.html:219
+#: portal/models.py:132 templates/aufnahme/anmeldung.html:219
 #: templates/aufnahme/formular.html:45
 msgid "Adresse"
 msgstr "Address"
 
-#: portal/models.py:116
+#: portal/models.py:133
 #, python-brace-format
 msgid ""
 "Vollständige https-Adresse. Der Platzhalter {mandant} wird durch "
@@ -4605,31 +4634,31 @@ msgstr ""
 "from the .env, e.g. https://{mandant}.sharepoint.com; without OFFICE_MANDANT"
 " such a tile is hidden."
 
-#: portal/models.py:118
+#: portal/models.py:135
 msgid "Symbol"
 msgstr "Icon"
 
-#: portal/models.py:119
+#: portal/models.py:136
 msgid "Hex-Farbwert, z. B. #0f6cbd."
 msgstr "Hex colour value, e.g. #0f6cbd."
 
-#: portal/models.py:121
+#: portal/models.py:138
 msgid "Angezeigt"
 msgstr "Shown"
 
-#: portal/models.py:124
+#: portal/models.py:141
 msgid "Office-Kachel"
 msgstr "Office tile"
 
-#: portal/models.py:125
+#: portal/models.py:142
 msgid "Office-Kacheln"
 msgstr "Office tiles"
 
-#: portal/models.py:137
+#: portal/models.py:154
 msgid "Die Adresse muss mit https:// beginnen."
 msgstr "The address must start with https://."
 
-#: portal/models.py:139
+#: portal/models.py:156
 msgid "Bitte einen Hex-Farbwert wie #0f6cbd angeben."
 msgstr "Please enter a hex colour value such as #0f6cbd."
 
@@ -4908,7 +4937,7 @@ msgid "Zeugnisnoten (Liste)"
 msgstr "Report grades (list)"
 
 #: portal/navigation.py:179 templates/zeugnisse/uebersicht.html:56
-#: zeugnisse/models.py:200
+#: zeugnisse/models.py:203
 msgid "Konferenzen"
 msgstr "Conferences"
 
@@ -5433,7 +5462,7 @@ msgstr "Code from the app or backup code"
 msgid "Bitte melden Sie sich erneut an."
 msgstr "Please sign in again."
 
-#: portal/sicherheit.py:68
+#: portal/sicherheit.py:73
 #, python-format
 msgid ""
 "Ersatzcode verwendet – es bleibt %(n)s Ersatzcode. Neue Codes erzeugen Sie "
@@ -5448,47 +5477,47 @@ msgstr[1] ""
 "Backup code used – %(n)s backup codes left. You can create new codes under "
 "“Security”."
 
-#: portal/sicherheit.py:76
+#: portal/sicherheit.py:82
 msgid "Zu viele falsche Codes. Bitte melden Sie sich erneut an."
 msgstr "Too many wrong codes. Please sign in again."
 
-#: portal/sicherheit.py:79
+#: portal/sicherheit.py:85
 msgid "Der Code stimmt nicht. Bitte den aktuellen Code der App eingeben."
 msgstr "The code is not correct. Please enter the current code from the app."
 
-#: portal/sicherheit.py:109
+#: portal/sicherheit.py:115
 msgid "Zwei-Faktor-Anmeldung eingerichtet"
 msgstr "Two-factor sign-in set up"
 
-#: portal/sicherheit.py:110
+#: portal/sicherheit.py:116
 msgid "Die Zwei-Faktor-Anmeldung ist eingerichtet."
 msgstr "Two-factor sign-in is set up."
 
-#: portal/sicherheit.py:112
+#: portal/sicherheit.py:118
 msgid "Der Code stimmt nicht. Bitte die Uhrzeit des Telefons prüfen."
 msgstr "The code is not correct. Please check the phone's clock."
 
-#: portal/sicherheit.py:120
+#: portal/sicherheit.py:126
 msgid "Neue Ersatzcodes erzeugt; die bisherigen gelten nicht mehr."
 msgstr "New backup codes created; the previous ones are no longer valid."
 
-#: portal/sicherheit.py:122
+#: portal/sicherheit.py:128
 msgid "Die Zwei-Faktor-Anmeldung ist für Ihr Konto verpflichtend."
 msgstr "Two-factor sign-in is mandatory for your account."
 
-#: portal/sicherheit.py:125
+#: portal/sicherheit.py:131
 msgid "Zwei-Faktor-Anmeldung abgeschaltet"
 msgstr "Two-factor sign-in switched off"
 
-#: portal/sicherheit.py:126
+#: portal/sicherheit.py:132
 msgid "Die Zwei-Faktor-Anmeldung ist abgeschaltet."
 msgstr "Two-factor sign-in is switched off."
 
-#: portal/sicherheit.py:129
+#: portal/sicherheit.py:135
 msgid "Der Code stimmt nicht."
 msgstr "The code is not correct."
 
-#: portal/sicherheit.py:158
+#: portal/sicherheit.py:164
 msgid ""
 "Für Ihr Konto ist die Zwei-Faktor-Anmeldung vorgeschrieben. Bitte richten "
 "Sie sie jetzt ein."
@@ -6028,11 +6057,6 @@ msgstr "Time"
 msgid "Benutzer:in"
 msgstr "User"
 
-#: sicherung/models.py:94 templates/portal/login.html:10
-#: templates/sicherung/benutzer.html:16
-msgid "Benutzername"
-msgstr "Username"
-
 #: sicherung/models.py:95 templates/laufbahn/loeschfristen.html:12
 #: templates/sicherung/protokoll.html:8 templates/sicherung/protokoll.html:14
 msgid "Aktion"
@@ -6106,10 +6130,6 @@ msgstr "no"
 #: sicherung/pdf.py:231
 msgid "Keine Einträge in diesem Zeitraum."
 msgstr "No entries in this period."
-
-#: sicherung/pdf.py:235
-msgid "Zeitpunkt"
-msgstr "Time"
 
 #: sicherung/pdf.py:254
 msgid "Leere Felder sind ausgelassen."
@@ -6241,7 +6261,7 @@ msgstr "Organisation"
 msgid "Stammklasse"
 msgstr "Home class"
 
-#: stammdaten/admin.py:301
+#: stammdaten/admin.py:301 stammdaten/admin.py:311
 msgid "Akte"
 msgstr "Record"
 
@@ -6250,93 +6270,93 @@ msgstr "Record"
 msgid "Schülerakte"
 msgstr "Student record"
 
-#: stammdaten/admin.py:337 templates/portal/_start_hr.html:18
+#: stammdaten/admin.py:350 templates/portal/_start_hr.html:18
 #: templates/zeugnisse/klasse.html:41 templates/zeugnisse/zeugnis.html:44
 msgid "fehlt"
 msgstr "missing"
 
-#: stammdaten/admin.py:337
+#: stammdaten/admin.py:350
 msgid "läuft bald ab"
 msgstr "expires soon"
 
-#: stammdaten/admin.py:337 templates/foerderung/_akte.html:23
+#: stammdaten/admin.py:350 templates/foerderung/_akte.html:23
 #: templates/foerderung/nachteilsausgleich.html:15
 msgid "gültig"
 msgstr "valid"
 
-#: stammdaten/admin.py:346 stammdaten/admin.py:408 stammdaten/models.py:387
+#: stammdaten/admin.py:359 stammdaten/admin.py:421 stammdaten/models.py:387
 #: templates/laufbahn/loeschfristen.html:73
 msgid "Nachweise"
 msgstr "Certificates"
 
-#: stammdaten/admin.py:350
+#: stammdaten/admin.py:363
 msgid "fehlend, abgelaufen oder bald ablaufend"
 msgstr "missing, expired or expiring soon"
 
-#: stammdaten/admin.py:350
+#: stammdaten/admin.py:363
 msgid "vollständig und gültig"
 msgstr "complete and valid"
 
-#: stammdaten/admin.py:384
+#: stammdaten/admin.py:397
 msgid "Person und Einsatz"
 msgstr "Person and assignment"
 
-#: stammdaten/admin.py:385
+#: stammdaten/admin.py:398
 msgid "Tätigkeit"
 msgstr "Duties"
 
-#: stammdaten/admin.py:390
+#: stammdaten/admin.py:403
 msgid "Dienstverhältnis (HR)"
 msgstr "Employment (HR)"
 
-#: stammdaten/admin.py:393
+#: stammdaten/admin.py:406
 msgid "Intern (HR)"
 msgstr "Internal (HR)"
 
-#: stammdaten/admin.py:435
+#: stammdaten/admin.py:448
 msgid "Mitglieder (aktuell)"
 msgstr "Members (current)"
 
-#: stammdaten/admin.py:439
+#: stammdaten/admin.py:452
 msgid "Alle Schüler:innen der Ursprungs-Stammklassen hinzufügen"
 msgstr "Add all students of the source home classes"
 
-#: stammdaten/admin.py:450
+#: stammdaten/admin.py:463
 #, python-format
 msgid ""
 "%(n)s Mitgliedschaften angelegt. Danach bitte Abwählende wieder entfernen."
 msgstr "%(n)s memberships created. Please then remove students who opted out."
 
-#: stammdaten/admin.py:491 templates/foerderung/_akte.html:16
+#: stammdaten/admin.py:504 templates/foerderung/_akte.html:16
 #: templates/foerderung/nachteilsausgleich.html:33
 msgid "Gültig"
 msgstr "Valid"
 
-#: stammdaten/admin.py:521 templates/sicherung/sicherungen.html:49
+#: stammdaten/admin.py:534 templates/sicherung/sicherungen.html:49
 msgid "Größe"
 msgstr "Size"
 
-#: stammdaten/admin.py:582
+#: stammdaten/admin.py:595
 msgid "Personen (aktiv)"
 msgstr "People (active)"
 
-#: stammdaten/admin.py:592
+#: stammdaten/admin.py:605
 msgid "Eingesetzte Personen"
 msgstr "People deployed"
 
-#: stammdaten/admin.py:603
+#: stammdaten/admin.py:616
 msgid "Pflicht für"
 msgstr "Required for"
 
-#: stammdaten/admin.py:625
+#: stammdaten/admin.py:638
 msgid "Arbeitstage"
 msgstr "Working days"
 
-#: stammdaten/admin.py:638
+#: stammdaten/admin.py:651
 msgid "Englische Bezeichnungen"
 msgstr "English names"
 
-#: stammdaten/admin.py:639
+#: stammdaten/admin.py:652
 msgid "Sichtbarkeit und Anzeige"
 msgstr "Visibility and display"
 
@@ -9034,7 +9054,7 @@ msgstr "No. %(nr)s"
 #: templates/laufbahn/schueler.html:7 templates/laufbahn/wechsel.html:90
 #: templates/zeugnisse/gefaehrdung.html:19
 #: templates/zeugnisse/protokoll.html:16 templates/zeugnisse/zeugnis.html:11
-#: zeugnisse/ansichten.py:580
+#: zeugnisse/ansichten.py:581
 #, python-format
 msgid "Klasse %(k)s"
 msgstr "Class %(k)s"
@@ -9705,8 +9725,8 @@ msgstr ""
 "for corrections."
 
 #: templates/noten/notensperre.html:20 templates/zeugnisse/konferenz.html:6
-#: templates/zeugnisse/uebersicht.html:36 zeugnisse/models.py:199
-#: zeugnisse/models.py:228
+#: templates/zeugnisse/uebersicht.html:36 zeugnisse/models.py:202
+#: zeugnisse/models.py:231
 msgid "Konferenz"
 msgstr "Conference"
 
@@ -11234,7 +11254,7 @@ msgstr "No PDF exports yet."
 #: templates/sicherung/protokoll.html:3 templates/sicherung/protokoll.html:6
 #: templates/zeugnisse/konferenz.html:26 templates/zeugnisse/protokoll.html:5
 #: templates/zeugnisse/protokoll.html:20 templates/zeugnisse/protokoll.html:47
-#: zeugnisse/models.py:190
+#: zeugnisse/models.py:193
 msgid "Protokoll"
 msgstr "Minutes"
 
@@ -11325,7 +11345,7 @@ msgstr "Upload and check"
 msgid "Vorhandene Sicherungen"
 msgstr "Existing backups"
 
-#: templates/sicherung/sicherungen.html:48 zeugnisse/models.py:161
+#: templates/sicherung/sicherungen.html:48 zeugnisse/models.py:164
 msgid "Erstellt"
 msgstr "Created"
 
@@ -12006,7 +12026,7 @@ msgstr "reopen"
 msgid "als erledigt markieren"
 msgstr "mark as done"
 
-#: templates/zeugnisse/_kommentar.html:45 zeugnisse/models.py:160
+#: templates/zeugnisse/_kommentar.html:45 zeugnisse/models.py:163
 msgid "Anmerkung"
 msgstr "Note"
 
@@ -12358,7 +12378,7 @@ msgid "Konferenzdaten"
 msgstr "Conference details"
 
 #: templates/zeugnisse/konferenz.html:26 templates/zeugnisse/protokoll.html:20
-#: templates/zeugnisse/protokoll.html:46 zeugnisse/models.py:188
+#: templates/zeugnisse/protokoll.html:46 zeugnisse/models.py:191
 msgid "Vorsitz"
 msgstr "Chair"
 
@@ -12396,7 +12416,7 @@ msgstr "Promotion at risk"
 msgid "keine Gefährdung"
 msgstr "no risk"
 
-#: templates/zeugnisse/konferenz.html:75 zeugnisse/models.py:233
+#: templates/zeugnisse/konferenz.html:75 zeugnisse/models.py:236
 msgid "Versetzung gefährdet in"
 msgstr "Promotion at risk in"
 
@@ -12404,7 +12424,7 @@ msgstr "Promotion at risk in"
 msgid "schriftlich mitgeteilt am"
 msgstr "notified in writing on"
 
-#: templates/zeugnisse/konferenz.html:78 zeugnisse/models.py:232
+#: templates/zeugnisse/konferenz.html:78 zeugnisse/models.py:235
 msgid "Notenausgleich durch"
 msgstr "Compensated by"
 
@@ -12457,11 +12477,11 @@ msgstr "Minutes"
 msgid "nicht abgeschlossen"
 msgstr "not closed"
 
-#: templates/zeugnisse/protokoll.html:21 zeugnisse/models.py:191
+#: templates/zeugnisse/protokoll.html:21 zeugnisse/models.py:194
 msgid "Anwesend"
 msgstr "Present"
 
-#: templates/zeugnisse/protokoll.html:23 zeugnisse/models.py:192
+#: templates/zeugnisse/protokoll.html:23 zeugnisse/models.py:195
 msgid "Allgemeine Beratungspunkte"
 msgstr "General items discussed"
 
@@ -12560,7 +12580,7 @@ msgstr "Justification (optional)"
 msgid "freigegeben"
 msgstr "released"
 
-#: templates/zeugnisse/unterricht.html:35 zeugnisse/models.py:214
+#: templates/zeugnisse/unterricht.html:35 zeugnisse/models.py:217
 msgid "— offen —"
 msgstr "— open —"
 
@@ -12616,6 +12636,11 @@ msgstr "Next student"
 #: templates/zeugnisse/zeugnis.html:16
 msgid "Druckansicht"
 msgstr "Print view"
+
+#: templates/zeugnisse/zeugnis.html:24
+#, python-format
+msgid "am %(datum)s"
+msgstr "on %(datum)s"
 
 #: templates/zeugnisse/zeugnis.html:25
 msgid ""
@@ -12685,7 +12710,7 @@ msgstr "characters"
 msgid "Nach einer Änderung müssen alle Lehrkräfte erneut abzeichnen."
 msgstr "After a change all teachers have to initial again."
 
-#: templates/zeugnisse/zeugnis.html:81 zeugnisse/models.py:144
+#: templates/zeugnisse/zeugnis.html:81 zeugnisse/models.py:147
 msgid "Abzeichnungen"
 msgstr "Initials"
 
@@ -13297,48 +13322,48 @@ msgstr "There are open notes on the comment."
 msgid "Kein Versetzungsvermerk eingetragen."
 msgstr "No promotion endorsement entered."
 
-#: zeugnisse/ansichten.py:442
+#: zeugnisse/ansichten.py:443
 msgid "Zeugnis gespeichert."
 msgstr "Report saved."
 
-#: zeugnisse/ansichten.py:449
+#: zeugnisse/ansichten.py:450
 msgid "Kommentar gespeichert. Bisherige Abzeichnungen müssen erneuert werden."
 msgstr "Comment saved. Existing initials must be renewed."
 
-#: zeugnisse/ansichten.py:459
+#: zeugnisse/ansichten.py:460
 msgid "Zeugnis freigegeben."
 msgstr "Report released."
 
-#: zeugnisse/ansichten.py:467
+#: zeugnisse/ansichten.py:468
 msgid "Freigabe aufgehoben – das Zeugnis ist wieder ein Entwurf."
 msgstr "Release revoked – the report is a draft again."
 
-#: zeugnisse/ansichten.py:505
+#: zeugnisse/ansichten.py:507
 msgid "sie"
 msgstr "she"
 
-#: zeugnisse/ansichten.py:505
+#: zeugnisse/ansichten.py:507
 msgid "er"
 msgstr "he"
 
-#: zeugnisse/ansichten.py:505
+#: zeugnisse/ansichten.py:507
 msgid "sie/er"
 msgstr "she/he"
 
-#: zeugnisse/ansichten.py:526
+#: zeugnisse/ansichten.py:528
 #, python-format
 msgid "Versetzt in die Jahrgangsstufe %(jg)s."
 msgstr "Promoted to year %(jg)s."
 
-#: zeugnisse/ansichten.py:526
+#: zeugnisse/ansichten.py:528
 msgid "Versetzt."
 msgstr "Promoted."
 
-#: zeugnisse/ansichten.py:527
+#: zeugnisse/ansichten.py:529
 msgid "Nicht versetzt."
 msgstr "Not promoted."
 
-#: zeugnisse/ansichten.py:528
+#: zeugnisse/ansichten.py:530
 #, python-format
 msgid ""
 "Die Berechtigung zum Übergang in die Qualifikationsphase hat %(pron)s "
@@ -13349,61 +13374,61 @@ msgstr ""
 "qualification phase includes the intermediate school-leaving certificate "
 "(Mittlerer Schulabschluss)."
 
-#: zeugnisse/ansichten.py:530
+#: zeugnisse/ansichten.py:532
 #, python-format
 msgid ""
 "Die Berechtigung zum Übergang in die Qualifikationsphase hat %(pron)s nicht "
 "erhalten."
 msgstr "%(pron)s has not been granted entry to the qualification phase."
 
-#: zeugnisse/ansichten.py:531
+#: zeugnisse/ansichten.py:533
 msgid "Die Jahrgangsstufe wird freiwillig wiederholt."
 msgstr "The year is repeated voluntarily."
 
-#: zeugnisse/ansichten.py:537
+#: zeugnisse/ansichten.py:539
 #, python-format
 msgid "%(name)s verlässt die Schule am %(datum)s."
 msgstr "%(name)s leaves the school on %(datum)s."
 
-#: zeugnisse/ansichten.py:540
+#: zeugnisse/ansichten.py:542
 #, python-format
 msgid "%(name)s verlässt die Schule."
 msgstr "%(name)s leaves the school."
 
-#: zeugnisse/ansichten.py:683
+#: zeugnisse/ansichten.py:684
 #, python-format
 msgid "%(name)s: keine Entscheidung."
 msgstr "%(name)s: no decision."
 
-#: zeugnisse/ansichten.py:685
+#: zeugnisse/ansichten.py:686
 #, python-format
 msgid "%(name)s: Die Nichtversetzung bedarf einer Begründung im Protokoll."
 msgstr "%(name)s: non-promotion requires a reason in the minutes."
 
-#: zeugnisse/ansichten.py:687
+#: zeugnisse/ansichten.py:688
 #, python-format
 msgid "%(name)s: Bitte den Notenausgleich im Protokoll vermerken."
 msgstr "%(name)s: please record the compensation in the minutes."
 
-#: zeugnisse/ansichten.py:689
+#: zeugnisse/ansichten.py:690
 msgid "Das Datum der Konferenz fehlt."
 msgstr "The conference date is missing."
 
-#: zeugnisse/ansichten.py:739
+#: zeugnisse/ansichten.py:740
 msgid ""
 "Konferenz abgeschlossen. Die Beschlüsse sind in die Zeugnisse übernommen."
 msgstr ""
 "Conference closed. The decisions have been transferred to the reports."
 
-#: zeugnisse/ansichten.py:742
+#: zeugnisse/ansichten.py:743
 msgid "Konferenz gespeichert."
 msgstr "Conference saved."
 
-#: zeugnisse/models.py:25 zeugnisse/models.py:216
+#: zeugnisse/models.py:25 zeugnisse/models.py:219
 msgid "Versetzt"
 msgstr "Promoted"
 
-#: zeugnisse/models.py:26 zeugnisse/models.py:219
+#: zeugnisse/models.py:26 zeugnisse/models.py:222
 msgid "Nicht versetzt"
 msgstr "Not promoted"
 
@@ -13415,7 +13440,7 @@ msgstr "Entry to the qualification phase granted"
 msgid "Berechtigung zum Übergang in die Qualifikationsphase nicht erhalten"
 msgstr "Entry to the qualification phase not granted"
 
-#: zeugnisse/models.py:29 zeugnisse/models.py:222
+#: zeugnisse/models.py:29 zeugnisse/models.py:225
 msgid "Freiwillige Wiederholung"
 msgstr "Voluntary repetition"
 
@@ -13524,103 +13549,103 @@ msgstr "Subject grade (report)"
 msgid "Fachnoten (Zeugnis)"
 msgstr "Subject grades (report)"
 
-#: zeugnisse/models.py:139
+#: zeugnisse/models.py:142
 msgid "Abgezeichnet am"
 msgstr "Initialled on"
 
-#: zeugnisse/models.py:140
+#: zeugnisse/models.py:143
 msgid "Stand des Kommentars"
 msgstr "Comment version"
 
-#: zeugnisse/models.py:143
+#: zeugnisse/models.py:146
 msgid "Abzeichnung"
 msgstr "Initials"
 
-#: zeugnisse/models.py:165
+#: zeugnisse/models.py:168
 msgid "Anmerkung zum Kommentar"
 msgstr "Note on the comment"
 
-#: zeugnisse/models.py:166
+#: zeugnisse/models.py:169
 msgid "Anmerkungen zum Kommentar"
 msgstr "Notes on the comment"
 
-#: zeugnisse/models.py:175
+#: zeugnisse/models.py:178
 msgid "Halbjahreskonferenz (Zeugniskonferenz)"
 msgstr "Mid-year conference (report conference)"
 
-#: zeugnisse/models.py:176
+#: zeugnisse/models.py:179
 msgid "Klassenkonferenz als Versetzungskonferenz"
 msgstr "Class conference as promotion conference"
 
-#: zeugnisse/models.py:178
+#: zeugnisse/models.py:181
 msgid "Geplant"
 msgstr "Planned"
 
-#: zeugnisse/models.py:178
+#: zeugnisse/models.py:181
 msgid "Durchgeführt"
 msgstr "Held"
 
-#: zeugnisse/models.py:186
+#: zeugnisse/models.py:189
 msgid "Ort / Raum"
 msgstr "Place / room"
 
-#: zeugnisse/models.py:196
+#: zeugnisse/models.py:199
 msgid "Änderungsprotokoll Konferenz"
 msgstr "Change log conference"
 
-#: zeugnisse/models.py:215
+#: zeugnisse/models.py:218
 msgid "Keine Entscheidung (Halbjahr)"
 msgstr "No decision (mid-year)"
 
-#: zeugnisse/models.py:217
+#: zeugnisse/models.py:220
 msgid "Versetzt mit Notenausgleich"
 msgstr "Promoted with compensation"
 
-#: zeugnisse/models.py:218
+#: zeugnisse/models.py:221
 msgid "Nicht versetzt – Nachprüfung möglich"
 msgstr "Not promoted – re-sit possible"
 
-#: zeugnisse/models.py:220
+#: zeugnisse/models.py:223
 msgid "Berechtigung Qualifikationsphase erteilt"
 msgstr "Entry to qualification phase granted"
 
-#: zeugnisse/models.py:221
+#: zeugnisse/models.py:224
 msgid "Berechtigung Qualifikationsphase nicht erteilt"
 msgstr "Entry to qualification phase not granted"
 
-#: zeugnisse/models.py:230
+#: zeugnisse/models.py:233
 msgid "Vorschlag des Systems"
 msgstr "System suggestion"
 
-#: zeugnisse/models.py:234
+#: zeugnisse/models.py:237
 msgid "Gefährdung schriftlich mitgeteilt am"
 msgstr "Risk notified in writing on"
 
-#: zeugnisse/models.py:235
+#: zeugnisse/models.py:238
 msgid "Stimmen dafür"
 msgstr "Votes for"
 
-#: zeugnisse/models.py:236
+#: zeugnisse/models.py:239
 msgid "Stimmen dagegen"
 msgstr "Votes against"
 
-#: zeugnisse/models.py:237
+#: zeugnisse/models.py:240
 msgid "Begründung / Bemerkung für das Protokoll"
 msgstr "Reason / note for the minutes"
 
-#: zeugnisse/models.py:238
+#: zeugnisse/models.py:241
 msgid "Nicht mitwirkend (Verwandtschaft, häusliche Gemeinschaft)"
 msgstr "Not participating (relatives, same household)"
 
-#: zeugnisse/models.py:239
+#: zeugnisse/models.py:242
 msgid "Änderungsprotokoll Konferenzbeschluss"
 msgstr "Change log conference decision"
 
-#: zeugnisse/models.py:242
+#: zeugnisse/models.py:245
 msgid "Konferenzbeschluss"
 msgstr "Conference decision"
 
-#: zeugnisse/models.py:243
+#: zeugnisse/models.py:246
 msgid "Konferenzbeschlüsse"
 msgstr "Conference decisions"
 

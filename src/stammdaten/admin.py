@@ -302,6 +302,19 @@ class SchuelerprofilAdmin(ZusatzfelderAdminMixin, SimpleHistoryAdmin):
     def akte(self, obj):
         return format_html('<a href="{}">{}</a>', reverse("schuelerakte", args=[obj.pk]), gettext("Schülerakte"))
 
+    def get_list_display(self, request):
+        """Den Link zur Schülerakte nur zeigen, wenn die Person die Akte auch öffnen darf (ab 0.4.9.2)."""
+        from portal.rechte import darf_akte_sehen
+
+        spalten = list(super().get_list_display(request))
+        if "akte" in spalten:
+            @admin.display(description=_("Akte"))
+            def akte(obj):
+                return self.akte(obj) if darf_akte_sehen(request.user, obj) else "—"
+
+            spalten[spalten.index("akte")] = akte
+        return spalten
+
 
 # ---------------------------------------------------------------- Personal
 

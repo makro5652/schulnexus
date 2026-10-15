@@ -130,6 +130,9 @@ class ZeugnisFachnote(models.Model):
         verbose_name_plural = _("Fachnoten (Zeugnis)")
         ordering = ["zeugnis", "spalte", "reihenfolge"]
 
+    def __str__(self):
+        return f"{self.fachname}: {self.vermerk or (self.note if self.note is not None else '–')}"
+
 
 class Abzeichnung(models.Model):
     """Digitale Kenntnisnahme des Zeugniskommentars durch eine unterrichtende Lehrkraft."""

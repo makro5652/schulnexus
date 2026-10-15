@@ -1,4 +1,4 @@
-# Schulnexus (Version 0.4.9.1, Entwicklungsstand)
+# Schulnexus (Version 0.4.9.2, Entwicklungsstand)
 
 **Schulnexus** ist eine Open-Source-Schulverwaltung für die DSN (bis 0.4.8.1 „Schulverwaltung“, in 0.4.9.0 kurz „edunex“): Stammdaten, Klassen und Lerngruppen,
 Noten mit Gewichtung, Fehlzeiten, Nachmittagsprogramm, Anhänge zur Schülerakte,
@@ -323,6 +323,12 @@ Ab 0.4.6.0. Ausführliche Einrichtung auf Unraid: `ANLEITUNG-UNRAID.md`, Abschni
   (5 Versuche, 5 Minuten). Die **IT** kann sie je Konto **verpflichtend** machen und bei verlorenem Telefon
   **zurücksetzen** (System › Benutzer und Rechte › Konto); alles wird protokolliert. Die Verwaltungsoberfläche
   (`/verwaltung/`) meldet sich ebenfalls über diese Anmeldung an.
+- **Schutz gegen Passwort-Raten (ab 0.4.9.2):** Nach 10 fehlgeschlagenen Anmeldungen eines Kontos bzw. 50 von einer
+  IP-Adresse innerhalb von 15 Minuten lehnt die Anmeldung weitere Versuche ab, ohne das Passwort zu prüfen; die Sperre
+  endet von selbst. Falsche Codes beim zweiten Faktor zählen mit. Einstellbar mit `ANMELDUNG_MAX_FEHLVERSUCHE`,
+  `ANMELDUNG_MAX_JE_IP` und `ANMELDUNG_SPERRE_MINUTEN`. Die IT sieht die Fehlversuche in der Verwaltungsoberfläche
+  (Portal › Fehlgeschlagene Anmeldungen) und hebt eine Sperre durch Löschen der Einträge vorzeitig auf. Hinter einem
+  Reverse-Proxy (`HINTER_PROXY=1`) zählt die vom Proxy angehängte Adresse im Kopf `X-Forwarded-For`.
 - **HTTPS:** `HTTPS=1` setzen, sobald die Seite über https erreichbar ist (z. B. `tailscale serve`), und die
   https-Adresse in `CSRF_TRUSTED_ORIGINS` eintragen. Dann gelten sichere Cookies und HSTS. `HINTER_PROXY=1` und
   `HTTPS_UMLEITUNG=1` nur, wenn der vorgeschaltete Proxy den Kopf `X-Forwarded-Proto` zuverlässig setzt.
@@ -732,6 +738,27 @@ im Portal, in der Verwaltungsoberfläche und auf der Anmeldeseite:
   `portal.css`, `menueband.css` und `verwaltung.css` (Abschnitte „Designs“). Schriftfarben auf
   getönten Flächen sind gegenüber der Palette leicht abgedunkelt, damit der Kontrast reicht.
   Catppuccin steht unter MIT-Lizenz.
+
+## Code-Prüfung 0.4.9.2
+
+Systematische Prüfung des gesamten Codes: statische Analyse (ruff, bandit), Abhängigkeiten (pip-audit: keine bekannten
+Lücken), Shell-Skripte (shellcheck), `manage.py check --deploy`, alle 92 Vorlagen übersetzt, Migrationsstand, Testabdeckung
+(89 %) sowie ein automatischer Aufruf aller verlinkten Seiten für jede der 13 Demo-Rollen (je Seitentyp bis zu drei Varianten, rund 4 700 Aufrufe). Behoben:
+
+- Zeugnisseite stürzte ab, wenn das freigebende Konto gelöscht war; Personensuche bei Personal ohne Bereich.
+- Zahlenfelder (Gewichte, BE, Anteil des 1. Halbjahres) nehmen „NaN“, „Infinity“ und zu große Werte nicht mehr an
+  (vorher Serverfehler).
+- Anmeldesperre nach zu vielen Fehlversuchen (siehe „Sicherheit und Verschlüsselung“).
+- Links nur noch dort, wo die Zielseite für die angemeldete Person auch geöffnet werden darf (Klassenliste,
+  Schülerakte, Zeugnis, Konferenz, Förderplan, Nachteilsausgleich, Laufbahn, Verwaltungsliste der Schüler:innen).
+- Klassenliste lädt die Fehlzeiten in einer Abfrage statt einer je Schüler:in.
+- Wiederherstellung einer Modulsicherung: auch Daten- und Formatfehler (nicht nur Konflikte) brechen sauber mit Meldung ab;
+  wie bisher wird nichts verändert und vorher automatisch gesichert.
+
+Bewusst so belassen: Das Öffnen der Zeugnisseiten legt fehlende Zeugnis-Entwürfe an und gleicht Klasse und Jahrgang ab
+(gewollt, damit jede Schülerin und jeder Schüler einen Eintrag hat); die Seite „Sicherheit“ legt beim ersten Aufruf den
+leeren Zwei-Faktor-Eintrag an. In der Verwaltungsoberfläche zeigt Django bei Verweisfeldern teils Links zu Einträgen,
+die die Person nicht öffnen darf (Ergebnis: „Zugriff verweigert“, keine Datenpreisgabe).
 
 ## Update von einer älteren Version
 

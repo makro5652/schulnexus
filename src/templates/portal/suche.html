@@ -26,7 +26,7 @@
     <h2>{% translate "Kollegium und Personal" %} <span class="leise">({{ personal|length }})</span></h2>
     {% for e in personal %}
       <p>{% if e.link %}<a href="{% url 'admin:stammdaten_personalprofil_change' e.pp.pk %}">{{ e.pp.person }}</a>{% else %}{{ e.pp.person }}{% endif %}
-        <span class="leise">· {{ e.pp.stellenbezeichnung|default:e.pp.bereich.lokal_name|default:"" }}{% if e.pp.dienst_email %} · <a href="mailto:{{ e.pp.dienst_email }}">{{ e.pp.dienst_email }}</a>{% endif %}</span></p>
+        <span class="leise">· {% if e.pp.stellenbezeichnung %}{{ e.pp.stellenbezeichnung }}{% elif e.pp.bereich %}{{ e.pp.bereich.lokal_name }}{% endif %}{% if e.pp.dienst_email %} · <a href="mailto:{{ e.pp.dienst_email }}">{{ e.pp.dienst_email }}</a>{% endif %}</span></p>
     {% empty %}<p class="leer">{% translate "Keine Treffer." %}</p>{% endfor %}
   </section>
   {% endif %}

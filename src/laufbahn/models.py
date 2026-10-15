@@ -77,6 +77,9 @@ class Klassenplan(models.Model):
         unique_together = [("wechsel", "alt")]
         ordering = ["alt__jahrgang", "alt__name"]
 
+    def __str__(self):
+        return f"{self.alt} → {self.neu or '–'}"
+
 
 class Wechselposten(models.Model):
     OFFEN, DURCHGEFUEHRT = "offen", "durchgefuehrt"

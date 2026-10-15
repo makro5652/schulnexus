@@ -128,12 +128,20 @@ def foerder_hinweise(user):
 
 # ---------------------------------------------------------------- Seiten
 
+def _darf_klasse(user, schueler):
+    from portal.rechte import darf_klassenliste_sehen
+
+    klasse = schueler.stammklasse()
+    return klasse is not None and darf_klassenliste_sehen(user, klasse)
+
+
 def _gemeinsam(request, dokument, schueler):
     bearbeiten = darf_foerderung_bearbeiten(request.user, schueler)
     return {
         "s": schueler,
         "p": schueler.person,
         "klasse": schueler.stammklasse(),
+        "darf_klasse": _darf_klasse(request.user, schueler),
         "bearbeiten": bearbeiten,
         "darf_akte": darf_akte_sehen(request.user, schueler),
         "aushaendigungen": dokument.aushaendigungen.select_related("empfaenger", "erfasst_von"),

@@ -192,6 +192,12 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = "same-origin"
 SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin"
 
+# Schutz gegen Passwort- und Code-Raten (ab 0.4.9.2): nach zu vielen Fehlversuchen ist die Anmeldung für ein Konto
+# bzw. von einer IP-Adresse vorübergehend gesperrt. Fehlversuche beim zweiten Faktor zählen mit.
+ANMELDUNG_MAX_FEHLVERSUCHE = int(os.environ.get("ANMELDUNG_MAX_FEHLVERSUCHE", "10"))     # je Konto
+ANMELDUNG_MAX_JE_IP = int(os.environ.get("ANMELDUNG_MAX_JE_IP", "50"))                  # je IP-Adresse
+ANMELDUNG_SPERRE_MINUTEN = int(os.environ.get("ANMELDUNG_SPERRE_MINUTEN", "15"))
+
 # ---------------------------------------------------------------- Verschlüsselung gespeicherter Daten (ab 0.4.6.0)
 # 32 Byte (Base64), erzeugen mit:  python manage.py schluessel_erzeugen
 # Leer = keine Verschlüsselung. Ein verlorener Schlüssel macht verschlüsselte Anhänge und Sicherungen unlesbar!
