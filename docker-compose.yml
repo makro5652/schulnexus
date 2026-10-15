@@ -1,15 +1,19 @@
-# Schulverwaltung – lokaler Start und Testserver
+# edunex – lokaler Start und Testserver
 #   Start:   docker compose up --build
 #   Aufruf:  http://localhost:8000
 #   Stopp:   docker compose down        (Daten bleiben erhalten)
 #   Reset:   docker compose down -v     (löscht ALLE Daten!)
+#   VPS mit Traefik: sh vps/einrichten.sh (siehe README.md)
+
+# Fester Projektname: Container und Datenträger heißen edunex-…, unabhängig vom Ordnernamen.
+name: edunex
 
 services:
   db:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${DB_NAME:-schulverwaltung}
+      POSTGRES_DB: ${DB_NAME:-edunex}
       POSTGRES_USER: ${DB_BENUTZER:-schule}
       POSTGRES_PASSWORD: ${DB_PASSWORT:?Bitte DB_PASSWORT in .env setzen}
     volumes:
@@ -28,7 +32,7 @@ services:
         condition: service_healthy
     env_file: .env
     environment:
-      DATABASE_URL: postgres://${DB_BENUTZER:-schule}:${DB_PASSWORT}@db:5432/${DB_NAME:-schulverwaltung}
+      DATABASE_URL: postgres://${DB_BENUTZER:-schule}:${DB_PASSWORT}@db:5432/${DB_NAME:-edunex}
       MEDIA_ROOT: /daten/dokumente
       MODUL_SICHERUNGEN: /daten/modulsicherungen
     ports:

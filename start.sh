@@ -1,5 +1,5 @@
 #!/bin/sh
-# Startet die Schulverwaltung lokal mit Docker.
+# Startet edunex lokal mit Docker.
 # Beim ersten Start wird eine .env mit zufälligen Passwörtern erzeugt.
 set -e
 cd "$(dirname "$0")"
@@ -53,7 +53,7 @@ done
 echo " bereit."
 
 echo ""
-echo "Schulverwaltung läuft:  http://localhost:${PORT}"
+echo "edunex läuft:  http://localhost:${PORT}"
 echo "Verwaltungsoberfläche:  http://localhost:${PORT}/verwaltung/"
 echo ""
 echo "Zugangsdaten stehen in der Datei .env:"

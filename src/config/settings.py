@@ -1,5 +1,5 @@
 """
-Einstellungen der Schulverwaltung.
+Einstellungen von edunex (Open-Source-Schulverwaltung).
 
 Alle umgebungsabhängigen Werte kommen aus Umgebungsvariablen (siehe .env.example).
 So läuft derselbe Code auf dem MacBook, dem Testserver und später in Produktion.
@@ -89,7 +89,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Datenbank: im Container PostgreSQL, Verbindung über DATABASE_URL.
 DATABASES = {
     "default": dj_database_url.config(
-        default="postgres://schule:schule@localhost:5432/schulverwaltung",
+        default="postgres://schule:schule@localhost:5432/edunex",
         conn_max_age=60,
     )
 }
@@ -248,7 +248,7 @@ EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", True)
 EMAIL_USE_SSL = env_bool("EMAIL_USE_SSL", False)
 EMAIL_TIMEOUT = 20
-DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", f"{SCHULNAME} <schulverwaltung@localhost>")
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", f"{SCHULNAME} <edunex@localhost>")
 
 LOGGING = {
     "version": 1,

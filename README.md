@@ -1,6 +1,6 @@
-# Schulverwaltung (Version 0.4.8.1, Entwicklungsstand)
+# edunex (Version 0.4.9.0, Entwicklungsstand)
 
-Open-Source-Schulverwaltung für die DSN: Stammdaten, Klassen und Lerngruppen,
+**edunex** ist eine Open-Source-Schulverwaltung für die DSN (bis 0.4.8.1 „Schulverwaltung“): Stammdaten, Klassen und Lerngruppen,
 Noten mit Gewichtung, Fehlzeiten, Nachmittagsprogramm, Anhänge zur Schülerakte,
 Förderpläne und Nachteilsausgleiche, Neuanmeldungen, Zeugnisse und Konferenzen, Schuljahreswechsel,
 Abgänge mit Abgangszeugnis, Archiv und Löschfristen, Schulkalender, Raumbuchung, Elternsprechtage und
@@ -15,11 +15,11 @@ Sicherungen, Zwei-Faktor-Anmeldung, HTTPS-Betrieb. Läuft im Browser, betrieben 
 ## Starten auf dem MacBook
 
 1. **Docker Desktop** installieren und starten: https://www.docker.com/products/docker-desktop/
-2. Den Ordner `schulverwaltung` entpacken, z. B. nach `~/Projekte/schulverwaltung`.
+2. Den Ordner `edunex` entpacken, z. B. nach `~/Projekte/edunex`.
 3. Terminal öffnen und eingeben:
 
    ```sh
-   cd ~/Projekte/schulverwaltung
+   cd ~/Projekte/edunex
    ./start.sh
    ```
 
@@ -69,11 +69,57 @@ Arbeitsseite mit drei Spalten:
 - **Rechte:** Sekretariat, Verwaltungsleitung, Schulleitung alle Gruppen; Stufenkoordination die
   Gruppen ihrer Stufe (AGs ohne Jahrgang bleiben bei der Verwaltung).
 
+## Quellcode von GitHub holen
+
+Der Quellcode liegt im privaten Repository `makro5652/edunex`. Auf einem Server:
+
+```sh
+git clone https://github.com/makro5652/edunex.git
+cd edunex
+```
+
+Bei einem privaten Repository fragt `git clone` nach Benutzername und Passwort: Als Passwort einen
+*Personal Access Token* eingeben (github.com/settings/tokens, „Fine-grained“, nur Lesezugriff auf
+„Contents“ dieses Repositorys). Neue Versionen später mit `git pull` holen und das jeweilige
+Einrichtungsskript erneut starten (die `.env` bleibt erhalten, sie steht nicht im Repository).
+
+## Betrieb auf einem VPS mit Traefik (ab 0.4.9.0)
+
+Für einen Server im Internet, auf dem bereits **Traefik** als Reverse-Proxy mit Let's Encrypt läuft
+(z. B. ein Hostinger-VPS mit Docker). edunex ist dann nur über `https://<Domain>` erreichbar; der
+Port 8000 wird ausschließlich an `127.0.0.1` gebunden.
+
+1. DNS-Eintrag (A-Eintrag) für die gewünschte Adresse, z. B. `schule.example.org`, auf die IP des Servers setzen.
+2. Quellcode auf den Server holen (siehe oben, oder ZIP hochladen und mit `unzip` entpacken).
+3. Im Projektordner ausführen:
+
+   ```sh
+   sh vps/einrichten.sh schule.example.org
+   ```
+
+   Das Skript erzeugt die `.env` mit zufälligen Passwörtern und dem Verschlüsselungsschlüssel, stellt
+   HTTPS-Betrieb hinter dem Proxy ein (`HTTPS=1`, `HINTER_PROXY=1`, `ALLOWED_HOSTS`,
+   `CSRF_TRUSTED_ORIGINS`) und ermittelt Docker-Netzwerk, Entrypoint und Zertifikats-Resolver aus dem
+   laufenden Traefik und den Labels der übrigen Container. Die Vorschläge lassen sich mit der
+   Eingabetaste übernehmen oder überschreiben.
+4. Am Ende zeigt das Skript Adresse und Zugangsdaten. Den `DATEN_SCHLUESSEL` getrennt vom Server aufbewahren.
+
+Update: `git pull` (oder neues ZIP entpacken, `.env` behalten) und `sh vps/einrichten.sh` erneut ausführen.
+Befehle für den laufenden Betrieb immer mit beiden Dateien, z. B.
+`docker compose -f docker-compose.yml -f vps/traefik.yml logs -f web`.
+Entfernen samt aller Daten: `docker compose -f docker-compose.yml -f vps/traefik.yml down -v`.
+
+> Ein öffentlich erreichbarer Server ist für **Demo-Daten** gedacht. Das Elternportal bleibt aus
+> (`ELTERNPORTAL_AKTIV=0`); für Leitung und IT die Zwei-Faktor-Anmeldung verpflichtend machen.
+
+Ohne Traefik: Die Datei `vps/traefik.yml` weglassen und einen anderen Reverse-Proxy (Caddy,
+Nginx Proxy Manager) auf `127.0.0.1:8000` zeigen lassen; die Einstellungen in der `.env` sind dieselben.
+
 ## Betrieb auf Unraid (Zugriff über Tailscale)
 
 Für den Dauerbetrieb auf einem Unraid-Server gibt es eine eigene Variante im Ordner `unraid/`:
 ein veröffentlichter Port (voreingestellt 8010), erreichbar über das Tailscale des Servers,
-Daten unter `/mnt/user/appdata/schulverwaltung-daten`, tägliche Datenbanksicherung.
+Daten unter `/mnt/user/appdata/edunex-daten`, tägliche Datenbanksicherung.
 Einrichtung im Unraid-Terminal mit `sh unraid/einrichten.sh` – Schritt für Schritt in
 [ANLEITUNG-UNRAID.md](ANLEITUNG-UNRAID.md).
 
@@ -262,7 +308,7 @@ Ab 0.4.6.0. Ausführliche Einrichtung auf Unraid: `ANLEITUNG-UNRAID.md`, Abschni
 
 - **Verschlüsselte Ablage (AES-256-GCM):** Anhänge der Personenakten, Bewerbungsunterlagen, Modulsicherungen und
   PDF-Exporte werden mit dem Schlüssel `DATEN_SCHLUESSEL` aus der `.env` verschlüsselt gespeichert und beim Öffnen in
-  der Anwendung entschlüsselt. `start.sh` bzw. `unraid/einrichten.sh` erzeugen den Schlüssel beim Einrichten bzw. beim
+  der Anwendung entschlüsselt. `start.sh`, `unraid/einrichten.sh` bzw. `vps/einrichten.sh` erzeugen den Schlüssel beim Einrichten bzw. beim
   ersten Update und zeigen ihn einmal an. Beim Start des Containers werden ältere, noch unverschlüsselte Dateien
   automatisch nachverschlüsselt (`manage.py dateien_verschluesseln`). Die Datenbankfelder selbst bleiben lesbar; sie
   werden durch die verschlüsselten Festplatten des Servers geschützt.
@@ -689,6 +735,15 @@ im Portal, in der Verwaltungsoberfläche und auf der Anmeldeseite:
 
 ## Update von einer älteren Version
 
+**Umbenennung in edunex (0.4.9.0):** Die Docker-Projekte heißen jetzt fest `edunex` (Container
+`edunex-web-1` usw., Datenträger `edunex_datenbank` …), die Vorgaben für Datenbankname und Unraid-Ablageort
+lauten `edunex` bzw. `/mnt/user/appdata/edunex-daten`. Eine bereits laufende Installation unter dem alten
+Namen behält ihre `.env` (dort stehen `DB_NAME` und `APPDATA` weiterhin auf dem alten Wert); vor dem
+ersten Start der neuen Version die alten Container mit `docker compose -p schulverwaltung down`
+(ohne `-v`) stoppen und in der `.env` `COMPOSE_PROJECT_NAME=schulverwaltung` ergänzen, damit die
+vorhandenen Datenträger weiterverwendet werden. Modulsicherungen älterer Versionen lassen sich weiterhin
+einlesen; verschlüsselte Dateien bleiben lesbar.
+
 Neuen Ordnerinhalt über den alten kopieren (die `.env` behalten) und erneut `./start.sh`
 ausführen. Ab 0.4.6.0 ergänzt das Skript die `.env` einmalig um `DATEN_SCHLUESSEL` (wird angezeigt –
 sicher aufbewahren) sowie `OFFICE_MANDANT` und `HTTPS`; vorhandene Dateien werden beim Start verschlüsselt. Die Datenbank wird automatisch umgestellt; vorhandene Kategorien werden zu Ordnern.
@@ -729,6 +784,7 @@ und fehlende Beispiele (z. B. Neuanmeldungen) ergänzt. Checklisten-Vorlagen wer
 | `src/aufnahme` | Neuanmeldungen: Bewerbungsakte, Checklisten, Unterlagen, Übernahme (`uebernahme.py`), Rechte (`rechte.py`) |
 | `src/locale` | Übersetzungen (Englisch) |
 | `unraid/` | Betrieb auf Unraid: `docker-compose.yml`, `.env.example`, `einrichten.sh` |
+| `vps/` | Betrieb auf einem VPS hinter Traefik: `traefik.yml` (Ergänzung zur `docker-compose.yml`), `einrichten.sh` |
 | `docker/` | Startskript des Containers, Sicherungsskript |
 | `src/config/version.py` | Versionsnummer (kleine Änderungen erhöhen die letzte Stelle) |
 

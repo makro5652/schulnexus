@@ -1,5 +1,5 @@
 """
-Rollen der Schulverwaltung (Django-Benutzergruppen) mit ihren Standardrechten.
+Rollen in edunex (Django-Benutzergruppen) mit ihren Standardrechten.
 
 Die Gruppennamen sind feste Schlüssel; die Anzeige erfolgt übersetzt. Rechte werden von
 `manage.py grundeinrichtung` nur ergänzt, nie entfernt – Anpassungen in der Verwaltung bleiben

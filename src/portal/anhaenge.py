@@ -90,7 +90,7 @@ def datei_ausliefern(request, feld, inhaltstyp, originalname):
     antwort = FileResponse(datei, content_type=inhaltstyp or "application/octet-stream")
     art = "inline" if ansehen else "attachment"
     antwort["Content-Disposition"] = f"{art}; filename*=UTF-8''{quote(name)}"
-    # Hochgeladene Inhalte dürfen keine Skripte im Kontext der Schulverwaltung ausführen.
+    # Hochgeladene Inhalte dürfen keine Skripte im Kontext von edunex ausführen.
     antwort["Content-Security-Policy"] = "sandbox; default-src 'none'; img-src 'self'; style-src 'unsafe-inline'"
     antwort["X-Content-Type-Options"] = "nosniff"
     antwort["Cache-Control"] = "private, no-store"

@@ -169,7 +169,7 @@ class Beitrag(models.Model):
         if self.ueber == "system":
             from django.utils.translation import gettext
 
-            return gettext("Schulverwaltung (automatisch)")
+            return gettext("edunex (automatisch)")
         if self.von_person_id:
             return self.von_person.anzeigename
         if self.von_benutzer_id:

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-15 11:33+0300\n"
+"POT-Creation-Date: 2026-10-15 13:49+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1235,8 +1235,8 @@ msgid "Beiträge"
 msgstr "Posts"
 
 #: elternkontakt/models.py:172
-msgid "Schulverwaltung (automatisch)"
-msgstr "School administration (automatic)"
+msgid "edunex (automatisch)"
+msgstr "edunex (automatic)"
 
 #: elternkontakt/models.py:185
 msgid "Fehltage (ganztägig)"
@@ -5650,7 +5650,7 @@ msgstr "Backup deleted."
 msgid "Die Datei dieser Sicherung fehlt im Sicherungsordner."
 msgstr "The file of this backup is missing from the backup folder."
 
-#: sicherung/ansichten.py:172 sicherung/archiv.py:72
+#: sicherung/ansichten.py:172 sicherung/archiv.py:74
 msgid "Bitte mindestens ein Modul wählen."
 msgstr "Please select at least one module."
 
@@ -5776,35 +5776,35 @@ msgstr "change"
 msgid "löschen"
 msgstr "delete"
 
-#: sicherung/archiv.py:114
+#: sicherung/archiv.py:116
 #, python-format
 msgid "%(datei)s (%(art)s): %(module)s"
 msgstr "%(datei)s (%(art)s): %(module)s"
 
-#: sicherung/archiv.py:152 sicherung/archiv.py:155
-msgid "Die Datei ist keine gültige Sicherung der Schulverwaltung."
-msgstr "The file is not a valid backup of the school administration."
+#: sicherung/archiv.py:154 sicherung/archiv.py:157
+msgid "Die Datei ist keine gültige Sicherung von edunex."
+msgstr "The file is not a valid edunex backup."
 
-#: sicherung/archiv.py:163
+#: sicherung/archiv.py:165
 #, python-format
 msgid "In der Sicherung fehlt die Datei für %(modul)s."
 msgstr "The backup is missing the file for %(modul)s."
 
-#: sicherung/archiv.py:166
+#: sicherung/archiv.py:168
 #, python-format
 msgid "Die Sicherung ist beschädigt (Prüfsumme von %(modul)s stimmt nicht)."
 msgstr "The backup is damaged (checksum of %(modul)s does not match)."
 
-#: sicherung/archiv.py:209
+#: sicherung/archiv.py:211
 #, python-format
 msgid "erstellt %(zeit)s von %(wer)s"
 msgstr "created %(zeit)s by %(wer)s"
 
-#: sicherung/archiv.py:235
+#: sicherung/archiv.py:237
 msgid "Die gewählten Module sind in dieser Sicherung nicht enthalten."
 msgstr "The selected modules are not contained in this backup."
 
-#: sicherung/archiv.py:246
+#: sicherung/archiv.py:248
 #, python-format
 msgid ""
 "%(modul)s: Die Sicherung stammt von einem anderen Programmstand (Version "
@@ -5813,7 +5813,7 @@ msgstr ""
 "%(modul)s: The backup comes from a different program state (version %(v)s). "
 "Please restore with the same version."
 
-#: sicherung/archiv.py:316
+#: sicherung/archiv.py:318
 #, python-format
 msgid ""
 "%(n)d Verweise %(b)s fehlen im System – bitte zuerst das zugehörige Modul "
@@ -5822,25 +5822,25 @@ msgstr ""
 "%(n)d references %(b)s are missing in the system – please restore the "
 "related module first or both together."
 
-#: sicherung/archiv.py:319
+#: sicherung/archiv.py:321
 #, python-format
 msgid "%(n)d Verweise %(b)s gibt es nicht mehr; sie werden leer gelassen."
 msgstr "%(n)d references %(b)s no longer exist; they will be left empty."
 
-#: sicherung/archiv.py:321
+#: sicherung/archiv.py:323
 #, python-format
 msgid ""
 "%(n)d Einträge des nicht mehr vorhandenen Modells %(m)s werden übersprungen."
 msgstr "%(n)d entries of the no longer existing model %(m)s will be skipped."
 
-#: sicherung/archiv.py:338
+#: sicherung/archiv.py:340
 msgid ""
 "Ihr eigenes Benutzerkonto ist nicht in der Sicherung enthalten und bleibt "
 "erhalten."
 msgstr ""
 "Your own user account is not contained in the backup and will be kept."
 
-#: sicherung/archiv.py:360
+#: sicherung/archiv.py:362
 #, python-format
 msgid ""
 "Einige Einträge können nicht gelöscht werden, weil andere Daten sie "
@@ -5849,18 +5849,18 @@ msgstr ""
 "Some entries cannot be deleted because other data depends on them (%(was)s)."
 " Please restore the dependent modules as well."
 
-#: sicherung/archiv.py:389
+#: sicherung/archiv.py:391
 #, python-format
 msgid "vor Wiederherstellung aus %(datei)s"
 msgstr "before restoring from %(datei)s"
 
-#: sicherung/archiv.py:410
+#: sicherung/archiv.py:412
 #, python-format
 msgid ""
 "Die Wiederherstellung wurde abgebrochen, es wurde nichts verändert: %(f)s"
 msgstr "The restore was aborted, nothing was changed: %(f)s"
 
-#: sicherung/archiv.py:412
+#: sicherung/archiv.py:414
 #, python-format
 msgid ""
 "%(module)s aus %(datei)s; vorher gesichert in %(vorher)s; %(n)d Dateien "
@@ -6153,11 +6153,6 @@ msgstr "%(n)d entries"
 #, python-format
 msgid "Bestand (Stand %(d)s)"
 msgstr "Records (as of %(d)s)"
-
-#: stammdaten/admin.py:43 stammdaten/admin.py:44
-#: templates/portal/_menueband.html:7 templates/portal/base.html:6
-msgid "Schulverwaltung"
-msgstr "School administration"
 
 #: stammdaten/admin.py:68
 msgid "Schülerprofil (vollständige Akte über „Ändern“)"

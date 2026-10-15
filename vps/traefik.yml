@@ -1,0 +1,32 @@
+# edunex auf einem VPS hinter einem vorhandenen Traefik (HTTPS über Let's Encrypt)
+#
+# Wird zusätzlich zur docker-compose.yml im Hauptordner geladen:
+#   docker compose -f docker-compose.yml -f vps/traefik.yml up -d --build
+#
+# Benötigte Werte in der .env (Hauptordner), Beispiele:
+#   DOMAIN=schule.example.org
+#   TRAEFIK_NETZWERK=traefik          (Docker-Netzwerk, in dem Traefik hängt)
+#   TRAEFIK_ENTRYPOINT=websecure      (Entrypoint für https)
+#   TRAEFIK_RESOLVER=letsencrypt      (Name des Zertifikats-Resolvers)
+#   PORT=127.0.0.1:8000               (nur lokal veröffentlichen; von außen nur über Traefik)
+#   ALLOWED_HOSTS=schule.example.org,localhost,127.0.0.1
+#   CSRF_TRUSTED_ORIGINS=https://schule.example.org
+#   HTTPS=1 und HINTER_PROXY=1
+# Schritt für Schritt: README.md, Abschnitt „Betrieb auf einem VPS mit Traefik“.
+
+services:
+  web:
+    networks: [default, proxy]
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=${TRAEFIK_NETZWERK:?Bitte TRAEFIK_NETZWERK in .env setzen}
+      - traefik.http.routers.edunex.rule=Host(`${DOMAIN:?Bitte DOMAIN in .env setzen}`)
+      - traefik.http.routers.edunex.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}
+      - traefik.http.routers.edunex.tls=true
+      - traefik.http.routers.edunex.tls.certresolver=${TRAEFIK_RESOLVER:-letsencrypt}
+      - traefik.http.services.edunex.loadbalancer.server.port=8000
+
+networks:
+  proxy:
+    external: true
+    name: ${TRAEFIK_NETZWERK:?Bitte TRAEFIK_NETZWERK in .env setzen}
