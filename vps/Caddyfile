@@ -1,0 +1,9 @@
+# Caddy: automatisches HTTPS (Let's Encrypt) für die in DOMAIN eingetragene Adresse.
+# Caddy setzt X-Forwarded-Proto/-For selbst; fremde Werte aus dem Internet werden verworfen.
+{$DOMAIN} {
+	encode zstd gzip
+	request_body {
+		max_size 600MB
+	}
+	reverse_proxy web:8000
+}

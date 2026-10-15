@@ -44,7 +44,7 @@ jobs:
         run: python tools/sprachdateien.py pruefen
       - name: Shell-Skripte (shellcheck)
         run: |
-          shellcheck -S warning -e SC1111 start.sh unraid/einrichten.sh vps/einrichten.sh docker/*.sh
+          shellcheck -S warning -e SC1111 start.sh unraid/einrichten.sh vps/einrichten.sh vps/einrichten-caddy.sh docker/*.sh
 
   tests:
     name: Tests (PostgreSQL 16)

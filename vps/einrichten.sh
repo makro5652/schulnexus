@@ -36,7 +36,7 @@ haeufigster() { sort | uniq -c | sort -rn | head -n 1 | awk '{print $2}'; }
 TRAEFIK="$(docker ps --format '{{.Names}} {{.Image}}' | awk 'tolower($2) ~ /traefik/ {print $1; exit}')"
 if [ -z "$TRAEFIK" ]; then
   echo "Es läuft kein Traefik-Container. Dieses Skript setzt einen vorhandenen Traefik voraus."
-  echo "Ohne Traefik: README.md, Abschnitt „Betrieb auf einem VPS mit Traefik“, Hinweis am Ende."
+  echo "Ohne Traefik (mitgelieferter Caddy-Proxy): sh vps/einrichten-caddy.sh"
   exit 1
 fi
 NETZ_VORSCHLAG="$(docker inspect -f '{{range $k, $v := .NetworkSettings.Networks}}{{$k}}{{"\n"}}{{end}}' "$TRAEFIK" \

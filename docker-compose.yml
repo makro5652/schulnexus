@@ -3,7 +3,7 @@
 #   Aufruf:  http://localhost:8000
 #   Stopp:   docker compose down        (Daten bleiben erhalten)
 #   Reset:   docker compose down -v     (löscht ALLE Daten!)
-#   VPS mit Traefik: sh vps/einrichten.sh (siehe README.md)
+#   VPS mit Traefik: sh vps/einrichten.sh, ohne Traefik: sh vps/einrichten-caddy.sh (siehe README.md)
 
 # Fester Projektname: Container und Datenträger heißen schulnexus-…, unabhängig vom Ordnernamen.
 name: schulnexus

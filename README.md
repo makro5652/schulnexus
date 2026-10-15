@@ -112,8 +112,33 @@ Entfernen samt aller Daten: `docker compose -f docker-compose.yml -f vps/traefik
 > Ein öffentlich erreichbarer Server ist für **Demo-Daten** gedacht. Das Elternportal bleibt aus
 > (`ELTERNPORTAL_AKTIV=0`); für Leitung und IT die Zwei-Faktor-Anmeldung verpflichtend machen.
 
-Ohne Traefik: Die Datei `vps/traefik.yml` weglassen und einen anderen Reverse-Proxy (Caddy,
-Nginx Proxy Manager) auf `127.0.0.1:8000` zeigen lassen; die Einstellungen in der `.env` sind dieselben.
+Ohne Traefik: siehe nächsten Abschnitt (mitgelieferter Caddy). Alternativ einen eigenen Reverse-Proxy
+(z. B. Nginx Proxy Manager) auf `127.0.0.1:8000` zeigen lassen; die Einstellungen in der `.env` sind dieselben.
+
+## Betrieb auf einem VPS ohne Traefik (Caddy, ab 0.4.9.4)
+
+Für einen Server im Internet **ohne** vorhandenen Reverse-Proxy (z. B. ein frischer Hostinger-VPS mit Docker).
+Mitgeliefert wird ein kleiner **Caddy**-Container, der das HTTPS-Zertifikat von Let's Encrypt selbst holt und
+erneuert. Die Anwendung selbst ist nur an `127.0.0.1:8000` gebunden; von außen sind nur die Ports 80 und 443 offen.
+
+Voraussetzungen: DNS-A-Eintrag der Adresse zeigt auf die IP des Servers; Ports **80 und 443 sind frei** (kein
+Traefik, Nginx oder Apache auf dem Server) und in der Firewall freigegeben. Läuft bereits ein Traefik, stattdessen
+den Abschnitt „Betrieb auf einem VPS mit Traefik“ verwenden.
+
+```sh
+git clone https://github.com/makro5652/schulnexus.git
+cd schulnexus
+sh vps/einrichten-caddy.sh schule.example.org
+```
+
+Das Skript prüft, ob die Ports 80/443 frei sind, erzeugt beim ersten Aufruf die `.env` mit zufälligen
+Passwörtern und dem Verschlüsselungsschlüssel, stellt HTTPS-Betrieb hinter dem Proxy ein, baut und startet die
+Container und zeigt am Ende Adresse und Zugangsdaten. Eine vorhandene `.env` (z. B. aus einem abgebrochenen
+Versuch mit Traefik) wird weiterverwendet und nur um Adresse und HTTPS-Einstellungen ergänzt.
+
+Update: `git pull` und `sh vps/einrichten-caddy.sh` erneut ausführen. Befehle für den laufenden Betrieb immer
+mit beiden Dateien, z. B. `docker compose -f docker-compose.yml -f vps/caddy.yml logs -f caddy web`.
+Entfernen samt aller Daten: `docker compose -f docker-compose.yml -f vps/caddy.yml down -v`.
 
 ## Betrieb auf Unraid (Zugriff über Tailscale)
 

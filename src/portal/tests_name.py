@@ -30,7 +30,7 @@ class NameOhneAnmeldungTest(TestCase):
         self.assertEqual((admin.site.site_header, admin.site.site_title), ("Schulnexus", "Schulnexus"))
 
     def test_version(self):
-        self.assertEqual(VERSION, "0.4.9.3")
+        self.assertEqual(VERSION, "0.4.9.4")
 
 
 class NameAngemeldetTest(Grundlage):
@@ -126,6 +126,25 @@ class DockerDateienTest(TestCase):
         beispiel = (PROJEKT / ".env.example").read_text()
         for n in ("DOMAIN=", "TRAEFIK_NETZWERK=", "TRAEFIK_ENTRYPOINT=", "TRAEFIK_RESOLVER="):
             self.assertIn("\n" + n, beispiel)
+
+    def test_vps_ohne_traefik(self):
+        """Betrieb ohne vorhandenen Traefik (ab 0.4.9.4): mitgelieferter Caddy holt das Zertifikat selbst."""
+        if not (PROJEKT / "vps").exists():
+            self.skipTest("Docker-Dateien liegen nicht neben src/")
+        caddy = (PROJEKT / "vps" / "caddy.yml").read_text()
+        for teil in ("image: caddy:2", '"80:80"', '"443:443"', "./vps/Caddyfile:/etc/caddy/Caddyfile:ro", "caddy_daten:/data"):
+            self.assertIn(teil, caddy)
+        self.assertNotIn("traefik", caddy.lower().split("services:")[1])
+        datei = (PROJEKT / "vps" / "Caddyfile").read_text()
+        self.assertIn("{$DOMAIN}", datei)
+        self.assertIn("reverse_proxy web:8000", datei)
+        # Uploads bis zur Höchstgröße der Sicherungen dürfen nicht am Proxy scheitern
+        self.assertGreaterEqual(int(datei.split("max_size")[1].split("MB")[0]), settings.SICHERUNG_UPLOAD_MAX_MB)
+        skript = (PROJEKT / "vps" / "einrichten-caddy.sh").read_text()
+        for teil in ("HINTER_PROXY 1", "HTTPS 1", 'PORT "127.0.0.1:8000"', "CSRF_TRUSTED_ORIGINS", "vps/caddy.yml",
+                     "chmod 600 .env", "DATEN_SCHLUESSEL", "bereits belegt"):
+            self.assertIn(teil, skript)
+        self.assertNotIn("traefik.yml", skript)
 
 
 class GitHubPruefungenTest(TestCase):

@@ -1,0 +1,33 @@
+# Schulnexus auf einem VPS OHNE vorhandenen Traefik: mitgelieferter Caddy-Proxy holt das HTTPS-Zertifikat selbst.
+#
+# Wird zusätzlich zur docker-compose.yml im Hauptordner geladen:
+#   docker compose -f docker-compose.yml -f vps/caddy.yml up -d --build
+#
+# Benötigte Werte in der .env (Hauptordner), Beispiele:
+#   DOMAIN=schule.example.org
+#   PORT=127.0.0.1:8000               (Anwendung nur lokal; von außen nur über Caddy auf 80/443)
+#   ALLOWED_HOSTS=schule.example.org,localhost,127.0.0.1
+#   CSRF_TRUSTED_ORIGINS=https://schule.example.org
+#   HTTPS=1 und HINTER_PROXY=1
+# Voraussetzung: Die Ports 80 und 443 des Servers sind frei (kein anderer Webserver, kein Traefik).
+# Schritt für Schritt: README.md, Abschnitt „Betrieb auf einem VPS ohne Traefik (Caddy)“.
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - web
+    environment:
+      DOMAIN: ${DOMAIN:?Bitte DOMAIN in .env setzen}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./vps/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_daten:/data
+      - caddy_konfig:/config
+
+volumes:
+  caddy_daten:
+  caddy_konfig:
