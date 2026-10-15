@@ -85,3 +85,8 @@ table { border-collapse: collapse; width: 100%; }
   html[data-design="mocha"] .werkzeug a { color: #cba6f7; }
   html[data-design="mocha"] .werkzeug button { background: #cba6f7; color: #11111b; }
 }
+
+/* Am Telefon: Blatt nicht auf feste A4-Breite zwingen (Drucken bleibt unverändert) */
+@media screen and (max-width: 820px) {
+  .blatt { width: auto; min-height: 0; margin: 0.6rem 0.4rem; padding: 1rem; overflow-x: auto; }
+}

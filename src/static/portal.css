@@ -168,7 +168,7 @@ select, .formular input, .formular textarea { font: inherit; padding: 0.4rem 0.5
 .link.gefahr { color: var(--warnung); font-size: 0.85rem; }
 .hochladen { margin-top: 1rem; border-top: 1px solid var(--linie); padding-top: 0.8rem; }
 .hochladen summary { cursor: pointer; font-weight: 600; color: var(--akzent); }
-.formular { display: grid; gap: 0.8rem; margin-top: 0.8rem; max-width: 820px; }
+.formular { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.8rem; margin-top: 0.8rem; max-width: 820px; }
 .formular label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.85rem; font-weight: 600; }
 .formular label small { font-weight: 400; }
 .formular textarea { width: 100%; }

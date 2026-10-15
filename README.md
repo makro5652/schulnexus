@@ -739,6 +739,23 @@ im Portal, in der Verwaltungsoberfläche und auf der Anmeldeseite:
   getönten Flächen sind gegenüber der Palette leicht abgedunkelt, damit der Kontrast reicht.
   Catppuccin steht unter MIT-Lizenz.
 
+## Automatische Prüfungen auf GitHub (ab 0.4.9.3)
+
+Bei jedem Push auf `main`, bei Pull Requests, wöchentlich (montags) und auf Knopfdruck („Actions“ → „Prüfung“ → „Run workflow“) läuft `.github/workflows/pruefung.yml` mit vier Aufträgen:
+
+| Auftrag | Inhalt |
+|---|---|
+| Code-Qualität | `ruff` (Syntax- und Namensfehler, Konfiguration `ruff.toml`), `manage.py check`, `makemigrations --check` (vergessene Migrationen), vollständige Übersetzungen, `shellcheck` für alle Skripte |
+| Tests | gesamte Testsuite gegen PostgreSQL 16 (parallel) |
+| Sicherheit | `pip-audit` (bekannte Schwachstellen in Abhängigkeiten), `bandit` (mittlere und hohe Schwere) |
+| Oberfläche | baut den Docker-Container, startet ihn mit Demodaten, meldet sich mit sechs Rollen an und prüft bis zu 40 Seitentypen je Rolle am Telefon (390 px) und am Desktop: kein Serverfehler, kein JavaScript-Fehler, kein seitliches Überlaufen. Die Bildschirmfotos stehen danach unter „Artifacts“ des Laufs (14 Tage) |
+
+Es sind keine Geheimnisse hinterlegt; verwendet werden nur erfundene Demodaten und bei jedem Lauf neu erzeugte Wegwerf-Schlüssel. `.github/dependabot.yml` meldet wöchentlich veraltete Python-Pakete und monatlich Aktionen und Basis-Images als Pull Request.
+
+Die Oberflächenprüfung lässt sich auch lokal ausführen (Playwright für Python nötig): `python tools/oberflaeche_pruefen.py http://localhost:8000 ausgabeordner`. Rückgabewert 1 bei Befunden.
+
+Hinweis: Private Repositories haben ein monatliches Kontingent an Actions-Minuten (je nach Tarif; der genaue Wert sollte auf GitHub unter „Settings → Billing“ nachgesehen werden). Ein vollständiger Lauf dauert etwa 10–15 Minuten.
+
 ## Code-Prüfung 0.4.9.2
 
 Systematische Prüfung des gesamten Codes: statische Analyse (ruff, bandit), Abhängigkeiten (pip-audit: keine bekannten

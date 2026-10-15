@@ -1,0 +1,141 @@
+# Automatische Prüfungen für Schulnexus (ab 0.4.9.3)
+# Läuft bei jedem Push auf main, bei Pull Requests, wöchentlich und auf Knopfdruck.
+# Es werden ausschließlich erfundene Demodaten verwendet; keine Geheimnisse des Betriebs nötig.
+name: Prüfung
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "17 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pruefung-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qualitaet:
+    name: Code-Qualität (ruff, Django-Prüfung, Übersetzungen, Shell)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt ruff
+      - name: ruff (Syntax- und Namensfehler)
+        run: ruff check src tools
+      - name: Django-Systemprüfung und fehlende Migrationen
+        working-directory: src
+        env:
+          SECRET_KEY: nur-fuer-die-pruefung
+          DATABASE_URL: postgres://schule:schule@localhost:5432/schulnexus
+        run: |
+          python manage.py check
+          python manage.py makemigrations --check --dry-run
+      - name: Übersetzungen vollständig
+        run: python tools/sprachdateien.py pruefen
+      - name: Shell-Skripte (shellcheck)
+        run: |
+          shellcheck -S warning -e SC1111 start.sh unraid/einrichten.sh vps/einrichten.sh docker/*.sh
+
+  tests:
+    name: Tests (PostgreSQL 16)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: schule
+          POSTGRES_PASSWORD: schule
+          POSTGRES_DB: schulnexus
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U schule"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Testsuite
+        working-directory: src
+        env:
+          SECRET_KEY: nur-fuer-die-pruefung
+          DATABASE_URL: postgres://schule:schule@localhost:5432/schulnexus
+        run: |
+          export DATEN_SCHLUESSEL="$(python -c 'import base64,os;print(base64.urlsafe_b64encode(os.urandom(32)).decode().rstrip("="))')"
+          python manage.py test --parallel 4 --noinput
+
+  sicherheit:
+    name: Sicherheit (Abhängigkeiten, bandit)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install pip-audit bandit
+      - name: Bekannte Schwachstellen in Abhängigkeiten
+        run: pip-audit -r requirements.txt
+      - name: Statische Sicherheitsanalyse (nur mittlere und hohe Schwere)
+        run: bandit -r src -x "src/*/tests*.py,src/*/migrations" --severity-level medium -q
+
+  oberflaeche:
+    name: Oberfläche im Container (Telefon 390 px und Desktop)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    needs: [qualitaet]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Konfiguration mit Wegwerf-Geheimnissen erzeugen
+        run: |
+          zufall() { LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c "$1"; }
+          schluessel() { head -c 32 /dev/urandom | base64 | tr '+/' '-_' | tr -d '=\n'; }
+          sed -e "s|^SECRET_KEY=.*|SECRET_KEY=$(zufall 50)|" \
+              -e "s|^DB_PASSWORT=.*|DB_PASSWORT=$(zufall 24)|" \
+              -e "s|^ADMIN_PASSWORT=.*|ADMIN_PASSWORT=$(zufall 16)|" \
+              -e "s|^DEMO_PASSWORT=.*|DEMO_PASSWORT=Schule-Demo-2026|" \
+              -e "s|^DATEN_SCHLUESSEL=.*|DATEN_SCHLUESSEL=$(schluessel)|" \
+              .env.example > .env
+      - name: Container bauen und starten
+        run: docker compose up --build -d
+      - name: Auf Bereitschaft warten
+        run: |
+          for i in $(seq 1 90); do
+            if curl -fsS -o /dev/null http://localhost:8000/anmelden/; then echo "bereit nach $((i*2)) s"; exit 0; fi
+            sleep 2
+          done
+          docker compose logs --tail=200
+          exit 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Playwright installieren
+        run: |
+          pip install playwright
+          playwright install --with-deps chromium
+      - name: Oberfläche prüfen
+        run: python tools/oberflaeche_pruefen.py http://localhost:8000 bildschirmfotos-ci
+      - name: Bildschirmfotos und Befunde sichern
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bildschirmfotos
+          path: bildschirmfotos-ci
+          retention-days: 14
+      - name: Container-Protokoll bei Fehler
+        if: failure()
+        run: docker compose logs --tail=300

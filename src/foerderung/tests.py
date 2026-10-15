@@ -114,7 +114,7 @@ class AnhangTest(Grundlage):
             "anhang-titel": "Telefonat", "anhang-kategorie": "korrespondenz", "anhang-zugriffsstufe": "akte",
             "anhang-notiz": "Vater ruft wegen Ausflug an."})
         self.assertTrue(Dokument.objects.filter(titel="Telefonat", datei="").exists())
-        r = self.client.post(reverse("anhang_hochladen", args=[self.s9a.pk]), {
+        self.client.post(reverse("anhang_hochladen", args=[self.s9a.pk]), {
             "anhang-titel": "Leer", "anhang-kategorie": "sonstiges", "anhang-zugriffsstufe": "akte", "anhang-notiz": ""})
         self.assertFalse(Dokument.objects.filter(titel="Leer").exists())
 

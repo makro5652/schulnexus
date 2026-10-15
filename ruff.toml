@@ -1,0 +1,8 @@
+# Statische Prüfung (ab 0.4.9.3), läuft automatisch auf GitHub: ruff check src
+target-version = "py312"
+line-length = 130
+extend-exclude = ["src/*/migrations"]
+
+[lint]
+# F: Pyflakes (undefinierte Namen, unbenutzte Importe/Variablen), E9: Syntaxfehler, PLE: weitere sichere Fehler
+select = ["F", "E9", "PLE"]

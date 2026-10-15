@@ -30,7 +30,7 @@ class NameOhneAnmeldungTest(TestCase):
         self.assertEqual((admin.site.site_header, admin.site.site_title), ("Schulnexus", "Schulnexus"))
 
     def test_version(self):
-        self.assertEqual(VERSION, "0.4.9.2")
+        self.assertEqual(VERSION, "0.4.9.3")
 
 
 class NameAngemeldetTest(Grundlage):
@@ -126,3 +126,19 @@ class DockerDateienTest(TestCase):
         beispiel = (PROJEKT / ".env.example").read_text()
         for n in ("DOMAIN=", "TRAEFIK_NETZWERK=", "TRAEFIK_ENTRYPOINT=", "TRAEFIK_RESOLVER="):
             self.assertIn("\n" + n, beispiel)
+
+
+class GitHubPruefungenTest(TestCase):
+    """Die Workflow-Dateien für die automatische Prüfung (ab 0.4.9.3) sind vorhanden und vollständig."""
+
+    def test_workflow_und_dependabot(self):
+        if not (PROJEKT / ".github").exists():
+            self.skipTest("Repository-Dateien liegen nicht neben src/")
+        wf = (PROJEKT / ".github" / "workflows" / "pruefung.yml").read_text()
+        for teil in ("manage.py test --parallel", "makemigrations --check", "ruff check", "sprachdateien.py pruefen",
+                     "shellcheck", "pip-audit", "bandit", "oberflaeche_pruefen.py", "postgres:16", "docker compose up --build"):
+            self.assertIn(teil, wf)
+        self.assertNotIn("secrets.", wf)          # keine Geheimnisse des Betriebs nötig
+        self.assertIn("pip", (PROJEKT / ".github" / "dependabot.yml").read_text())
+        self.assertTrue((PROJEKT / "ruff.toml").exists())
+        self.assertTrue((PROJEKT / "tools" / "oberflaeche_pruefen.py").exists())

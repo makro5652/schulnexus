@@ -10,14 +10,16 @@ python - <<'PY'
 import os, sys, time
 import psycopg
 url = os.environ["DATABASE_URL"]
+letzter = None
 for versuch in range(60):
     try:
         psycopg.connect(url, connect_timeout=3).close()
         print("Datenbank erreichbar.")
         sys.exit(0)
     except Exception as fehler:
+        letzter = fehler
         time.sleep(2)
-print("Datenbank nicht erreichbar:", fehler)
+print("Datenbank nicht erreichbar:", letzter)
 sys.exit(1)
 PY
 
