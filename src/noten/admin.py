@@ -145,7 +145,7 @@ class BewertungsordnerAdmin(SimpleHistoryAdmin):
     list_display = ["pfad_anzeige", "unterricht", "gewicht", "anteil", "anzahl_nachweise"]
     list_filter = [EigenerUnterrichtFilter]
     search_fields = ["name", "unterricht__gruppe__name", "unterricht__fach__name"]
-    fields = ["unterricht", "eltern", "name", "gewicht", "reihenfolge", "beschreibung"]
+    fields = ["unterricht", "eltern", "name", "gewicht", "gewichtsart", "reihenfolge", "beschreibung"]
     inlines = [LeistungsnachweisInline]
 
     def get_queryset(self, request):

@@ -88,7 +88,7 @@ _LEHRER = (
       "notenstufe", "notenschluessel", "gewichtungsvorlage", "leistungskategorie", "laufbahnabschnitt", "abschluss",
       "sprachenfolge", "vorherigeschule", "elternprofil", "bildungsgang", "abschlussart", "einwilligung", "stunde",
       "agangebot", "agwahl", "agzuteilung", "foerderschwerpunkt", "ausgleichsmassnahme")
-    | r(ALLE, "bewertungsordner", "leistungsnachweis")
+    | r(ALLE, "bewertungsordner", "leistungsnachweis") | r("view", "leistungsvorgabe")
     | r(("add", "change", "view"), "note", "zeugnisnote", "fehlzeit", "foerderplan", "foerdereintrag",
         "nachteilsausgleich", "aushaendigung")
     | r(ALLE, "foerderziel")
@@ -107,14 +107,16 @@ _ELTERNKONTAKT_VERWALTUNG = r(ALLE, "gespraech", "beitrag", "empfaenger") | r("v
 # Gesundheitshinweise der eigenen Stufe: zeilenweise über view_gesundheit_klasse (siehe portal/rechte.py)
 _STUFE = (_LEHRER | r(("add", "change", "view"), "laufbahnabschnitt", "abschluss", "gruppe") | r(ALLE, "mitgliedschaft")
           | {"view_gesundheit_klasse", "freigeben_zeugnis"} | r(ALLE, "konferenz", "beschluss")
-          | r(("view", "change"), "gespraech", "empfaenger") | _REGELN | _TERMINE_KALENDER)
+          | r(("view", "change"), "gespraech", "empfaenger") | _REGELN | _TERMINE_KALENDER
+          # Leistungsvorgaben (Pflichtnoten mit Frist) für die koordinierten Jahrgänge, zeilenweise in noten/rechte.py
+          | r(ALLE, "leistungsvorgabe"))
 
 _SCHUELERDATEN = r(ALLE, "person", "schuelerprofil", "elternprofil", "beziehung", "gruppe", "mitgliedschaft", "einwilligung",
                    "dokument", "laufbahnabschnitt", "abschluss", "vorherigeschule", "sprachenfolge", "gesundheitsangaben",
                    "fehlzeit", "agangebot", "agwahl", "agzuteilung") | {"view_gesundheitsangaben"}
 _KATALOGE = ("schuljahr", "abschnitt", "fach", "bildungsgang", "abschlussart", "stunde", "unterricht", "notenskala",
              "notenstufe", "notenschluessel", "gewichtungsvorlage", "leistungskategorie", "zusatzfeld", "personalbereich")
-_NOTEN_LESEN = r("view", "leistungsnachweis", "note", "zeugnisnote", "bewertungsordner")
+_NOTEN_LESEN = r("view", "leistungsnachweis", "note", "zeugnisnote", "bewertungsordner", "leistungsvorgabe")
 _HR = r(ALLE, "personalprofil", "personalbereich", "dienstleister", "nachweisart", "nachweis", "personalabwesenheit",
         "fortbildung", "notfallkontakt", "dokument") | r(("add", "change", "view"), "person", "zusatzfeld") | {"view_hr_daten", "view_fach"}
 

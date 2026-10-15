@@ -1,0 +1,69 @@
+{% extends "portal/base.html" %}
+{% load i18n formate %}
+{% block title %}{% translate "Bewertungsstruktur" %} · {{ u.fach.kuerzel }} {{ u.gruppe.name }}{% endblock %}
+{% block inhaltsklasse %}breit{% endblock %}
+{% block inhalt %}
+<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> ›
+  <a href="{% url 'notenuebersicht' u.pk %}">{{ u.fach.lokal_name }} {{ u.gruppe.name }}</a> › {% translate "Bewertungsstruktur" %}</p>
+<h1>{% translate "Bewertungsstruktur" %}</h1>
+<p class="unterzeile">{{ u.fach.lokal_name }} · {{ u.gruppe.name }} · {{ u.abschnitt }}</p>
+
+<form method="post" class="karte ne-struktur">{% csrf_token %}
+  <button type="submit" name="aktion" value="speichern" class="mb-unsichtbar" tabindex="-1" aria-hidden="true">{% translate "Struktur speichern" %}</button>
+  <div class="karte-kopf">
+    <h2>{% translate "Ordner und Leistungsnachweise" %}</h2>
+    <a class="knopf zweitrangig" href="{% url 'noten_eintragen' u.pk %}">{% translate "Noten eintragen" %}</a>
+  </div>
+  <p class="hinweistext">{% translate "Je Ebene wählbar: relative Gewichte (z. B. 2 : 1, 50 : 50) oder Prozent (Summe 100). Gerechnet wird in beiden Fällen als gewichteter Mittelwert; noch leere Einträge werden übersprungen. „Anteil“ ist der planmäßige Anteil an der Gesamtnote." %}</p>
+  <div class="tabellenrahmen">
+  <table class="liste ne-strukturtabelle">
+    <thead><tr><th>{% translate "Eintrag" %}</th><th>{% translate "Gewicht" %}</th><th>{% translate "Gewichte darin" %}</th>
+      <th class="zahl">{% translate "Reihenfolge" %}</th><th class="zahl">{% translate "Anteil" %}</th><th></th></tr></thead>
+    <tbody>
+      <tr class="ne-wurzel">
+        <th scope="row">{% translate "Oberste Ebene" %}</th><td>–</td>
+        <td><select name="art_wurzel" aria-label="{% translate 'Gewichte der obersten Ebene' %}">{% for k, t in gewichtsarten %}<option value="{{ k }}"{% if k == wurzel.art %} selected{% endif %}>{{ t }}</option>{% endfor %}</select>
+          {% if wurzel.abweichung %}<small class="ne-summenwarnung">{% if wurzel.fehlt %}{% blocktranslate with s=wurzel.summe f=wurzel.fehlt %}Summe {{ s }} % – es fehlen {{ f }} %{% endblocktranslate %}{% else %}{% blocktranslate with s=wurzel.summe f=wurzel.zuviel %}Summe {{ s }} % – {{ f }} % zu viel{% endblocktranslate %}{% endif %}</small>{% endif %}</td>
+        <td></td><td class="zahl">100 %</td><td></td>
+      </tr>
+      {% for z in zeilen %}
+      {% if z.typ == "ordner" %}
+      <tr class="ne-ordnerzeile">
+        <th scope="row"><span class="ne-einzug" style="padding-left: {{ z.einzug }}rem">{% if z.ebene %}└ {% endif %}<input name="name_{{ z.o.pk }}" value="{{ z.o.name }}" maxlength="80" aria-label="{% translate 'Name des Ordners' %}"></span></th>
+        <td><span class="ne-mit-einheit"><input name="gewicht_{{ z.o.pk }}" value="{{ z.o.gewicht|floatformat:'-2' }}" inputmode="decimal" size="5" aria-label="{% translate 'Gewicht' %} {{ z.o.name }}"><span class="ne-einheit">{% if z.eltern_art == "prozent" %}%{% endif %}</span></span></td>
+        <td><select name="art_{{ z.o.pk }}" aria-label="{% translate 'Gewichte in diesem Ordner' %}">{% for k, t in gewichtsarten %}<option value="{{ k }}"{% if k == z.o.gewichtsart %} selected{% endif %}>{{ t }}</option>{% endfor %}</select>
+          {% if z.info.abweichung %}<small class="ne-summenwarnung">{% if z.info.fehlt %}{% blocktranslate with s=z.info.summe f=z.info.fehlt %}Summe {{ s }} % – es fehlen {{ f }} %{% endblocktranslate %}{% else %}{% blocktranslate with s=z.info.summe f=z.info.zuviel %}Summe {{ s }} % – {{ f }} % zu viel{% endblocktranslate %}{% endif %}</small>{% endif %}</td>
+        <td class="zahl"><input name="reihenfolge_{{ z.o.pk }}" value="{{ z.o.reihenfolge }}" inputmode="numeric" size="3" aria-label="{% translate 'Reihenfolge' %}"></td>
+        <td class="zahl">{{ z.anteil|floatformat:1 }} %</td>
+        <td class="aktionen"><a href="{% url 'noten_eintragen' u.pk %}?ordner={{ z.o.pk }}">+ {% translate "Noten" %}</a>
+          {% if z.leer %}<button type="submit" class="link" name="aktion" value="ordner_loeschen:{{ z.o.pk }}" onclick="return confirm('{% translate "Leeren Ordner löschen?" as f %}{{ f|escapejs }}')">{% translate "löschen" %}</button>{% endif %}</td>
+      </tr>
+      {% else %}
+      <tr class="ne-lnzeile">
+        <td><span class="ne-einzug" style="padding-left: {{ z.einzug }}rem"><a href="{% url 'noten_bearbeiten' u.pk z.ln.pk %}">{{ z.ln.titel }}</a> <small class="leise">{{ z.ln.datum|tagmonat }}</small></span></td>
+        <td><span class="ne-mit-einheit"><input name="lgewicht_{{ z.ln.pk }}" value="{{ z.ln.gewicht|floatformat:'-2' }}" inputmode="decimal" size="5" aria-label="{% translate 'Gewicht' %} {{ z.ln.titel }}"><span class="ne-einheit">{% if z.eltern_art == "prozent" %}%{% endif %}</span></span></td>
+        <td class="leise">{% blocktranslate count n=z.noten %}{{ n }} Note{% plural %}{{ n }} Noten{% endblocktranslate %}</td>
+        <td></td>
+        <td class="zahl">{{ z.anteil|floatformat:1 }} %</td>
+        <td class="aktionen"><button type="submit" class="link" name="aktion" value="ln_loeschen:{{ z.ln.pk }}" onclick="return confirm('{% translate "Leistungsnachweis mit allen Noten löschen?" as f %}{{ f|escapejs }}')">{% translate "löschen" %}</button></td>
+      </tr>
+      {% endif %}
+      {% empty %}<tr><td colspan="6" class="leer">{% translate "Noch keine Ordner. Lege zuerst einen Ordner an, z. B. „Schriftlich“ oder „Sonstige Mitarbeit“." %}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  <p><button type="submit" class="knopf" name="aktion" value="speichern">{% translate "Struktur speichern" %}</button></p>
+</form>
+
+<section class="karte ne-neuer-ordner">
+  <h2>{% translate "Neuer Ordner" %}</h2>
+  <form method="post" class="ne-felder">{% csrf_token %}<input type="hidden" name="aktion" value="ordner_neu">
+    <label class="sy-feld">{% translate "Name" %} <input name="name" required maxlength="80" placeholder="{% translate 'z. B. Quartal 1' %}"></label>
+    <label class="sy-feld">{% translate "Liegt in" %}
+      <select name="eltern"><option value="">{% translate "oberste Ebene" %}</option>{% for o, label in ordner_liste %}<option value="{{ o.pk }}">{{ label }}</option>{% endfor %}</select></label>
+    <label class="sy-feld">{% translate "Gewicht" %} <input name="gewicht" inputmode="decimal" size="5" placeholder="1"></label>
+    <button type="submit" class="knopf zweitrangig">{% translate "Anlegen" %}</button>
+  </form>
+</section>
+{% endblock %}

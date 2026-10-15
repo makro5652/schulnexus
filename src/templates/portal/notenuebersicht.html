@@ -5,8 +5,12 @@
 {% block inhalt %}
 <p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › {% translate "Notenübersicht" %}</p>
 <h1>{{ unterricht.fach.lokal_name }} · {{ unterricht.gruppe.name }}</h1>
-<p class="knopfreihe" style="float:right"><a class="knopf" href="{% url 'zeugnis_unterricht' unterricht.pk %}">{% translate "Zeugnisnoten und Kommentare" %}</a></p>
+<p class="knopfreihe ne-kopfknoepfe">
+  {% if darf_eintragen %}<a class="knopf" href="{% url 'noten_eintragen' unterricht.pk %}">{% translate "Noten eintragen" %}</a>
+  <a class="knopf zweitrangig" href="{% url 'bewertungsstruktur' unterricht.pk %}">{% translate "Bewertungsstruktur" %}</a>{% endif %}
+  <a class="knopf zweitrangig" href="{% url 'zeugnis_unterricht' unterricht.pk %}">{% translate "Zeugnisnoten und Kommentare" %}</a></p>
 <p class="unterzeile">{{ unterricht.abschnitt }} · {% blocktranslate with name=unterricht.lehrkraft.person.anzeigename %}Lehrkraft {{ name }}{% endblocktranslate %} · {% blocktranslate with skala=unterricht.skala %}Skala „{{ skala }}“{% endblocktranslate %}</p>
+{% if vorgaben %}{% include "noten/_vorgaben_unterricht.html" %}{% endif %}
 
 {% if spalten %}
 <div class="tabellenrahmen">
@@ -21,8 +25,8 @@
     <tr>
       {% for sp in spalten %}
       <th>
-        {% if user.is_staff %}<a class="ln-titel" href="{% url 'admin:noten_leistungsnachweis_change' sp.ln.pk %}" title="{% translate 'Noten eintragen' %}">{{ sp.ln.titel }}</a>{% else %}<span class="ln-titel">{{ sp.ln.titel }}</span>{% endif %}
-        <small>{{ sp.ln.datum|tagmonat }} · ×{{ sp.ln.gewicht|floatformat:-2 }}</small>
+        {% if darf_eintragen %}<a class="ln-titel" href="{% url 'noten_bearbeiten' unterricht.pk sp.ln.pk %}" title="{% translate 'Noten eintragen' %}">{{ sp.ln.titel }}</a>{% else %}<span class="ln-titel">{{ sp.ln.titel }}</span>{% endif %}
+        <small>{{ sp.ln.datum|tagmonat }} · {{ sp.gewicht }}</small>
         <small>{% blocktranslate with anteil=sp.anteil|floatformat:1 %}≈ {{ anteil }} % der Note{% endblocktranslate %}</small>
       </th>
       {% endfor %}
@@ -56,30 +60,30 @@
 <section class="karte struktur">
   <div class="karte-kopf">
     <h2>{% translate "Bewertungsstruktur" %}</h2>
-    {% if user.is_staff %}<a class="knopf zweitrangig" href="{% url 'admin:noten_bewertungsordner_add' %}?unterricht={{ unterricht.pk }}">{% translate "Neuer Ordner" %}</a>{% endif %}
+    {% if darf_eintragen %}<a class="knopf zweitrangig" href="{% url 'bewertungsstruktur' unterricht.pk %}">{% translate "Struktur bearbeiten" %}</a>{% endif %}
   </div>
-  <p class="hinweistext">{% translate "Ordner und Unterordner sind frei benennbar. Das Gewicht gilt jeweils relativ zu den anderen Einträgen derselben Ebene." %}</p>
+  <p class="hinweistext">{% translate "Ordner und Unterordner sind frei benennbar. Gewichte gelten je Ebene – relativ (z. B. 2 : 1) oder in Prozent, je nach Einstellung des Ordners." %}</p>
   {% if struktur %}
+  <div class="rollbar">
   <table class="liste">
-    <thead><tr><th>{% translate "Ordner" %}</th><th class="zahl">{% translate "Gewicht" %}</th><th class="zahl">{% translate "Anteil an der Note" %}</th><th class="zahl">{% translate "Leistungsnachweise" %}</th>{% if user.is_staff %}<th></th>{% endif %}</tr></thead>
+    <thead><tr><th>{% translate "Ordner" %}</th><th class="zahl">{% translate "Gewicht" %}</th><th class="zahl">{% translate "Anteil an der Note" %}</th><th class="zahl">{% translate "Leistungsnachweise" %}</th>{% if darf_eintragen %}<th></th>{% endif %}</tr></thead>
     <tbody>
     {% for e in struktur %}
       <tr>
         <td><span style="padding-left: {{ e.einzug }}rem">{% if e.ebene %}└ {% endif %}{{ e.ordner.name }}</span></td>
-        <td class="zahl">{{ e.ordner.gewicht|floatformat:-2 }}</td>
+        <td class="zahl">{{ e.gewicht }}</td>
         <td class="zahl">{{ e.anteil|floatformat:1 }} %</td>
         <td class="zahl">{{ e.anzahl }}</td>
-        {% if user.is_staff %}
+        {% if darf_eintragen %}
         <td class="aktionen">
-          <a href="{% url 'admin:noten_bewertungsordner_change' e.ordner.pk %}">{% translate "Bearbeiten" %}</a>
-          <a href="{% url 'admin:noten_leistungsnachweis_add' %}?ordner={{ e.ordner.pk }}">+ {% translate "Leistungsnachweis" %}</a>
-          <a href="{% url 'admin:noten_bewertungsordner_add' %}?unterricht={{ unterricht.pk }}&amp;eltern={{ e.ordner.pk }}">+ {% translate "Unterordner" %}</a>
+          <a href="{% url 'noten_eintragen' unterricht.pk %}?ordner={{ e.ordner.pk }}">+ {% translate "Noten" %}</a>
         </td>
         {% endif %}
       </tr>
     {% endfor %}
     </tbody>
   </table>
+  </div>
   {% else %}<p class="leer">{% translate "Noch keine Ordner. Lege zuerst einen Ordner an, z. B. „Schriftlich“ oder „Sonstige Mitarbeit“." %}</p>{% endif %}
 </section>
 {% endblock %}

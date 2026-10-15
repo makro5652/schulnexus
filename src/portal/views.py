@@ -13,6 +13,7 @@ from aufnahme.ansichten import start_hinweise as aufnahme_hinweise
 from elternkontakt.ansichten import akte_kontext as eltern_akte, gruppe_erlaubt as eltern_gruppe_erlaubt
 from elternkontakt.ansichten import start_hinweise as eltern_hinweise
 from laufbahn.ansichten import start_hinweise as laufbahn_hinweise
+from noten.ansichten import start_hinweise as noten_hinweise
 from termine.ansichten import start_hinweise as termine_hinweise
 from zeugnisse.ansichten import start_hinweise as zeugnis_hinweise
 from fehlzeiten.models import Fehlzeit
@@ -104,7 +105,7 @@ def start(request):
          "foerderung": foerder_hinweise(request.user), "ist_verwaltung": ist_verwaltung(request.user),
          "aufnahme": aufnahme_hinweise(request.user), "zeugnisse": zeugnis_hinweise(request.user),
          "elternkontakt": eltern_hinweise(request.user), "laufbahn": laufbahn_hinweise(request.user),
-         "termine": termine_hinweise(request.user),
+         "termine": termine_hinweise(request.user), "noten_vorgaben": noten_hinweise(request.user),
          "begruessung": begruessung(jetzt), "heute": jetzt.date(), "kalenderwoche": jetzt.isocalendar()[1],
          "schnellzugriff": schnellzugriff(request.user, sj), "geburtstage": geburtstage(request.user, jetzt.date()),
          "notizen": notizen_fuer(request.user, jetzt.date())},
@@ -119,10 +120,15 @@ def notenuebersicht(request, pk):
     if not darf_unterricht_sehen(request.user, unterricht):
         raise PermissionDenied
 
+    from noten import rechte as noten_rechte, vorgaben as noten_vorgaben
+    from noten.ansichten import gewicht_text
+
     baum = Baum(unterricht)
     anteil_ordner, anteil_ln = nominale_anteile(baum.ordner, baum.nachweise)
+    art_von = {o.pk: o.gewichtsart for o in baum.ordner}
     spalten = [
-        {"ln": ln, "pfad": pfad, "anteil": anteil_ln.get(ln.pk)} for ln, pfad in baum.nachweise_in_reihenfolge()
+        {"ln": ln, "pfad": pfad, "anteil": anteil_ln.get(ln.pk), "gewicht": gewicht_text(ln.gewicht, art_von.get(ln.ordner_id))}
+        for ln, pfad in baum.nachweise_in_reihenfolge()
     ]
     # Kopfzeile: aufeinanderfolgende Leistungsnachweise desselben Ordners zusammenfassen
     gruppen = []
@@ -134,7 +140,8 @@ def notenuebersicht(request, pk):
 
     struktur = [
         {"ordner": o, "ebene": ebene, "pfad": pfad, "anteil": anteil_ordner.get(o.pk),
-         "anzahl": len(baum.nachweise_in[o.pk]), "einzug": ebene * 1.4}
+         "anzahl": len(baum.nachweise_in[o.pk]), "einzug": ebene * 1.4,
+         "gewicht": gewicht_text(o.gewicht, art_von.get(o.eltern_id) if o.eltern_id else unterricht.gewichtsart)}
         for o, ebene, pfad in baum.in_reihenfolge()
     ]
 
@@ -161,7 +168,9 @@ def notenuebersicht(request, pk):
     return render(
         request,
         "portal/notenuebersicht.html",
-        {"unterricht": unterricht, "spalten": spalten, "gruppen": gruppen, "zeilen": zeilen, "struktur": struktur},
+        {"unterricht": unterricht, "spalten": spalten, "gruppen": gruppen, "zeilen": zeilen, "struktur": struktur,
+         "darf_eintragen": noten_rechte.darf_noten_eintragen(request.user, unterricht),
+         "vorgaben": noten_vorgaben.staende_fuer_unterricht(unterricht) if noten_rechte.darf_vorgaben_sehen(request.user) else []},
     )
 
 

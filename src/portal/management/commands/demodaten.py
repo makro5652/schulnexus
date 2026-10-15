@@ -169,6 +169,12 @@ class Command(BaseCommand):
                 call_command("grundeinrichtung", stdout=self.stdout)
                 self.termine_anlegen(opts["passwort"])
                 self.stdout.write("Räume, Schulkalender, Elternsprechtag und LEG ergänzt.")
+            from noten.models import Leistungsvorgabe
+
+            if not Leistungsvorgabe.objects.exists():
+                call_command("grundeinrichtung", stdout=self.stdout)
+                self.vorgaben_anlegen()
+                self.stdout.write("Leistungsvorgaben und Beispiel für Prozent-Gewichte ergänzt.")
             return
 
         call_command("grundeinrichtung", stdout=self.stdout)
@@ -528,6 +534,7 @@ class Command(BaseCommand):
         self.elternkontakt_anlegen()
         self.laufbahn_anlegen()
         self.termine_anlegen(pw)
+        self.vorgaben_anlegen()
 
         self.stdout.write(self.style.SUCCESS(
             f"Demo-Daten angelegt: {len(alle)} Schüler:innen, {Person.objects.count()} Personen, "
@@ -1172,6 +1179,33 @@ class Command(BaseCommand):
         ehemalig("Felix", "Brandt", "m", "A-2022-01", Schuljahr.objects.get(name="2024/25"), 10, date(2025, 6, 27),
                  "Mittlerer Schulabschluss", "abschluss")
 
+
+    # ------------------------------------------------------------ Leistungsvorgaben, Prozent-Gewichte (ab 0.4.7.0)
+    def vorgaben_anlegen(self):
+        from noten.models import PROZENT, Leistungsvorgabe
+
+        sj = Schuljahr.objects.get(name="2026/27")
+        hj1 = Abschnitt.objects.get(schuljahr=sj, nummer=1)
+        sl = User.objects.filter(username="schulleitung").first()
+        faecher = {f.kuerzel: f for f in Fach.objects.all()}
+        v = Leistungsvorgabe.objects.create(
+            titel="Quartalsnote Sonstige Mitarbeit (Quartal 1)", titel_en="Term grade class participation (quarter 1)",
+            abschnitt=hj1, jahrgang_von=5, jahrgang_bis=10, ordner_enthaelt="Quartal 1", mindestanzahl=1,
+            frist=date(2026, 10, 30), angelegt_von=sl,
+            hinweis="Bis zu den Herbstferien muss für jede Schülerin und jeden Schüler eine Mitarbeitsnote vorliegen.")
+        v = Leistungsvorgabe.objects.create(
+            titel="Erste Klassenarbeit", titel_en="First class test", abschnitt=hj1, jahrgang_von=5, jahrgang_bis=10,
+            titel_enthaelt="Klassenarbeit", mindestanzahl=1, frist=date(2026, 10, 9), angelegt_von=sl)
+        v.faecher.set([faecher[k] for k in ("CH", "BIO", "M", "D") if k in faecher])
+        Leistungsvorgabe.objects.create(
+            titel="Zwei schriftliche Leistungsnachweise", titel_en="Two written assessments", abschnitt=hj1,
+            jahrgang_von=9, jahrgang_bis=10, ordner_enthaelt="Schriftlich", mindestanzahl=2, frist=date(2027, 1, 15), angelegt_von=sl)
+        # Beispiel Prozent-Gewichte: Chemie 9b, Sonstige Mitarbeit › Quartal 1 und 2 je 50 %
+        for o in Bewertungsordner.objects.filter(unterricht__fach__kuerzel="CH", unterricht__gruppe__name="9b",
+                                                 name="Sonstige Mitarbeit", eltern=None):
+            o.gewichtsart = PROZENT
+            o.save(update_fields=["gewichtsart"])
+            o.unterordner.update(gewicht=Decimal(50))
 
     # ------------------------------------------------------------ Kalender, Räume, Sprechtage (ab 0.4.5.0)
     def termine_anlegen(self, pw):

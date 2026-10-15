@@ -965,3 +965,79 @@ p.zf-status { margin: 0 0 0.6rem; }
 .sy-spalte { display: grid; gap: 1rem; align-content: start; min-width: 0; }
 .zf-zeile .zf-status { margin-left: 0; }
 #zweifaktor form { margin: 0.6rem 0; display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }
+
+/* ---------------------------------------------------------------- Noten: Schnelleingabe, Struktur, Leistungsvorgaben (0.4.7.0) */
+.ne-kopfknoepfe { float: right; margin: 0 0 0.6rem 1rem; }
+.ne-form { display: grid; gap: 1rem; }
+.ne-felder { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 2.4fr) minmax(0, 1.2fr) minmax(0, 0.9fr); gap: 0.8rem; align-items: start; }
+.ne-felder .sy-feld input, .ne-felder .sy-feld select { width: 100%; min-width: 0; box-sizing: border-box; }
+.ne-mit-einheit { display: inline-flex; align-items: center; gap: 0.3rem; max-width: 100%; }
+.ne-mit-einheit input { flex: 1 1 auto; min-width: 3.5rem; }
+.ne-einheit { color: var(--leise); font-weight: 600; min-width: 0.9rem; }
+.ne-summe { margin: 0.4rem 0 0; }
+.ne-summe.ne-ueber, .ne-summenwarnung { color: var(--warnung); }
+.ne-summenwarnung { display: block; font-size: 0.78rem; margin-top: 0.2rem; }
+.ne-be { margin-top: 0.8rem; }
+.ne-be summary { cursor: pointer; color: var(--akzent); font-weight: 600; font-size: 0.9rem; }
+.ne-be .ne-felder { grid-template-columns: repeat(2, minmax(0, 14rem)); margin-top: 0.6rem; }
+.ne-hilfe { margin-top: 0.3rem; }
+.ne-tabelle { width: 100%; border-collapse: collapse; }
+.ne-tabelle th, .ne-tabelle td { padding: 0.32rem 0.5rem; border-bottom: 1px solid var(--linie); text-align: left; vertical-align: middle; }
+.ne-tabelle thead th { font-size: 0.8rem; color: var(--leise); font-weight: 600; }
+.ne-tabelle tbody th { font-weight: 500; white-space: nowrap; }
+.ne-tabelle input { font: inherit; padding: 0.35rem 0.5rem; border: 1px solid var(--linie); border-radius: 6px; background: var(--grund); color: var(--text); box-sizing: border-box; }
+.ne-note { width: 5.2rem; font-weight: 700; font-size: 1.05rem; text-align: center; }
+.ne-note:focus { outline: 2px solid var(--akzent); outline-offset: 1px; }
+.ne-kommentar { width: 100%; min-width: 8rem; }
+.ne-nr { color: var(--leise); font-size: 0.8rem; width: 2rem; }
+.ne-deutung { margin-left: 0.45rem; font-size: 0.8rem; color: var(--leise); white-space: nowrap; }
+.ne-falsch .ne-note { border-color: var(--warnung); background: var(--gefahr-flaeche); }
+.ne-falsch .ne-deutung { color: var(--warnung); font-weight: 600; }
+.ne-fehlertext { display: block; }
+.ne-einzel { display: none; }
+.ne-mit-gewicht .ne-einzel { display: table-cell; }
+.ne-knoepfe { position: sticky; bottom: 0; background: var(--grund); padding: 0.6rem 0; border-top: 1px solid var(--linie); z-index: 3; }
+.ne-strukturtabelle input, .ne-strukturtabelle select { font: inherit; padding: 0.3rem 0.45rem; border: 1px solid var(--linie); border-radius: 6px; background: var(--grund); color: var(--text); }
+.ne-strukturtabelle input[name^="name_"] { width: min(16rem, 100%); font-weight: 600; }
+.ne-wurzel th, .ne-wurzel td { background: var(--akzent-hell); }
+.ne-lnzeile td { font-size: 0.92rem; }
+.ne-einzug { display: inline-flex; align-items: center; gap: 0.3rem; }
+.ne-strukturtabelle .aktionen { white-space: nowrap; }
+.ne-strukturtabelle .aktionen > * + * { margin-left: 0.6rem; }
+.ne-neuer-ordner .ne-felder { grid-template-columns: minmax(0, 2fr) minmax(0, 2fr) minmax(0, 0.8fr) auto; align-items: end; }
+.nv-filter { display: flex; gap: 1rem; align-items: end; flex-wrap: wrap; margin: 0.6rem 0 1rem; }
+.nv-vorgabe { margin-bottom: 1rem; }
+.nv-vorgabe h2 { margin: 0 0 0.3rem; }
+.nv-merkmale { display: flex; flex-wrap: wrap; gap: 0.35rem 0.9rem; margin: 0; color: var(--leise); font-size: 0.88rem; }
+.nv-frist { font-weight: 600; color: var(--text); }
+.nv-frist.vorbei { color: var(--warnung); }
+.nv-zaehler { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.7rem 0; }
+.nv-stand { display: inline-block; font-size: 0.78rem; font-weight: 600; padding: 0.12rem 0.55rem; border-radius: 999px; background: var(--grund); border: 1px solid var(--linie); color: var(--leise); white-space: nowrap; }
+.nv-stand.erfuellt { background: var(--akzent-hell); color: var(--akzent); border-color: transparent; }
+.nv-stand.in_arbeit { background: #fff4d6; color: #8a5a00; border-color: transparent; }
+.nv-stand.ueberfaellig { background: var(--gefahr-flaeche); color: var(--warnung); border-color: transparent; }
+:root[data-design="mocha"] .nv-stand.in_arbeit { background: #3b3220; color: #f9e2af; }
+@media (prefers-color-scheme: dark) { :root[data-design="standard"] .nv-stand.in_arbeit { background: #3b3220; color: #f5d78e; } }
+.nv-bald { color: var(--warnung); font-weight: 600; }
+.nv-startliste { list-style: none; padding: 0; margin: 0.4rem 0 0; display: grid; gap: 0.45rem; }
+.nv-unterricht { margin: 0.6rem 0 1rem; clear: both; }
+.nv-unterricht h2 { font-size: 1rem; margin: 0; }
+.nv-ueberfaellig { color: var(--warnung); font-weight: 600; }
+.nv-drei { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr); gap: 0.7rem; }
+.nv-faecher { border: 1px solid var(--linie); border-radius: 8px; padding: 0.5rem 0.8rem; }
+.nv-faecher legend { font-size: 0.85rem; font-weight: 600; padding: 0 0.3rem; }
+.nv-faecher > div { display: grid; grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr)); gap: 0.25rem 1rem; }
+.nv-faecher label { display: inline-flex; gap: 0.35rem; align-items: center; font-size: 0.9rem; }
+@media (max-width: 860px) {
+  .ne-felder, .ne-be .ne-felder, .ne-neuer-ordner .ne-felder, .nv-drei { grid-template-columns: minmax(0, 1fr); }
+  .ne-kopfknoepfe { float: none; margin: 0 0 0.6rem; }
+}
+@media (max-width: 600px) {
+  .ne-tabelle thead { display: none; }
+  .ne-tabelle tr { display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) auto; gap: 0.2rem 0.4rem; padding: 0.45rem 0; border-bottom: 1px solid var(--linie); align-items: center; }
+  .ne-tabelle th, .ne-tabelle td { border: 0; padding: 0; }
+  .ne-tabelle tbody th { white-space: normal; }
+  .ne-tabelle td:nth-child(4) { grid-column: 2 / -1; }
+  .ne-mit-gewicht .ne-einzel { display: block; grid-column: 2 / -1; }
+  .ne-deutung { display: block; margin: 0.15rem 0 0; text-align: center; }
+}

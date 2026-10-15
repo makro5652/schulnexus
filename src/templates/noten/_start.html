@@ -1,0 +1,17 @@
+{% load i18n formate %}
+<section class="karte nv-start" id="leistungsvorgaben">
+  <h2>{% translate "Leistungsvorgaben" %}</h2>
+  {% if noten_vorgaben.meine %}
+  <ul class="nv-startliste">
+    {% for st in noten_vorgaben.meine %}
+    <li><span class="nv-stand {{ st.stand }}">{{ st.text }}</span>
+      <a href="{% url 'notenuebersicht' st.unterricht.pk %}">{{ st.unterricht.fach.kuerzel }} {{ st.unterricht.gruppe.name }}</a>:
+      {{ st.vorgabe.lokal_titel }} <span class="leise">{% blocktranslate with d=st.vorgabe.frist|kurzdatum %}bis {{ d }}{% endblocktranslate %} · {{ st.vollstaendig }}/{{ st.vorgabe.mindestanzahl }}</span></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  {% if noten_vorgaben.ueberfaellig %}
+  <p class="nv-ueberfaellig">{% blocktranslate count n=noten_vorgaben.ueberfaellig %}{{ n }} Vorgabe ist in einem Unterricht überfällig.{% plural %}{{ n }}-mal sind Vorgaben in Unterrichten überfällig.{% endblocktranslate %}
+    <a href="{% url 'leistungsvorgaben' %}?offen=1">{% translate "Übersicht öffnen" %}</a></p>
+  {% endif %}
+</section>

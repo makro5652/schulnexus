@@ -1,0 +1,11 @@
+{% load i18n formate %}
+<section class="karte nv-unterricht">
+  <h2>{% translate "Leistungsvorgaben" %}</h2>
+  <ul class="nv-startliste">
+    {% for st in vorgaben %}
+    <li><span class="nv-stand {{ st.stand }}">{{ st.text }}</span> <strong>{{ st.vorgabe.lokal_titel }}</strong>
+      <span class="leise">{% blocktranslate with d=st.vorgabe.frist|kurzdatum %}bis {{ d }}{% endblocktranslate %} · {% blocktranslate with a=st.vollstaendig n=st.vorgabe.mindestanzahl %}{{ a }} von {{ n }} vollständig{% endblocktranslate %}{% if st.vorgabe.ordner_enthaelt %} · {% blocktranslate with t=st.vorgabe.ordner_enthaelt %}im Ordner „{{ t }}“{% endblocktranslate %}{% endif %}{% if st.vorgabe.titel_enthaelt %} · {% blocktranslate with t=st.vorgabe.titel_enthaelt %}Bezeichnung mit „{{ t }}“{% endblocktranslate %}{% endif %}</span>
+      {% if st.vorgabe.hinweis %}<small class="blockzeile leise">{{ st.vorgabe.hinweis }}</small>{% endif %}</li>
+    {% endfor %}
+  </ul>
+</section>

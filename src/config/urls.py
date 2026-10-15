@@ -12,6 +12,7 @@ urlpatterns = [
     path("office/", views.office, name="office"),
     path("abmelden/", auth_views.LogoutView.as_view(), name="logout"),
     path("noten/unterricht/<int:pk>/", views.notenuebersicht, name="notenuebersicht"),
+    path("noten/", include("noten.urls")),
     path("klassen/<int:pk>/", views.klassenliste, name="klassenliste"),
     path("schueler/<int:pk>/", views.schuelerakte, name="schuelerakte"),
     path("schueler/<int:pk>/anhang/", anhaenge.anhang_hochladen, name="anhang_hochladen"),

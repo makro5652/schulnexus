@@ -161,7 +161,9 @@ def menueband(request):
         "unterricht", pgettext("Menüband", "Unterricht"),
         mein_unterricht,
         Gruppe(_("Bewertung"))
-        .add(_("Leistungsnachweise"), _url("admin:noten_leistungsnachweis_changelist"), "stift", gross=True,
+        .add(_("Leistungsvorgaben"), _url("leistungsvorgaben"), "haken", gross=True, bedingung=p("noten.view_leistungsvorgabe"),
+             hinweis=_("Pflichtnoten mit Frist"))
+        .add(_("Leistungsnachweise"), _url("admin:noten_leistungsnachweis_changelist"), "stift",
              bedingung=p("noten.view_leistungsnachweis"))
         .add(_("Neuer Leistungsnachweis"), _url("admin:noten_leistungsnachweis_add"), "plus", bedingung=p("noten.add_leistungsnachweis"))
         .add(_("Bewertungsordner"), _url("admin:noten_bewertungsordner_changelist"), "ordner", bedingung=p("noten.view_bewertungsordner"))

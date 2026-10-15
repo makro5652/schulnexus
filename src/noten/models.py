@@ -12,6 +12,7 @@ Notenmodul.
 """
 from decimal import ROUND_HALF_UP, Decimal
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -21,6 +22,12 @@ from simple_history.models import HistoricalRecords
 
 from stammdaten.sprache import LokalerNameMixin
 from stammdaten.models import Abschnitt, Fach, Gruppe, Personalprofil, Schuelerprofil
+
+
+# Wie die Gewichte der Einträge einer Ebene eingegeben werden (ab 0.4.7.0). Gerechnet wird in beiden Fällen gleich:
+# gewichteter Mittelwert, leere Einträge werden übersprungen. „Prozent“ zeigt % an und prüft die Summe auf 100.
+RELATIV, PROZENT = "relativ", "prozent"
+GEWICHTSARTEN = [(RELATIV, _("relativ (z. B. 2 : 1)")), (PROZENT, _("in Prozent (Summe 100)"))]
 
 
 class Notenskala(LokalerNameMixin, models.Model):
@@ -157,6 +164,7 @@ class Unterricht(models.Model):
         Gewichtungsvorlage, null=True, blank=True, on_delete=models.PROTECT, verbose_name=_("Startvorlage für Bewertungsordner"),
         help_text=_("Beim Anlegen werden daraus die obersten Ordner erzeugt. Danach sind die Ordner frei änderbar."),
     )
+    gewichtsart = models.CharField(_("Gewichte der obersten Ebene"), max_length=8, choices=GEWICHTSARTEN, default=RELATIV)
 
     class Meta:
         verbose_name = _("Unterricht")
@@ -220,6 +228,7 @@ class Bewertungsordner(models.Model):
     )
     reihenfolge = models.PositiveSmallIntegerField(_("Reihenfolge"), default=10)
     beschreibung = models.CharField(_("Beschreibung"), max_length=200, blank=True)
+    gewichtsart = models.CharField(_("Gewichte der Einträge in diesem Ordner"), max_length=8, choices=GEWICHTSARTEN, default=RELATIV)
     history = HistoricalRecords(verbose_name=_("Änderungsprotokoll Bewertungsordner"))
 
     class Meta:
@@ -442,3 +451,67 @@ class Zeugnisnote(models.Model):
                     {"begruendung": gettext("Die Note weicht vom Vorschlag (%(vorschlag)s) ab. Bitte pädagogisch begründen.")
                      % {"vorschlag": vorgeschlagen}}
                 )
+
+
+class Leistungsvorgabe(models.Model):
+    """
+    Pflicht-Leistungsnachweis mit Frist (ab 0.4.7.0), festgelegt von Schulleitung, Stellvertretung oder
+    Stufenkoordination (nur eigene Jahrgänge). Beispiel: „Quartalsnote Sonstige Mitarbeit“, Jahrgänge 5–10,
+    alle Fächer, Ordner enthält „Quartal 1“, mindestens 1, bis 31.10.
+
+    Erfüllt ist die Vorgabe für einen Unterricht, wenn bis zur Frist mindestens `mindestanzahl` passende
+    Leistungsnachweise angelegt sind, in denen für alle Schüler:innen eine Note oder ein Vermerk steht.
+    """
+
+    titel = models.CharField(_("Bezeichnung"), max_length=120, help_text=_("z. B. Quartalsnote Sonstige Mitarbeit Q1"))
+    titel_en = models.CharField(_("Bezeichnung (Englisch)"), max_length=120, blank=True)
+    abschnitt = models.ForeignKey(Abschnitt, on_delete=models.CASCADE, related_name="leistungsvorgaben", verbose_name=_("Halbjahr"))
+    jahrgang_von = models.PositiveSmallIntegerField(_("ab Jahrgang"))
+    jahrgang_bis = models.PositiveSmallIntegerField(_("bis Jahrgang"))
+    faecher = models.ManyToManyField(Fach, blank=True, related_name="leistungsvorgaben", verbose_name=_("Fächer"),
+                                     help_text=_("Keine Auswahl = alle Fächer."))
+    ordner_enthaelt = models.CharField(
+        _("Ordner enthält"), max_length=80, blank=True,
+        help_text=_("Optional: Nur Leistungsnachweise in Ordnern, deren Pfad diesen Text enthält, z. B. „Schriftlich“ oder „Quartal 1“."))
+    titel_enthaelt = models.CharField(
+        _("Bezeichnung enthält"), max_length=80, blank=True,
+        help_text=_("Optional: Nur Leistungsnachweise, deren Bezeichnung diesen Text enthält, z. B. „Klassenarbeit“."))
+    mindestanzahl = models.PositiveSmallIntegerField(_("Mindestanzahl"), default=1, validators=[MinValueValidator(1)])
+    frist = models.DateField(_("Frist"))
+    hinweis = models.CharField(_("Hinweis für Lehrkräfte"), max_length=300, blank=True)
+    angelegt_von = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="+",
+                                     verbose_name=_("Angelegt von"))
+    angelegt_am = models.DateTimeField(_("Angelegt am"), auto_now_add=True)
+    history = HistoricalRecords(verbose_name=_("Änderungsprotokoll Leistungsvorgabe"))
+
+    class Meta:
+        verbose_name = _("Leistungsvorgabe")
+        verbose_name_plural = _("Leistungsvorgaben")
+        ordering = ["frist", "titel"]
+
+    def __str__(self):
+        return self.titel
+
+    def lokal_titel(self, sprache=None):
+        from django.utils.translation import get_language
+
+        sprache = sprache or get_language() or "de"
+        return self.titel_en if sprache.startswith("en") and self.titel_en else self.titel
+
+    @property
+    def jahrgaenge(self):
+        return range(self.jahrgang_von, self.jahrgang_bis + 1)
+
+    def clean(self):
+        if self.jahrgang_von and self.jahrgang_bis and self.jahrgang_von > self.jahrgang_bis:
+            raise ValidationError({"jahrgang_bis": _("„bis Jahrgang“ darf nicht kleiner sein als „ab Jahrgang“.")})
+        if self.abschnitt_id and self.frist and not (self.abschnitt.beginn <= self.frist <= self.abschnitt.ende):
+            raise ValidationError({"frist": gettext("Die Frist muss im Halbjahr liegen (%(von)s bis %(bis)s).") % {
+                "von": self.abschnitt.beginn.strftime("%d.%m.%Y"), "bis": self.abschnitt.ende.strftime("%d.%m.%Y")}})
+
+    def unterrichte(self):
+        qs = Unterricht.objects.filter(abschnitt=self.abschnitt, gruppe__jahrgang__gte=self.jahrgang_von,
+                                       gruppe__jahrgang__lte=self.jahrgang_bis)
+        if self.pk and self.faecher.exists():
+            qs = qs.filter(fach__in=self.faecher.all())
+        return qs.select_related("fach", "gruppe", "lehrkraft__person", "abschnitt")

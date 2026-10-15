@@ -1,10 +1,10 @@
-# Schulverwaltung (Version 0.4.6.0, Entwicklungsstand)
+# Schulverwaltung (Version 0.4.7.0, Entwicklungsstand)
 
 Open-Source-Schulverwaltung für die DSN: Stammdaten, Klassen und Lerngruppen,
 Noten mit Gewichtung, Fehlzeiten, Nachmittagsprogramm, Anhänge zur Schülerakte,
 Förderpläne und Nachteilsausgleiche, Neuanmeldungen, Zeugnisse und Konferenzen, Schuljahreswechsel,
 Abgänge mit Abgangszeugnis, Archiv und Löschfristen, Schulkalender, Raumbuchung, Elternsprechtage und
-Lern- und Entwicklungsgespräche, Office-Startseite für Microsoft 365. Verschlüsselte Ablage von Anhängen und
+Lern- und Entwicklungsgespräche, Office-Startseite für Microsoft 365, Noten-Schnelleingabe und Pflichtnoten mit Frist. Verschlüsselte Ablage von Anhängen und
 Sicherungen, Zwei-Faktor-Anmeldung, HTTPS-Betrieb. Läuft im Browser, betrieben mit Docker.
 
 > Nur mit **erfundenen Testdaten** verwenden. Vor echten Schülerdaten: HTTPS einrichten (`HTTPS=1`),
@@ -379,29 +379,65 @@ Ablauf der Schullaufbahn: **Aufnahme → Klasse → Versetzung → Schuljahreswe
 Jeder Unterricht hat eine frei gestaltbare Ordnerstruktur, z. B.:
 
 ```
-Schriftlich (Gewicht 50)
-├─ 1. Klassenarbeit (Gewicht 1)
-└─ Test Atombau (Gewicht 0,5)
-Sonstige Mitarbeit (Gewicht 50)
-├─ Quartal 1 (Gewicht 1)
-│  ├─ Mitarbeit September (Gewicht 1)
-│  └─ Protokoll Flammenfärbung (Gewicht 0,5)
-├─ Quartal 2 (Gewicht 1)
-└─ Referate (Gewicht 2)
+Quartal 1 (50)
+├─ Klausur Quartal 1 (50)
+└─ Sonstige Mitarbeit Quartal 1 (50)        Gewichte darin: Prozent
+   ├─ Test (20 %)
+   ├─ Mitarbeit 31.10. (4 %)   → Note 2+
+   └─ …
+Quartal 2 (50)
+└─ …
 ```
 
-- Ordner und Leistungsnachweise sind **frei benennbar**, Leistungsnachweise haben ein **Datum**.
-- Jedes Gewicht gilt **relativ zu den anderen Einträgen derselben Ebene** (50/50 = 1/1).
+- Ordner und Leistungsnachweise sind **frei benennbar**, Leistungsnachweise haben ein **Datum** und ein **Gewicht**.
+- **Gewichtsart je Ebene** (ab 0.4.7.0): Für die oberste Ebene und für jeden Ordner wählt die Lehrkraft, ob die
+  Gewichte darin **relativ** (z. B. 2 : 1 oder 50 : 50) oder **in Prozent** angegeben werden. Bei Prozent zeigt die
+  Struktur die Summe und meldet, wie viel bis 100 % fehlt oder zu viel ist; ein einzelner Wert darf 100 nicht
+  übersteigen. Gerechnet wird in beiden Fällen als gewichteter Mittelwert; **leere Einträge** (z. B. ein noch nicht
+  begonnenes Quartal) werden übersprungen, die übrigen tragen dann entsprechend mehr.
 - Ein Ordner kann Unterordner und Leistungsnachweise gleichzeitig enthalten (bis zu 5 Ebenen).
-- **Leere Ordner** (z. B. ein noch nicht begonnenes Quartal) werden bei der Berechnung übersprungen.
-- Die Notenübersicht zeigt für jeden Eintrag seinen planmäßigen Anteil an der Gesamtnote.
-- Bedienung: Notenübersicht → „Bewertungsstruktur“ → „+ Unterordner“ bzw. „+ Leistungsnachweis“.
-  Die Noten trägt man ein, indem man auf den Namen des Leistungsnachweises klickt.
+- Notenübersicht und Struktur zeigen für jeden Eintrag seinen planmäßigen **Anteil an der Gesamtnote**.
+- **Bewertungsstruktur im Portal:** Notenübersicht › „Bewertungsstruktur“ – Ordner anlegen, umbenennen, Gewichte und
+  Gewichtsart ändern, Reihenfolge, leere Ordner und Leistungsnachweise löschen. Die Verwaltungsoberfläche ist dafür
+  nicht mehr nötig.
 - Die Gewichtungsvorlage legt beim Anlegen eines Unterrichts nur die **Start-Ordner** an.
+- **Notenformat:** je Unterricht eine Skala – Sek I „1 bis 6 mit Tendenzen“ (1+ … 6) oder Sek II „0 bis 15 Punkte“;
+  zusätzlich je Leistungsnachweis optional BE mit Notenschlüssel.
+
+**Schnelleingabe** (ab 0.4.7.0): Notenübersicht › „Noten eintragen“ oder Klick auf einen Leistungsnachweis.
+Oben Ordner, Bezeichnung (mit Vorschlägen aus früheren Einträgen), Datum und Gewicht; bei einem Prozent-Ordner wird
+angezeigt, wie viel Prozent im Ordner schon vergeben sind. Darunter die Klassenliste mit einem Textfeld je
+Schüler:in:
+
+| Eingabe | Bedeutung |
+| --- | --- |
+| `2+`, `2`, `2-` (Sek II: `15` … `0`) | Note der Skala |
+| `34`, `34,5` | erreichte BE, wenn ein Notenschlüssel gewählt ist (Note wird berechnet und sofort angezeigt) |
+| `=2+` | Note direkt, auch bei Notenschlüssel |
+| `e`, `u`, `b`, `nb` | entschuldigt, unentschuldigt, befreit, nicht bewertbar |
+| `u 6` | unentschuldigt mit Note |
+| leer | keine Note |
+
+Enter oder ↓ springt zur nächsten Zeile, ↑ zur vorigen; eine Notenspalte aus Excel lässt sich in das erste Feld
+einfügen. Jede Eingabe wird sofort geprüft; ist eine ungültig, wird **nichts** gespeichert und die Zeile markiert.
+„Speichern und nächsten anlegen“ öffnet gleich den nächsten Eintrag im selben Ordner. Einzelgewichte mit Begründung
+sind über „Einzelgewichte anzeigen“ erreichbar. Eintragen dürfen die unterrichtende Lehrkraft, die Schulleitung und
+die IT.
 
 **Gewichtung pro einzelner Note:** Zusätzlich zum Gewicht des Leistungsnachweises kann jede
 einzelne Note ein individuelles Gewicht bekommen (z. B. verkürzte Nachschreibarbeit). Eine
 Abweichung muss begründet werden und ist in der Notenübersicht mit „×Gewicht“ markiert.
+
+**Leistungsvorgaben – Pflichtnoten mit Frist** (ab 0.4.7.0): Menüband › Unterricht › Leistungsvorgaben.
+Schulleitung und Stellvertretung legen Vorgaben für alle Jahrgänge an, die Stufenkoordination für ihre Jahrgänge.
+Eine Vorgabe nennt Halbjahr, Jahrgänge, Fächer (keine Auswahl = alle), optional „Ordner enthält“ (z. B. „Quartal 1“)
+und „Bezeichnung enthält“ (z. B. „Klassenarbeit“), eine Mindestanzahl und eine Frist, z. B. „Quartalsnote Sonstige
+Mitarbeit Q1, Jahrgänge 5–10, alle Fächer, bis 30.10.“. Ein Leistungsnachweis zählt, wenn sein Datum spätestens am
+Tag der Frist liegt, er passt und für alle Schüler:innen, die an diesem Tag zur Gruppe gehörten, eine Note oder ein
+Vermerk eingetragen ist. Die Übersicht zeigt je Unterricht eine Ampel (erfüllt, in Arbeit, offen, überfällig);
+Lehrkräfte sehen ihren eigenen Unterricht, Koordination und Leitung ihre Jahrgänge bzw. alle. Lehrkräfte werden auf
+der Startseite 14 Tage vor der Frist erinnert, die Leitung sieht die Zahl überfälliger Vorgaben; die Notenübersicht
+eines Unterrichts zeigt den Stand seiner Vorgaben. Die Bewertungsstruktur selbst bleibt frei.
 
 ## Personenakten
 

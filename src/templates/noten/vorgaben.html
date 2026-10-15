@@ -1,0 +1,69 @@
+{% extends "portal/base.html" %}
+{% load i18n formate %}
+{% block title %}{% translate "Leistungsvorgaben" %}{% endblock %}
+{% block inhaltsklasse %}breit{% endblock %}
+{% block inhalt %}
+<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › {% translate "Unterricht" %} › {% translate "Leistungsvorgaben" %}</p>
+<div class="of-kopf">
+  <div>
+    <h1>{% translate "Leistungsvorgaben" %}</h1>
+    <p class="leise">{% translate "Pflichtnoten mit Frist: Welche Leistungsnachweise müssen bis wann in welchen Jahrgängen und Fächern vorliegen?" %}</p>
+  </div>
+  {% if darf_verwalten %}<a class="knopf" href="{% url 'vorgabe_neu' %}{% if a %}?abschnitt={{ a.pk }}{% endif %}">{% translate "Neue Vorgabe" %}</a>{% endif %}
+</div>
+
+<form method="get" class="nv-filter">
+  <label class="sy-feld">{% translate "Halbjahr" %}
+    <select name="abschnitt" onchange="this.form.submit()">{% for x in abschnitte %}<option value="{{ x.pk }}"{% if x == a %} selected{% endif %}>{{ x.schuljahr }} – {{ x.lokal_name }}</option>{% endfor %}</select></label>
+  <label class="haken"><input type="checkbox" name="offen" value="1"{% if nur_offen %} checked{% endif %} onchange="this.form.submit()"> {% translate "nur nicht erfüllte" %}</label>
+  <noscript><button type="submit" class="knopf zweitrangig klein">{% translate "Anzeigen" %}</button></noscript>
+</form>
+
+{% for k in karten %}
+<section class="karte nv-vorgabe">
+  <div class="karte-kopf">
+    <div>
+      <h2>{{ k.v.lokal_titel }}</h2>
+      <p class="nv-merkmale">
+        <span>{% blocktranslate with von=k.v.jahrgang_von bis=k.v.jahrgang_bis %}Jahrgang {{ von }}–{{ bis }}{% endblocktranslate %}</span>
+        <span>{{ k.faecher }}</span>
+        <span>{% blocktranslate count n=k.v.mindestanzahl %}mindestens {{ n }} Leistungsnachweis{% plural %}mindestens {{ n }} Leistungsnachweise{% endblocktranslate %}</span>
+        {% if k.v.ordner_enthaelt %}<span>{% blocktranslate with t=k.v.ordner_enthaelt %}im Ordner „{{ t }}“{% endblocktranslate %}</span>{% endif %}
+        {% if k.v.titel_enthaelt %}<span>{% blocktranslate with t=k.v.titel_enthaelt %}Bezeichnung mit „{{ t }}“{% endblocktranslate %}</span>{% endif %}
+        <span class="nv-frist{% if k.v.frist < heute %} vorbei{% endif %}">{% blocktranslate with d=k.v.frist|kurzdatum %}Frist {{ d }}{% endblocktranslate %}</span>
+      </p>
+      {% if k.v.hinweis %}<p class="hinweistext">{{ k.v.hinweis }}</p>{% endif %}
+    </div>
+    {% if k.darf_aendern %}<div class="knopfreihe">
+      <a class="knopf zweitrangig klein" href="{% url 'vorgabe_bearbeiten' k.v.pk %}">{% translate "Bearbeiten" %}</a>
+      <form method="post" action="{% url 'vorgabe_loeschen' k.v.pk %}" onsubmit="return confirm('{% translate "Vorgabe löschen?" as f %}{{ f|escapejs }}')">{% csrf_token %}<button type="submit" class="knopf zweitrangig klein">{% translate "Löschen" %}</button></form>
+    </div>{% endif %}
+  </div>
+  <p class="nv-zaehler">
+    <span class="nv-stand erfuellt">{{ k.zaehler.erfuellt }} {{ stand_text.erfuellt }}</span>
+    <span class="nv-stand in_arbeit">{{ k.zaehler.in_arbeit }} {{ stand_text.in_arbeit }}</span>
+    <span class="nv-stand offen">{{ k.zaehler.offen }} {{ stand_text.offen }}</span>
+    <span class="nv-stand ueberfaellig">{{ k.zaehler.ueberfaellig }} {{ stand_text.ueberfaellig }}</span>
+  </p>
+  {% if k.zeilen %}
+  <div class="tabellenrahmen">
+  <table class="liste nv-tabelle">
+    <thead><tr><th>{% translate "Unterricht" %}</th><th>{% translate "Lehrkraft" %}</th><th>{% translate "Stand" context "Vorgabe" %}</th><th class="zahl">{% translate "vollständig" %}</th></tr></thead>
+    <tbody>
+    {% for z in k.zeilen %}
+      <tr><td><a href="{% url 'notenuebersicht' z.unterricht.pk %}">{{ z.unterricht.fach.lokal_name }} {{ z.unterricht.gruppe.name }}</a></td>
+        <td>{{ z.unterricht.lehrkraft.person.anzeigename }} <small class="leise">{{ z.unterricht.lehrkraft.kuerzel }}</small></td>
+        <td><span class="nv-stand {{ z.stand }}">{{ z.text }}</span>{% if z.bald %} <small class="nv-bald">{% translate "Frist naht" %}</small>{% endif %}</td>
+        <td class="zahl">{{ z.vollstaendig }} / {{ k.v.mindestanzahl }}{% if z.unvollstaendig %} <small class="leise" title="{% translate 'angelegt, aber noch nicht für alle Schüler:innen eingetragen' %}">(+{{ z.unvollstaendig }})</small>{% endif %}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% elif nur_offen %}<p class="leer">{% translate "Alle betroffenen Unterrichte haben die Vorgabe erfüllt." %}</p>
+  {% else %}<p class="leer">{% translate "Für diese Vorgabe gibt es in diesem Halbjahr keinen passenden Unterricht." %}</p>{% endif %}
+</section>
+{% empty %}
+<p class="leer">{% translate "Für dieses Halbjahr sind keine Leistungsvorgaben angelegt." %}</p>
+{% endfor %}
+<p class="hinweistext">{% translate "Ein Leistungsnachweis zählt, wenn sein Datum spätestens am Tag der Frist liegt, er zu Ordner und Bezeichnung passt und für alle Schüler:innen eine Note oder ein Vermerk (z. B. entschuldigt) eingetragen ist." %}</p>
+{% endblock %}

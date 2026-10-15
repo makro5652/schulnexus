@@ -33,6 +33,7 @@ GEHEIM = {"password", "schluessel"}
 # Datumsbezug je Modell (Pfad zu einem Datumsfeld); sonst automatisch über KANDIDATEN, sonst „Bestand“
 DATUMSFELDER = {
     "noten.leistungsnachweis": "datum",
+    "noten.leistungsvorgabe": "frist",
     "noten.note": "leistungsnachweis__datum",
     "noten.zeugnisnote": "unterricht__abschnitt__ende",
     "noten.unterricht": "abschnitt__ende",
