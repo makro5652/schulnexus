@@ -23,10 +23,10 @@
     <ul>{% for k in sz.klassen %}<li><a href="{{ k.url }}"><strong>{{ k.titel }}</strong><span>{% if k.anzahl is None %}{{ k.unter }}{% else %}{% blocktranslate count n=k.anzahl %}{{ n }} Schüler:in{% plural %}{{ n }} Schüler:innen{% endblocktranslate %}{% endif %}</span></a></li>{% endfor %}</ul>
   </div>
   {% endif %}
-  {% if sz.kurse %}
-  <div class="sz-gruppe">
+  {% if kurswahl %}
+  <div class="sz-gruppe sz-unterricht">
     <h2>{% translate "Mein Unterricht" %}</h2>
-    <ul>{% for k in sz.kurse %}<li><a href="{{ k.url }}"><strong>{{ k.titel }}</strong><span>{% translate "Notenübersicht" %} · {{ k.unter }}</span></a></li>{% endfor %}</ul>
+    {% include "noten/_kurswahl.html" with kw=kurswahl stil="start" %}
   </div>
   {% endif %}
 </nav>

@@ -155,6 +155,9 @@ def unterricht(request, pk):
 
     if not darf_unterricht_sehen(request.user, u):
         raise PermissionDenied
+    from noten import kurswahl
+
+    kurswahl.merken(request, u)
     darf_noten = rechte.darf_zeugnisnote_setzen(request.user, u)
     schueler = list(u.schueler())
     bestehend = {z.schueler_id: z for z in Zeugnisnote.objects.filter(unterricht=u).select_related("stufe")}
@@ -247,6 +250,7 @@ def unterricht(request, pk):
     return render(request, "zeugnisse/unterricht.html", {
         "u": u, "zeilen": zeilen, "optionen": optionen, "darf_noten": darf_noten,
         "gesetzt": sum(1 for z in zeilen if z["zn"]), "personal": personal,
+        "kurswahl": kurswahl.auswahl(request, u, nur_wenn_enthalten=True),
     })
 
 

@@ -1041,3 +1041,23 @@ p.zf-status { margin: 0 0 0.6rem; }
   .ne-mit-gewicht .ne-einzel { display: block; grid-column: 2 / -1; }
   .ne-deutung { display: block; margin: 0.15rem 0 0; text-align: center; }
 }
+
+/* ---------------------------------------------------------------- Kursauswahl „Mein Unterricht“ (0.4.7.1) */
+.sz-unterricht { grid-column: span 2; }
+.kw-start { display: grid; gap: 0.5rem; background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--radius); padding: 0.75rem 0.9rem; }
+.kw-start .kw-label { font-size: 0.8rem; color: var(--leise); }
+.kw-start select, .kw-wechsel select { font: inherit; padding: 0.45rem 0.55rem; border: 1px solid var(--linie); border-radius: 8px; background: var(--grund); color: var(--text);
+  width: 100%; min-width: 0; }
+.kw-start .kw-knoepfe { display: flex; gap: 0.45rem; flex-wrap: wrap; }
+.kw-start .kw-knoepfe .knopf, .kw-start .kw-knoepfe button { display: inline-flex; align-items: center; gap: 0.4rem; }
+.kw-start .kw-knoepfe svg { width: 1rem; height: 1rem; }
+.kw-kopf { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem 1.2rem; flex-wrap: wrap; }
+.kw-kopf h1 { margin-bottom: 0.2rem; }
+.kw-wechsel { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--leise); }
+.kw-wechsel select { width: auto; max-width: 18rem; font-size: 0.9rem; color: var(--text); }
+.kw-aktionen { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
+@media (max-width: 700px) {
+  .sz-unterricht { grid-column: auto; }
+  .kw-wechsel { width: 100%; }
+  .kw-wechsel select { flex: 1; max-width: none; }
+}

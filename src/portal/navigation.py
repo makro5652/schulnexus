@@ -27,6 +27,7 @@ class Gruppe:
     def __init__(self, titel):
         self.titel = titel
         self.befehle = []
+        self.auswahl = None          # Auswahlliste statt Befehlen, z. B. „Mein Unterricht“ (noten/kurswahl.py)
 
     def add(self, titel, url, symbol, gross=False, bedingung=True, hinweis=""):
         if bedingung and url:
@@ -43,7 +44,7 @@ class Gruppe:
 
 
 def _karte(schluessel, titel, *gruppen):
-    gruppen = [g for g in gruppen if g.befehle]
+    gruppen = [g for g in gruppen if g.befehle or g.auswahl]
     return {"schluessel": schluessel, "titel": titel, "gruppen": gruppen} if gruppen else None
 
 
@@ -151,12 +152,13 @@ def menueband(request):
     # ------------------------------------------------------------ Unterricht
     mein_unterricht = Gruppe(_("Mein Unterricht"))
     if personal and sj:
-        kurse = list(Unterricht.objects.filter(lehrkraft=personal, abschnitt__schuljahr=sj)
-                     .select_related("fach", "gruppe", "abschnitt").order_by("abschnitt__nummer", "gruppe__name", "fach__reihenfolge"))
-        for u in kurse:
-            mein_unterricht.add(f"{u.fach.kuerzel} {u.gruppe.name}", _url("notenuebersicht", u.pk), "buch", gross=len(kurse) <= 3,
-                                hinweis=_("Notenübersicht %(fach)s %(gruppe)s, %(abschnitt)s") % {
-                                    "fach": u.fach.lokal_name, "gruppe": u.gruppe.name, "abschnitt": u.abschnitt.lokal_name})
+        from noten import kurswahl
+
+        rm = getattr(request, "resolver_match", None)
+        aktuell = None
+        if rm is not None and rm.url_name in kurswahl.URLNAME_ZU_ZIEL and rm.kwargs.get("pk"):
+            aktuell = Unterricht(pk=rm.kwargs["pk"])
+        mein_unterricht.auswahl = kurswahl.auswahl(request, aktuell)
     unterricht = _karte(
         "unterricht", pgettext("Menüband", "Unterricht"),
         mein_unterricht,

@@ -8,7 +8,8 @@
     <h1>{% translate "Zeugnisnoten und Kommentare" %}</h1>
     <p class="unterzeile">{{ u.fach.lokal_name }} · {{ u.gruppe.name }} · {{ u.abschnitt.lokal_name }} {{ u.abschnitt.schuljahr }} · {{ u.lehrkraft.person.anzeigename }}</p>
   </div>
-  <a class="knopf zweitrangig" href="{% url 'notenuebersicht' u.pk %}">{% translate "Notenübersicht" %}</a>
+  <div class="kw-aktionen">{% include "noten/_kurswahl.html" with kw=kurswahl stil="wechsel" ziel="zeugnis" %}
+  <a class="knopf zweitrangig" href="{% url 'notenuebersicht' u.pk %}">{% translate "Notenübersicht" %}</a></div>
 </div>
 
 <p class="hinweistext">{% translate "Die Zeugnisnote ist eine ganze Note (Rili Sek I, 3.5). Vorausgewählt ist der gerundete rechnerische Vorschlag; gespeichert wird erst mit „Zeugnisnoten speichern“. Weicht die Note vom Vorschlag ab, ist eine pädagogische Begründung Pflicht. Den Zeugniskommentar schreibt die Klassenleitung; bitte lesen, abzeichnen und bei Bedarf anmerken." %}</p>

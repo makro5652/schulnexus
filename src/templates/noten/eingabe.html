@@ -5,7 +5,7 @@
 {% block inhalt %}
 <p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> ›
   <a href="{% url 'notenuebersicht' u.pk %}">{{ u.fach.lokal_name }} {{ u.gruppe.name }}</a> › {% translate "Noten eintragen" %}</p>
-<h1>{% if ln %}{% blocktranslate with titel=ln.titel %}Noten: {{ titel }}{% endblocktranslate %}{% else %}{% translate "Noten eintragen" %}{% endif %}</h1>
+<div class="kw-kopf"><h1>{% if ln %}{% blocktranslate with titel=ln.titel %}Noten: {{ titel }}{% endblocktranslate %}{% else %}{% translate "Noten eintragen" %}{% endif %}</h1>{% if not ln %}{% include "noten/_kurswahl.html" with kw=kurswahl stil="wechsel" ziel="eintragen" %}{% endif %}</div>
 <p class="unterzeile">{{ u.fach.lokal_name }} · {{ u.gruppe.name }} · {{ u.abschnitt }} · {% blocktranslate with skala=u.skala %}Skala „{{ skala }}“{% endblocktranslate %}</p>
 
 <form method="post" id="ne-form" class="ne-form" novalidate>{% csrf_token %}

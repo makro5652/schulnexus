@@ -5,7 +5,7 @@
 {% block inhalt %}
 <p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> ›
   <a href="{% url 'notenuebersicht' u.pk %}">{{ u.fach.lokal_name }} {{ u.gruppe.name }}</a> › {% translate "Bewertungsstruktur" %}</p>
-<h1>{% translate "Bewertungsstruktur" %}</h1>
+<div class="kw-kopf"><h1>{% translate "Bewertungsstruktur" %}</h1>{% include "noten/_kurswahl.html" with kw=kurswahl stil="wechsel" ziel="struktur" %}</div>
 <p class="unterzeile">{{ u.fach.lokal_name }} · {{ u.gruppe.name }} · {{ u.abschnitt }}</p>
 
 <form method="post" class="karte ne-struktur">{% csrf_token %}

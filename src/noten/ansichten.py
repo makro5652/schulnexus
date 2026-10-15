@@ -17,6 +17,7 @@ from portal.rechte import ist_schulleitung, ist_verwaltung, personal_von
 from stammdaten.models import Abschnitt, Fach, Schuljahr
 
 from . import eingabe as E
+from . import kurswahl
 from . import rechte
 from . import vorgaben as V
 from .berechnung import Baum, nominale_anteile
@@ -31,6 +32,7 @@ def _unterricht(request, pk):
     u = get_object_or_404(Unterricht.objects.select_related("fach", "gruppe", "abschnitt", "skala", "lehrkraft__person"), pk=pk)
     if not rechte.darf_noten_eintragen(request.user, u):
         raise PermissionDenied
+    kurswahl.merken(request, u)
     return u
 
 
@@ -174,6 +176,7 @@ def noten_eintragen(request, pk, ln_pk=None):
         },
         "titel_vorschlaege": sorted({t for t in Leistungsnachweis.objects.filter(unterricht=u).values_list("titel", flat=True)}),
         "einzelgewichte": any(z["w"].get("gewicht") for z in zeilen),
+        "kurswahl": kurswahl.auswahl(request, u, nur_wenn_enthalten=True),
     })
 
 
@@ -241,6 +244,7 @@ def struktur(request, pk):
     return render(request, "noten/struktur.html", {
         "u": u, "zeilen": zeilen, "wurzel": ebene_info(None, u.gewichtsart), "gewichtsarten": GEWICHTSARTEN,
         "ordner_liste": [(o, "\u00a0\u00a0\u00a0" * ebene + o.name) for o, ebene, _p in baum.in_reihenfolge() if ebene < Bewertungsordner.MAX_TIEFE - 1],
+        "kurswahl": kurswahl.auswahl(request, u, nur_wenn_enthalten=True),
     })
 
 

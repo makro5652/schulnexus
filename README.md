@@ -1,4 +1,4 @@
-# Schulverwaltung (Version 0.4.7.0, Entwicklungsstand)
+# Schulverwaltung (Version 0.4.7.1, Entwicklungsstand)
 
 Open-Source-Schulverwaltung für die DSN: Stammdaten, Klassen und Lerngruppen,
 Noten mit Gewichtung, Fehlzeiten, Nachmittagsprogramm, Anhänge zur Schülerakte,
@@ -519,6 +519,14 @@ Portal und Verwaltungsoberfläche haben oben dasselbe **Menüband** (wie in Word
 - Mit dem Pfeil rechts neben den Registerkarten lässt sich das Band einklappen; der Browser
   merkt sich die Einstellung. Tastatur: Pfeiltasten wechseln die Karte, Esc schließt Menüs.
 
+**Mein Unterricht – Kursauswahl** (ab 0.4.7.1): Statt einer Kachel je Kurs gibt es eine **Auswahlliste** mit allen
+eigenen Kursen des Schuljahres, nach Halbjahr gegliedert (das laufende ist markiert), dazu die Knöpfe
+**Notenübersicht**, **Noten eintragen** und **Zeugnisnoten**. Sie steht im Menüband (Unterricht › Mein Unterricht) und
+auf der Startseite. Vorausgewählt ist der zuletzt geöffnete Kurs, sonst der erste des laufenden Halbjahres; in der
+Liste springt man durch Tippen der Anfangsbuchstaben. Auf Notenübersicht, Schnelleingabe, Bewertungsstruktur und
+Zeugnisnoten wechselt **„Kurs wechseln“** direkt zum selben Bereich eines anderen Kurses. So bleiben auch zehn und
+mehr Kurse übersichtlich.
+
 Das Portal ist **nur für Beschäftigte** (Verwaltung und Lehrkräfte). Konten ohne Personalakte
 und ohne Verwaltungszugang können sich nicht anmelden.
 
@@ -526,7 +534,7 @@ und ohne Verwaltungszugang können sich nicht anmelden.
 
 - **Kopf:** Begrüßung, Kalenderblatt mit Datum und Kalenderwoche. Die Suche (Schüler:innen,
   Kolleg:innen, für die Verwaltung auch Eltern) steht in der Titelleiste; gefunden wird nur, wen man sehen darf.
-- **Schnellzugriff:** eigene Klassen und Gruppen sowie eigener Unterricht (direkt zur Notenübersicht).
+- **Schnellzugriff:** eigene Klassen und Gruppen; **Mein Unterricht** als Auswahlliste (siehe unten).
 - **Notizen:** nur für die eigene Person sichtbar; Farbe, optionales Fälligkeitsdatum
   (ab diesem Tag hervorgehoben), anheften, abhaken, bearbeiten, löschen.
   Verwaltung und Schulleitung können eine Notiz als **Mitteilung an alle** veröffentlichen;

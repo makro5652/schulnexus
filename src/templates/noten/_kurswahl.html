@@ -1,0 +1,23 @@
+{% load i18n %}{# Kursauswahl „Mein Unterricht“. Parameter: kw (noten.kurswahl.auswahl), stil = band | start | wechsel, ziel (bei wechsel) #}
+{% if kw %}
+{% if stil == "wechsel" %}
+<form class="kw-wechsel" method="get" action="{% url 'kurs_oeffnen' %}">
+  <input type="hidden" name="ziel" value="{{ ziel }}">
+  <label for="kw-wechsel-{{ ziel }}">{% translate "Kurs wechseln" %}</label>
+  <select id="kw-wechsel-{{ ziel }}" name="u" onchange="this.form.submit()">
+    {% for g in kw.gruppen %}<optgroup label="{{ g.titel }}">{% for k in g.kurse %}<option value="{{ k.pk }}"{% if k.pk == kw.gewaehlt %} selected{% endif %}>{{ k.titel }}</option>{% endfor %}</optgroup>{% endfor %}
+  </select>
+  <noscript><button type="submit" class="knopf zweitrangig klein">{% translate "Wechseln" %}</button></noscript>
+</form>
+{% else %}
+<form class="kw kw-{{ stil }}" method="get" action="{% url 'kurs_oeffnen' %}">
+  <label class="{% if stil == 'band' %}mb-unsichtbar{% else %}kw-label{% endif %}" for="kw-{{ stil }}">{% blocktranslate count n=kw.anzahl %}Kurs wählen ({{ n }} Kurs){% plural %}Kurs wählen ({{ n }} Kurse){% endblocktranslate %}</label>
+  <select id="kw-{{ stil }}" name="u">
+    {% for g in kw.gruppen %}<optgroup label="{{ g.titel }}">{% for k in g.kurse %}<option value="{{ k.pk }}"{% if k.pk == kw.gewaehlt %} selected{% endif %}>{{ k.titel }}</option>{% endfor %}</optgroup>{% endfor %}
+  </select>
+  <div class="kw-knoepfe">
+    {% for z in kw.ziele %}<button type="submit" name="ziel" value="{{ z.wert }}" class="{% if stil == 'band' %}kw-band-knopf{% elif forloop.first %}knopf klein{% else %}knopf zweitrangig klein{% endif %}"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-{{ z.symbol }}"/></svg><span>{{ z.titel }}</span></button>{% endfor %}
+  </div>
+</form>
+{% endif %}
+{% endif %}

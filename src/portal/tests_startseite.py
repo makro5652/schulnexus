@@ -225,7 +225,9 @@ class MenuebandTest(TestCase):
         self.anmelden("lehrkraft")
         mb, r = self.band()
         b = self.befehle(mb)
-        self.assertIn("CH 9a", b)              # eigener Unterricht
+        auswahl = [g.auswahl for k in mb["karten"] for g in k["gruppen"] if g.auswahl]
+        self.assertEqual(len(auswahl), 1)      # eigener Unterricht als Auswahlliste (ab 0.4.7.1)
+        self.assertIn("Chemie 9a", [kurs["titel"] for g in auswahl[0]["gruppen"] for kurs in g["kurse"]])
         self.assertIn("9a", b)                 # eigene Klasse
         self.assertNotIn("Personalliste", b)
         self.assertNotIn("Alle Schüler:innen", b)

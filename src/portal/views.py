@@ -14,6 +14,7 @@ from elternkontakt.ansichten import akte_kontext as eltern_akte, gruppe_erlaubt 
 from elternkontakt.ansichten import start_hinweise as eltern_hinweise
 from laufbahn.ansichten import start_hinweise as laufbahn_hinweise
 from noten.ansichten import start_hinweise as noten_hinweise
+from noten.kurswahl import auswahl as kurswahl_auswahl, merken as kurs_merken
 from termine.ansichten import start_hinweise as termine_hinweise
 from zeugnisse.ansichten import start_hinweise as zeugnis_hinweise
 from fehlzeiten.models import Fehlzeit
@@ -107,7 +108,7 @@ def start(request):
          "elternkontakt": eltern_hinweise(request.user), "laufbahn": laufbahn_hinweise(request.user),
          "termine": termine_hinweise(request.user), "noten_vorgaben": noten_hinweise(request.user),
          "begruessung": begruessung(jetzt), "heute": jetzt.date(), "kalenderwoche": jetzt.isocalendar()[1],
-         "schnellzugriff": schnellzugriff(request.user, sj), "geburtstage": geburtstage(request.user, jetzt.date()),
+         "schnellzugriff": schnellzugriff(request.user, sj), "kurswahl": kurswahl_auswahl(request), "geburtstage": geburtstage(request.user, jetzt.date()),
          "notizen": notizen_fuer(request.user, jetzt.date())},
     )
 
@@ -123,6 +124,7 @@ def notenuebersicht(request, pk):
     from noten import rechte as noten_rechte, vorgaben as noten_vorgaben
     from noten.ansichten import gewicht_text
 
+    kurs_merken(request, unterricht)
     baum = Baum(unterricht)
     anteil_ordner, anteil_ln = nominale_anteile(baum.ordner, baum.nachweise)
     art_von = {o.pk: o.gewichtsart for o in baum.ordner}
@@ -170,6 +172,7 @@ def notenuebersicht(request, pk):
         "portal/notenuebersicht.html",
         {"unterricht": unterricht, "spalten": spalten, "gruppen": gruppen, "zeilen": zeilen, "struktur": struktur,
          "darf_eintragen": noten_rechte.darf_noten_eintragen(request.user, unterricht),
+         "kurswahl": kurswahl_auswahl(request, unterricht, nur_wenn_enthalten=True),
          "vorgaben": noten_vorgaben.staende_fuer_unterricht(unterricht) if noten_rechte.darf_vorgaben_sehen(request.user) else []},
     )
 

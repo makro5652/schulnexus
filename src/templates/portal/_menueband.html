@@ -55,6 +55,7 @@
     {% for g in k.gruppen %}
     <section class="mb-gruppe" aria-label="{{ g.titel }}">
       <div class="mb-befehle">
+        {% if g.auswahl %}{% include "noten/_kurswahl.html" with kw=g.auswahl stil="band" %}{% endif %}
         {% for b in g.grosse %}<a class="mb-gross{% if b.aktiv %} aktiv{% endif %}" href="{{ b.url }}" title="{{ b.hinweis }}"{% if b.aktiv %} aria-current="page"{% endif %}><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-{{ b.symbol }}"/></svg><span>{{ b.titel }}</span></a>{% endfor %}
         {% if g.kleine %}<div class="mb-klein">{% for b in g.kleine %}<a class="{% if b.aktiv %}aktiv{% endif %}" href="{{ b.url }}" title="{{ b.hinweis }}"{% if b.aktiv %} aria-current="page"{% endif %}><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-{{ b.symbol }}"/></svg><span>{{ b.titel }}</span></a>{% endfor %}</div>{% endif %}
       </div>

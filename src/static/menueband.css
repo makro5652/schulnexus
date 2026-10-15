@@ -133,3 +133,13 @@ html[data-design="mocha"] .mb-zeichen { background: var(--mb-akzent); color: #11
 }
 @media (prefers-reduced-motion: reduce) { .mb-einklappen svg { transition: none; } }
 @media print { .mb { display: none !important; } }
+
+/* Kursauswahl „Mein Unterricht“ im Menüband (ab 0.4.7.1) */
+.kw-band { display: grid; gap: 0.3rem; align-content: start; padding: 0.15rem 0.2rem; }
+.kw-band select { font: inherit; font-size: 0.85rem; width: 15rem; max-width: 70vw; padding: 0.3rem 0.45rem; border: 1px solid var(--mb-linie);
+  border-radius: 6px; background: var(--mb-flaeche); color: var(--mb-text); }
+.kw-band .kw-knoepfe { display: flex; gap: 0.15rem; flex-wrap: nowrap; }
+.kw-band-knopf { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.24rem 0.45rem; border: 0; border-radius: 5px; background: none;
+  font: inherit; font-size: 0.78rem; color: var(--mb-text); cursor: pointer; white-space: nowrap; }
+.kw-band-knopf:hover { background: var(--mb-hover); }
+.kw-band-knopf svg { color: var(--mb-akzent); }
