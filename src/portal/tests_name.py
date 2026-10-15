@@ -30,7 +30,7 @@ class NameOhneAnmeldungTest(TestCase):
         self.assertEqual((admin.site.site_header, admin.site.site_title), ("Schulnexus", "Schulnexus"))
 
     def test_version(self):
-        self.assertEqual(VERSION, "0.4.9.5")
+        self.assertEqual(VERSION, "0.4.9.6")
 
 
 class NameAngemeldetTest(Grundlage):
@@ -157,6 +157,34 @@ class DockerDateienTest(TestCase):
                      "chmod 600 .env", "DATEN_SCHLUESSEL", "bereits belegt"):
             self.assertIn(teil, skript)
         self.assertNotIn("traefik.yml", skript)
+
+
+class LeereUmgebungswerteTest(TestCase):
+    """Leere Angaben in der .env („HSTS_SEKUNDEN=“) dürfen den Start nicht verhindern (Fehler 0.4.9.5, behoben 0.4.9.6)."""
+
+    def test_einstellungen_mit_leeren_werten(self):
+        import os
+        import re
+        import subprocess
+        import sys
+
+        quelle = (PROJEKT / ".env.example")
+        if not quelle.exists():
+            self.skipTest(".env.example liegt nicht neben src/")
+        umgebung = {k: v for k, v in os.environ.items() if k not in ("DJANGO_SETTINGS_MODULE",)}
+        for zeile in quelle.read_text().splitlines():
+            m = re.match(r"^([A-Z][A-Z0-9_]*)=(.*)$", zeile)
+            if m:
+                umgebung[m.group(1)] = m.group(2)
+        # zusätzlich jede Ganzzahl-Einstellung leer
+        for n in re.findall(r'env_int\("([A-Z0-9_]+)"', (Path(settings.BASE_DIR) / "config" / "settings.py").read_text()):
+            umgebung[n] = ""
+        umgebung.update({"HTTPS": "1", "HINTER_PROXY": "1", "DEBUG": "0", "SECRET_KEY": "pruefung"})
+        ergebnis = subprocess.run([sys.executable, "-c", "import django;from django.conf import settings;settings.DATABASES;print(settings.SECURE_HSTS_SECONDS)"],
+                                  cwd=settings.BASE_DIR, env={**umgebung, "DJANGO_SETTINGS_MODULE": "config.settings"},
+                                  capture_output=True, text=True, timeout=60)
+        self.assertEqual(ergebnis.returncode, 0, ergebnis.stderr[-600:])
+        self.assertEqual(ergebnis.stdout.strip(), "31536000")
 
 
 class GitHubPruefungenTest(TestCase):

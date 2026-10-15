@@ -17,6 +17,12 @@ def env_bool(name: str, default: bool = False) -> bool:
     return os.environ.get(name, str(default)).strip().lower() in {"1", "true", "yes", "ja", "on"}
 
 
+def env_int(name: str, default: int) -> int:
+    """Ganzzahl aus der Umgebung; leere Angabe (z. B. „HSTS_SEKUNDEN=“ in der .env) zählt als nicht gesetzt (ab 0.4.9.6)."""
+    wert = os.environ.get(name, "").strip()
+    return int(wert) if wert else default
+
+
 def env_list(name: str, default: str = "") -> list[str]:
     return [item.strip() for item in os.environ.get(name, default).split(",") if item.strip()]
 
@@ -152,10 +158,10 @@ STUFEN = {"mittelstufe": _jahrgaenge("MITTELSTUFE", "5-10"), "oberstufe": _jahrg
 # Jahresnote (ab 0.4.8.0): In diesen Jahrgängen fließt das 1. Halbjahr mit diesem Anteil (%) in den Vorschlag des
 # 2. Halbjahres ein; die Lehrkraft kann den Anteil je Kurs ändern (0 = aus).
 JAHRESNOTE_JAHRGAENGE = _jahrgaenge("JAHRESNOTE_JAHRGAENGE", "5-10")
-JAHRESNOTE_ANTEIL_HJ1 = int(os.environ.get("JAHRESNOTE_ANTEIL_HJ1", "40"))
+JAHRESNOTE_ANTEIL_HJ1 = env_int("JAHRESNOTE_ANTEIL_HJ1", 40)
 
 # Höchstgröße je Anhang in Megabyte (in .env änderbar).
-DOKUMENT_MAX_MB = int(os.environ.get("DOKUMENT_MAX_MB", "25"))
+DOKUMENT_MAX_MB = env_int("DOKUMENT_MAX_MB", 25)
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
 FILE_UPLOAD_PERMISSIONS = 0o640
 
@@ -177,7 +183,7 @@ if HINTER_PROXY:
 # Weiterleitung http → https durch Django (nur zusammen mit HINTER_PROXY=1, sonst Endlosschleife hinter einem Proxy)
 SECURE_SSL_REDIRECT = env_bool("HTTPS_UMLEITUNG", False)
 SECURE_REDIRECT_EXEMPT = [r"^gesundheit/$"]          # Docker-Healthcheck fragt intern per http
-SECURE_HSTS_SECONDS = int(os.environ.get("HSTS_SEKUNDEN", "31536000" if HTTPS else "0"))
+SECURE_HSTS_SECONDS = env_int("HSTS_SEKUNDEN", 31536000 if HTTPS else 0)
 SECURE_HSTS_INCLUDE_SUBDOMAINS = False
 SECURE_HSTS_PRELOAD = False
 # Sitzungen laufen nach 8 Stunden ab; Cookies nur per HTTPS, sobald HTTPS aktiv ist.
@@ -194,9 +200,9 @@ SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin"
 
 # Schutz gegen Passwort- und Code-Raten (ab 0.4.9.2): nach zu vielen Fehlversuchen ist die Anmeldung für ein Konto
 # bzw. von einer IP-Adresse vorübergehend gesperrt. Fehlversuche beim zweiten Faktor zählen mit.
-ANMELDUNG_MAX_FEHLVERSUCHE = int(os.environ.get("ANMELDUNG_MAX_FEHLVERSUCHE", "10"))     # je Konto
-ANMELDUNG_MAX_JE_IP = int(os.environ.get("ANMELDUNG_MAX_JE_IP", "50"))                  # je IP-Adresse
-ANMELDUNG_SPERRE_MINUTEN = int(os.environ.get("ANMELDUNG_SPERRE_MINUTEN", "15"))
+ANMELDUNG_MAX_FEHLVERSUCHE = env_int("ANMELDUNG_MAX_FEHLVERSUCHE", 10)     # je Konto
+ANMELDUNG_MAX_JE_IP = env_int("ANMELDUNG_MAX_JE_IP", 50)                  # je IP-Adresse
+ANMELDUNG_SPERRE_MINUTEN = env_int("ANMELDUNG_SPERRE_MINUTEN", 15)
 
 # ---------------------------------------------------------------- Verschlüsselung gespeicherter Daten (ab 0.4.6.0)
 # 32 Byte (Base64), erzeugen mit:  python manage.py schluessel_erzeugen
@@ -221,10 +227,10 @@ if TESTLAUF:
     import tempfile
 
     MODUL_SICHERUNGEN = Path(tempfile.mkdtemp(prefix="sv-test-sicherungen-"))
-SICHERUNG_UPLOAD_MAX_MB = int(os.environ.get("SICHERUNG_UPLOAD_MAX_MB", "500"))
-SICHERUNG_BEHALTEN_AUTOMATISCH = int(os.environ.get("SICHERUNG_BEHALTEN_AUTOMATISCH", "14"))
+SICHERUNG_UPLOAD_MAX_MB = env_int("SICHERUNG_UPLOAD_MAX_MB", 500)
+SICHERUNG_BEHALTEN_AUTOMATISCH = env_int("SICHERUNG_BEHALTEN_AUTOMATISCH", 14)
 # PDF-Export: höchstens so viele Einträge je PDF-Datei; mehr werden auf mehrere Dateien verteilt
-PDF_EINTRAEGE_JE_DATEI = int(os.environ.get("PDF_EINTRAEGE_JE_DATEI", "1500"))
+PDF_EINTRAEGE_JE_DATEI = env_int("PDF_EINTRAEGE_JE_DATEI", 1500)
 # PDF-Exporte im Hintergrund erstellen (in Tests sofort)
 SICHERUNG_HINTERGRUND = not TESTLAUF
 
@@ -238,7 +244,7 @@ AUTHENTICATION_BACKENDS = ["portal.backends.RechteBackend"]
 ELTERN_EMAIL_VERSAND = env_bool("ELTERN_EMAIL_VERSAND", False)
 # Öffentliche Adresse, unter der Eltern die Links öffnen. Eine reine Tailscale-Adresse ist für Eltern NICHT erreichbar.
 ELTERN_LINK_BASIS = os.environ.get("ELTERN_LINK_BASIS", "http://localhost:8000").rstrip("/")
-ELTERN_LINK_TAGE = int(os.environ.get("ELTERN_LINK_TAGE", "60"))
+ELTERN_LINK_TAGE = env_int("ELTERN_LINK_TAGE", 60)
 # Nachrichtentext zusätzlich in die E-Mail schreiben (Standard: nur Hinweis und Link – datensparsamer)
 ELTERN_EMAIL_INHALT = env_bool("ELTERN_EMAIL_INHALT", False)
 # Elternportal mit eigener Anmeldung (vorbereitet). Erst nach Zwei-Faktor-Anmeldung und Datenschutzfreigabe einschalten.
@@ -248,7 +254,7 @@ EMAIL_BACKEND = os.environ.get(
     "EMAIL_BACKEND",
     "django.core.mail.backends.smtp.EmailBackend" if ELTERN_EMAIL_VERSAND else "django.core.mail.backends.console.EmailBackend")
 EMAIL_HOST = os.environ.get("EMAIL_HOST", "localhost")
-EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
+EMAIL_PORT = env_int("EMAIL_PORT", 587)
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", True)
