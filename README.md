@@ -1,4 +1,4 @@
-# Schulverwaltung (Version 0.4.8.0, Entwicklungsstand)
+# Schulverwaltung (Version 0.4.8.1, Entwicklungsstand)
 
 Open-Source-Schulverwaltung für die DSN: Stammdaten, Klassen und Lerngruppen,
 Noten mit Gewichtung, Fehlzeiten, Nachmittagsprogramm, Anhänge zur Schülerakte,
@@ -84,7 +84,8 @@ Zeugnismuster Anlage 11) und Richtlinie zur Gestaltung von Bildungsgängen und A
 Deutschen Schulen im Ausland (Beschluss vom 18.03.2026). **Menüband › Unterricht › Zeugnisse.**
 
 1. **Zeugnisnoten** (je Kurs, auch über „Zeugnisnoten und Kommentare“ in der Notenübersicht): ganze Noten,
-   vorausgewählt ist der gerundete Vorschlag; Abweichung nur mit pädagogischer Begründung; Vermerke „n.b.“ und „befreit“.
+   vorausgewählt ist der gerundete Vorschlag; die Lehrkraft hat die Notenhoheit – Abweichungen werden nur farbig markiert,
+   eine Begründung ist freiwillig (ab 0.4.8.1); Vermerke „n.b.“ und „befreit“. Auf dem Zeugnis steht immer die festgesetzte Zeugnisnote.
 2. **Zeugniskommentar:** schreibt die Klassenleitung. Alle Lehrkräfte, die die Schülerin oder den Schüler unterrichten,
    sehen ihn bei ihren Noten, **zeichnen digital ab** und können **Anmerkungen** hinterlassen. Ändert sich der Text,
    werden Abzeichnungen als veraltet markiert. Der Kommentar wird als Beiblatt gedruckt.
@@ -424,13 +425,23 @@ Quartal 2 (50)
   wählt als Grundlage den rechnerischen Schnitt oder die festgesetzte Halbjahreszeugnisnote. Die Notenübersicht
   zeigt dann „Ø 2. Halbjahr“, „1. Halbjahr (40 %)“ und den „Jahresvorschlag“. Jahrgänge und Anteil:
   `JAHRESNOTE_JAHRGAENGE` (Standard 5-10) und `JAHRESNOTE_ANTEIL_HJ1` (Standard 40) in der `.env`.
-- **Klausuren je Fach** (Schulleitung › Unterrichtsorganisation › Klausuren je Fach; Schulleitung und
+- **Klausuren je Fach** (Schulleitung › Unterrichtsorganisation › Notenregeln; Schulleitung und
   Stellvertretung): Nach Beschluss der Fachkonferenz legt die Schulleitung fest, in welchen Fächern und Jahrgängen
   Klausuren bzw. Klassenarbeiten geschrieben werden, mit festem Anteil (Standard 50 % Klausuren / 50 % Sonstige
   Mitarbeit). Betroffene Kurse erhalten diese beiden obersten Ordner; vorhandene passende Ordner („Schriftlich“,
   „Sonstige Mitarbeit“) werden übernommen, weitere oberste Ordner in „Sonstige Mitarbeit“ verschoben. Lehrkräfte können
   die beiden Ordner nicht umbenennen, umgewichten oder löschen, gliedern darunter aber frei. Fächer ohne Regel bleiben
   frei gestaltbar. Abgeschlossene Halbjahre werden nicht verändert.
+
+**Zeugnisnote** (ab 0.4.8.1)
+
+- **Notenhoheit:** Die Lehrkraft setzt die Zeugnisnote fest. Weicht sie vom gerundeten rechnerischen Vorschlag ab, wird
+  das **farbig markiert** (Seite „Zeugnisnoten und Kommentare“, Notenübersicht, Excel, Notenbogen) – eine Begründung
+  ist freiwillig. Auf dem Zeugnis steht immer die festgesetzte Zeugnisnote.
+- **Nur die Zeugnisnote eintragen:** Unter Schulleitung › Notenregeln › „Zeugnisnote ohne Einzelnoten“ gibt die
+  Schulleitung bzw. Stellvertretung frei, in welchen Fächern und Jahrgängen Lehrkräfte die Zeugnisnote ohne
+  Einzelnoten eintragen dürfen (keine Fächer gewählt = alle Fächer). Ohne Freigabe braucht eine Zeugnisnote mindestens
+  eine Einzelnote; Vermerke („befreit“, „n.b.“) gehen immer. Demo-Daten: Musik, Kunst und Sport in Jahrgang 5–10.
 
 **Notensperre** (ab 0.4.8.0; Unterricht › Zeugnis › Notensperre)
 

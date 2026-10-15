@@ -13,6 +13,7 @@ from .models import (
     Bewertungsordner,
     Klausurregel,
     Notensperre,
+    Zeugnisnotenfreigabe,
     Gewichtungsvorlage,
     Leistungskategorie,
     Leistungsnachweis,
@@ -113,6 +114,12 @@ class OberordnerInline(admin.TabularInline):
 @admin.register(Klausurregel)
 class KlausurregelAdmin(SimpleHistoryAdmin):
     list_display = ["__str__", "anteil_klausur", "bemerkung"]
+    filter_horizontal = ["faecher"]
+
+
+@admin.register(Zeugnisnotenfreigabe)
+class ZeugnisnotenfreigabeAdmin(SimpleHistoryAdmin):
+    list_display = ["__str__", "bemerkung", "geaendert_am"]
     filter_horizontal = ["faecher"]
 
 

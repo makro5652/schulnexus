@@ -1,10 +1,11 @@
 {% extends "portal/base.html" %}
 {% load i18n %}
-{% block title %}{% translate "Klausuren je Fach" %}{% endblock %}
+{% block title %}{% translate "Notenregeln" %}{% endblock %}
 {% block inhaltsklasse %}breit{% endblock %}
 {% block inhalt %}
-<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › {% translate "Schulleitung" %} › {% translate "Klausuren je Fach" %}</p>
-<h1>{% translate "Klausuren je Fach" %}</h1>
+<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › {% translate "Schulleitung" %} › {% translate "Notenregeln" %}</p>
+<h1>{% translate "Notenregeln" %}</h1>
+<h2 class="sy-ueberschrift">{% translate "Klausuren je Fach" %}</h2>
 <p class="unterzeile">{% translate "Wo nach Beschluss der Fachkonferenz Klausuren bzw. Klassenarbeiten geschrieben werden, gilt im Notenvorschlag: Klausuren und Sonstige Mitarbeit mit festem Anteil (Standard 50 / 50). Die betroffenen Kurse erhalten diese beiden obersten Ordner; Lehrkräfte können sie nicht umbenennen, umgewichten oder löschen, gliedern darunter aber frei. Fächer ohne Regel bleiben frei gestaltbar." %}</p>
 
 <div class="sy-raster">
@@ -29,7 +30,7 @@
 
   <section class="karte">
     <h2>{% if regel %}{% translate "Regel bearbeiten" %}{% else %}{% translate "Neue Regel" %}{% endif %}</h2>
-    <form method="post" class="sy-formular">{% csrf_token %}
+    <form method="post" class="sy-formular">{% csrf_token %}<input type="hidden" name="aktion" value="regel">
       {% if form.non_field_errors %}<p class="sy-fehler">{{ form.non_field_errors|join:" " }}</p>{% endif %}
       <fieldset class="nv-faecher"><legend>{{ form.faecher.label }}</legend>{{ form.faecher }}{% for e in form.faecher.errors %}<small class="fehler">{{ e }}</small>{% endfor %}</fieldset>
       <div class="nv-drei">
@@ -44,6 +45,37 @@
       <label class="sy-feld">{{ form.bemerkung.label }} {{ form.bemerkung }}<small class="leise">{{ form.bemerkung.help_text }}</small></label>
       <div class="knopfreihe"><button type="submit" class="knopf">{% translate "Speichern und anwenden" %}</button>
         {% if regel %}<a class="knopf zweitrangig" href="{% url 'klausurregeln' %}">{% translate "Abbrechen" %}</a>{% endif %}</div>
+    </form>
+  </section>
+</div>
+
+<h2 class="sy-ueberschrift" id="nur-zeugnisnote">{% translate "Zeugnisnote ohne Einzelnoten" %}</h2>
+<p class="unterzeile">{% translate "Die Lehrkraft hat die Notenhoheit. Hier gibt die Schulleitung frei, in welchen Fächern und Jahrgängen Lehrkräfte die Zeugnisnote auch ohne Einzelnoten eintragen dürfen (z. B. Sport, Musik, Kunst). Ohne Freigabe braucht eine Zeugnisnote mindestens eine Einzelnote. Weicht eine Zeugnisnote vom rechnerischen Vorschlag ab, wird das nur farbig markiert; auf dem Zeugnis steht immer die festgesetzte Zeugnisnote." %}</p>
+<div class="sy-raster">
+  <section class="karte">
+    <h2>{% translate "Freigaben" %}</h2>
+    {% if freigaben %}
+    <div class="rollbar"><table class="liste">
+      <thead><tr><th>{% translate "Fächer" %}</th><th>{% translate "Jahrgänge" %}</th><th>{% translate "Bemerkung" %}</th><th></th></tr></thead>
+      <tbody>{% for f in freigaben %}
+        <tr><td>{% for x in f.faecher.all %}{{ x.lokal_name }}{% if not forloop.last %}, {% endif %}{% empty %}{% translate "alle Fächer" %}{% endfor %}</td>
+          <td>{{ f.jahrgang_von }}–{{ f.jahrgang_bis }}</td><td class="leise">{{ f.bemerkung }}</td>
+          <td class="aktionen"><form method="post" action="{% url 'zeugnisfreigabe_loeschen' f.pk %}" class="zg-inline">{% csrf_token %}<button type="submit" class="link">{% translate "aufheben" %}</button></form></td></tr>
+      {% endfor %}</tbody>
+    </table></div>
+    {% else %}<p class="leer">{% translate "Keine Freigaben – eine Zeugnisnote braucht überall mindestens eine Einzelnote." %}</p>{% endif %}
+  </section>
+  <section class="karte">
+    <h2>{% translate "Neue Freigabe" %}</h2>
+    <form method="post" class="sy-formular">{% csrf_token %}<input type="hidden" name="aktion" value="freigabe">
+      {% if freigabe_form.non_field_errors %}<p class="sy-fehler">{{ freigabe_form.non_field_errors|join:" " }}</p>{% endif %}
+      <fieldset class="nv-faecher"><legend>{{ freigabe_form.faecher.label }} <small class="leise">{{ freigabe_form.faecher.help_text }}</small></legend>{{ freigabe_form.faecher }}</fieldset>
+      <div class="lb-zwei sy-zeitraum">
+        <label class="sy-feld">{{ freigabe_form.jahrgang_von.label }} {{ freigabe_form.jahrgang_von }}{% for e in freigabe_form.jahrgang_von.errors %}<small class="fehler">{{ e }}</small>{% endfor %}</label>
+        <label class="sy-feld">{{ freigabe_form.jahrgang_bis.label }} {{ freigabe_form.jahrgang_bis }}{% for e in freigabe_form.jahrgang_bis.errors %}<small class="fehler">{{ e }}</small>{% endfor %}</label>
+      </div>
+      <label class="sy-feld">{{ freigabe_form.bemerkung.label }} {{ freigabe_form.bemerkung }}</label>
+      <button type="submit" class="knopf">{% translate "Freigeben" %}</button>
     </form>
   </section>
 </div>

@@ -16,7 +16,10 @@
 {% if vorgaben %}{% include "noten/_vorgaben_unterricht.html" %}{% endif %}
 
 {% if vorlaeufig %}<p class="ne-vorlaeufig">{% translate "Vorläufig:" %} {% for v in vorlaeufig %}{% blocktranslate with pfad=v.pfad belegt=v.belegt|floatformat:-2 %}„{{ pfad }}“ ist erst zu {{ belegt }} % belegt{% endblocktranslate %}{% if not forloop.last %}; {% endif %}{% endfor %}. {% translate "Fehlende Anteile werden übersprungen, die vorhandenen zählen entsprechend mehr." %}</p>{% endif %}
-{% if spalten or jahresnote %}
+{% if abweichungen %}<p class="zg-abw-hinweis">{% blocktranslate count n=abweichungen %}{{ n }} Zeugnisnote weicht vom rechnerischen Vorschlag ab (markiert).{% plural %}{{ n }} Zeugnisnoten weichen vom rechnerischen Vorschlag ab (markiert).{% endblocktranslate %}</p>{% endif %}
+{% if nur_zeugnisnote and not spalten %}<p class="ne-vorlaeufig">{% translate "Für dieses Fach und diesen Jahrgang dürfen Sie die Zeugnisnote auch ohne Einzelnoten eintragen (Freigabe der Schulleitung)." %}
+  <a class="knopf klein" href="{% url 'zeugnis_unterricht' unterricht.pk %}">{% translate "Zeugnisnoten eintragen" %}</a></p>{% endif %}
+{% if spalten or jahresnote or nur_zeugnisnote %}
 <div class="tabellenrahmen">
 <table class="noten">
   <thead>
@@ -27,6 +30,7 @@
       {% if jahresnote %}<th rowspan="2" class="kat">{% translate "Ø 2. Halbjahr" %}</th>
       <th rowspan="2" class="kat">{% blocktranslate with a=unterricht.anteil_vorhalbjahr|floatformat:-2 %}1. Halbjahr ({{ a }} %){% endblocktranslate %}</th>{% endif %}
       <th rowspan="2" class="vorschlag">{% if jahresnote %}{% translate "Jahresvorschlag" %}{% else %}{% translate "Vorschlag" %}{% endif %}</th>
+      <th rowspan="2" class="vorschlag">{% translate "Zeugnisnote" %}</th>
     </tr>
     <tr>
       {% for sp in spalten %}
@@ -52,6 +56,9 @@
       <td class="vorschlag">
         {% if z.vorschlag.schnitt is not None %}<strong>{{ z.vorschlag.stufe }}</strong><small>Ø {{ z.vorschlag.schnitt }}</small>{% else %}–{% endif %}
         {% if z.vorschlag.warnungen %}<span class="warnung" title="{{ z.vorschlag.warnungen|join:' ' }}">!</span>{% endif %}
+      </td>
+      <td class="vorschlag{% if z.abweichung %} zn-abweichung{% endif %}"{% if z.abweichung %} title="{% translate 'Die Zeugnisnote weicht vom rechnerischen Vorschlag ab.' %}"{% endif %}>
+        {% if z.zn %}<strong>{% if z.zn.vermerk %}{{ z.zn.get_vermerk_display }}{% else %}{{ z.zn.stufe }}{% endif %}</strong>{% if z.abweichung %}<small>{% translate "≠ Vorschlag" %}</small>{% endif %}{% else %}<span class="leer">–</span>{% endif %}
       </td>
     </tr>
   {% empty %}

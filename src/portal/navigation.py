@@ -247,8 +247,8 @@ def menueband(request):
         .add(_("Notenskalen"), _url("admin:noten_notenskala_changelist"), "lineal", bedingung=leitung and p("noten.view_notenskala"))
         .add(_("Gewichtungsvorlagen"), _url("admin:noten_gewichtungsvorlage_changelist"), "regler",
              bedingung=leitung and p("noten.view_gewichtungsvorlage"))
-        .add(_("Klausuren je Fach"), _url("klausurregeln"), "stift", bedingung=noten_rechte.darf_klausurregeln(user),
-             hinweis=_("Klausuren bzw. Klassenarbeiten mit festem Anteil (z. B. 50 / 50), festgelegt nach Fachkonferenz")),
+        .add(_("Notenregeln"), _url("klausurregeln"), "stift", bedingung=noten_rechte.darf_klausurregeln(user),
+             hinweis=_("Klausuren je Fach (z. B. 50 / 50) und Freigabe: Zeugnisnote ohne Einzelnoten")),
         Gruppe(_("Archiv"))
         .add(_("Archiv"), _url("archiv"), "archiv", gross=True, bedingung=leitung and darf_archiv(user),
              hinweis=_("Abgegangene Schüler:innen, Abgangszeugnisse, Löschfristen"))

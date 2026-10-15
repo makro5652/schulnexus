@@ -1,4 +1,4 @@
-"""Klausurregeln je Fach und Jahrgang (ab 0.4.8.0): Seite für Schulleitung und Stellvertretung."""
+"""Notenregeln für Schulleitung und Stellvertretung: Klausuren je Fach (ab 0.4.8.0), Zeugnisnote ohne Einzelnoten (ab 0.4.8.1)."""
 from django import forms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -13,7 +13,7 @@ from sicherung.models import Protokoll
 from stammdaten.models import Fach
 
 from . import rechte
-from .models import Klausurregel
+from .models import Klausurregel, Zeugnisnotenfreigabe
 
 
 class RegelForm(forms.ModelForm):
@@ -45,6 +45,22 @@ class RegelForm(forms.ModelForm):
         return daten
 
 
+class FreigabeForm(forms.ModelForm):
+    class Meta:
+        model = Zeugnisnotenfreigabe
+        fields = ["faecher", "jahrgang_von", "jahrgang_bis", "bemerkung"]
+        widgets = {
+            "faecher": forms.CheckboxSelectMultiple,
+            "jahrgang_von": forms.NumberInput(attrs={"min": 1, "max": 13}),
+            "jahrgang_bis": forms.NumberInput(attrs={"min": 1, "max": 13}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, prefix="fg", **kwargs)
+        self.fields["faecher"].queryset = Fach.objects.order_by("reihenfolge", "name")
+        self.fields["faecher"].label_from_instance = lambda f: f.lokal_name
+
+
 def _betroffen(regel):
     heute = timezone.localdate()
     return {u.pk: u for u in regel.unterrichte().filter(abschnitt__ende__gte=heute)}
@@ -68,8 +84,21 @@ def klausurregeln(request, pk=None):
     if not rechte.darf_klausurregeln(request.user):
         raise PermissionDenied
     regel = get_object_or_404(Klausurregel, pk=pk) if pk else None
-    form = RegelForm(request.POST or None, instance=regel)
-    if request.method == "POST" and form.is_valid():
+    freigabe_form = FreigabeForm(request.POST if request.POST.get("aktion") == "freigabe" else None)
+    if freigabe_form.is_bound:
+        if freigabe_form.is_valid():
+            f = freigabe_form.save(commit=False)
+            f.angelegt_von = request.user
+            f.save()
+            freigabe_form.save_m2m()
+            Protokoll.schreiben(request.user, "rechte", gettext("Zeugnisnote ohne Einzelnoten freigegeben: %(f)s, %(fa)s") % {
+                "f": f, "fa": ", ".join(x.kuerzel for x in f.faecher.all()) or gettext("alle Fächer")})
+            messages.success(request, gettext("Freigabe gespeichert."))
+            return redirect("klausurregeln")
+        form = RegelForm(instance=regel)
+    else:
+        form = RegelForm(request.POST or None, instance=regel)
+    if request.method == "POST" and not freigabe_form.is_bound and form.is_valid():
         with transaction.atomic():
             vorher = _betroffen(regel) if regel else {}
             neu = form.save(commit=False)
@@ -91,7 +120,22 @@ def klausurregeln(request, pk=None):
     regeln = list(Klausurregel.objects.prefetch_related("faecher"))
     for r in regeln:
         r.kurse = len(_betroffen(r))
-    return render(request, "noten/klausurregeln.html", {"form": form, "regel": regel, "regeln": regeln})
+    return render(request, "noten/klausurregeln.html", {
+        "form": form, "regel": regel, "regeln": regeln, "freigabe_form": freigabe_form,
+        "freigaben": Zeugnisnotenfreigabe.objects.prefetch_related("faecher"),
+    })
+
+
+@login_required
+@require_POST
+def freigabe_loeschen(request, pk):
+    if not rechte.darf_klausurregeln(request.user):
+        raise PermissionDenied
+    f = get_object_or_404(Zeugnisnotenfreigabe, pk=pk)
+    Protokoll.schreiben(request.user, "rechte", gettext("Freigabe „Zeugnisnote ohne Einzelnoten“ aufgehoben: %(f)s") % {"f": f})
+    f.delete()
+    messages.success(request, gettext("Freigabe aufgehoben."))
+    return redirect("klausurregeln")
 
 
 @login_required

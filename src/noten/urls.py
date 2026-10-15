@@ -14,6 +14,7 @@ urlpatterns = [
     path("unterricht/<int:pk>/notenbogen/", X.notenbogen, name="notenbogen"),
     path("klausurregeln/<int:pk>/", KR.klausurregeln, name="klausurregel_bearbeiten"),
     path("klausurregeln/<int:pk>/loeschen/", KR.klausurregel_loeschen, name="klausurregel_loeschen"),
+    path("klausurregeln/freigabe/<int:pk>/loeschen/", KR.freigabe_loeschen, name="zeugnisfreigabe_loeschen"),
     path("unterricht/<int:pk>/eintragen/", A.noten_eintragen, name="noten_eintragen"),
     path("unterricht/<int:pk>/eintragen/<int:ln_pk>/", A.noten_eintragen, name="noten_bearbeiten"),
     path("unterricht/<int:pk>/struktur/", A.struktur, name="bewertungsstruktur"),

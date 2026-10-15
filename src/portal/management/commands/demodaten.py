@@ -180,6 +180,11 @@ class Command(BaseCommand):
             if not Klausurregel.objects.exists():
                 self.klausurregeln_anlegen()
                 self.stdout.write("Klausurregeln und Beispielkurs im 2. Halbjahr ergänzt.")
+            from noten.models import Zeugnisnotenfreigabe
+
+            if not Zeugnisnotenfreigabe.objects.exists():
+                self.zeugnisfreigabe_anlegen()
+                self.stdout.write("Freigabe „Zeugnisnote ohne Einzelnoten“ für Musik, Kunst und Sport ergänzt.")
             return
 
         call_command("grundeinrichtung", stdout=self.stdout)
@@ -541,6 +546,7 @@ class Command(BaseCommand):
         self.termine_anlegen(pw)
         self.vorgaben_anlegen()
         self.klausurregeln_anlegen()
+        self.zeugnisfreigabe_anlegen()
 
         self.statistik_aktualisieren()
         self.stdout.write(self.style.SUCCESS(
@@ -1223,6 +1229,14 @@ class Command(BaseCommand):
         if connection.vendor == "postgresql":
             with connection.cursor() as c:
                 c.execute("ANALYZE")
+
+    # ------------------------------------------------------------ Zeugnisnote ohne Einzelnoten (ab 0.4.8.1)
+    def zeugnisfreigabe_anlegen(self):
+        from noten.models import Zeugnisnotenfreigabe
+
+        f = Zeugnisnotenfreigabe.objects.create(jahrgang_von=5, jahrgang_bis=10, angelegt_von=User.objects.filter(username="schulleitung").first(),
+                                                bemerkung="Beispiel: Musik, Kunst und Sport nur mit Zeugnisnote")
+        f.faecher.set(Fach.objects.filter(kuerzel__in=["MU", "KU", "SPO"]))
 
     # ------------------------------------------------------------ Klausurregeln, Jahresnote (ab 0.4.8.0)
     def klausurregeln_anlegen(self):

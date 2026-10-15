@@ -471,6 +471,16 @@ class Note(models.Model):
         return (self.erreichte_be / ln.max_be * 100).quantize(Decimal("0.1"))
 
 
+def weicht_ab(skala, schnitt, stufe):
+    """
+    Zeugnisnote ≠ gerundeter rechnerischer Vorschlag? Verglichen werden ganze Noten (Sek I) bzw. Punkte (Sek II),
+    gerundet nach der Regel der Skala. Ohne Vorschlag (keine Einzelnoten) oder ohne Note: keine Abweichung.
+    """
+    if schnitt is None or stufe is None:
+        return False
+    return stufe.wert.quantize(Decimal(1), rounding=ROUND_HALF_UP) != skala.ganz_runden(schnitt)
+
+
 class Zeugnisnote(models.Model):
     unterricht = models.ForeignKey(Unterricht, on_delete=models.CASCADE, related_name="zeugnisnoten", verbose_name=_("Unterricht"))
     schueler = models.ForeignKey(Schuelerprofil, on_delete=models.CASCADE, related_name="zeugnisnoten", verbose_name=_("Schüler:in"))
@@ -482,7 +492,9 @@ class Zeugnisnote(models.Model):
         _("Vermerk statt Note"), max_length=8, choices=VERMERKE, blank=True, default="",
         help_text=_("n.b., wenn weniger als sechs Wochen am Stück bzw. acht Wochen insgesamt teilgenommen (Rili Sek I, 3.8)"),
     )
-    begruendung = models.TextField(_("Pädagogische Begründung"), blank=True, help_text=_("Pflicht bei Abweichung vom Vorschlag"))
+    begruendung = models.TextField(_("Pädagogische Begründung"), blank=True,
+                                   help_text=_("Freiwillig. Die Lehrkraft setzt die Zeugnisnote in eigener Verantwortung fest; "
+                                               "Abweichungen vom rechnerischen Vorschlag werden nur markiert."))
     festgesetzt_am = models.DateTimeField(auto_now=True)
     history = HistoricalRecords(verbose_name=_("Änderungsprotokoll Zeugnisnote"))
 
@@ -504,20 +516,12 @@ class Zeugnisnote(models.Model):
             return
         if self.stufe.skala_id != self.unterricht.skala_id:
             raise ValidationError(_("Die Note gehört nicht zur Notenskala des Unterrichts."))
-        if self.vorschlag is not None:
-            vorgeschlagen = self.unterricht.skala.naechste_stufe(self.vorschlag)
-            if not self.unterricht.skala.hoeher_ist_besser and vorgeschlagen:
-                # Zeugnisnoten sind ganze Noten (Rili Sek I 3.5): verglichen wird die gerundete Note, nicht die Tendenz.
-                ganz = self.unterricht.skala.ganz_runden(self.vorschlag)
-                abweichung = self.stufe.wert.quantize(Decimal(1), rounding=ROUND_HALF_UP) != ganz
-                vorgeschlagen = next((s for s in self.unterricht.skala.stufen.all() if s.wert == ganz), vorgeschlagen)
-            else:
-                abweichung = bool(vorgeschlagen and vorgeschlagen.pk != self.stufe_id)
-            if abweichung and not self.begruendung.strip():
-                raise ValidationError(
-                    {"begruendung": gettext("Die Note weicht vom Vorschlag (%(vorschlag)s) ab. Bitte pädagogisch begründen.")
-                     % {"vorschlag": vorgeschlagen}}
-                )
+        # Ab 0.4.8.1: Die Lehrkraft hat die Notenhoheit – eine Abweichung vom Vorschlag wird markiert, nicht verhindert.
+
+    @property
+    def abweichung(self):
+        """Weicht die festgesetzte Note vom (beim Speichern berechneten) Vorschlag ab?"""
+        return weicht_ab(self.unterricht.skala, self.vorschlag, self.stufe)
 
 
 class Leistungsvorgabe(models.Model):
@@ -709,3 +713,41 @@ class Notensperre(models.Model):
 
     def __str__(self):
         return f"{self.klasse} {self.abschnitt}: {'gesperrt' if self.gesperrt else 'offen'}"
+
+
+class Zeugnisnotenfreigabe(models.Model):
+    """
+    Freigabe der Schulleitung (ab 0.4.8.1): In diesen Fächern und Jahrgängen dürfen Lehrkräfte die Zeugnisnote auch
+    ohne Einzelnoten eintragen (z. B. Sport, Musik, Kunst). Keine Fächer gewählt = alle Fächer.
+    """
+
+    faecher = models.ManyToManyField(Fach, blank=True, related_name="zeugnisnotenfreigaben", verbose_name=_("Fächer"),
+                                     help_text=_("Keine Auswahl = alle Fächer."))
+    jahrgang_von = models.PositiveSmallIntegerField(_("ab Jahrgang"))
+    jahrgang_bis = models.PositiveSmallIntegerField(_("bis Jahrgang"))
+    bemerkung = models.CharField(_("Bemerkung"), max_length=200, blank=True)
+    angelegt_von = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="+",
+                                     verbose_name=_("Angelegt von"))
+    geaendert_am = models.DateTimeField(_("Geändert am"), auto_now=True)
+    history = HistoricalRecords(verbose_name=_("Änderungsprotokoll Zeugnisnotenfreigabe"))
+
+    class Meta:
+        verbose_name = _("Freigabe: Zeugnisnote ohne Einzelnoten")
+        verbose_name_plural = _("Freigaben: Zeugnisnote ohne Einzelnoten")
+        ordering = ["jahrgang_von", "jahrgang_bis"]
+
+    def __str__(self):
+        return gettext("Nur Zeugnisnote, Jahrgang %(von)s–%(bis)s") % {"von": self.jahrgang_von, "bis": self.jahrgang_bis}
+
+    def clean(self):
+        if self.jahrgang_von and self.jahrgang_bis and self.jahrgang_von > self.jahrgang_bis:
+            raise ValidationError({"jahrgang_bis": _("„bis Jahrgang“ darf nicht kleiner sein als „ab Jahrgang“.")})
+
+    @classmethod
+    def fuer(cls, unterricht):
+        """Gilt eine Freigabe für diesen Unterricht?"""
+        j = unterricht.gruppe.jahrgang
+        if j is None:
+            return None
+        return (cls.objects.filter(jahrgang_von__lte=j, jahrgang_bis__gte=j)
+                .filter(Q(faecher__isnull=True) | Q(faecher=unterricht.fach_id)).distinct().first())

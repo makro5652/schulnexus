@@ -115,10 +115,10 @@ class BerechnungTest(Grundlage):
     def test_zeugnisvorschlag_rundet_zugunsten(self):
         z = Zeugnisnote(unterricht=self.u, schueler=self.schueler[0], vorschlag=Decimal("2.50"),
                         stufe=self.u.skala.stufen.get(bezeichnung="2"))
-        z.clean()                                                     # 2 entspricht dem Vorschlag – keine Begründung nötig
+        self.assertFalse(z.abweichung)                                # 2,50 → 2 entspricht dem Vorschlag
         z.stufe = self.u.skala.stufen.get(bezeichnung="3")
-        with self.assertRaises(ValidationError):
-            z.clean()                                                 # 3 weicht ab
+        z.clean()                                                     # ab 0.4.8.1 erlaubt, aber markiert
+        self.assertTrue(z.abweichung)
 
 
 class JahresnoteTest(Grundlage):

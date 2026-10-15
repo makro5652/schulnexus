@@ -2,7 +2,6 @@
 import os
 from decimal import Decimal
 
-from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.test import SimpleTestCase, TestCase
 from django.urls import reverse
@@ -116,10 +115,11 @@ class ZeugnisTest(TestCase):
         sek1 = self.ch9a.skala
         s = self.schueler[0]
         z = Zeugnisnote(unterricht=self.ch9a, schueler=s, vorschlag=Decimal("2.30"), stufe=sek1.stufen.get(bezeichnung="2"))
-        z.clean()                                                       # 2,3 → ganze Note 2: keine Begründung nötig
+        z.clean()                                                       # 2,3 → ganze Note 2: keine Abweichung
+        self.assertFalse(z.abweichung)
         z.stufe = sek1.stufen.get(bezeichnung="3")
-        with self.assertRaises(ValidationError):
-            z.clean()
+        z.clean()                                                       # ab 0.4.8.1: erlaubt, nur markiert
+        self.assertTrue(z.abweichung)
         z.stufe, z.vermerk = None, "nb"
         z.clean()
 

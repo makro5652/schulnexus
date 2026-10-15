@@ -171,6 +171,9 @@ def notenuebersicht(request, pk):
 
     gesperrt = gesperrte_schueler(unterricht, [s.pk for s in schueler_liste])
     nta = aktive_nta_je_schueler([s.pk for s in schueler_liste])
+    from noten.models import Zeugnisnote, Zeugnisnotenfreigabe, weicht_ab
+
+    zeugnisnoten = {z.schueler_id: z for z in Zeugnisnote.objects.filter(unterricht=unterricht).select_related("stufe")}
     for s in schueler_liste:
         noten = noten_je_schueler[s.pk]
         nach_ln = {n.leistungsnachweis_id: n for n in noten}
@@ -181,7 +184,10 @@ def notenuebersicht(request, pk):
             "schueler": s, "gesperrt": s.pk in gesperrt,
             "zellen": [nach_ln.get(sp["ln"].pk) for sp in spalten],
             "vorschlag": vorschlagsnote(unterricht, s, noten, baum, jahr=jahr),
+            "zn": zeugnisnoten.get(s.pk),
         })
+        z = zeilen[-1]
+        z["abweichung"] = bool(z["zn"] and not z["zn"].vermerk and weicht_ab(unterricht.skala, z["vorschlag"].schnitt, z["zn"].stufe))
 
     return render(
         request,
@@ -190,6 +196,8 @@ def notenuebersicht(request, pk):
          "darf_eintragen": noten_rechte.darf_noten_eintragen(request.user, unterricht),
          "kurswahl": kurswahl_auswahl(request, unterricht, nur_wenn_enthalten=True), "vorlaeufig": vorlaeufig,
          "jahresnote": unterricht.mit_jahresnote, "gesperrt_anzahl": len(gesperrt),
+         "nur_zeugnisnote": Zeugnisnotenfreigabe.fuer(unterricht) is not None,
+         "abweichungen": sum(1 for z in zeilen if z["abweichung"]),
          "vorgaben": noten_vorgaben.staende_fuer_unterricht(unterricht) if noten_rechte.darf_vorgaben_sehen(request.user) else []},
     )
 

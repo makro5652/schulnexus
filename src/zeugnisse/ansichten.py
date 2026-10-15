@@ -174,6 +174,9 @@ def unterricht(request, pk):
     for n in alle:
         noten_je.setdefault(n.schueler_id, []).append(n)
     auswahl = _noten_auswahl(u.skala)
+    from noten.models import Zeugnisnotenfreigabe, weicht_ab
+
+    nur_zeugnisnote = Zeugnisnotenfreigabe.fuer(u) is not None
 
     fehler = {}
     if request.method == "POST" and request.POST.get("aktion") == "noten":
@@ -199,6 +202,10 @@ def unterricht(request, pk):
                 else:
                     stufe = next((st for st in auswahl if str(st.pk) == wert), None)
                     if stufe is None:
+                        continue
+                    if v.schnitt is None and not nur_zeugnisnote:
+                        fehler[s.pk] = gettext("Keine Einzelnoten vorhanden. Eine Zeugnisnote ohne Einzelnoten ist für dieses Fach "
+                                               "und diesen Jahrgang nicht freigegeben (Schulleitung › Notenregeln).")
                         continue
                     z.vermerk, z.stufe = "", stufe
                 try:
@@ -228,17 +235,19 @@ def unterricht(request, pk):
             lehrkraefte[s.pk] = rechte.lehrkraefte_ids(s, u.abschnitt)
         status = kommentar_status(z, lehrkraefte[s.pk])
         eigene = next((a for a in z.abzeichnungen.all() if personal and a.lehrkraft_id == personal.pk), None)
-        gewaehlt, vorgeschlagen = "", False
+        gewaehlt, vorgeschlagen, ziel_pk = "", False, ""
+        if v.schnitt is not None and auswahl:
+            ziel = u.skala.ganz_runden(v.schnitt)
+            ziel_pk = str(min(auswahl, key=lambda st: abs(st.wert - ziel)).pk)
         if request.method == "POST" and s.pk in fehler:
             gewaehlt = request.POST.get(f"note-{s.pk}", "")
         elif zn:
             gewaehlt = zn.vermerk or str(zn.stufe_id)
-        elif v.schnitt is not None and auswahl:
-            ziel = u.skala.ganz_runden(v.schnitt)
-            naechste = min(auswahl, key=lambda st: abs(st.wert - ziel))
-            gewaehlt, vorgeschlagen = str(naechste.pk), True
+        elif ziel_pk:
+            gewaehlt, vorgeschlagen = ziel_pk, True
         zeilen.append({
             "s": s, "z": z, "zn": zn, "vorschlag": v, "gewaehlt": gewaehlt, "vorgeschlagen": vorgeschlagen, "fehler": fehler.get(s.pk),
+            "ziel_pk": ziel_pk, "abweichung": bool(zn and not zn.vermerk and weicht_ab(u.skala, v.schnitt, zn.stufe)),
             "begruendung": request.POST.get(f"begruendung-{s.pk}", zn.begruendung if zn else "") if request.method == "POST" else (zn.begruendung if zn else ""),
             "gesperrt": s.pk in gesperrt, "status": status, "eigene": eigene,
             "darf_abzeichnen": rechte.darf_abzeichnen(request.user, z),
@@ -254,6 +263,8 @@ def unterricht(request, pk):
         "u": u, "zeilen": zeilen, "optionen": optionen, "darf_noten": darf_noten,
         "gesetzt": sum(1 for z in zeilen if z["zn"]), "personal": personal,
         "kurswahl": kurswahl.auswahl(request, u, nur_wenn_enthalten=True),
+        "nur_zeugnisnote": nur_zeugnisnote,
+        "abweichungen": sum(1 for zl in zeilen if zl["abweichung"]),
     })
 
 

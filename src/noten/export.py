@@ -21,7 +21,7 @@ from portal.rechte import darf_unterricht_sehen
 
 from .ansichten import gewicht_text
 from .berechnung import Baum, Vorhalbjahr, nominale_anteile, vorschlagsnote
-from .models import Note, Unterricht, Zeugnisnote
+from .models import Note, Unterricht, Zeugnisnote, weicht_ab
 
 
 def _zahl(wert, stellen=2):
@@ -75,6 +75,7 @@ def datensatz(u):
             "noten": [nach_ln.get(sp["ln"].pk) for sp in spalten],
             "texte": [_note_text(nach_ln.get(sp["ln"].pk), u.skala) for sp in spalten],
             "v": v, "zeugnis": (z.stufe.bezeichnung if z and z.stufe_id else (z.get_vermerk_display() if z and z.vermerk else "")),
+            "abweichung": bool(z and z.stufe_id and weicht_ab(u.skala, v.schnitt, z.stufe)),
         })
     return {"u": u, "spalten": spalten, "ordner": ordner, "zeilen": zeilen, "jahresnote": u.mit_jahresnote,
             "stand": timezone.localtime()}
@@ -159,6 +160,10 @@ def excel(request, pk):
                 c.number_format = "0.00"
             if v.gefaehrdet:
                 c.fill = gefahr_fl
+        if z["abweichung"]:
+            c = ws.cell(row=r, column=len(werte))
+            c.fill = PatternFill("solid", fgColor="F6C995")
+            c.value = f"{z['zeugnis']} ≠ " + (str(v.stufe) if v.stufe else "")
     ws.column_dimensions["A"].width = 26
     for spalte in range(2, len(kopf) + 1):
         ws.column_dimensions[get_column_letter(spalte)].width = 13
@@ -167,6 +172,7 @@ def excel(request, pk):
     letzte = start + 2 + len(d["zeilen"]) + 1
     ws.cell(row=letzte, column=1, value=_("Der Vorschlag ist rechnerisch ermittelt; die Zeugnisnote setzt die Lehrkraft fest. "
                                          "Rot hinterlegt: Gefährdung. Gerundet wird bei Gleichstand zur besseren Note.")).font = Font(size=8, italic=True)
+    ws.cell(row=letzte + 1, column=1, value=_("Orange: Die Zeugnisnote weicht vom rechnerischen Vorschlag ab.")).font = Font(size=8, italic=True)
 
     ws2 = wb.create_sheet(_("Leistungsnachweise")[:31])
     kopf2 = [_("Ordner"), _("Bezeichnung"), _("Datum"), _("Gewicht"), _("Anteil an der Note (%)"), _("Noten"), _("Schnitt")]
@@ -230,6 +236,7 @@ def notenbogen(request, pk):
     normal_s, fett_s = schrift()
     gruen, linie, flaeche = colors.HexColor("#1f5f5b"), colors.HexColor("#c9cfd3"), colors.HexColor("#e3efed")
     gefahr = colors.HexColor("#f8e1d7")
+    abw = colors.HexColor("#f6c995")
     st = ParagraphStyle("t", fontName=normal_s, fontSize=7.4, leading=9)
     st_k = ParagraphStyle("k", parent=st, fontName=fett_s)
     st_klein = ParagraphStyle("kl", parent=st, fontSize=6.4, leading=7.8, textColor=colors.HexColor("#5b6670"))
@@ -283,6 +290,8 @@ def notenbogen(request, pk):
             daten.append(reihe)
             if v.gefaehrdet:
                 stil.append(("BACKGROUND", (0, i), (-1, i), gefahr))
+            if z["abweichung"]:
+                stil.append(("BACKGROUND", (-1, i), (-1, i), abw))
         namen_b, ende_b = 42 * mm, (2 if not d["jahresnote"] else 4) * 21 * mm
         rest = max(breite - namen_b - ende_b, 10 * mm)
         n = max(len(d["spalten"]), 1)
@@ -291,7 +300,7 @@ def notenbogen(request, pk):
         tab.setStyle(TableStyle(stil))
         story += [tab, Spacer(1, 2 * mm),
                   p(_("Der Vorschlag ist rechnerisch ermittelt; die Zeugnisnote setzt die Lehrkraft fest. Hinterlegt: Gefährdung. "
-                      "Gerundet wird bei Gleichstand zur besseren Note."), st_klein)]
+                      "Gerundet wird bei Gleichstand zur besseren Note.") + " " + _("Orange: Die Zeugnisnote weicht vom rechnerischen Vorschlag ab."), st_klein)]
         story += [NextPageTemplate("hoch"), PageBreak()]
     else:
         story.append(NextPageTemplate("hoch"))
@@ -323,11 +332,14 @@ def notenbogen(request, pk):
             rech.append([p(_("1. Halbjahr"), st_k), p(""), p(f"{_zahl(u.anteil_vorhalbjahr, 0)} %"), p(_zahl(v.vorhalbjahr) or "–")])
         rech.append([p(_("Jahresvorschlag") if d["jahresnote"] else _("Vorschlag"), st_k), p(""), p(""),
                      Paragraph(f"<b>{escape(str(v.stufe or '–'))}</b> ({escape(_zahl(v.schnitt) or '–')})", st)])
-        rech.append([p(_("Festgesetzte Zeugnisnote"), st_k), p(""), p(""), p(z["zeugnis"] or "–")])
+        rech.append([p(_("Festgesetzte Zeugnisnote"), st_k), p(_("weicht vom Vorschlag ab") if z["abweichung"] else "", st_klein), p(""),
+                     Paragraph(f"<b>{escape(z['zeugnis'] or '–')}</b>", st)])
         t2 = Table(rech, colWidths=[80 * mm, 25 * mm, 35 * mm, breite_h - 140 * mm])
         stil2 = [("GRID", (0, 0), (-1, -1), 0.3, linie), ("BACKGROUND", (0, 0), (-1, 0), flaeche), ("VALIGN", (0, 0), (-1, -1), "TOP")]
         if v.gefaehrdet:
             stil2.append(("BACKGROUND", (0, len(rech) - 2), (-1, len(rech) - 2), gefahr))
+        if z["abweichung"]:
+            stil2.append(("BACKGROUND", (0, len(rech) - 1), (-1, len(rech) - 1), abw))
         t2.setStyle(TableStyle(stil2))
         story.append(t2)
         for w in v.warnungen:

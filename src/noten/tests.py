@@ -197,15 +197,16 @@ class BewertungsordnerTest(NotenFixture):
 
 
 class ZeugnisnoteTest(NotenFixture):
-    def test_abweichung_braucht_begruendung(self):
+    def test_abweichung_ohne_begruendung_erlaubt_und_markiert(self):
+        # ab 0.4.8.1: Notenhoheit der Lehrkraft – Abweichung wird markiert, nicht verhindert
         z = Zeugnisnote(unterricht=self.u, schueler=self.s1, vorschlag=Decimal("2.10"), stufe=self.st["3"])
-        with self.assertRaises(ValidationError):
-            z.full_clean()
-        z.begruendung = "Deutliche Leistungssteigerung im Halbjahr, aber ..."
         z.full_clean()
+        self.assertTrue(z.abweichung)
 
     def test_passende_note_ohne_begruendung(self):
-        Zeugnisnote(unterricht=self.u, schueler=self.s1, vorschlag=Decimal("2.10"), stufe=self.st["2"]).full_clean()
+        z = Zeugnisnote(unterricht=self.u, schueler=self.s1, vorschlag=Decimal("2.10"), stufe=self.st["2"])
+        z.full_clean()
+        self.assertFalse(z.abweichung)
 
 
 class EinzelgewichtTest(NotenFixture):
