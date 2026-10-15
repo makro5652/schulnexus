@@ -1,4 +1,4 @@
-"""Tests: Umbenennung in edunex (0.4.9.0) – Name in Oberfläche, Verwaltung, Kalender, Sicherungen und Docker-Dateien."""
+"""Tests: Name Schulnexus (ab 0.4.9.1; zuvor „Schulverwaltung“, 0.4.9.0 „edunex“) – Name in Oberfläche, Verwaltung, Kalender, Sicherungen und Docker-Dateien."""
 import io
 import json
 import zipfile
@@ -20,51 +20,53 @@ class NameOhneAnmeldungTest(TestCase):
     def test_anmeldeseite_traegt_den_namen(self):
         r = self.client.get(reverse("login"))
         self.assertContains(r, "<title>")
-        self.assertContains(r, "edunex")
-        self.assertContains(r, f"edunex · Open-Source-Schulverwaltung · Version {VERSION}")
+        self.assertContains(r, "Schulnexus")
+        self.assertContains(r, f"Schulnexus · Open-Source-Schulverwaltung · Version {VERSION}")
         self.assertNotContains(r, "<title>Schulverwaltung")
 
     def test_verwaltungsoberflaeche(self):
         from django.contrib import admin
 
-        self.assertEqual((admin.site.site_header, admin.site.site_title), ("edunex", "edunex"))
+        self.assertEqual((admin.site.site_header, admin.site.site_title), ("Schulnexus", "Schulnexus"))
 
     def test_version(self):
-        self.assertEqual(VERSION, "0.4.9.0")
+        self.assertEqual(VERSION, "0.4.9.1")
 
 
 class NameAngemeldetTest(Grundlage):
     def test_menueband_und_titel(self):
         self.anmelden("lehrkraft")
         r = self.client.get(reverse("start"))
-        self.assertContains(r, '<strong>edunex</strong>')
-        self.assertContains(r, '<span class="mb-zeichen" aria-hidden="true">e</span>')
+        self.assertContains(r, '<strong>Schulnexus</strong>')
+        self.assertContains(r, '<span class="mb-zeichen" aria-hidden="true">S</span>')
 
     def test_englische_oberflaeche_behaelt_den_namen(self):
         self.anmelden("lehrkraft")
         r = self.client.get(reverse("start"), HTTP_ACCEPT_LANGUAGE="en")
         self.client.cookies[settings.LANGUAGE_COOKIE_NAME] = "en"
         r = self.client.get(reverse("start"))
-        self.assertContains(r, '<strong>edunex</strong>')
-        self.assertContains(r, "edunex · Open-source school administration")
+        self.assertContains(r, '<strong>Schulnexus</strong>')
+        self.assertContains(r, "Schulnexus · Open-source school administration")
 
     def test_verwaltungsoberflaeche_angemeldet(self):
         self.anmelden("it")
         r = self.client.get(reverse("admin:index"))
-        self.assertContains(r, "<strong>edunex</strong>")
+        self.assertContains(r, "<strong>Schulnexus</strong>")
         self.assertContains(r, "<title>")
-        self.assertIn("| edunex</title>", r.content.decode().replace("\n", ""))
+        self.assertIn("| Schulnexus</title>", r.content.decode().replace("\n", ""))
 
     def test_kalenderdatei(self):
         self.anmelden("schulleitung")
         inhalt = self.client.get(reverse("kalender_ics")).content.decode()
-        self.assertIn("PRODID:-//edunex//Schulkalender//DE", inhalt)
+        self.assertIn("PRODID:-//Schulnexus//Schulkalender//DE", inhalt)
         self.assertNotIn("schulverwaltung", inhalt.lower())
+        self.assertNotIn("edunex", inhalt.lower())
+        self.assertIn("@schulnexus", inhalt)
 
     def test_neue_sicherung_hat_neues_format(self):
         s = archiv.sicherung_erstellen(["fehlzeiten"], self.sl)
         with zipfile.ZipFile(io.BytesIO(krypto.ablage_lesen(s.pfad))) as zf:
-            self.assertEqual(json.loads(zf.read("manifest.json"))["format"], "edunex-modulsicherung")
+            self.assertEqual(json.loads(zf.read("manifest.json"))["format"], "schulnexus-modulsicherung")
 
     def test_sicherung_unter_altem_namen_bleibt_lesbar(self):
         s = archiv.sicherung_erstellen(["fehlzeiten"], self.sl)
@@ -82,13 +84,14 @@ class NameAngemeldetTest(Grundlage):
         zf, manifest = archiv.oeffnen(s.pfad)
         zf.close()
         self.assertEqual(manifest["format"], "schulverwaltung-modulsicherung")
+        self.assertIn("edunex-modulsicherung", archiv.FORMATE_FRUEHER)
         # fremdes Format weiterhin abgelehnt
         m["format"] = "etwas-anderes"
         puffer = io.BytesIO()
         with zipfile.ZipFile(puffer, "w") as neu:
             neu.writestr("manifest.json", json.dumps(m))
         s.pfad.write_bytes(puffer.getvalue())
-        with self.assertRaisesMessage(archiv.SicherungFehler, "keine gültige Sicherung von edunex"):
+        with self.assertRaisesMessage(archiv.SicherungFehler, "keine gültige Sicherung von Schulnexus"):
             archiv.oeffnen(s.pfad)
 
     def test_schluesselableitung_unveraendert(self):
@@ -102,12 +105,14 @@ class DockerDateienTest(TestCase):
         if not (PROJEKT / "docker-compose.yml").exists():
             self.skipTest("Docker-Dateien liegen nicht neben src/")
         haupt = (PROJEKT / "docker-compose.yml").read_text()
-        self.assertIn("\nname: edunex\n", haupt)
-        self.assertIn("${DB_NAME:-edunex}", haupt)
-        self.assertIn("\nname: edunex\n", (PROJEKT / "unraid" / "docker-compose.yml").read_text())
+        self.assertIn("\nname: schulnexus\n", haupt)
+        self.assertIn("${DB_NAME:-schulnexus}", haupt)
+        self.assertIn("\nname: schulnexus\n", (PROJEKT / "unraid" / "docker-compose.yml").read_text())
         for datei in (".env.example", "unraid/.env.example", "docker-compose.yml", "unraid/docker-compose.yml",
                       "start.sh", "unraid/einrichten.sh", "docker/sicherung.sh", "Dockerfile"):
-            self.assertNotIn("schulverwaltung", (PROJEKT / datei).read_text().lower(), datei)
+            inhalt = (PROJEKT / datei).read_text().lower()
+            self.assertNotIn("schulverwaltung", inhalt, datei)
+            self.assertNotIn("edunex", inhalt, datei)
 
     def test_vps_dateien(self):
         if not (PROJEKT / "vps").exists():

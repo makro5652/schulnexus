@@ -1,5 +1,5 @@
 #!/bin/sh
-# edunex auf einem VPS hinter einem vorhandenen Traefik einrichten oder aktualisieren.
+# Schulnexus auf einem VPS hinter einem vorhandenen Traefik einrichten oder aktualisieren.
 # Aufruf aus dem Projektordner:   sh vps/einrichten.sh            (fragt nach der Adresse)
 #                                 sh vps/einrichten.sh schule.example.org
 # Beim ersten Aufruf wird .env mit zufälligen Passwörtern erzeugt und für den Betrieb hinter Traefik
@@ -43,9 +43,9 @@ NETZ_VORSCHLAG="$(docker inspect -f '{{range $k, $v := .NetworkSettings.Networks
   | grep -vE '^(bridge|host|none)?$' | head -n 1)"
 LABELS="$(docker ps -q | xargs -r docker inspect -f '{{range $k, $v := .Config.Labels}}{{$k}}={{$v}}{{"\n"}}{{end}}' 2>/dev/null || true)"
 ARGS="$(docker inspect -f '{{range .Config.Cmd}}{{.}}{{"\n"}}{{end}}{{range .Args}}{{.}}{{"\n"}}{{end}}' "$TRAEFIK" 2>/dev/null || true)"
-EP_VORSCHLAG="$(echo "$LABELS" | grep -E '^traefik\.http\.routers\.[^=]+\.entrypoints=' | grep -v 'edunex' | cut -d= -f2 | cut -d, -f1 | haeufigster)"
+EP_VORSCHLAG="$(echo "$LABELS" | grep -E '^traefik\.http\.routers\.[^=]+\.entrypoints=' | grep -v 'schulnexus' | cut -d= -f2 | cut -d, -f1 | haeufigster)"
 [ -z "$EP_VORSCHLAG" ] && EP_VORSCHLAG="$(echo "$ARGS" | grep -oE 'entrypoints\.[A-Za-z0-9_-]+\.address=:443' | head -n 1 | cut -d. -f2)"
-RES_VORSCHLAG="$(echo "$LABELS" | grep -E '^traefik\.http\.routers\.[^=]+\.tls\.certresolver=' | grep -v 'edunex' | cut -d= -f2 | haeufigster)"
+RES_VORSCHLAG="$(echo "$LABELS" | grep -E '^traefik\.http\.routers\.[^=]+\.tls\.certresolver=' | grep -v 'schulnexus' | cut -d= -f2 | haeufigster)"
 [ -z "$RES_VORSCHLAG" ] && RES_VORSCHLAG="$(echo "$ARGS" | grep -oE 'certificatesresolvers\.[A-Za-z0-9_-]+\.' | head -n 1 | cut -d. -f2)"
 
 # --------------------------------------------------------------- .env beim ersten Aufruf
@@ -62,7 +62,7 @@ if [ ! -f .env ]; then
 
   DOMAIN="${1:-}"
   while [ -z "$DOMAIN" ]; do
-    printf "Adresse (Domain), unter der edunex erreichbar sein soll, z. B. schule.example.org: "
+    printf "Adresse (Domain), unter der Schulnexus erreichbar sein soll, z. B. schule.example.org: "
     read -r DOMAIN || exit 1
   done
   echo "Gefundener Traefik-Container: $TRAEFIK"
@@ -123,7 +123,7 @@ done
 echo " bereit."
 
 echo ""
-echo "edunex läuft:  https://${DOMAIN}"
+echo "Schulnexus läuft:  https://${DOMAIN}"
 echo "(Das Zertifikat holt Traefik beim ersten Aufruf; das kann einige Sekunden dauern."
 echo " Voraussetzung: Ein DNS-Eintrag für ${DOMAIN} zeigt auf diesen Server.)"
 echo ""

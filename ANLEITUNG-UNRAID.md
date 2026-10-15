@@ -1,6 +1,6 @@
-# edunex auf Unraid (Zugriff über Tailscale)
+# Schulnexus auf Unraid (Zugriff über Tailscale)
 
-edunex läuft auf Unraid als Gruppe von drei Docker-Containern:
+Schulnexus läuft auf Unraid als Gruppe von drei Docker-Containern:
 
 - **web:** die Anwendung
 - **db:** die Datenbank
@@ -25,19 +25,19 @@ keinen Internetzugang.
 
 ## Installation
 
-1. ZIP auf dem Mac entpacken. Den Ordner `edunex` (das Programm) auf eine Unraid-Freigabe
-   kopieren, z. B. in die Freigabe `appdata`. Er liegt dann unter `/mnt/user/appdata/edunex`.
+1. ZIP auf dem Mac entpacken. Den Ordner `schulnexus` (das Programm) auf eine Unraid-Freigabe
+   kopieren, z. B. in die Freigabe `appdata`. Er liegt dann unter `/mnt/user/appdata/schulnexus`.
    Ist `appdata` im Finder nicht sichtbar, in Unraid unter *Shares › appdata › SMB Security Settings*
    den Export einschalten oder eine andere Freigabe verwenden (Pfade unten entsprechend anpassen).
 2. In Unraid oben rechts das **Terminal** öffnen (Symbol `>_`) und eingeben:
 
    ```sh
-   cd /mnt/user/appdata/edunex
+   cd /mnt/user/appdata/schulnexus
    sh unraid/einrichten.sh
    ```
 
 3. Das Skript stellt beim ersten Start drei Fragen:
-   - **Ablageort der Daten:** Eingabetaste übernimmt `/mnt/user/appdata/edunex-daten`.
+   - **Ablageort der Daten:** Eingabetaste übernimmt `/mnt/user/appdata/schulnexus-daten`.
      Programm und Daten liegen so getrennt.
    - **Port:** Eingabetaste übernimmt `8010`.
    - **Nur über Tailscale erreichbar?** Mit `j` ist der Port nur im Tailnet offen, mit Eingabetaste
@@ -54,7 +54,7 @@ keinen Internetzugang.
    Die Zugangsdaten stehen außerdem in `unraid/.env`. Mit `ADMIN_BENUTZER` und `ADMIN_PASSWORT`
    meldest du dich als Administrator an. Die Demo-Konten verwenden `DEMO_PASSWORT`.
 
-Die Container erscheinen danach im Unraid-Reiter *Docker* (Namen beginnen mit `edunex-`)
+Die Container erscheinen danach im Unraid-Reiter *Docker* (Namen beginnen mit `schulnexus-`)
 und starten nach einem Neustart des Servers automatisch.
 
 ## Aktualisieren
@@ -62,13 +62,13 @@ und starten nach einem Neustart des Servers automatisch.
 Den neuen Ordnerinhalt über den alten kopieren. Die Datei `unraid/.env` dabei **behalten**. Dann erneut:
 
 ```sh
-cd /mnt/user/appdata/edunex
+cd /mnt/user/appdata/schulnexus
 sh unraid/einrichten.sh
 ```
 
 ## Wo liegen die Daten?
 
-Unter dem Ablageort, voreingestellt `/mnt/user/appdata/edunex-daten`:
+Unter dem Ablageort, voreingestellt `/mnt/user/appdata/schulnexus-daten`:
 
 | Ordner | Inhalt |
 | --- | --- |
@@ -81,7 +81,7 @@ Das Plugin **„Appdata Backup“** kann diese Ordner zusätzlich mitsichern.
 
 ## Wichtige Befehle
 
-Alle Befehle im Ordner `unraid` des Projekts ausführen (`cd /mnt/user/appdata/edunex/unraid`):
+Alle Befehle im Ordner `unraid` des Projekts ausführen (`cd /mnt/user/appdata/schulnexus/unraid`):
 
 | Zweck | Befehl |
 | --- | --- |
@@ -95,8 +95,8 @@ Alle Befehle im Ordner `unraid` des Projekts ausführen (`cd /mnt/user/appdata/e
 
 ```sh
 docker compose stop web sicherung
-docker compose exec -T db pg_restore --clean --if-exists --no-owner -U schule -d edunex \
-  < /mnt/user/appdata/edunex-daten/sicherungen/edunex-2026-10-13_0200.dump
+docker compose exec -T db pg_restore --clean --if-exists --no-owner -U schule -d schulnexus \
+  < /mnt/user/appdata/schulnexus-daten/sicherungen/schulnexus-2026-10-13_0200.dump
 docker compose start web sicherung
 ```
 
@@ -123,7 +123,7 @@ docker compose start web sicherung
 - **Modulsicherungen (ab 0.4.3.0):** Sicherungen und PDF-Exporte aus dem Portal liegen in
   `${APPDATA}/modulsicherungen`. Der Ordner wird beim Start angelegt. Für eine tägliche automatische Modulsicherung
   in Unraid unter *User Scripts* einen Zeitplan anlegen mit
-  `docker compose -f /mnt/user/appdata/edunex/unraid/docker-compose.yml exec -T web python manage.py modulsicherung`
+  `docker compose -f /mnt/user/appdata/schulnexus/unraid/docker-compose.yml exec -T web python manage.py modulsicherung`
   (Pfad an den eigenen Installationsordner anpassen).
 
 ## HTTPS mit „tailscale serve“ (ab 0.4.6.0 empfohlen)

@@ -1,5 +1,5 @@
 #!/bin/sh
-# edunex auf Unraid einrichten oder aktualisieren.
+# Schulnexus auf Unraid einrichten oder aktualisieren.
 # Aufruf im Unraid-Terminal aus dem Projektordner:   sh unraid/einrichten.sh
 # Beim ersten Aufruf wird unraid/.env mit zufälligen Passwörtern erzeugt. Spätere Aufrufe bauen
 # die neue Version und starten neu; Daten und Einstellungen bleiben erhalten.
@@ -60,9 +60,9 @@ if [ -z "$APPDATA" ]; then echo "APPDATA ist in unraid/.env nicht gesetzt."; exi
 mkdir -p "$APPDATA"
 
 if [ "$BIND" = "0.0.0.0" ] || [ -z "$BIND" ]; then
-  BELEGT="$(docker ps --format '{{.Names}} {{.Ports}}' | grep -E "(0\.0\.0\.0|:::):${PORT}->" | grep -v '^edunex-' || true)"
+  BELEGT="$(docker ps --format '{{.Names}} {{.Ports}}' | grep -E "(0\.0\.0\.0|:::):${PORT}->" | grep -v '^schulnexus-' || true)"
 else
-  BELEGT="$(docker ps --format '{{.Names}} {{.Ports}}' | grep -E "(0\.0\.0\.0|${BIND}):${PORT}->" | grep -v '^edunex-' || true)"
+  BELEGT="$(docker ps --format '{{.Names}} {{.Ports}}' | grep -E "(0\.0\.0\.0|${BIND}):${PORT}->" | grep -v '^schulnexus-' || true)"
 fi
 if [ -n "$BELEGT" ]; then
   echo "Port ${PORT} wird bereits verwendet von: $(echo "$BELEGT" | cut -d' ' -f1)"
@@ -93,7 +93,7 @@ done
 echo " bereit."
 
 echo ""
-echo "edunex läuft. Aufruf von einem Gerät im Tailnet:"
+echo "Schulnexus läuft. Aufruf von einem Gerät im Tailnet:"
 [ -n "$TS_NAME" ] && echo "  http://${TS_NAME}:${PORT}"
 [ -n "$TS_IP" ] && echo "  http://${TS_IP}:${PORT}"
 [ -z "$TS_NAME$TS_IP" ] && echo "  http://<Tailscale-Name oder -IP des Unraid-Servers>:${PORT}"

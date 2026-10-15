@@ -9,7 +9,7 @@ mkdir -p "$ZIEL"
 until pg_isready -q; do sleep 5; done
 
 while true; do
-  datei="$ZIEL/edunex-$(date +%Y-%m-%d_%H%M).dump"
+  datei="$ZIEL/schulnexus-$(date +%Y-%m-%d_%H%M).dump"
   if pg_dump --format=custom --file="$datei.tmp"; then
     mv "$datei.tmp" "$datei"
     echo "$(date '+%Y-%m-%d %H:%M') Sicherung erstellt: $(basename "$datei")"
@@ -17,6 +17,6 @@ while true; do
     rm -f "$datei.tmp"
     echo "$(date '+%Y-%m-%d %H:%M') FEHLER: Sicherung fehlgeschlagen" >&2
   fi
-  find "$ZIEL" -name 'edunex-*.dump' -type f -mtime +"$TAGE" -delete
+  find "$ZIEL" -name 'schulnexus-*.dump' -type f -mtime +"$TAGE" -delete
   sleep 86400
 done

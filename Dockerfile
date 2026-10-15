@@ -1,4 +1,4 @@
-# edunex – Anwendungscontainer (Django + Gunicorn)
+# Schulnexus – Anwendungscontainer (Django + Gunicorn)
 FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \

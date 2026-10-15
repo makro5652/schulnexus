@@ -56,7 +56,7 @@ def _hkdf(material, zweck):
     from cryptography.hazmat.primitives import hashes
     from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 
-    # Fester Wert aus der Zeit vor der Umbenennung in edunex (0.4.9.0) – nie ändern, sonst sind Dateien unlesbar.
+    # Fester Wert aus der Zeit vor der Umbenennung (0.4.9.0) – nie ändern, sonst sind Dateien unlesbar.
     return HKDF(algorithm=hashes.SHA256(), length=32, salt=b"schulverwaltung", info=zweck.encode()).derive(material)
 
 

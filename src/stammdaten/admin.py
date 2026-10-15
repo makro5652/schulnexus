@@ -40,8 +40,8 @@ from .models import (
 )
 from .zusatzfelder import ZusatzfelderAdminMixin, ZusatzfelderInlineMixin, zusatz_fieldsets
 
-admin.site.site_header = "edunex"
-admin.site.site_title = "edunex"
+admin.site.site_header = "Schulnexus"
+admin.site.site_title = "Schulnexus"
 admin.site.index_title = _("Verwaltung")
 admin.site.enable_nav_sidebar = False  # volle Breite für Tabellen; Navigation über Startseite und Brotkrumen
 

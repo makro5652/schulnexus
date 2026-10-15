@@ -1,4 +1,4 @@
-# edunex auf einem VPS hinter einem vorhandenen Traefik (HTTPS über Let's Encrypt)
+# Schulnexus auf einem VPS hinter einem vorhandenen Traefik (HTTPS über Let's Encrypt)
 #
 # Wird zusätzlich zur docker-compose.yml im Hauptordner geladen:
 #   docker compose -f docker-compose.yml -f vps/traefik.yml up -d --build
@@ -20,11 +20,11 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=${TRAEFIK_NETZWERK:?Bitte TRAEFIK_NETZWERK in .env setzen}
-      - traefik.http.routers.edunex.rule=Host(`${DOMAIN:?Bitte DOMAIN in .env setzen}`)
-      - traefik.http.routers.edunex.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}
-      - traefik.http.routers.edunex.tls=true
-      - traefik.http.routers.edunex.tls.certresolver=${TRAEFIK_RESOLVER:-letsencrypt}
-      - traefik.http.services.edunex.loadbalancer.server.port=8000
+      - traefik.http.routers.schulnexus.rule=Host(`${DOMAIN:?Bitte DOMAIN in .env setzen}`)
+      - traefik.http.routers.schulnexus.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}
+      - traefik.http.routers.schulnexus.tls=true
+      - traefik.http.routers.schulnexus.tls.certresolver=${TRAEFIK_RESOLVER:-letsencrypt}
+      - traefik.http.services.schulnexus.loadbalancer.server.port=8000
 
 networks:
   proxy:

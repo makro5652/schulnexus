@@ -187,11 +187,11 @@ def kalender_ics(request):
         raise PermissionDenied
     sj = Schuljahr.aktuelles()
     ab = sj.beginn if sj else timezone.localdate() - timedelta(days=180)
-    zeilen = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//edunex//Schulkalender//DE", "CALSCALE:GREGORIAN",
+    zeilen = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Schulnexus//Schulkalender//DE", "CALSCALE:GREGORIAN",
               "X-WR-CALNAME:" + _ics_text(gettext("Schulkalender"))]
     stempel = timezone.now().strftime("%Y%m%dT%H%M%SZ")
     for t in Termin.objects.filter(Q(beginn__gte=ab) | Q(ende__gte=ab)).select_related("raum"):
-        zeilen += ["BEGIN:VEVENT", f"UID:termin-{t.pk}@edunex", f"DTSTAMP:{stempel}", "SUMMARY:" + _ics_text(t.lokal_titel)]
+        zeilen += ["BEGIN:VEVENT", f"UID:termin-{t.pk}@schulnexus", f"DTSTAMP:{stempel}", "SUMMARY:" + _ics_text(t.lokal_titel)]
         if t.ganztaegig:
             zeilen += [f"DTSTART;VALUE=DATE:{t.beginn:%Y%m%d}", f"DTEND;VALUE=DATE:{t.bis + timedelta(days=1):%Y%m%d}"]
         else:
@@ -204,7 +204,7 @@ def kalender_ics(request):
             zeilen.append("DESCRIPTION:" + _ics_text(t.beschreibung))
         zeilen.append("END:VEVENT")
     for z in Zeitfenster.objects.filter(datum__gte=ab).exclude(sprechtag__status=Sprechtag.ENTWURF).select_related("sprechtag"):
-        zeilen += ["BEGIN:VEVENT", f"UID:sprechtag-{z.pk}@edunex", f"DTSTAMP:{stempel}", "SUMMARY:" + _ics_text(z.sprechtag.titel),
+        zeilen += ["BEGIN:VEVENT", f"UID:sprechtag-{z.pk}@schulnexus", f"DTSTAMP:{stempel}", "SUMMARY:" + _ics_text(z.sprechtag.titel),
                    f"DTSTART:{z.datum:%Y%m%d}T{z.von:%H%M}00", f"DTEND:{z.datum:%Y%m%d}T{z.bis:%H%M}00", "END:VEVENT"]
     zeilen.append("END:VCALENDAR")
     antwort = HttpResponse("\r\n".join(zeilen) + "\r\n", content_type="text/calendar; charset=utf-8")

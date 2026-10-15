@@ -1,6 +1,6 @@
-# edunex (Version 0.4.9.0, Entwicklungsstand)
+# Schulnexus (Version 0.4.9.1, Entwicklungsstand)
 
-**edunex** ist eine Open-Source-Schulverwaltung für die DSN (bis 0.4.8.1 „Schulverwaltung“): Stammdaten, Klassen und Lerngruppen,
+**Schulnexus** ist eine Open-Source-Schulverwaltung für die DSN (bis 0.4.8.1 „Schulverwaltung“, in 0.4.9.0 kurz „edunex“): Stammdaten, Klassen und Lerngruppen,
 Noten mit Gewichtung, Fehlzeiten, Nachmittagsprogramm, Anhänge zur Schülerakte,
 Förderpläne und Nachteilsausgleiche, Neuanmeldungen, Zeugnisse und Konferenzen, Schuljahreswechsel,
 Abgänge mit Abgangszeugnis, Archiv und Löschfristen, Schulkalender, Raumbuchung, Elternsprechtage und
@@ -15,11 +15,11 @@ Sicherungen, Zwei-Faktor-Anmeldung, HTTPS-Betrieb. Läuft im Browser, betrieben 
 ## Starten auf dem MacBook
 
 1. **Docker Desktop** installieren und starten: https://www.docker.com/products/docker-desktop/
-2. Den Ordner `edunex` entpacken, z. B. nach `~/Projekte/edunex`.
+2. Den Ordner `schulnexus` entpacken, z. B. nach `~/Projekte/schulnexus`.
 3. Terminal öffnen und eingeben:
 
    ```sh
-   cd ~/Projekte/edunex
+   cd ~/Projekte/schulnexus
    ./start.sh
    ```
 
@@ -71,11 +71,11 @@ Arbeitsseite mit drei Spalten:
 
 ## Quellcode von GitHub holen
 
-Der Quellcode liegt im privaten Repository `makro5652/edunex`. Auf einem Server:
+Der Quellcode liegt im privaten Repository `makro5652/schulnexus`. Auf einem Server:
 
 ```sh
-git clone https://github.com/makro5652/edunex.git
-cd edunex
+git clone https://github.com/makro5652/schulnexus.git
+cd schulnexus
 ```
 
 Bei einem privaten Repository fragt `git clone` nach Benutzername und Passwort: Als Passwort einen
@@ -86,7 +86,7 @@ Einrichtungsskript erneut starten (die `.env` bleibt erhalten, sie steht nicht i
 ## Betrieb auf einem VPS mit Traefik (ab 0.4.9.0)
 
 Für einen Server im Internet, auf dem bereits **Traefik** als Reverse-Proxy mit Let's Encrypt läuft
-(z. B. ein Hostinger-VPS mit Docker). edunex ist dann nur über `https://<Domain>` erreichbar; der
+(z. B. ein Hostinger-VPS mit Docker). Schulnexus ist dann nur über `https://<Domain>` erreichbar; der
 Port 8000 wird ausschließlich an `127.0.0.1` gebunden.
 
 1. DNS-Eintrag (A-Eintrag) für die gewünschte Adresse, z. B. `schule.example.org`, auf die IP des Servers setzen.
@@ -119,7 +119,7 @@ Nginx Proxy Manager) auf `127.0.0.1:8000` zeigen lassen; die Einstellungen in de
 
 Für den Dauerbetrieb auf einem Unraid-Server gibt es eine eigene Variante im Ordner `unraid/`:
 ein veröffentlichter Port (voreingestellt 8010), erreichbar über das Tailscale des Servers,
-Daten unter `/mnt/user/appdata/edunex-daten`, tägliche Datenbanksicherung.
+Daten unter `/mnt/user/appdata/schulnexus-daten`, tägliche Datenbanksicherung.
 Einrichtung im Unraid-Terminal mit `sh unraid/einrichten.sh` – Schritt für Schritt in
 [ANLEITUNG-UNRAID.md](ANLEITUNG-UNRAID.md).
 
@@ -735,9 +735,9 @@ im Portal, in der Verwaltungsoberfläche und auf der Anmeldeseite:
 
 ## Update von einer älteren Version
 
-**Umbenennung in edunex (0.4.9.0):** Die Docker-Projekte heißen jetzt fest `edunex` (Container
-`edunex-web-1` usw., Datenträger `edunex_datenbank` …), die Vorgaben für Datenbankname und Unraid-Ablageort
-lauten `edunex` bzw. `/mnt/user/appdata/edunex-daten`. Eine bereits laufende Installation unter dem alten
+**Umbenennung in Schulnexus (ab 0.4.9.1; 0.4.9.0 hieß kurz „edunex“):** Die Docker-Projekte heißen jetzt fest `schulnexus` (Container
+`schulnexus-web-1` usw., Datenträger `schulnexus_datenbank` …), die Vorgaben für Datenbankname und Unraid-Ablageort
+lauten `schulnexus` bzw. `/mnt/user/appdata/schulnexus-daten`. Eine bereits laufende Installation unter dem alten
 Namen behält ihre `.env` (dort stehen `DB_NAME` und `APPDATA` weiterhin auf dem alten Wert); vor dem
 ersten Start der neuen Version die alten Container mit `docker compose -p schulverwaltung down`
 (ohne `-v`) stoppen und in der `.env` `COMPOSE_PROJECT_NAME=schulverwaltung` ergänzen, damit die

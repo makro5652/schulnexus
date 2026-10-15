@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}edunex{% endblock %} · {{ SCHULNAME }}</title>
+  <title>{% block title %}Schulnexus{% endblock %} · {{ SCHULNAME }}</title>
   <link rel="stylesheet" href="{% static 'portal.css' %}">
   <link rel="stylesheet" href="{% static 'menueband.css' %}">
   <script src="{% static 'menueband.js' %}" defer></script>
@@ -15,6 +15,6 @@
     {% if messages %}<ul class="meldungen">{% for m in messages %}<li class="{{ m.tags }}">{{ m }}</li>{% endfor %}</ul>{% endif %}
     {% block inhalt %}{% endblock %}
   </main>
-  <footer class="fuss">edunex · {% blocktranslate %}Open-Source-Schulverwaltung · Version {{ VERSION }} (Entwicklungsstand){% endblocktranslate %}</footer>
+  <footer class="fuss">Schulnexus · {% blocktranslate %}Open-Source-Schulverwaltung · Version {{ VERSION }} (Entwicklungsstand){% endblocktranslate %}</footer>
 </body>
 </html>

@@ -1,4 +1,4 @@
-# edunex auf Unraid – Zugriff über das Tailscale des Unraid-Servers
+# Schulnexus auf Unraid – Zugriff über das Tailscale des Unraid-Servers
 #
 #   Einrichten / Aktualisieren:  sh unraid/einrichten.sh   (im Projektordner)
 #   Aufruf:                      http://<Tailscale-Name oder -IP des Servers>:<PORT>
@@ -12,7 +12,7 @@
 # Tailscale läuft bereits auf dem Unraid-Server selbst; über ihn ist der Port im Tailnet erreichbar.
 # BIND_ADRESSE in unraid/.env legt fest, ob der Port zusätzlich im Heimnetz offen ist (siehe dort).
 
-name: edunex
+name: schulnexus
 
 services:
   vorbereitung:
@@ -33,7 +33,7 @@ services:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${DB_NAME:-edunex}
+      POSTGRES_DB: ${DB_NAME:-schulnexus}
       POSTGRES_USER: ${DB_BENUTZER:-schule}
       POSTGRES_PASSWORD: ${DB_PASSWORT:?Bitte DB_PASSWORT in unraid/.env setzen}
       TZ: ${TIME_ZONE:-Africa/Nairobi}
@@ -49,7 +49,7 @@ services:
   web:
     build:
       context: ..
-    image: edunex:lokal
+    image: schulnexus:lokal
     restart: unless-stopped
     user: "${PUID:-99}:${PGID:-100}"
     networks: [intern, extern]
@@ -62,7 +62,7 @@ services:
         condition: service_healthy
     env_file: .env
     environment:
-      DATABASE_URL: postgres://${DB_BENUTZER:-schule}:${DB_PASSWORT}@db:5432/${DB_NAME:-edunex}
+      DATABASE_URL: postgres://${DB_BENUTZER:-schule}:${DB_PASSWORT}@db:5432/${DB_NAME:-schulnexus}
       MEDIA_ROOT: /daten/dokumente
       MODUL_SICHERUNGEN: /daten/modulsicherungen
       HOME: /tmp
@@ -81,7 +81,7 @@ services:
         condition: service_healthy
     environment:
       PGHOST: db
-      PGDATABASE: ${DB_NAME:-edunex}
+      PGDATABASE: ${DB_NAME:-schulnexus}
       PGUSER: ${DB_BENUTZER:-schule}
       PGPASSWORD: ${DB_PASSWORT}
       SICHERUNG_BEHALTEN_TAGE: ${SICHERUNG_BEHALTEN_TAGE:-14}

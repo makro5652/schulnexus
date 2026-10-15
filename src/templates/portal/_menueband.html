@@ -3,8 +3,8 @@
 <header class="mb" id="menueband">
   <div class="mb-titel">
     <a class="mb-marke" href="{% url 'start' %}">
-      <span class="mb-zeichen" aria-hidden="true">e</span>
-      <span><strong>edunex</strong><small>{{ SCHULNAME }}{% if AKTUELLES_SCHULJAHR %} · {{ AKTUELLES_SCHULJAHR }}{% endif %}</small></span>
+      <span class="mb-zeichen" aria-hidden="true">S</span>
+      <span><strong>Schulnexus</strong><small>{{ SCHULNAME }}{% if AKTUELLES_SCHULJAHR %} · {{ AKTUELLES_SCHULJAHR }}{% endif %}</small></span>
     </a>
     {% if MENUEBAND %}
     <form class="mb-suche" method="get" action="{% url 'suche' %}" role="search">

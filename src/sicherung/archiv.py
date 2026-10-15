@@ -33,9 +33,9 @@ from portal import krypto
 from .models import Protokoll, Sicherung
 from .module import MODULE, NAMEN, SCHLUESSEL, ist_protokollmodell, modellname, modelle, modul_von
 
-FORMAT = "edunex-modulsicherung"
-# Sicherungen aus Versionen vor 0.4.9.0 (damals „Schulverwaltung“) bleiben einlesbar.
-FORMATE_FRUEHER = {"schulverwaltung-modulsicherung"}
+FORMAT = "schulnexus-modulsicherung"
+# Sicherungen früherer Versionen (bis 0.4.8.1 „Schulverwaltung“, 0.4.9.0 „edunex“) bleiben einlesbar.
+FORMATE_FRUEHER = {"schulverwaltung-modulsicherung", "edunex-modulsicherung"}
 FORMATVERSION = 1
 
 
@@ -151,10 +151,10 @@ def oeffnen(pfad):
         zf = _zip(pfad)
         manifest = json.loads(zf.read("manifest.json"))
     except (OSError, KeyError, ValueError, zipfile.BadZipFile):
-        raise SicherungFehler(_("Die Datei ist keine gültige Sicherung von edunex.")) from None
+        raise SicherungFehler(_("Die Datei ist keine gültige Sicherung von Schulnexus.")) from None
     if manifest.get("format") not in {FORMAT, *FORMATE_FRUEHER} or manifest.get("formatversion", 0) > FORMATVERSION:
         zf.close()
-        raise SicherungFehler(_("Die Datei ist keine gültige Sicherung von edunex."))
+        raise SicherungFehler(_("Die Datei ist keine gültige Sicherung von Schulnexus."))
     for key, info in manifest.get("module", {}).items():
         if key not in SCHLUESSEL:
             continue

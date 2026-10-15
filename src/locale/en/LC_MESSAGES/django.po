@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-15 13:49+0300\n"
+"POT-Creation-Date: 2026-10-15 14:48+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1235,8 +1235,8 @@ msgid "Beiträge"
 msgstr "Posts"
 
 #: elternkontakt/models.py:172
-msgid "edunex (automatisch)"
-msgstr "edunex (automatic)"
+msgid "Schulnexus (automatisch)"
+msgstr "Schulnexus (automatic)"
 
 #: elternkontakt/models.py:185
 msgid "Fehltage (ganztägig)"
@@ -5782,8 +5782,8 @@ msgid "%(datei)s (%(art)s): %(module)s"
 msgstr "%(datei)s (%(art)s): %(module)s"
 
 #: sicherung/archiv.py:154 sicherung/archiv.py:157
-msgid "Die Datei ist keine gültige Sicherung von edunex."
-msgstr "The file is not a valid edunex backup."
+msgid "Die Datei ist keine gültige Sicherung von Schulnexus."
+msgstr "The file is not a valid Schulnexus backup."
 
 #: sicherung/archiv.py:165
 #, python-format
