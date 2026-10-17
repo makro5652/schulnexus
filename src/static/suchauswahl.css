@@ -1,0 +1,95 @@
+/* Suchauswahl (ab 0.4.10.0) – passt sich Portal (--flaeche …) und Verwaltungsoberfläche (--body-bg …) an */
+.suchauswahl {
+  --sa-flaeche: var(--flaeche, var(--body-bg, #fff));
+  --sa-text: var(--text, var(--body-fg, #1d2327));
+  --sa-leise: var(--leise, var(--body-quiet-color, #5b6670));
+  --sa-linie: var(--linie, var(--border-color, #cfd5da));
+  --sa-akzent: var(--akzent, var(--primary, #1f5f5b));
+  --sa-akzent-hell: var(--akzent-hell, var(--selected-row, #e3efed));
+  position: relative;
+  max-width: 46rem;
+  min-width: 0;
+  font-size: 0.92rem;
+  font-weight: 400;
+  color: var(--sa-text);
+}
+.suchauswahl .sa-versteckt { display: none !important; }
+
+.suchauswahl .sa-feld {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem;
+  min-height: 2.4rem; padding: 0.3rem 0.4rem;
+  border: 1px solid var(--sa-linie); border-radius: 8px; background: var(--sa-flaeche); cursor: text;
+}
+.suchauswahl .sa-feld:focus-within { border-color: var(--sa-akzent); box-shadow: 0 0 0 2px var(--sa-akzent-hell); }
+.suchauswahl .sa-marken { display: contents; list-style: none; margin: 0; padding: 0; }
+.suchauswahl .sa-marke {
+  display: inline-flex; align-items: center; gap: 0.2rem; max-width: 100%;
+  margin: 0; padding: 0.1rem 0.15rem 0.1rem 0.55rem; border-radius: 999px;
+  background: var(--sa-akzent-hell); color: var(--sa-text); line-height: 1.5; white-space: nowrap;
+}
+.suchauswahl .sa-marke span { overflow: hidden; text-overflow: ellipsis; }
+.suchauswahl .sa-leer { list-style: none; color: var(--sa-leise); padding: 0.1rem 0.3rem; }
+.suchauswahl .sa-weg {
+  display: inline-grid; place-items: center; width: 1.5rem; height: 1.5rem; flex: none;
+  border: 0; border-radius: 50%; background: transparent; color: var(--sa-leise);
+  font: inherit; font-size: 1.05rem; line-height: 1; cursor: pointer; padding: 0;
+}
+.suchauswahl .sa-weg:hover, .suchauswahl .sa-weg:focus-visible { background: var(--sa-akzent); color: var(--sa-flaeche); }
+.suchauswahl input.sa-eingabe {
+  flex: 1 1 10rem; min-width: 8rem; width: auto !important; margin: 0; padding: 0.25rem 0.3rem !important;
+  border: 0 !important; outline: 0; box-shadow: none !important; background: transparent !important;
+  color: var(--sa-text); font: inherit;
+}
+
+.suchauswahl .sa-vorschlaege {
+  position: absolute; z-index: 30; left: 0; right: 0; margin: 0.2rem 0 0; padding: 0.25rem; list-style: none;
+  max-height: 16rem; overflow-y: auto;
+  border: 1px solid var(--sa-linie); border-radius: 8px; background: var(--sa-flaeche);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+}
+.suchauswahl .sa-vorschlaege[hidden] { display: none; }
+.suchauswahl .sa-treffer { padding: 0.4rem 0.6rem; border-radius: 6px; cursor: pointer; margin: 0; }
+.suchauswahl .sa-treffer.aktiv, .suchauswahl .sa-treffer:hover { background: var(--sa-akzent); color: var(--sa-flaeche); }
+.suchauswahl .sa-treffer.sa-vorschlag::after { content: "\2022"; margin-left: 0.4rem; color: var(--sa-akzent); }
+.suchauswahl .sa-treffer.sa-vorschlag.aktiv::after { color: var(--sa-flaeche); }
+.suchauswahl .sa-keine { padding: 0.4rem 0.6rem; color: var(--sa-leise); list-style: none; margin: 0; }
+
+.suchauswahl .sa-leiste { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.6rem; margin-top: 0.4rem; }
+.suchauswahl .sa-knopf {
+  font: inherit; font-size: 0.85rem; font-weight: 600; padding: 0.3rem 0.75rem; cursor: pointer;
+  border: 1px solid var(--sa-linie); border-radius: 6px; background: var(--sa-flaeche); color: var(--sa-akzent);
+  text-transform: none; height: auto; line-height: 1.4;
+}
+.suchauswahl .sa-knopf:hover { border-color: var(--sa-akzent); }
+.suchauswahl .sa-knopf[hidden] { display: none; }
+.suchauswahl .sa-knopf.sa-haupt { background: var(--sa-akzent); color: var(--sa-flaeche); border-color: var(--sa-akzent); }
+.suchauswahl .sa-zahl { color: var(--sa-leise); font-size: 0.85rem; }
+.suchauswahl .sa-hinweis { color: var(--sa-leise); font-size: 0.78rem; flex-basis: 100%; }
+
+.suchauswahl .sa-dialog {
+  width: min(32rem, calc(100vw - 2rem)); max-height: min(36rem, calc(100vh - 3rem)); padding: 0;
+  border: 1px solid var(--sa-linie); border-radius: 12px; background: var(--sa-flaeche); color: var(--sa-text);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+}
+.suchauswahl .sa-dialog[open] { display: flex; flex-direction: column; }
+.suchauswahl .sa-dialog::backdrop { background: rgba(0, 0, 0, 0.35); }
+.suchauswahl .sa-dialog-kopf { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 0.8rem 1rem 0.5rem; }
+.suchauswahl input.sa-dialog-suche {
+  margin: 0 1rem 0.5rem; width: auto !important; padding: 0.45rem 0.6rem;
+  border: 1px solid var(--sa-linie); border-radius: 8px; background: var(--sa-flaeche); color: var(--sa-text); font: inherit;
+}
+.suchauswahl .sa-dialog-liste { overflow-y: auto; padding: 0 0.6rem 0.8rem; flex: 1 1 auto; min-height: 6rem; }
+.suchauswahl .sa-gruppe { margin-bottom: 0.5rem; }
+.suchauswahl .sa-gruppe-titel { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--sa-leise); padding: 0.5rem 0.4rem 0.2rem; }
+.suchauswahl label.sa-option {
+  display: flex !important; flex-direction: row !important; align-items: center; gap: 0.55rem;
+  margin: 0; padding: 0.45rem 0.4rem; border-radius: 6px; cursor: pointer;
+  font-weight: 400 !important; font-size: 0.92rem; width: auto; float: none; color: var(--sa-text);
+}
+.suchauswahl label.sa-option:hover { background: var(--sa-akzent-hell); }
+.suchauswahl label.sa-option input { width: 1.1rem !important; height: 1.1rem; margin: 0; flex: none; accent-color: var(--sa-akzent); }
+
+@media (max-width: 600px) {
+  .suchauswahl .sa-hinweis { display: none; }
+  .suchauswahl .sa-dialog { width: 100vw; max-width: 100vw; max-height: 85vh; margin: auto 0 0; border-radius: 12px 12px 0 0; }
+}

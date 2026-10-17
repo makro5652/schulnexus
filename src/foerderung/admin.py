@@ -6,6 +6,8 @@ from django.utils.html import format_html
 from django.utils.translation import gettext, gettext_lazy as _
 from simple_history.admin import SimpleHistoryAdmin
 
+from portal.suchauswahl import SuchauswahlAdminMixin
+
 from portal.rechte import (
     darf_foerderung_bearbeiten, darf_foerderung_sehen, darf_nachteilsausgleich_sehen, foerder_schueler_filter,
     ist_foerderkoordination, ist_verwaltung, klassenleitung_schueler_ids,
@@ -180,12 +182,11 @@ class SchuelerVorauswahlMixin:
 
 
 @admin.register(Foerderplan)
-class FoerderplanAdmin(SchuelerVorauswahlMixin, FoerderRechteMixin, SimpleHistoryAdmin):
+class FoerderplanAdmin(SuchauswahlAdminMixin, SchuelerVorauswahlMixin, FoerderRechteMixin, SimpleHistoryAdmin):
     list_display = ["schueler", "klasse", "titel", "status", "gueltig_von", "evaluation_am", "eltern", "ansicht"]
     list_filter = ["status", "schuljahr", "schwerpunkte", ElternbestaetigungFilter]
     search_fields = ["schueler__person__nachname", "schueler__person__vorname", "titel"]
     autocomplete_fields = ["schueler", "verantwortlich", "vorgaenger"]
-    filter_horizontal = ["schwerpunkte", "beteiligte"]
     readonly_fields = ["erstellt_von", "erstellt_am", "geaendert_am"]
     inlines = [ZielInline, EintragInline, AushaendigungInline]
     fieldsets = [
@@ -198,6 +199,22 @@ class FoerderplanAdmin(SchuelerVorauswahlMixin, FoerderRechteMixin, SimpleHistor
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related("schueler__person", "schuljahr").prefetch_related("aushaendigungen")
+
+    suchauswahl_texte = {"beteiligte": (_("Unterrichtende Lehrkräfte"), _("Alle unterrichtenden Lehrkräfte übernehmen"))}
+
+    def suchauswahl_vorschlaege(self, request, db_field):
+        """Weitere Beteiligte: die Lehrkräfte, die die Schülerin / den Schüler im laufenden Halbjahr unterrichten."""
+        if db_field.name != "beteiligte" or not request.resolver_match:
+            return set()
+        plan = Foerderplan.objects.filter(pk=request.resolver_match.kwargs.get("object_id") or 0).select_related("schueler").first()
+        if not plan:
+            return set()
+        from stammdaten.models import Abschnitt
+        from zeugnisse.rechte import lehrkraefte_ids
+
+        heute = timezone.localdate()
+        abschnitt = Abschnitt.objects.filter(beginn__lte=heute, ende__gte=heute).first()
+        return lehrkraefte_ids(plan.schueler, abschnitt) - {None} if abschnitt else set()
 
     def get_changeform_initial_data(self, request):
         from stammdaten.models import Schuljahr
@@ -271,13 +288,12 @@ class AktivFilter(admin.SimpleListFilter):
 
 
 @admin.register(Nachteilsausgleich)
-class NachteilsausgleichAdmin(SchuelerVorauswahlMixin, FoerderRechteMixin, SimpleHistoryAdmin):
+class NachteilsausgleichAdmin(SuchauswahlAdminMixin, SchuelerVorauswahlMixin, FoerderRechteMixin, SimpleHistoryAdmin):
     sehen_pruefung = staticmethod(darf_nachteilsausgleich_sehen)
     list_display = ["schueler", "klasse", "massnahmen_kurz", "faecher_kurz", "status", "gueltig_von", "gueltig_bis", "eltern", "ansicht"]
     list_filter = [AktivFilter, "status", "massnahmen", "schwerpunkte", ElternbestaetigungFilter]
     search_fields = ["schueler__person__nachname", "schueler__person__vorname"]
     autocomplete_fields = ["schueler", "foerderplan"]
-    filter_horizontal = ["massnahmen", "faecher", "schwerpunkte"]
     readonly_fields = ["erstellt_von", "erstellt_am", "geaendert_am"]
     inlines = [AushaendigungInline]
     fieldsets = [

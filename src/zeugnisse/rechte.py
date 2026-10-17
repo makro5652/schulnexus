@@ -29,6 +29,20 @@ def lehrkraefte_ids(schueler, abschnitt):
     return set(unterrichte_fuer(schueler, abschnitt).values_list("lehrkraft_id", flat=True))
 
 
+def konferenz_kandidaten(k):
+    """Lehrkräfte, die Schüler:innen der Klasse im Halbjahr unterrichten, und die Klassenleitung (Vorschläge für
+    die Anwesenheit, ab 0.4.10.0)."""
+    from .noten import klassen_mitglieder
+
+    ids = set()
+    for s in klassen_mitglieder(k.klasse, k.abschnitt):
+        ids |= lehrkraefte_ids(s, k.abschnitt)
+    if k.klasse.leitung_id:
+        ids.add(k.klasse.leitung_id)
+    ids.discard(None)
+    return ids
+
+
 def unterrichtet(user, schueler, abschnitt):
     p = personal_von(user)
     return bool(p and p.pk in lehrkraefte_ids(schueler, abschnitt))

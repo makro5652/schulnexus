@@ -6,6 +6,8 @@ from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from simple_history.admin import SimpleHistoryAdmin
 
+from portal.suchauswahl import SuchauswahlAdminMixin
+
 from portal.rechte import ist_verwaltung
 
 from .berechnung import nominale_anteile
@@ -112,15 +114,13 @@ class OberordnerInline(admin.TabularInline):
 
 
 @admin.register(Klausurregel)
-class KlausurregelAdmin(SimpleHistoryAdmin):
+class KlausurregelAdmin(SuchauswahlAdminMixin, SimpleHistoryAdmin):
     list_display = ["__str__", "anteil_klausur", "bemerkung"]
-    filter_horizontal = ["faecher"]
 
 
 @admin.register(Zeugnisnotenfreigabe)
-class ZeugnisnotenfreigabeAdmin(SimpleHistoryAdmin):
+class ZeugnisnotenfreigabeAdmin(SuchauswahlAdminMixin, SimpleHistoryAdmin):
     list_display = ["__str__", "bemerkung", "geaendert_am"]
-    filter_horizontal = ["faecher"]
 
 
 @admin.register(Notensperre)

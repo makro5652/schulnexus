@@ -19,6 +19,7 @@
 {% if hindernisse %}<div class="an-banner warnend"><strong>{% translate "Die Konferenz kann noch nicht abgeschlossen werden:" %}</strong><ul class="schlicht">{% for h in hindernisse %}<li>{{ h }}</li>{% endfor %}</ul></div>{% endif %}
 {% if k.abgeschlossen %}<div class="an-banner ok">{% if k.art == "versetzung" %}{% translate "Abgeschlossen. Die Versetzungsentscheidungen sind in die Jahreszeugnisse übernommen." %}{% else %}{% translate "Abgeschlossen." %}{% endif %}</div>{% endif %}
 
+{{ form.media }}
 <form method="post" id="konferenz-form">
 {% csrf_token %}
 <details class="karte zg-kopfdaten"{% if not k.datum %} open{% endif %}>

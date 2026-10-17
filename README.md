@@ -177,6 +177,12 @@ Deutschen Schulen im Ausland (Beschluss vom 18.03.2026). **Menüband › Unterri
    Begründung (Pflicht bei Nichtversetzung); druckbare Niederschrift. Beim Abschluss der Versetzungskonferenz werden
    die Entscheidungen in die Jahreszeugnisse übernommen.
 
+   **Anwesenheit** (ab 0.4.10.0): Namen oder Kürzel tippen, mit den Pfeiltasten wählen, **Tab** oder **Enter**
+   übernimmt; jede Person erscheint als Marke mit ×. „Liste öffnen“ zeigt alle Beschäftigten zum Anklicken (mit
+   Suchfeld), oben die Lehrkräfte der Klasse; „Alle Lehrkräfte der Klasse übernehmen“ trägt sie gesammelt ein. Gäste
+   wie Schulleitung oder Förderkoordination lassen sich ebenso eintragen. In der Verwaltungsoberfläche stehen bei den
+   Konferenzbeschlüssen nur die Schüler:innen der Klasse zur Auswahl.
+
 Je Fach legt die Verwaltung unter **Fächer** fest, welche Rolle es für Versetzung und Zeugnis hat (Deutsch, Mathematik,
 Fremdsprache, Kunst/Musik/Sport, Religion/Ethik, weiteres Fach) und in welcher Zeugnisspalte es steht; bekannte
 Fachnamen werden automatisch eingeordnet. Welche Fremdsprache die erste bzw. zweite ist, steht in der Sprachenfolge.
@@ -786,6 +792,23 @@ Es sind keine Geheimnisse hinterlegt; verwendet werden nur erfundene Demodaten u
 Die Oberflächenprüfung lässt sich auch lokal ausführen (Playwright für Python nötig): `python tools/oberflaeche_pruefen.py http://localhost:8000 ausgabeordner`. Rückgabewert 1 bei Befunden.
 
 Hinweis: Private Repositories haben ein monatliches Kontingent an Actions-Minuten (je nach Tarif; der genaue Wert sollte auf GitHub unter „Settings → Billing“ nachgesehen werden). Ein vollständiger Lauf dauert etwa 10–15 Minuten.
+
+## Suchauswahl statt Hin-und-her-Listen (ab 0.4.10.0)
+
+Alle Mehrfachauswahlen der Verwaltungsoberfläche (Anwesende einer Konferenz, Beteiligte eines Förderplans, Fächer,
+Förderschwerpunkte, Maßnahmen, Lehrbefähigungen, gebildet aus Klassen, Pflichtnachweise) nutzen statt der zwei Listen
+zum Hin- und Herschieben eine **Suchauswahl**: tippen, Tab oder Enter übernimmt, × entfernt, „Liste öffnen“ zeigt alle
+Einträge im Overlay zum Anklicken. Wo es sinnvoll ist, stehen **Vorschläge** oben (Konferenz: Lehrkräfte der Klasse;
+Förderplan: die im laufenden Halbjahr unterrichtenden Lehrkräfte) und lassen sich gesammelt übernehmen. Ohne
+JavaScript bleibt die gewöhnliche Mehrfachauswahl nutzbar. Baustein: `portal/suchauswahl.py`, `static/suchauswahl.js`.
+
+Geprüft wurde dabei auch, wo Schüler:innen aus der ganzen Schule angeboten werden, obwohl der Zusammenhang eine Klasse
+oder einen Kurs vorgibt. Gefunden und eingeschränkt: Konferenzbeschlüsse in der Verwaltungsoberfläche (jetzt nur die
+Klasse, zuzüglich bereits erfasster Beschlüsse). Bereits eingeschränkt waren: Konferenzseite, Zeugnisnoten,
+Notenzeilen eines Leistungsnachweises (werden je Kursmitglied angelegt), Sprechtag-Buchungen (nur unterrichtete bzw.
+geleitete Schüler:innen), Förderpläne für Klassenleitungen (nur die eigene Klasse). Bewusst schulweit bleiben die
+Zuordnung zu Klassen und Gruppen, neue Förderpläne der Förderkoordination und Fehlzeiten in der Verwaltungsoberfläche
+(dort mit Suchfeld statt Liste).
 
 ## Code-Prüfung 0.4.9.2
 

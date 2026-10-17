@@ -7,6 +7,8 @@ from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from simple_history.admin import SimpleHistoryAdmin
 
+from portal.suchauswahl import SuchauswahlAdminMixin
+
 from portal.rechte import ist_personalverwaltung, ist_verwaltung
 
 from .models import (
@@ -370,13 +372,12 @@ class NachweisFilter(admin.SimpleListFilter):
 
 
 @admin.register(Personalprofil)
-class PersonalprofilAdmin(ZusatzfelderAdminMixin, SimpleHistoryAdmin):
+class PersonalprofilAdmin(SuchauswahlAdminMixin, ZusatzfelderAdminMixin, SimpleHistoryAdmin):
     zusatz_zielgruppe = "personal"
     list_display = ["person", "bereich", "stellenbezeichnung", "kuerzel"]
     list_filter = ["bereich", "anstellungsart", "dienstleister", "aktiv", "lehrbefaehigungen"]
     search_fields = ["kuerzel", "person__nachname", "person__vorname", "personalnummer", "stellenbezeichnung", "ausweisnummer"]
     autocomplete_fields = ["person", "vorgesetzt"]
-    filter_horizontal = ["lehrbefaehigungen"]
     list_select_related = ["person", "bereich"]
 
     def _hr(self, request):
@@ -436,12 +437,11 @@ class GruppenMitgliederInline(admin.TabularInline):
 
 
 @admin.register(Gruppe)
-class GruppeAdmin(SimpleHistoryAdmin):
+class GruppeAdmin(SuchauswahlAdminMixin, SimpleHistoryAdmin):
     list_display = ["name", "typ", "jahrgang", "schuljahr", "leitung", "anzahl_mitglieder"]
     list_filter = ["schuljahr", "typ", "jahrgang"]
     search_fields = ["name", "kuerzel"]
     autocomplete_fields = ["leitung"]
-    filter_horizontal = ["gebildet_aus"]
     inlines = [GruppenMitgliederInline]
     actions = ["aus_stammklassen_fuellen"]
 
@@ -608,10 +608,9 @@ class DienstleisterAdmin(admin.ModelAdmin):
 
 
 @admin.register(Nachweisart)
-class NachweisartAdmin(admin.ModelAdmin):
+class NachweisartAdmin(SuchauswahlAdminMixin, admin.ModelAdmin):
     list_display = ["name", "name_en", "gueltigkeit_monate", "pflicht_text", "reihenfolge"]
     list_editable = ["reihenfolge"]
-    filter_horizontal = ["pflicht_fuer"]
 
     @admin.display(description=_("Pflicht für"))
     def pflicht_text(self, obj):

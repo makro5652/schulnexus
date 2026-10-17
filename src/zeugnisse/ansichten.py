@@ -8,6 +8,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
+from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -18,6 +19,7 @@ from django.views.decorators.http import require_POST
 
 from noten.berechnung import Baum, Vorhalbjahr, vorschlagsnote
 from noten.models import Note, Unterricht, Zeugnisnote
+from portal.suchauswahl import Suchauswahl
 from portal.rechte import darf_akte_sehen, darf_unterricht_sehen, ist_schulleitung, personal_von
 from stammdaten.models import Abschnitt, Gruppe, Personalprofil
 
@@ -587,12 +589,7 @@ def konferenz_anlegen(klasse, abschnitt, user):
     art = Konferenz.VERSETZUNG if art_fuer(abschnitt) == Zeugnis.JAHR else Konferenz.HALBJAHR
     k, neu = Konferenz.objects.get_or_create(klasse=klasse, abschnitt=abschnitt, defaults={"art": art, "erstellt_von": user})
     if neu:
-        ids = set()
-        for s in klassen_mitglieder(klasse, abschnitt):
-            ids |= rechte.lehrkraefte_ids(s, abschnitt)
-        if klasse.leitung_id:
-            ids.add(klasse.leitung_id)
-        k.teilnehmende.set(ids)
+        k.teilnehmende.set(rechte.konferenz_kandidaten(k))
         if klasse.leitung_id:
             k.protokoll = klasse.leitung
             k.save(update_fields=["protokoll"])
@@ -605,17 +602,25 @@ class KonferenzForm(forms.ModelForm):
         fields = ["art", "datum", "beginn", "ende", "ort", "vorsitz", "protokoll", "teilnehmende", "notizen"]
         widgets = {"datum": DATUM, "beginn": forms.TimeInput(attrs={"type": "time"}, format="%H:%M"),
                    "ende": forms.TimeInput(attrs={"type": "time"}, format="%H:%M"),
-                   "notizen": forms.Textarea(attrs={"rows": 4}), "teilnehmende": forms.CheckboxSelectMultiple}
+                   "notizen": forms.Textarea(attrs={"rows": 4})}
 
     def __init__(self, *args, kandidaten=None, **kwargs):
         super().__init__(*args, **kwargs)
-        qs = Personalprofil.objects.filter(aktiv=True).select_related("person").order_by("person__nachname")
+        qs = Personalprofil.objects.filter(aktiv=True).select_related("person").order_by("person__nachname", "person__vorname")
         for f in ("vorsitz", "protokoll"):
             self.fields[f].queryset = qs
             self.fields[f].label_from_instance = lambda p: f"{p.person.anzeigename}{f' ({p.kuerzel})' if p.kuerzel else ''}"
-        ids = set(kandidaten or []) | set(self.instance.teilnehmende.values_list("pk", flat=True) if self.instance.pk else [])
-        self.fields["teilnehmende"].queryset = qs.filter(pk__in=ids)
+        # Anwesenheit (ab 0.4.10.0): Suchauswahl über alle aktiven Beschäftigten; die Lehrkräfte der Klasse stehen als
+        # Vorschläge oben und lassen sich gesammelt übernehmen. Bereits Eingetragene bleiben auch nach dem Ausscheiden.
+        bisher = set(self.instance.teilnehmende.values_list("pk", flat=True)) if self.instance.pk else set()
+        kandidaten = set(kandidaten or [])
+        self.fields["teilnehmende"].queryset = (Personalprofil.objects.filter(Q(aktiv=True) | Q(pk__in=bisher))
+                                                .select_related("person").order_by("person__nachname", "person__vorname"))
         self.fields["teilnehmende"].label_from_instance = lambda p: f"{p.person.anzeigename}{f' ({p.kuerzel})' if p.kuerzel else ''}"
+        self.fields["teilnehmende"].widget = Suchauswahl(
+            vorschlaege=kandidaten, vorschlag_titel=gettext("Lehrkräfte der Klasse"),
+            alle_text=gettext("Alle Lehrkräfte der Klasse übernehmen"))
+        self.fields["teilnehmende"].widget.choices = self.fields["teilnehmende"].choices
 
 
 def _konferenz_zeilen(k):
@@ -700,10 +705,8 @@ def konferenz(request, pk):
         raise PermissionDenied
     darf_leiten = rechte.darf_konferenz_leiten(user, k.klasse) and not k.abgeschlossen
     zeilen, spalten = _konferenz_zeilen(k)
-    kandidaten = set()
-    for zl in zeilen:
-        kandidaten |= rechte.lehrkraefte_ids(zl["s"], k.abschnitt)
-    form = KonferenzForm(instance=k, kandidaten=kandidaten | ({k.klasse.leitung_id} if k.klasse.leitung_id else set()))
+    kandidaten = rechte.konferenz_kandidaten(k)
+    form = KonferenzForm(instance=k, kandidaten=kandidaten)
     hindernisse = []
     if request.method == "POST":
         aktion = request.POST.get("aktion")
@@ -715,7 +718,7 @@ def konferenz(request, pk):
             return redirect("konferenz", pk=k.pk)
         if not darf_leiten:
             raise PermissionDenied
-        form = KonferenzForm(request.POST, instance=k, kandidaten=form.fields["teilnehmende"].queryset.values_list("pk", flat=True))
+        form = KonferenzForm(request.POST, instance=k, kandidaten=kandidaten)
         if form.is_valid():
             k = form.save(commit=False)
             if k.status == Konferenz.GEPLANT and aktion in ("speichern", "abschliessen") and k.datum and k.datum <= timezone.localdate():
