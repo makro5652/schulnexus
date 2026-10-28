@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-17 07:31+0300\n"
+"POT-Creation-Date: 2026-10-28 17:02+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -58,8 +58,9 @@ msgstr "Category"
 #: aufnahme/ansichten.py:114 aufnahme/models.py:259 aufnahme/models.py:306
 #: foerderung/models.py:86 nachmittag/models.py:20 portal/models.py:127
 #: stammdaten/models.py:82 stammdaten/models.py:455 stammdaten/models.py:730
-#: templates/aufnahme/anmeldung.html:130 templates/portal/_anhaenge.html:25
-#: termine/models.py:54 termine/models.py:147
+#: templates/aufnahme/anmeldung.html:130 templates/noten/notentabelle.html:66
+#: templates/portal/_anhaenge.html:25 termine/models.py:54
+#: termine/models.py:147
 msgid "Titel"
 msgstr "Title"
 
@@ -223,7 +224,7 @@ msgstr "Name (English)"
 
 #: aufnahme/models.py:71 laufbahn/models.py:136 nachmittag/models.py:21
 #: noten/models.py:42 noten/models.py:119 noten/models.py:289
-#: sicherung/models.py:96 stammdaten/models.py:367 stammdaten/models.py:688
+#: sicherung/models.py:97 stammdaten/models.py:367 stammdaten/models.py:688
 #: templates/sicherung/protokoll.html:14 templates/termine/termin.html:47
 #: termine/models.py:64
 msgid "Beschreibung"
@@ -647,7 +648,9 @@ msgstr "Contacts (application)"
 
 #: aufnahme/models.py:307 sicherung/models.py:20 stammdaten/admin.py:527
 #: stammdaten/models.py:381 stammdaten/models.py:733
-#: templates/aufnahme/anmeldung.html:130 templates/portal/_anhaenge.html:26
+#: templates/aufnahme/anmeldung.html:130 templates/noten/notentabelle.html:93
+#: templates/noten/notentabelle.html:94 templates/noten/notentabelle.html:95
+#: templates/portal/_anhaenge.html:26
 msgid "Datei"
 msgstr "File"
 
@@ -1010,7 +1013,7 @@ msgstr "Absences (automatic)"
 #: templates/elternkontakt/uebersicht.html:39
 #: templates/laufbahn/wechsel.html:92 templates/noten/eingabe.html:50
 #: templates/portal/klassenliste.html:13
-#: templates/portal/notenuebersicht.html:27
+#: templates/portal/notenuebersicht.html:28
 #: templates/termine/sprechzeiten.html:86 templates/zeugnisse/klasse.html:30
 #: templates/zeugnisse/konferenz.html:52
 #: templates/zeugnisse/unterricht.html:23 termine/models.py:278
@@ -2063,6 +2066,7 @@ msgid "Fach"
 msgstr "Subject"
 
 #: foerderung/models.py:148 stammdaten/models.py:252
+#: templates/noten/notentabelle.html:66
 #: templates/sicherung/benutzer_bearbeiten.html:73
 msgid "Bereich"
 msgstr "Area"
@@ -2148,10 +2152,10 @@ msgstr "Other"
 #: foerderung/models.py:188 noten/export.py:178 noten/export.py:314
 #: noten/models.py:352 portal/models.py:48 stammdaten/models.py:457
 #: stammdaten/models.py:874 stammdaten/models.py:969
-#: templates/termine/raumplan.html:15 templates/termine/termin.html:43
-#: templates/zeugnisse/protokoll.html:18 templates/zeugnisse/zeugnis.html:122
-#: termine/ansichten.py:219 termine/models.py:103 termine/models.py:213
-#: zeugnisse/models.py:186
+#: templates/noten/notentabelle.html:66 templates/termine/raumplan.html:15
+#: templates/termine/termin.html:43 templates/zeugnisse/protokoll.html:18
+#: templates/zeugnisse/zeugnis.html:122 termine/ansichten.py:219
+#: termine/models.py:103 termine/models.py:213 zeugnisse/models.py:186
 msgid "Datum"
 msgstr "Date"
 
@@ -2245,7 +2249,7 @@ msgstr "Change history: access arrangements"
 #: templates/foerderung/nachteilsausgleich.html:7
 #: templates/foerderung/nachteilsausgleich.html:11
 #: templates/portal/klassenliste.html:17
-#: templates/portal/notenuebersicht.html:49
+#: templates/portal/notenuebersicht.html:50
 #: templates/portal/schuelerakte.html:35
 msgid "Nachteilsausgleich"
 msgstr "Access arrangements"
@@ -3268,7 +3272,7 @@ msgstr "Assessment folder"
 #: noten/admin.py:146 noten/apps.py:8 noten/export.py:178 noten/models.py:425
 #: templates/noten/notensperre.html:21 templates/noten/struktur.html:43
 #: templates/portal/notenuebersicht.html:3
-#: templates/portal/notenuebersicht.html:96 templates/portal/start.html:69
+#: templates/portal/notenuebersicht.html:97 templates/portal/start.html:69
 #: templates/zeugnisse/klasse.html:30
 msgid "Noten"
 msgstr "Grades"
@@ -3291,7 +3295,8 @@ msgstr "Assessments in this folder (enter grades via “Change”)"
 #: noten/admin.py:209 noten/admin.py:277 noten/ansichten.py:68
 #: noten/export.py:178 noten/export.py:198 noten/export.py:314
 #: noten/export.py:326 noten/models.py:350 templates/noten/eingabe.html:20
-#: templates/portal/notenuebersicht.html:86
+#: templates/noten/notentabelle.html:67
+#: templates/portal/notenuebersicht.html:87
 msgid "Ordner"
 msgstr "Folder"
 
@@ -3300,7 +3305,8 @@ msgid "Anteil an der Gesamtnote"
 msgstr "Share of the overall grade"
 
 #: noten/admin.py:220 noten/export.py:177 noten/models.py:368
-#: portal/navigation.py:169 templates/portal/notenuebersicht.html:86
+#: portal/navigation.py:169 templates/noten/notentabelle.html:64
+#: templates/portal/notenuebersicht.html:87
 msgid "Leistungsnachweise"
 msgstr "Assessments"
 
@@ -3571,7 +3577,7 @@ msgstr "%(art)s: %(fach)s %(gruppe)s, %(abschnitt)s"
 msgid "Vertraulich – personenbezogene Daten"
 msgstr "Confidential – personal data"
 
-#: noten/export.py:137 templates/portal/notenuebersicht.html:30
+#: noten/export.py:137 templates/portal/notenuebersicht.html:31
 msgid "Ø 2. Halbjahr"
 msgstr "Ø 2nd semester"
 
@@ -3584,7 +3590,7 @@ msgid "Ø Vorschlag"
 msgstr "Ø suggestion"
 
 #: noten/export.py:139 noten/export.py:280 noten/export.py:333
-#: templates/portal/notenuebersicht.html:32
+#: templates/portal/notenuebersicht.html:33
 #: templates/portal/schuelerakte.html:134
 #: templates/zeugnisse/konferenz.html:54
 #: templates/zeugnisse/unterricht.html:23
@@ -3592,7 +3598,7 @@ msgid "Vorschlag"
 msgstr "Suggestion"
 
 #: noten/export.py:139 noten/models.py:502
-#: templates/portal/notenuebersicht.html:33
+#: templates/portal/notenuebersicht.html:34
 #: templates/zeugnisse/unterricht.html:23
 #: templates/zeugnisse/unterricht.html:34
 msgid "Zeugnisnote"
@@ -3613,9 +3619,9 @@ msgstr "Orange: the report grade differs from the calculated suggestion."
 
 #: noten/export.py:178 noten/export.py:198 noten/export.py:314
 #: noten/export.py:326 noten/models.py:284 templates/noten/eingabe.html:27
-#: templates/noten/struktur.html:22 templates/noten/struktur.html:35
-#: templates/noten/struktur.html:49 templates/noten/struktur.html:79
-#: templates/portal/notenuebersicht.html:86
+#: templates/noten/notentabelle.html:66 templates/noten/struktur.html:22
+#: templates/noten/struktur.html:35 templates/noten/struktur.html:49
+#: templates/noten/struktur.html:79 templates/portal/notenuebersicht.html:87
 msgid "Gewicht"
 msgstr "Weight"
 
@@ -3630,7 +3636,7 @@ msgstr "Average"
 #: noten/export.py:197 noten/kurswahl.py:19 templates/noten/struktur.html:3
 #: templates/noten/struktur.html:7 templates/noten/struktur.html:8
 #: templates/portal/notenuebersicht.html:10
-#: templates/portal/notenuebersicht.html:79
+#: templates/portal/notenuebersicht.html:80
 msgid "Bewertungsstruktur"
 msgstr "Assessment structure"
 
@@ -3688,7 +3694,7 @@ msgstr "No assessments yet."
 msgid "Rechenweg"
 msgstr "Calculation"
 
-#: noten/export.py:326 templates/portal/notenuebersicht.html:86
+#: noten/export.py:326 templates/portal/notenuebersicht.html:87
 msgid "Anteil an der Note"
 msgstr "Share of the grade"
 
@@ -3700,7 +3706,7 @@ msgstr "Ø"
 msgid "Schnitt 2. Halbjahr"
 msgstr "Average 2nd semester"
 
-#: noten/export.py:333 templates/portal/notenuebersicht.html:32
+#: noten/export.py:333 templates/portal/notenuebersicht.html:33
 msgid "Jahresvorschlag"
 msgstr "Year suggestion"
 
@@ -3723,6 +3729,56 @@ msgstr "Signature teacher"
 #: noten/export.py:354
 msgid "Notenbogen als PDF"
 msgstr "Grade sheet as PDF"
+
+#: noten/importseite.py:18
+msgid "Ausgefüllte Notentabelle (.xlsx)"
+msgstr "Completed grade sheet (.xlsx)"
+
+#: noten/importseite.py:32 noten/notenimport.py:327
+#: templates/noten/notentabelle.html:11
+msgid ""
+"Die Notentabelle ist für Noten 1–6 (Sek I) gedacht; dieser Unterricht "
+"verwendet Punkte."
+msgstr ""
+"The grade sheet is designed for grades 1–6 (lower secondary); this course "
+"uses points."
+
+#: noten/importseite.py:35
+msgid "Notentabelle heruntergeladen"
+msgstr "Grade sheet downloaded"
+
+#: noten/importseite.py:63
+msgid "Die hochgeladene Tabelle wurde verworfen."
+msgstr "The uploaded sheet was discarded."
+
+#: noten/importseite.py:69
+#, python-format
+msgid "Es wurde nichts gespeichert: %(fehler)s"
+msgstr "Nothing was saved: %(fehler)s"
+
+#: noten/importseite.py:74
+#, python-format
+msgid "%(n)s Leistungsnachweis übernommen"
+msgid_plural "%(n)s Leistungsnachweise übernommen"
+msgstr[0] "%(n)s assessment imported"
+msgstr[1] "%(n)s assessments imported"
+
+#: noten/importseite.py:75
+#, python-format
+msgid "%(neu)s Noten neu, %(geaendert)s geändert, %(gleich)s unverändert."
+msgstr "%(neu)s grades new, %(geaendert)s changed, %(gleich)s unchanged."
+
+#: noten/importseite.py:76
+msgid "Noten aus Excel übernommen"
+msgstr "Grades imported from Excel"
+
+#: noten/importseite.py:87 templates/noten/notentabelle.html:93
+msgid "Klassenarbeiten"
+msgstr "Class tests"
+
+#: noten/importseite.py:87
+msgid "Sonstige Mitarbeit (SoMi)"
+msgstr "Class participation (SoMi)"
 
 #: noten/klausurregeln.py:44
 #, python-format
@@ -3782,7 +3838,7 @@ msgstr[1] "Rule deleted; the folders are free again in %(n)s courses."
 #: noten/kurswahl.py:18 templates/noten/eingabe.html:3
 #: templates/noten/eingabe.html:7 templates/noten/eingabe.html:8
 #: templates/noten/struktur.html:16 templates/portal/notenuebersicht.html:9
-#: templates/portal/notenuebersicht.html:38
+#: templates/portal/notenuebersicht.html:39
 msgid "Noten eintragen"
 msgstr "Enter grades"
 
@@ -4346,7 +4402,130 @@ msgstr "Permissions: report grade without individual grades"
 msgid "Nur Zeugnisnote, Jahrgang %(von)s–%(bis)s"
 msgstr "Report grade only, years %(von)s–%(bis)s"
 
-#: noten/sperrseite.py:35 templates/portal/notenuebersicht.html:49
+#: noten/notenimport.py:182
+#, python-format
+msgid "„%(text)s“ ist kein gültiges Datum."
+msgstr "“%(text)s” is not a valid date."
+
+#: noten/notenimport.py:190
+#, python-format
+msgid "„%(text)s“ ist kein gültiges Gewicht."
+msgstr "“%(text)s” is not a valid weight."
+
+#: noten/notenimport.py:199
+msgid "Die Datei ist größer als 5 MB."
+msgstr "The file is larger than 5 MB."
+
+#: noten/notenimport.py:204
+msgid "Die Datei ließ sich nicht als Excel-Datei (.xlsx) öffnen."
+msgstr "The file could not be opened as an Excel file (.xlsx)."
+
+#: noten/notenimport.py:207
+#, python-format
+msgid ""
+"Das ist keine Notentabelle von Schulnexus – es fehlt das Blatt „%(blatt)s“."
+msgstr ""
+"This is not a Schulnexus grade sheet – the sheet “%(blatt)s” is missing."
+
+#: noten/notenimport.py:316
+#, python-format
+msgid ""
+"Die Dezimalnote %(text)s entspricht keiner Notenstufe der Skala (z. B. 2,3 ="
+" 2-)."
+msgstr ""
+"The decimal grade %(text)s does not match any grade of the scale (e.g. 2.3 ="
+" 2-)."
+
+#: noten/notenimport.py:329
+#, python-format
+msgid ""
+"Die Klasse in der Datei („%(datei)s“) passt nicht zu diesem Unterricht "
+"(„%(kurs)s“). Bitte im Blatt „Master“ die Klasse eintragen oder die Datei "
+"beim richtigen Unterricht hochladen."
+msgstr ""
+"The class in the file (“%(datei)s”) does not match this course (“%(kurs)s”)."
+" Please enter the class on the “Master” sheet or upload the file to the "
+"correct course."
+
+#: noten/notenimport.py:333
+#, python-format
+msgid ""
+"Das Fach in der Datei („%(datei)s“) weicht vom Unterricht ab („%(kurs)s“)."
+msgstr ""
+"The subject in the file (“%(datei)s”) differs from the course (“%(kurs)s”)."
+
+#: noten/notenimport.py:337
+#, python-format
+msgid "Das Schuljahr in der Datei („%(datei)s“) weicht ab („%(kurs)s“)."
+msgstr "The school year in the file (“%(datei)s”) differs (“%(kurs)s”)."
+
+#: noten/notenimport.py:351
+msgid "mehrdeutig – nicht übernommen"
+msgstr "ambiguous – not imported"
+
+#: noten/notenimport.py:354
+msgid "nicht in diesem Unterricht gefunden – nicht übernommen"
+msgstr "not found in this course – not imported"
+
+#: noten/notenimport.py:356
+msgid "steht mehrfach in der Datei – nur die erste Zeile zählt"
+msgstr "appears more than once in the file – only the first row counts"
+
+#: noten/notenimport.py:358
+msgid "Noten gesperrt – nicht übernommen"
+msgstr "grades locked – not imported"
+
+#: noten/notenimport.py:365
+msgid ""
+"Keine Schülerin und kein Schüler der Datei wurde in diesem Unterricht "
+"gefunden (Nachname und Vorname müssen übereinstimmen)."
+msgstr ""
+"No student in the file was found in this course (surname and first name must"
+" match)."
+
+#: noten/notenimport.py:380
+msgid "(neu)"
+msgstr "(new)"
+
+#: noten/notenimport.py:390
+#, python-format
+msgid "Das Datum %(datum)s liegt nicht im Halbjahr (%(von)s bis %(bis)s)."
+msgstr "The date %(datum)s is not within the half-year (%(von)s to %(bis)s)."
+
+#: noten/notenimport.py:393
+msgid ""
+"Gewicht 0 ist in Schulnexus nicht möglich – Spalte leeren oder ein Gewicht "
+"über 0 eintragen."
+msgstr ""
+"A weight of 0 is not possible in Schulnexus – clear the column or enter a "
+"weight above 0."
+
+#: noten/notenimport.py:401
+#, python-format
+msgid ""
+"„%(titel)s“ wird in Schulnexus mit Bewertungseinheiten und Notenschlüssel "
+"geführt; %(n)s abweichende Note aus der Tabelle wird nicht übernommen."
+msgid_plural ""
+"„%(titel)s“ wird in Schulnexus mit Bewertungseinheiten und Notenschlüssel "
+"geführt; %(n)s abweichende Noten aus der Tabelle werden nicht übernommen."
+msgstr[0] ""
+"“%(titel)s” is recorded in Schulnexus with marks and a grading key; %(n)s "
+"differing grade from the sheet is not imported."
+msgstr[1] ""
+"“%(titel)s” is recorded in Schulnexus with marks and a grading key; %(n)s "
+"differing grades from the sheet are not imported."
+
+#: noten/notenimport.py:420
+#, python-format
+msgid "Zeile %(zeile)s: %(fehler)s"
+msgstr "Row %(zeile)s: %(fehler)s"
+
+#: noten/notenimport.py:434
+#, python-format
+msgid "Im Blatt „%(blatt)s“ stehen keine Noten."
+msgstr "There are no grades on the sheet “%(blatt)s”."
+
+#: noten/sperrseite.py:35 templates/portal/notenuebersicht.html:50
 msgid "Noten gesperrt"
 msgstr "Grades locked"
 
@@ -4541,7 +4720,7 @@ msgstr "Two-factor sign-in"
 msgid "Zwei-Faktor-Anmeldungen"
 msgstr "Two-factor sign-ins"
 
-#: portal/models.py:101 sicherung/models.py:94 templates/portal/login.html:10
+#: portal/models.py:101 sicherung/models.py:95 templates/portal/login.html:10
 #: templates/sicherung/benutzer.html:16
 msgid "Benutzername"
 msgstr "Username"
@@ -4681,9 +4860,9 @@ msgstr "Please enter a hex colour value such as #0f6cbd."
 #: templates/foerderung/plan.html:7 templates/laufbahn/_kopf.html:2
 #: templates/laufbahn/schueler.html:5 templates/laufbahn/wechsel.html:6
 #: templates/noten/eingabe.html:6 templates/noten/klausurregeln.html:6
-#: templates/noten/notensperre.html:6 templates/noten/struktur.html:6
-#: templates/noten/vorgabe_form.html:5 templates/noten/vorgaben.html:6
-#: templates/portal/klassenliste.html:5
+#: templates/noten/notensperre.html:6 templates/noten/notentabelle.html:6
+#: templates/noten/struktur.html:6 templates/noten/vorgabe_form.html:5
+#: templates/noten/vorgaben.html:6 templates/portal/klassenliste.html:5
 #: templates/portal/notenuebersicht.html:6 templates/portal/rollen.html:6
 #: templates/portal/schuelerakte.html:5 templates/portal/sicherheit.html:5
 #: templates/portal/start.html:3 templates/portal/stufe.html:5
@@ -4844,8 +5023,8 @@ msgstr "Offers made, enrolment pending"
 #: portal/navigation.py:129 portal/navigation.py:290 stammdaten/admin.py:129
 #: stammdaten/models.py:169 stammdaten/models.py:964
 #: templates/laufbahn/schuljahre.html:24 templates/laufbahn/wechsel.html:22
-#: templates/portal/stufe.html:11 templates/portal/stufe.html:22
-#: templates/portal/suche.html:17
+#: templates/noten/notentabelle.html:80 templates/portal/stufe.html:11
+#: templates/portal/stufe.html:22 templates/portal/suche.html:17
 msgid "Schüler:innen"
 msgstr "Students"
 
@@ -5973,7 +6152,7 @@ msgstr "active"
 
 #: sicherung/konten.py:102 templates/noten/eingabe.html:58
 #: templates/noten/notensperre.html:27
-#: templates/portal/notenuebersicht.html:49
+#: templates/portal/notenuebersicht.html:50
 #: templates/sicherung/benutzer.html:28
 #: templates/sicherung/benutzer_bearbeiten.html:9
 #: templates/termine/sprechtag.html:89 templates/termine/sprechzeiten.html:25
@@ -6101,28 +6280,35 @@ msgstr "Password reset"
 msgid "Benutzerkonto geändert"
 msgstr "User account changed"
 
-#: sicherung/models.py:91 templates/sicherung/protokoll.html:14
+#: sicherung/models.py:90 templates/noten/notentabelle.html:3
+#: templates/noten/notentabelle.html:6 templates/noten/notentabelle.html:7
+#: templates/portal/notenuebersicht.html:11
+msgid "Excel-Notentabelle"
+msgstr "Excel grade sheet"
+
+#: sicherung/models.py:92 templates/sicherung/protokoll.html:14
 #: templates/termine/sprechzeiten.html:25
 #: templates/termine/sprechzeiten.html:85
 #: templates/zeugnisse/protokoll.html:18
 msgid "Zeit"
 msgstr "Time"
 
-#: sicherung/models.py:93 sicherung/pdf.py:235
+#: sicherung/models.py:94 sicherung/pdf.py:235
 #: templates/sicherung/protokoll.html:14
 msgid "Benutzer:in"
 msgstr "User"
 
-#: sicherung/models.py:95 templates/laufbahn/loeschfristen.html:12
-#: templates/sicherung/protokoll.html:8 templates/sicherung/protokoll.html:14
+#: sicherung/models.py:96 templates/laufbahn/loeschfristen.html:12
+#: templates/noten/notentabelle.html:67 templates/sicherung/protokoll.html:8
+#: templates/sicherung/protokoll.html:14
 msgid "Aktion"
 msgstr "Action"
 
-#: sicherung/models.py:99
+#: sicherung/models.py:100
 msgid "Protokolleintrag"
 msgstr "Log entry"
 
-#: sicherung/models.py:100
+#: sicherung/models.py:101
 msgid "Protokoll (Sicherung und Rechte)"
 msgstr "Log (backup and permissions)"
 
@@ -6196,7 +6382,7 @@ msgstr "Empty fields are omitted."
 msgid "Seite %(n)d"
 msgstr "Page %(n)d"
 
-#: sicherung/pdf.py:296
+#: sicherung/pdf.py:296 templates/noten/notentabelle.html:67
 msgid "geändert"
 msgstr "changed"
 
@@ -8371,6 +8557,7 @@ msgid "Bestätigung erbeten"
 msgstr "Confirmation requested"
 
 #: templates/elternkontakt/eltern_portal.html:20
+#: templates/noten/notentabelle.html:67
 msgid "neu"
 msgstr "new"
 
@@ -9590,12 +9777,12 @@ msgstr "title with “%(t)s”"
 msgid "Noten: %(titel)s"
 msgstr "Grades: %(titel)s"
 
-#: templates/noten/eingabe.html:9 templates/portal/notenuebersicht.html:15
+#: templates/noten/eingabe.html:9 templates/portal/notenuebersicht.html:16
 #, python-format
 msgid "Skala „%(skala)s“"
 msgstr "Scale “%(skala)s”"
 
-#: templates/noten/eingabe.html:11 templates/portal/notenuebersicht.html:14
+#: templates/noten/eingabe.html:11 templates/portal/notenuebersicht.html:15
 #, python-format
 msgid ""
 "Die Noten von %(n)s Schüler:in sind gesperrt (Zeugnisfreigabe bzw. "
@@ -9656,7 +9843,7 @@ msgstr "Reason"
 msgid "Noten gesperrt (Zeugnisfreigabe bzw. Konferenz)"
 msgstr "Grades locked (report release or conference)"
 
-#: templates/noten/eingabe.html:64 templates/portal/notenuebersicht.html:65
+#: templates/noten/eingabe.html:64 templates/portal/notenuebersicht.html:66
 #: templates/zeugnisse/unterricht.html:67
 msgid "Keine Schüler:innen in dieser Gruppe."
 msgstr "No students in this group."
@@ -9846,6 +10033,175 @@ msgstr ""
 "released is still changed by withdrawing the report release. All steps are "
 "logged."
 
+#: templates/noten/notentabelle.html:17
+msgid "1. Vorlage herunterladen"
+msgstr "1. Download the template"
+
+#: templates/noten/notentabelle.html:18
+msgid ""
+"Die Tabelle enthält die Schüler:innen dieses Kurses, die vorhandenen "
+"Leistungsnachweise mit Noten und die Gewichte. Sie rechnet auch ohne "
+"Schulnexus (Excel, Numbers, LibreOffice) und erklärt den Rechenweg im Blatt "
+"„Erklärung“."
+msgstr ""
+"The sheet contains the students of this course, the existing assessments "
+"with grades and the weights. It also calculates without Schulnexus (Excel, "
+"Numbers, LibreOffice) and explains the calculation on the “Erklärung” sheet."
+
+#: templates/noten/notentabelle.html:19
+msgid "Notentabelle herunterladen"
+msgstr "Download grade sheet"
+
+#: templates/noten/notentabelle.html:21
+msgid ""
+"Blatt „Master“: Klasse (muss stimmen), Gewichte der Halbjahre und Bereiche."
+msgstr ""
+"“Master” sheet: class (must match), weights of the half-years and areas."
+
+#: templates/noten/notentabelle.html:22
+#, python-format
+msgid "Übernommen wird das Blatt „%(blatt)s“ – passend zu diesem Unterricht."
+msgstr "The sheet “%(blatt)s” is imported – matching this course."
+
+#: templates/noten/notentabelle.html:23
+msgid ""
+"Bis zu 8 Klassenarbeiten und 20 SoMi-Noten je Halbjahr; erlaubt sind 1+ … 6,"
+" Dezimalnoten mit passender Stufe (2,3 = 2-), e, b, nb, u."
+msgstr ""
+"Up to 8 class tests and 20 participation grades per half-year; allowed are "
+"1+ … 6, decimal grades matching a grade (2.3 = 2-), e, b, nb, u."
+
+#: templates/noten/notentabelle.html:27
+msgid "2. Ausgefüllte Tabelle hochladen"
+msgstr "2. Upload the completed sheet"
+
+#: templates/noten/notentabelle.html:31
+msgid ""
+"Voraussetzung: Die Klasse im Blatt „Master“ entspricht diesem Kurs und "
+"Nachname sowie Vorname stimmen mit den Schüler:innen überein. Vor dem "
+"Speichern sehen Sie eine Vorschau."
+msgstr ""
+"Requirement: the class on the “Master” sheet matches this course, and "
+"surname and first name match the students. You will see a preview before "
+"anything is saved."
+
+#: templates/noten/notentabelle.html:32
+#: templates/sicherung/sicherungen.html:38
+msgid "Hochladen und prüfen"
+msgstr "Upload and check"
+
+#: templates/noten/notentabelle.html:40
+msgid "Vorschau"
+msgstr "Preview"
+
+#: templates/noten/notentabelle.html:40
+#, python-format
+msgid "Blatt „%(blatt)s“"
+msgstr "Sheet “%(blatt)s”"
+
+#: templates/noten/notentabelle.html:43
+msgid "Noch nicht übernehmbar:"
+msgstr "Cannot be imported yet:"
+
+#: templates/noten/notentabelle.html:45
+msgid "Bitte die Datei korrigieren und erneut hochladen."
+msgstr "Please correct the file and upload it again."
+
+#: templates/noten/notentabelle.html:48 templates/zeugnisse/zeugnis.html:30
+msgid "Hinweise:"
+msgstr "Notes:"
+
+#: templates/noten/notentabelle.html:51
+msgid "Zielordner"
+msgstr "Target folders"
+
+#: templates/noten/notentabelle.html:57
+#, python-format
+msgid "neu anlegen: „%(name)s“"
+msgstr "create new: “%(name)s”"
+
+#: templates/noten/notentabelle.html:62
+msgid "Vorschau aktualisieren"
+msgstr "Update preview"
+
+#: templates/noten/notentabelle.html:68
+#: templates/sicherung/wiederherstellen.html:23
+msgid "unverändert"
+msgstr "unchanged"
+
+#: templates/noten/notentabelle.html:71
+msgid "KA"
+msgstr "Test"
+
+#: templates/noten/notentabelle.html:71 templates/noten/notentabelle.html:94
+msgid "SoMi"
+msgstr "Particip."
+
+#: templates/noten/notentabelle.html:74
+msgid "neu anlegen"
+msgstr "create"
+
+#: templates/noten/notentabelle.html:74
+msgid "aktualisieren"
+msgstr "update"
+
+#: templates/noten/notentabelle.html:74
+msgid "übersprungen"
+msgstr "skipped"
+
+#: templates/noten/notentabelle.html:76
+msgid "Keine Spalten mit Noten."
+msgstr "No columns with grades."
+
+#: templates/noten/notentabelle.html:82
+msgid "Zeile"
+msgstr "Row"
+
+#: templates/noten/notentabelle.html:82
+msgid "Name in der Datei"
+msgstr "Name in the file"
+
+#: templates/noten/notentabelle.html:82
+msgid "Zuordnung"
+msgstr "Match"
+
+#: templates/noten/notentabelle.html:88
+msgid "Im Kurs, aber nicht in der Datei:"
+msgstr "In the course but not in the file:"
+
+#: templates/noten/notentabelle.html:90
+msgid "Gewichte"
+msgstr "Weights"
+
+#: templates/noten/notentabelle.html:92
+msgid "Gewichte aus der Datei übernehmen"
+msgstr "Apply weights from the file"
+
+#: templates/noten/notentabelle.html:93 templates/noten/notentabelle.html:94
+#: templates/noten/notentabelle.html:95 templates/zeugnisse/uebersicht.html:23
+msgid "Kurs"
+msgstr "Course"
+
+#: templates/noten/notentabelle.html:95
+msgid "Anteil 1. Halbjahr"
+msgstr "Share of 1st half-year"
+
+#: templates/noten/notentabelle.html:97
+msgid ""
+"Leere Zellen löschen keine vorhandenen Noten. Kommentare und Einzelgewichte "
+"vorhandener Noten bleiben erhalten."
+msgstr ""
+"Empty cells do not delete existing grades. Comments and individual weights "
+"of existing grades are kept."
+
+#: templates/noten/notentabelle.html:99
+msgid "Noten übernehmen"
+msgstr "Import grades"
+
+#: templates/noten/notentabelle.html:100
+msgid "Verwerfen"
+msgstr "Discard"
+
 #: templates/noten/struktur.html:11
 #, python-format
 msgid ""
@@ -9951,7 +10307,7 @@ msgstr[1] "%(n)s grades"
 msgid "Leistungsnachweis mit allen Noten löschen?"
 msgstr "Delete assessment with all grades?"
 
-#: templates/noten/struktur.html:57 templates/portal/notenuebersicht.html:104
+#: templates/noten/struktur.html:57 templates/portal/notenuebersicht.html:105
 msgid ""
 "Noch keine Ordner. Lege zuerst einen Ordner an, z. B. „Schriftlich“ oder "
 "„Sonstige Mitarbeit“."
@@ -10316,7 +10672,7 @@ msgid "Kontakte"
 msgstr "Contacts"
 
 #: templates/portal/klassenliste.html:17
-#: templates/portal/notenuebersicht.html:49 templates/portal/stufe.html:23
+#: templates/portal/notenuebersicht.html:50 templates/portal/stufe.html:23
 msgid "NTA"
 msgstr "AA"
 
@@ -10367,49 +10723,53 @@ msgstr ""
 "two-factor sign-in."
 
 #: templates/portal/notenuebersicht.html:11
+msgid "Notentabelle herunterladen oder ausgefüllt hochladen"
+msgstr "Download the grade sheet or upload a completed one"
+
+#: templates/portal/notenuebersicht.html:12
 #: templates/zeugnisse/unterricht.html:3 templates/zeugnisse/unterricht.html:8
 msgid "Zeugnisnoten und Kommentare"
 msgstr "Report grades and comments"
 
-#: templates/portal/notenuebersicht.html:12
+#: templates/portal/notenuebersicht.html:13
 msgid "Notenübersicht als Excel-Datei herunterladen"
 msgstr "Download grade overview as Excel file"
 
-#: templates/portal/notenuebersicht.html:12
+#: templates/portal/notenuebersicht.html:13
 msgid "Excel"
 msgstr "Excel"
 
-#: templates/portal/notenuebersicht.html:13
+#: templates/portal/notenuebersicht.html:14
 msgid "Kursübersicht und Notenbogen je Schüler:in als PDF"
 msgstr "Course overview and grade sheet per student as PDF"
 
-#: templates/portal/notenuebersicht.html:13
-#: templates/portal/notenuebersicht.html:49
+#: templates/portal/notenuebersicht.html:14
+#: templates/portal/notenuebersicht.html:50
 msgid "Notenbogen (PDF)"
 msgstr "Grade sheet (PDF)"
 
-#: templates/portal/notenuebersicht.html:15
+#: templates/portal/notenuebersicht.html:16
 #, python-format
 msgid "Lehrkraft %(name)s"
 msgstr "Teacher %(name)s"
 
-#: templates/portal/notenuebersicht.html:18
+#: templates/portal/notenuebersicht.html:19
 msgid "Vorläufig:"
 msgstr "Provisional:"
 
-#: templates/portal/notenuebersicht.html:18
+#: templates/portal/notenuebersicht.html:19
 #, python-format
 msgid "„%(pfad)s“ ist erst zu %(belegt)s %% belegt"
 msgstr "“%(pfad)s” is only %(belegt)s %% filled"
 
-#: templates/portal/notenuebersicht.html:18
+#: templates/portal/notenuebersicht.html:19
 msgid ""
 "Fehlende Anteile werden übersprungen, die vorhandenen zählen entsprechend "
 "mehr."
 msgstr ""
 "Missing shares are skipped; the existing ones count correspondingly more."
 
-#: templates/portal/notenuebersicht.html:19
+#: templates/portal/notenuebersicht.html:20
 #: templates/zeugnisse/unterricht.html:17
 #, python-format
 msgid "%(n)s Zeugnisnote weicht vom rechnerischen Vorschlag ab (markiert)."
@@ -10420,7 +10780,7 @@ msgstr[0] ""
 msgstr[1] ""
 "%(n)s report grades differ from the calculated suggestion (marked)."
 
-#: templates/portal/notenuebersicht.html:20
+#: templates/portal/notenuebersicht.html:21
 msgid ""
 "Für dieses Fach und diesen Jahrgang dürfen Sie die Zeugnisnote auch ohne "
 "Einzelnoten eintragen (Freigabe der Schulleitung)."
@@ -10428,38 +10788,38 @@ msgstr ""
 "For this subject and year group you may enter the report grade without "
 "individual grades (enabled by school management)."
 
-#: templates/portal/notenuebersicht.html:21
+#: templates/portal/notenuebersicht.html:22
 msgid "Zeugnisnoten eintragen"
 msgstr "Enter report grades"
 
-#: templates/portal/notenuebersicht.html:29
+#: templates/portal/notenuebersicht.html:30
 msgid "Ordnerschnitte"
 msgstr "Folder averages"
 
-#: templates/portal/notenuebersicht.html:31
+#: templates/portal/notenuebersicht.html:32
 #, python-format
 msgid "1. Halbjahr (%(a)s %%)"
 msgstr "1st semester (%(a)s %%)"
 
-#: templates/portal/notenuebersicht.html:40
+#: templates/portal/notenuebersicht.html:41
 #, python-format
 msgid "≈ %(anteil)s %% der Note"
 msgstr "≈ %(anteil)s %% of the grade"
 
-#: templates/portal/notenuebersicht.html:51
+#: templates/portal/notenuebersicht.html:52
 #, python-format
 msgid "Individuelles Gewicht: %(grund)s"
 msgstr "Individual weight: %(grund)s"
 
-#: templates/portal/notenuebersicht.html:60
+#: templates/portal/notenuebersicht.html:61
 msgid "Die Zeugnisnote weicht vom rechnerischen Vorschlag ab."
 msgstr "The report grade differs from the calculated suggestion."
 
-#: templates/portal/notenuebersicht.html:61
+#: templates/portal/notenuebersicht.html:62
 msgid "≠ Vorschlag"
 msgstr "≠ suggestion"
 
-#: templates/portal/notenuebersicht.html:70
+#: templates/portal/notenuebersicht.html:71
 msgid ""
 "Der Vorschlag ist rechnerisch ermittelt; die Zeugnisnote setzt die Lehrkraft"
 " in pädagogischer Gesamtwürdigung fest. Rot markierte Zeilen liegen im "
@@ -10472,7 +10832,7 @@ msgstr ""
 "exclamation mark indicates a folder without a grade. The percentages apply "
 "once all entries are graded; empty folders are skipped."
 
-#: templates/portal/notenuebersicht.html:71
+#: templates/portal/notenuebersicht.html:72
 #, python-format
 msgid ""
 "Jahresvorschlag: 1. Halbjahr %(a)s %%, 2. Halbjahr den Rest; ändern unter "
@@ -10481,19 +10841,19 @@ msgstr ""
 "Year suggestion: 1st semester %(a)s %%, 2nd semester the rest; change under "
 "“Assessment structure”."
 
-#: templates/portal/notenuebersicht.html:72
+#: templates/portal/notenuebersicht.html:73
 msgid "Gerundet wird bei Gleichstand zur besseren Note."
 msgstr "Ties are rounded to the better grade."
 
-#: templates/portal/notenuebersicht.html:74
+#: templates/portal/notenuebersicht.html:75
 msgid "Noch keine Leistungsnachweise angelegt."
 msgstr "No assessments created yet."
 
-#: templates/portal/notenuebersicht.html:80
+#: templates/portal/notenuebersicht.html:81
 msgid "Struktur bearbeiten"
 msgstr "Edit structure"
 
-#: templates/portal/notenuebersicht.html:82
+#: templates/portal/notenuebersicht.html:83
 msgid ""
 "Ordner und Unterordner sind frei benennbar. Gewichte gelten je Ebene – "
 "relativ (z. B. 2 : 1) oder in Prozent, je nach Einstellung des Ordners."
@@ -11393,10 +11753,6 @@ msgstr "Upload backup"
 msgid "Passwort (falls verschlüsselt)"
 msgstr "Password (if encrypted)"
 
-#: templates/sicherung/sicherungen.html:38
-msgid "Hochladen und prüfen"
-msgstr "Upload and check"
-
 #: templates/sicherung/sicherungen.html:44
 msgid "Vorhandene Sicherungen"
 msgstr "Existing backups"
@@ -11491,10 +11847,6 @@ msgstr "Module"
 #: templates/sicherung/wiederherstellen.html:22
 msgid "überschrieben"
 msgstr "overwritten"
-
-#: templates/sicherung/wiederherstellen.html:23
-msgid "unverändert"
-msgstr "unchanged"
 
 #: templates/sicherung/wiederherstellen.html:35
 msgid "Mitbetroffen in anderen Modulen (wird gelöscht oder geleert):"
@@ -12575,10 +12927,6 @@ msgid "Mein Unterricht: Zeugnisnoten und Kommentare"
 msgstr "My teaching: report grades and comments"
 
 #: templates/zeugnisse/uebersicht.html:23
-msgid "Kurs"
-msgstr "Course"
-
-#: templates/zeugnisse/uebersicht.html:23
 msgid "Kommentare abzuzeichnen"
 msgstr "Comments to initial"
 
@@ -12708,10 +13056,6 @@ msgstr "Revoke release"
 #: templates/zeugnisse/zeugnis.html:29
 msgid "Vor der Freigabe noch offen:"
 msgstr "Still open before release:"
-
-#: templates/zeugnisse/zeugnis.html:30
-msgid "Hinweise:"
-msgstr "Notes:"
 
 #: templates/zeugnisse/zeugnis.html:36
 msgid "Fachnoten"

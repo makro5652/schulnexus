@@ -1,0 +1,106 @@
+{% extends "portal/base.html" %}
+{% load i18n formate %}
+{% block title %}{% translate "Excel-Notentabelle" %} {{ u.fach.kuerzel }} {{ u.gruppe.name }}{% endblock %}
+{% block inhaltsklasse %}breit{% endblock %}
+{% block inhalt %}
+<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › <a href="{% url 'notenuebersicht' u.pk %}">{{ u.fach.lokal_name }} · {{ u.gruppe.name }}</a> › {% translate "Excel-Notentabelle" %}</p>
+<h1>{% translate "Excel-Notentabelle" %}</h1>
+<p class="unterzeile">{{ u.fach.lokal_name }} · {{ u.gruppe.name }} · {{ u.abschnitt }}</p>
+
+{% if not sek1 %}
+<div class="an-banner warnend">{% translate "Die Notentabelle ist für Noten 1–6 (Sek I) gedacht; dieser Unterricht verwendet Punkte." %}</div>
+{% else %}
+
+{% if not tabelle %}
+<div class="nt-raster">
+  <section class="karte">
+    <h2>{% translate "1. Vorlage herunterladen" %}</h2>
+    <p>{% translate "Die Tabelle enthält die Schüler:innen dieses Kurses, die vorhandenen Leistungsnachweise mit Noten und die Gewichte. Sie rechnet auch ohne Schulnexus (Excel, Numbers, LibreOffice) und erklärt den Rechenweg im Blatt „Erklärung“." %}</p>
+    <p><a class="knopf" href="{% url 'notentabelle_vorlage' u.pk %}">{% translate "Notentabelle herunterladen" %}</a></p>
+    <ul class="nt-liste leise">
+      <li>{% translate "Blatt „Master“: Klasse (muss stimmen), Gewichte der Halbjahre und Bereiche." %}</li>
+      <li>{% blocktranslate with blatt=blatt %}Übernommen wird das Blatt „{{ blatt }}“ – passend zu diesem Unterricht.{% endblocktranslate %}</li>
+      <li>{% translate "Bis zu 8 Klassenarbeiten und 20 SoMi-Noten je Halbjahr; erlaubt sind 1+ … 6, Dezimalnoten mit passender Stufe (2,3 = 2-), e, b, nb, u." %}</li>
+    </ul>
+  </section>
+  <section class="karte">
+    <h2>{% translate "2. Ausgefüllte Tabelle hochladen" %}</h2>
+    <form method="post" enctype="multipart/form-data" class="formular">{% csrf_token %}
+      <label>{{ form.datei.label }} {{ form.datei }}</label>
+      {% for e in form.datei.errors %}<p class="fehler">{{ e }}</p>{% endfor %}
+      <p class="leise">{% translate "Voraussetzung: Die Klasse im Blatt „Master“ entspricht diesem Kurs und Nachname sowie Vorname stimmen mit den Schüler:innen überein. Vor dem Speichern sehen Sie eine Vorschau." %}</p>
+      <button type="submit" class="knopf" name="aktion" value="hochladen">{% translate "Hochladen und prüfen" %}</button>
+    </form>
+  </section>
+</div>
+{% else %}
+
+<form method="post">{% csrf_token %}
+<section class="karte">
+  <div class="karte-kopf"><h2>{% translate "Vorschau" %}</h2><span class="leise">{{ tabelle.dateiname }} · {% blocktranslate with blatt=blatt %}Blatt „{{ blatt }}“{% endblocktranslate %}</span></div>
+
+  {% if vorschau.fehler %}
+  <div class="an-banner warnend"><strong>{% translate "Noch nicht übernehmbar:" %}</strong>
+    <ul>{% for f in vorschau.fehler %}<li>{{ f }}</li>{% endfor %}</ul>
+    {% translate "Bitte die Datei korrigieren und erneut hochladen." %}</div>
+  {% endif %}
+  {% if vorschau.warnungen %}
+  <div class="an-banner"><strong>{% translate "Hinweise:" %}</strong><ul>{% for w in vorschau.warnungen %}<li>{{ w }}</li>{% endfor %}</ul></div>
+  {% endif %}
+
+  <h3>{% translate "Zielordner" %}</h3>
+  <div class="formzeile zwei">
+    {% for x in bereiche %}
+    <label>{{ x.titel }}
+      <select name="ordner_{{ x.b }}">
+        {% for wert, text in ordner %}<option value="{{ wert }}"{% if wert == x.ziel %} selected{% endif %}>{{ text }}</option>{% endfor %}
+        <option value="neu"{% if x.ziel == "neu" %} selected{% endif %}>{% blocktranslate with name=x.neu %}neu anlegen: „{{ name }}“{% endblocktranslate %}</option>
+      </select>
+    </label>
+    {% endfor %}
+  </div>
+  <p><button type="submit" class="knopf zweitrangig klein" name="aktion" value="pruefen">{% translate "Vorschau aktualisieren" %}</button></p>
+
+  <h3>{% translate "Leistungsnachweise" %}</h3>
+  <div class="rollbar"><table class="liste kompakt">
+    <thead><tr><th>{% translate "Bereich" %}</th><th>{% translate "Titel" %}</th><th>{% translate "Datum" %}</th><th class="zahl">{% translate "Gewicht" %}</th>
+      <th>{% translate "Ordner" %}</th><th>{% translate "Aktion" %}</th><th class="zahl">{% translate "neu" %}</th><th class="zahl">{% translate "geändert" %}</th>
+      <th class="zahl">{% translate "unverändert" %}</th></tr></thead>
+    <tbody>{% for s in vorschau.spalten %}
+      <tr{% if s.fehler %} class="nt-fehler"{% endif %}>
+        <td>{% if s.bereich == "ka" %}{% translate "KA" %}{% else %}{% translate "SoMi" %}{% endif %}</td>
+        <td>{{ s.titel }}</td><td>{{ s.datum_anzeige|default:"–" }}</td><td class="zahl">{{ s.gewicht_anzeige }}</td>
+        <td>{{ s.ordner }}</td>
+        <td>{% if s.aktion == "neu" %}<span class="etikett">{% translate "neu anlegen" %}</span>{% elif s.aktion == "aktualisieren" %}<span class="etikett">{% translate "aktualisieren" %}</span>{% else %}<span class="etikett warnend">{% translate "übersprungen" %}</span>{% endif %}</td>
+        <td class="zahl">{{ s.neu }}</td><td class="zahl">{{ s.geaendert }}</td><td class="zahl">{{ s.gleich }}</td>
+      </tr>{% empty %}<tr><td colspan="9" class="leise">{% translate "Keine Spalten mit Noten." %}</td></tr>{% endfor %}
+    </tbody>
+  </table></div>
+
+  <h3>{% translate "Schüler:innen" %}</h3>
+  <div class="rollbar"><table class="liste kompakt">
+    <thead><tr><th class="zahl">{% translate "Zeile" %}</th><th>{% translate "Name in der Datei" %}</th><th>{% translate "Zuordnung" %}</th></tr></thead>
+    <tbody>{% for z in vorschau.zeilen %}
+      <tr><td class="zahl">{{ z.zeile }}</td><td>{{ z.name }}</td>
+        <td>{% if z.status == "ok" %}✓ {{ z.text }}{% else %}<span class="etikett warnend">{{ z.text }}</span>{% endif %}</td></tr>
+    {% endfor %}</tbody>
+  </table></div>
+  {% if vorschau.ohne %}<p class="leise">{% translate "Im Kurs, aber nicht in der Datei:" %} {{ vorschau.ohne|join:", " }}</p>{% endif %}
+
+  <h3>{% translate "Gewichte" %}</h3>
+  <label class="haken nt-haken"><input type="checkbox" name="gewichte" value="1">
+    {% translate "Gewichte aus der Datei übernehmen" %}</label>
+  <p class="leise">{% translate "Klassenarbeiten" %}: {% translate "Datei" %} {{ vorschau.datei_gewichte.ka|default:"–" }} · {% translate "Kurs" %} {{ vorschau.kurs_gewichte.ka|default:"–" }}
+    &nbsp;|&nbsp; {% translate "SoMi" %}: {% translate "Datei" %} {{ vorschau.datei_gewichte.somi|default:"–" }} · {% translate "Kurs" %} {{ vorschau.kurs_gewichte.somi|default:"–" }}
+    {% if u.abschnitt.nummer == 2 %}&nbsp;|&nbsp; {% translate "Anteil 1. Halbjahr" %}: {% translate "Datei" %} {{ vorschau.anteil_datei|default:"–" }} % · {% translate "Kurs" %} {{ vorschau.anteil_kurs|default:"–" }} %{% endif %}</p>
+
+  <p class="leise">{% translate "Leere Zellen löschen keine vorhandenen Noten. Kommentare und Einzelgewichte vorhandener Noten bleiben erhalten." %}</p>
+  <p class="knopfreihe">
+    {% if not vorschau.fehler %}<button type="submit" class="knopf" name="aktion" value="uebernehmen">{% translate "Noten übernehmen" %}</button>{% endif %}
+    <button type="submit" class="knopf zweitrangig" name="aktion" value="verwerfen">{% translate "Verwerfen" %}</button>
+  </p>
+</section>
+</form>
+{% endif %}
+{% endif %}
+{% endblock %}

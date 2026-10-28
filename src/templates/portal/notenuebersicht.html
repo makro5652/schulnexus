@@ -7,7 +7,8 @@
 <div class="kw-kopf"><h1>{{ unterricht.fach.lokal_name }} · {{ unterricht.gruppe.name }}</h1>{% include "noten/_kurswahl.html" with kw=kurswahl stil="wechsel" ziel="uebersicht" %}</div>
 <p class="knopfreihe ne-kopfknoepfe">
   {% if darf_eintragen %}<a class="knopf" href="{% url 'noten_eintragen' unterricht.pk %}">{% translate "Noten eintragen" %}</a>
-  <a class="knopf zweitrangig" href="{% url 'bewertungsstruktur' unterricht.pk %}">{% translate "Bewertungsstruktur" %}</a>{% endif %}
+  <a class="knopf zweitrangig" href="{% url 'bewertungsstruktur' unterricht.pk %}">{% translate "Bewertungsstruktur" %}</a>
+  {% if not unterricht.skala.hoeher_ist_besser %}<a class="knopf zweitrangig" href="{% url 'notentabelle' unterricht.pk %}" title="{% translate 'Notentabelle herunterladen oder ausgefüllt hochladen' %}">{% translate "Excel-Notentabelle" %}</a>{% endif %}{% endif %}
   <a class="knopf zweitrangig" href="{% url 'zeugnis_unterricht' unterricht.pk %}">{% translate "Zeugnisnoten und Kommentare" %}</a>
   {% if spalten %}<a class="knopf zweitrangig" href="{% url 'noten_excel' unterricht.pk %}" title="{% translate 'Notenübersicht als Excel-Datei herunterladen' %}">{% translate "Excel" %}</a>
   <a class="knopf zweitrangig" href="{% url 'notenbogen' unterricht.pk %}" title="{% translate 'Kursübersicht und Notenbogen je Schüler:in als PDF' %}">{% translate "Notenbogen (PDF)" %}</a>{% endif %}</p>

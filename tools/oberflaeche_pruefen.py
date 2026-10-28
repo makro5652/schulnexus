@@ -23,7 +23,7 @@ AUSGABE = Path(sys.argv[2] if len(sys.argv) > 2 else "oberflaeche")
 PASSWORT = sys.argv[3] if len(sys.argv) > 3 else "Schule-Demo-2026"
 ROLLEN = ["lehrkraft", "mittelstufe", "schulleitung", "verwaltung", "foerderung", "it"]
 JE_ROLLE = 40
-AUSLASSEN = re.compile(r"^/(verwaltung|abmelden|static|media|sprache|design)/|/(druck|excel|notenbogen|pdf|herunterladen|datei)/|"
+AUSLASSEN = re.compile(r"^/(verwaltung|abmelden|static|media|sprache|design)/|/(druck|excel|notenbogen|pdf|herunterladen|datei|vorlage)/|"
                        r"\.(ics|pdf|xlsx|zip|csv)$|/loeschen/")
 
 

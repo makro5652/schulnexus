@@ -793,6 +793,30 @@ Die Oberflächenprüfung lässt sich auch lokal ausführen (Playwright für Pyth
 
 Hinweis: Private Repositories haben ein monatliches Kontingent an Actions-Minuten (je nach Tarif; der genaue Wert sollte auf GitHub unter „Settings → Billing“ nachgesehen werden). Ein vollständiger Lauf dauert etwa 10–15 Minuten.
 
+## Excel-Notentabelle: herunterladen, offline ausfüllen, hochladen (ab 0.4.11.0)
+
+In der **Notenübersicht** eines Unterrichts (Sek I, Noten 1–6) führt „Excel-Notentabelle“ zu einer eigenen Seite:
+
+1. **Vorlage herunterladen:** Die Datei enthält die Schüler:innen des Kurses, die vorhandenen Leistungsnachweise mit
+   Noten (Klassenarbeiten aus dem schriftlichen, SoMi aus dem Ordner „Sonstige Mitarbeit“, jeweils samt Unterordnern),
+   Bereichsgewichte, den Anteil des 1. Halbjahres und die Rundungsregel der Skala. Im 2. Halbjahr ist auch das Blatt des
+   1. Halbjahres aus dem zugehörigen Kurs gefüllt. Die Tabelle rechnet ohne Schulnexus (Excel, Numbers, LibreOffice;
+   nur Grundfunktionen), hat ein Blatt „Master“ für alle Gewichte und ein Blatt „Erklärung“ mit Rechenbeispiel.
+2. **Hochladen:** Voraussetzung ist, dass die **Klasse** im Blatt „Master“ zur Gruppe des Unterrichts passt
+   (Groß-/Kleinschreibung und Leerzeichen egal) und **Nachname und Vorname** (oder Rufname) mit den Schüler:innen
+   übereinstimmen. Übernommen wird das Blatt des passenden Halbjahres.
+3. **Vorschau:** Schulnexus zeigt je Spalte, ob ein Leistungsnachweis neu angelegt oder aktualisiert wird (gleicher Titel
+   im Zielordner), wie viele Noten neu, geändert oder unverändert sind, welche Namen nicht zugeordnet werden konnten und
+   welche Schüler:innen gesperrt sind. Zielordner lassen sich wählen oder neu anlegen; die Bereichsgewichte (und im
+   2. Halbjahr der Anteil des 1. Halbjahres) können optional aus der Datei übernommen werden.
+4. **Übernehmen:** erst nach Bestätigung. Ungültige Noten, ein falsches Datum oder eine falsche Klasse verhindern die
+   Übernahme vollständig. Leere Zellen löschen keine vorhandenen Noten; Kommentare und Einzelgewichte bleiben erhalten.
+   Leistungsnachweise mit Notenschlüssel (Bewertungseinheiten) werden nicht überschrieben. Download und Übernahme stehen
+   im Protokoll.
+
+Erlaubte Eingaben: 1+ … 6, Dezimalnoten mit passender Stufe (2,3 = 2-), e, b, nb, u. Code: `noten/notentabelle.py`
+(Erzeugung), `noten/notenimport.py` (Lesen, Prüfen, Übernehmen), `noten/importseite.py` (Seite).
+
 ## Suchauswahl statt Hin-und-her-Listen (ab 0.4.10.0)
 
 Alle Mehrfachauswahlen der Verwaltungsoberfläche (Anwesende einer Konferenz, Beteiligte eines Förderplans, Fächer,

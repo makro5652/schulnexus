@@ -3,6 +3,7 @@ from django.urls import path
 from . import ansichten as A
 from . import klausurregeln as KR
 from . import export as X
+from . import importseite as IS
 from . import kurswahl as K
 from . import sperrseite as SP
 
@@ -12,6 +13,8 @@ urlpatterns = [
     path("sperre/", SP.notensperre, name="notensperre"),
     path("unterricht/<int:pk>/excel/", X.excel, name="noten_excel"),
     path("unterricht/<int:pk>/notenbogen/", X.notenbogen, name="notenbogen"),
+    path("unterricht/<int:pk>/notentabelle/", IS.notentabelle, name="notentabelle"),
+    path("unterricht/<int:pk>/notentabelle/vorlage/", IS.vorlage, name="notentabelle_vorlage"),
     path("klausurregeln/<int:pk>/", KR.klausurregeln, name="klausurregel_bearbeiten"),
     path("klausurregeln/<int:pk>/loeschen/", KR.klausurregel_loeschen, name="klausurregel_loeschen"),
     path("klausurregeln/freigabe/<int:pk>/loeschen/", KR.freigabe_loeschen, name="zeugnisfreigabe_loeschen"),

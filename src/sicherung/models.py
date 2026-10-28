@@ -87,6 +87,7 @@ class Protokoll(models.Model):
         ("wiederhergestellt", _("Wiederherstellung")), ("pdf", _("PDF-Export")), ("rechte", _("Rollen und Rechte geändert")),
         ("passwort", _("Passwort zurückgesetzt")), ("konto", _("Benutzerkonto geändert")),
         ("zweifaktor", _("Zwei-Faktor-Anmeldung")), ("noten", _("Notensperre")),
+        ("notenimport", _("Excel-Notentabelle")),
     ]
     zeit = models.DateTimeField(_("Zeit"), auto_now_add=True)
     benutzer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
