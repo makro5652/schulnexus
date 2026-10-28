@@ -1,0 +1,54 @@
+{% load i18n %}
+{# Fächer und Lehrkräfte einer Gruppe (ab 0.4.14.0): je Fach und Halbjahr eine Lehrkraft – daraus entsteht der Unterricht. #}
+<section class="karte zo-faecher" aria-label="{% translate 'Fächer und Lehrkräfte' %}">
+  {% if not unterricht.abschnitte %}
+  <p class="leer">{% translate "Für dieses Schuljahr sind noch keine Halbjahre angelegt." %}</p>
+  {% else %}
+  <form method="post" action="{% url 'zuordnung_unterricht' gruppe.pk %}" id="zo-faecherform">
+    {% csrf_token %}
+    <div class="zo-faecher-werkzeuge">
+      <input type="search" class="zo-suche" id="zo-fachsuche" placeholder="{% translate 'Fach suchen …' %}" aria-label="{% translate 'Fach suchen' %}">
+      <label class="haken klein"><input type="checkbox" id="zo-nur-belegt"{% if unterricht.belegt %} checked{% endif %}> {% translate "nur belegte Fächer" %}</label>
+      {% if darf_unterricht and unterricht.abschnitte|length > 1 %}
+      <button type="button" class="knopf zweitrangig klein" id="zo-hj-kopieren" title="{% translate 'Leere Felder im 2. Halbjahr mit der Lehrkraft des 1. Halbjahres füllen' %}">{% translate "1. Halbjahr → 2. Halbjahr" %}</button>
+      {% endif %}
+      {% if darf_unterricht %}<button type="submit" class="knopf klein" id="zo-faecher-speichern">{% translate "Speichern" %}</button>{% endif %}
+    </div>
+    {% if not darf_unterricht %}<p class="hinweistext">{% translate "Nur lesend – Fächer und Lehrkräfte festlegen dürfen Sekretariat, Koordination, Schulleitung und Administration." %}</p>{% endif %}
+
+    <div class="tabellenrahmen">
+    <table class="liste kompakt zo-faechertabelle">
+      <thead><tr>
+        <th scope="col">{% translate "Fach" %}</th>
+        {% for a in unterricht.abschnitte %}<th scope="col">{{ a.lokal_name }}</th>{% endfor %}
+      </tr></thead>
+      <tbody>
+      {% for z in unterricht.zeilen %}
+        <tr class="zo-fachzeile{% if z.belegt %} belegt{% endif %}" data-belegt="{% if z.belegt %}1{% endif %}" data-name="{{ z.fach.lokal_name|lower }} {{ z.fach.kuerzel|lower }}">
+          <th scope="row">{{ z.fach.lokal_name }} <small class="leise">{{ z.fach.kuerzel }}</small></th>
+          {% for c in z.zellen %}
+          <td>
+            <input type="hidden" name="vorher_{{ c.feld }}" value="{{ c.u.lehrkraft_id|default:'' }}">
+            <select name="{{ c.feld }}" class="zo-lehrkraft" data-nummer="{{ c.abschnitt.nummer }}" data-fach="{{ z.fach.pk }}"
+                    aria-label="{{ z.fach.lokal_name }}, {{ c.abschnitt.lokal_name }}"{% if not darf_unterricht %} disabled{% endif %}>
+              <option value="">–</option>
+              {% if z.befaehigt %}<optgroup label="{% translate 'mit Lehrbefähigung' %}">
+                {% for p in z.befaehigt %}<option value="{{ p.pk }}"{% if c.u.lehrkraft_id == p.pk %} selected{% endif %}>{{ p.person.nachname }}, {{ p.person.rufname|default:p.person.vorname }}{% if p.kuerzel %} ({{ p.kuerzel }}){% endif %}</option>{% endfor %}
+              </optgroup>{% endif %}
+              <optgroup label="{% if z.befaehigt %}{% translate 'weitere Lehrkräfte' %}{% else %}{% translate 'Lehrkräfte' %}{% endif %}">
+                {% for p in z.weitere %}<option value="{{ p.pk }}"{% if c.u.lehrkraft_id == p.pk %} selected{% endif %}>{{ p.person.nachname }}, {{ p.person.rufname|default:p.person.vorname }}{% if p.kuerzel %} ({{ p.kuerzel }}){% endif %}</option>{% endfor %}
+              </optgroup>
+            </select>
+            {% if c.u.hat_daten %}<small class="zo-noten" title="{% translate 'Es gibt schon Noten – nur die Lehrkraft lässt sich wechseln.' %}">{% translate "Noten vorhanden" %}</small>{% endif %}
+          </td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    </div>
+    <p class="leer" id="zo-keine-faecher" hidden>{% translate "Noch keine Fächer belegt – Häkchen „nur belegte Fächer“ entfernen, um alle Fächer zu sehen." %}</p>
+    <p class="klein leise">{% translate "Eine Lehrkraft wählen legt den Unterricht an, „–“ entfernt ihn wieder (nur solange es keine Noten gibt). Notenskala und Startvorlage werden wie bei den anderen Klassen des Jahrgangs gesetzt." %}</p>
+  </form>
+  {% endif %}
+</section>

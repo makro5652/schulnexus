@@ -345,8 +345,10 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .zo-kopf h1 { margin-bottom: 0; }
 .zo-sj label { display: flex; flex-direction: column; font-size: 0.8rem; color: var(--leise); gap: 0.2rem; }
 .zo-raster { display: grid; grid-template-columns: minmax(200px, 250px) minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; align-items: start; }
-@media (max-width: 1100px) { .zo-raster { grid-template-columns: minmax(180px, 220px) minmax(0, 1fr); } .zo-pool { grid-column: 2; } }
-@media (max-width: 720px) { .zo-raster { grid-template-columns: 1fr; } .zo-pool { grid-column: auto; } }
+.zo-haupt { grid-column: 2 / -1; display: grid; gap: 1rem; min-width: 0; }
+.zo-spalten { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; align-items: start; }
+@media (max-width: 1100px) { .zo-raster { grid-template-columns: minmax(180px, 220px) minmax(0, 1fr); } .zo-spalten { grid-template-columns: 1fr; } }
+@media (max-width: 720px) { .zo-raster { grid-template-columns: 1fr; } .zo-haupt { grid-column: auto; } }
 .zo-raster .karte { padding: 1rem; min-width: 0; }
 .zo-raster h2 { font-size: 1rem; }
 .zo-suche { width: 100%; font: inherit; font-size: 0.9rem; padding: 0.45rem 0.65rem; border: 1px solid var(--linie); border-radius: 7px; background: var(--grund); color: var(--text); }
@@ -1136,3 +1138,23 @@ td.zn-abweichung small { color: #c06a1c; font-weight: 600; }
 .nk-quelle-text { color:#B4532A; font-weight:normal; white-space:normal; }
 .nk-hinweis { color:#B4532A; font-size:.9em; margin:.5rem 0; }
 .nk-zn-kopf { background:#B4532A; color:#fff; }
+
+/* Klassen und Gruppen: Reiter, Bearbeiten, Fächer und Lehrkräfte (ab 0.4.14.0) */
+.zo-reiter { display: flex; gap: 0.3rem; margin-top: 0.8rem; border-bottom: 1px solid var(--linie); flex-wrap: wrap; }
+.zo-reiter a { padding: 0.45rem 0.9rem; border-radius: 7px 7px 0 0; color: var(--text); text-decoration: none; font-weight: 600; font-size: 0.92rem; border-bottom: 3px solid transparent; }
+.zo-reiter a:hover { background: var(--akzent-hell); }
+.zo-reiter a.aktiv { color: var(--akzent); border-bottom-color: var(--akzent); }
+.zo-bearbeiten { margin-top: 0.7rem; }
+.zo-bearbeiten > summary { cursor: pointer; font-size: 0.9rem; color: var(--akzent); font-weight: 600; }
+.zo-bearbeiten-form { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 0.5rem 0.8rem; margin-top: 0.6rem; align-items: end; }
+.zo-bearbeiten-form input:not([type=checkbox]), .zo-bearbeiten-form select { width: 100%; }
+.zo-neu-schueler { margin: 0 0 0.8rem; padding-top: 0; border-top: 0; }
+.zo-faecher { padding: 1rem; min-width: 0; }
+.zo-faecher-werkzeuge { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; margin-bottom: 0.7rem; }
+.zo-faecher-werkzeuge .zo-suche { width: auto; flex: 1 1 12rem; }
+.zo-faechertabelle th[scope=row] { font-weight: 600; white-space: nowrap; }
+.zo-faechertabelle select { font: inherit; font-size: 0.88rem; width: 100%; min-width: 11rem; padding: 0.25rem 0.4rem; border: 1px solid var(--linie); border-radius: 6px; background: var(--grund); color: var(--text); }
+.zo-faechertabelle tr.belegt th[scope=row] { color: var(--akzent); }
+.zo-faechertabelle select.geaendert { border-color: var(--akzent); box-shadow: 0 0 0 2px var(--akzent-hell); }
+.zo-faechertabelle tr[hidden] { display: none; }
+.zo-noten { display: block; color: var(--leise); font-size: 0.72rem; margin-top: 0.15rem; }

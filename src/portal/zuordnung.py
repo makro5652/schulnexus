@@ -13,7 +13,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
-from django.db.models import Count, Q
+from django.db.models import Case, Count, IntegerField, Q, Value, When
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import formats, timezone
@@ -21,35 +21,45 @@ from django.utils.dateparse import parse_date
 from django.utils.translation import gettext, gettext_lazy as _
 from django.views.decorators.http import require_POST
 
-from stammdaten.models import Gruppe, Laufbahnabschnitt, Mitgliedschaft, Personalprofil, Schuelerprofil, Schuljahr
+from stammdaten.models import Gruppe, Laufbahnabschnitt, Mitgliedschaft, Person, Personalprofil, Schuelerprofil, Schuljahr
 
-from .rechte import ist_verwaltung, koordinierte_jahrgaenge
+from .rechte import ist_it, ist_verwaltung, koordinierte_jahrgaenge
 
 
 # ---------------------------------------------------------------- Rechte
 
+def alle_jahrgaenge(user):
+    """Verwaltung (Sekretariat, Verwaltungsleitung, Schulleitung) und IT-Administration arbeiten in allen Jahrgängen."""
+    return ist_verwaltung(user) or ist_it(user)
+
+
 def darf_zuordnen(user):
-    """Verwaltung (Sekretariat, Verwaltungsleitung, Schulleitung) oder Stufenkoordination mit Mitgliedschaftsrechten."""
+    """Verwaltung, IT-Administration oder Stufenkoordination mit Mitgliedschaftsrechten."""
     if not user.has_perm("stammdaten.change_mitgliedschaft"):
         return False
-    return ist_verwaltung(user) or bool(koordinierte_jahrgaenge(user))
+    return alle_jahrgaenge(user) or bool(koordinierte_jahrgaenge(user))
 
 
 def gruppen_fuer(user, sj):
     qs = Gruppe.objects.filter(schuljahr=sj)
-    if ist_verwaltung(user):
+    if alle_jahrgaenge(user):
         return qs
     return qs.filter(jahrgang__in=koordinierte_jahrgaenge(user))
 
 
 def darf_gruppe_bearbeiten(user, gruppe):
-    return darf_zuordnen(user) and (ist_verwaltung(user) or gruppe.jahrgang in koordinierte_jahrgaenge(user))
+    return darf_zuordnen(user) and (alle_jahrgaenge(user) or gruppe.jahrgang in koordinierte_jahrgaenge(user))
+
+
+def darf_schueler_anlegen(user):
+    """Neue Schüler:innen direkt anlegen: wer Personen und Schülerprofile anlegen darf (Sekretariat, Leitung, IT)."""
+    return user.has_perms(("stammdaten.add_person", "stammdaten.add_schuelerprofil"))
 
 
 def schueler_fuer(user, sj):
     """Schülerpool: Verwaltung alle aktiven; Stufenkoordination die Schüler:innen ihrer Stufe und solche ohne Klasse."""
     qs = Schuelerprofil.objects.filter(status__in=["aktiv", "bewerber"])
-    if ist_verwaltung(user):
+    if alle_jahrgaenge(user):
         return qs
     jahrgaenge = koordinierte_jahrgaenge(user)
     in_stufe = Mitgliedschaft.objects.aktiv().filter(gruppe__schuljahr=sj, gruppe__typ=Gruppe.STAMMKLASSE,
@@ -136,7 +146,7 @@ class GruppeForm(forms.ModelForm):
         self.fields["vorgaenger"].queryset = Gruppe.objects.filter(schuljahr=vorjahr) if vorjahr else Gruppe.objects.none()
         for f in ("kuerzel", "name"):
             self.fields[f].help_text = ""
-        if user is not None and not ist_verwaltung(user):
+        if user is not None and not alle_jahrgaenge(user):
             jg = sorted(koordinierte_jahrgaenge(user))
             self.fields["jahrgang"].required = True
             self.fields["jahrgang"].widget = forms.Select(choices=[(j, j) for j in jg])
@@ -155,6 +165,33 @@ class GruppeForm(forms.ModelForm):
         if self.schuljahr and Gruppe.objects.filter(schuljahr=self.schuljahr, name__iexact=name).exclude(pk=self.instance.pk).exists():
             raise ValidationError(_("Eine Gruppe mit diesem Namen gibt es in diesem Schuljahr schon."))
         return name
+
+
+class GruppeBearbeitenForm(GruppeForm):
+    """Wie „Neue Gruppe“, aber ohne Typ – ein Typwechsel würde die Regeln für Stammklassen umgehen."""
+
+    class Meta(GruppeForm.Meta):
+        fields = ["name", "jahrgang", "leitung", "kuerzel", "vorgaenger"]
+
+
+class SchuelerNeuForm(forms.Form):
+    vorname = forms.CharField(label=_("Vorname(n)"), max_length=80)
+    nachname = forms.CharField(label=_("Nachname"), max_length=80)
+    geschlecht = forms.ChoiceField(label=_("Geschlecht"), choices=Person.GESCHLECHT, required=False)
+    geburtsdatum = forms.DateField(label=_("Geburtsdatum"), required=False, widget=forms.DateInput(attrs={"type": "date"}))
+    religionsunterricht = forms.ChoiceField(label=_("Religion / Ethik"), choices=Schuelerprofil.RELIGIONSUNTERRICHT, required=False)
+    trotzdem = forms.BooleanField(label=_("Trotzdem anlegen (gleichnamige Person vorhanden)"), required=False)
+
+    def clean(self):
+        daten = super().clean()
+        if daten.get("vorname") and daten.get("nachname") and not daten.get("trotzdem"):
+            gleich = Person.objects.filter(vorname__iexact=daten["vorname"].strip(), nachname__iexact=daten["nachname"].strip())
+            if daten.get("geburtsdatum"):
+                gleich = gleich.filter(Q(geburtsdatum=daten["geburtsdatum"]) | Q(geburtsdatum__isnull=True))
+            if gleich.exists():
+                raise ValidationError(_("Eine Person mit diesem Namen gibt es schon – bitte rechts in der Liste suchen. "
+                                        "Wirklich eine weitere Person anlegen: „Trotzdem anlegen“ ankreuzen."))
+        return daten
 
 
 # ---------------------------------------------------------------- Ansichten
@@ -184,8 +221,10 @@ def zuordnung(request):
 
     gruppen = list(gruppen_fuer(request.user, sj).select_related("leitung__person")
                    .annotate(anzahl=Count("mitgliedschaften", filter=Q(mitgliedschaften__von__lte=stichtag)
-                                          & (Q(mitgliedschaften__bis__isnull=True) | Q(mitgliedschaften__bis__gte=stichtag)), distinct=True))
-                   .order_by("typ", "jahrgang", "name"))
+                                          & (Q(mitgliedschaften__bis__isnull=True) | Q(mitgliedschaften__bis__gte=stichtag)), distinct=True),
+                             rang=Case(When(typ=Gruppe.STAMMKLASSE, then=Value(0)), When(typ=Gruppe.LERNGRUPPE, then=Value(1)),
+                                       default=Value(2), output_field=IntegerField()))
+                   .order_by("rang", "jahrgang", "name"))
     gruppe = next((g for g in gruppen if str(g.pk) == request.GET.get("gruppe")), None) or (gruppen[0] if gruppen else None)
 
     # Stammklasse jeder Person im gewählten Schuljahr (für Anzeige und Filter)
@@ -221,11 +260,21 @@ def zuordnung(request):
         vorfilter["ohne_klasse"] = any(e["klasse"] is None for e in pool)
 
     klassen = [g for g in gruppen if g.typ == Gruppe.STAMMKLASSE]
+    darf_bearbeiten = gruppe is not None and darf_gruppe_bearbeiten(request.user, gruppe)
+    from .klassenunterricht import darf_unterricht_verteilen, tabelle
+
+    mit_faechern = gruppe is not None and gruppe.typ != Gruppe.AG      # AGs haben keinen Unterricht mit Noten
+    ansicht = "faecher" if mit_faechern and request.GET.get("ansicht") == "faecher" else "schueler"
     return render(request, "portal/zuordnung.html", {
+        "ansicht": ansicht, "mit_faechern": mit_faechern, "unterricht": tabelle(gruppe) if ansicht == "faecher" else None,
+        "darf_unterricht": gruppe is not None and darf_unterricht_verteilen(request.user, gruppe),
+        "bearbeiten_form": GruppeBearbeitenForm(prefix="bearb", instance=gruppe, schuljahr=sj, user=request.user)
+        if darf_bearbeiten and request.user.has_perm("stammdaten.change_gruppe") else None,
+        "schueler_form": SchuelerNeuForm(prefix="sn") if darf_bearbeiten and darf_schueler_anlegen(request.user) else None,
         "sj": sj, "schuljahre": Schuljahr.objects.all(), "gruppen": gruppen, "gruppe": gruppe, "mitglieder": mitglieder,
         "pool": pool, "klassen": klassen, "jahrgaenge": sorted({g.jahrgang for g in klassen if g.jahrgang}),
         "religionen": Schuelerprofil.RELIGIONSUNTERRICHT[1:], "stichtag": stichtag, "vorgaenger_neu": vorgaenger_neu,
-        "vorfilter": vorfilter, "darf_bearbeiten": gruppe is not None and darf_gruppe_bearbeiten(request.user, gruppe),
+        "vorfilter": vorfilter, "darf_bearbeiten": darf_bearbeiten,
         "neu_form": GruppeForm(prefix="neu", schuljahr=sj, user=request.user,
                                initial={"typ": Gruppe.LERNGRUPPE}) if request.user.has_perm("stammdaten.add_gruppe") else None,
         "typen": Gruppe.TYPEN,
@@ -289,3 +338,52 @@ def gruppe_anlegen(request):
     messages.error(request, gettext("Gruppe nicht angelegt: %(fehler)s") % {
         "fehler": " ".join(f"{form.fields[f].label}: {' '.join(e)}" if f in form.fields else " ".join(e) for f, e in form.errors.items())})
     return _zurueck(sj)
+
+
+def _fehlertext(form):
+    return " ".join(f"{form.fields[f].label}: {' '.join(e)}" if f in form.fields else " ".join(e) for f, e in form.errors.items())
+
+
+@login_required
+@require_POST
+def gruppe_bearbeiten(request, pk):
+    gruppe = get_object_or_404(Gruppe.objects.select_related("schuljahr"), pk=pk)
+    if not (darf_gruppe_bearbeiten(request.user, gruppe) and request.user.has_perm("stammdaten.change_gruppe")):
+        raise PermissionDenied
+    form = GruppeBearbeitenForm(request.POST, prefix="bearb", instance=gruppe, schuljahr=gruppe.schuljahr, user=request.user)
+    if form.is_valid():
+        form.save()
+        messages.success(request, gettext("Gruppe „%(name)s“ gespeichert.") % {"name": gruppe.name})
+    else:
+        messages.error(request, gettext("Nicht gespeichert: %(fehler)s") % {"fehler": _fehlertext(form)})
+    return _zurueck(gruppe.schuljahr, gruppe)
+
+
+@login_required
+@require_POST
+def schueler_anlegen(request, pk):
+    """Neue:n Schüler:in mit den wichtigsten Angaben anlegen und gleich der Gruppe zuordnen."""
+    from aufnahme.uebernahme import naechste_schuelernummer
+
+    gruppe = get_object_or_404(Gruppe.objects.select_related("schuljahr"), pk=pk)
+    if not (darf_gruppe_bearbeiten(request.user, gruppe) and darf_schueler_anlegen(request.user)):
+        raise PermissionDenied
+    form = SchuelerNeuForm(request.POST, prefix="sn")
+    if not form.is_valid():
+        messages.error(request, gettext("Nicht angelegt: %(fehler)s") % {"fehler": _fehlertext(form)})
+        return _zurueck(gruppe.schuljahr, gruppe, neu="1")
+    d = form.cleaned_data
+    start = stichtag_fuer(gruppe, _datum(request))
+    with transaction.atomic():
+        person = Person.objects.create(vorname=d["vorname"].strip(), nachname=d["nachname"].strip(),
+                                       geschlecht=d["geschlecht"], geburtsdatum=d["geburtsdatum"])
+        s = Schuelerprofil.objects.create(person=person, schuelernummer=naechste_schuelernummer(), eintrittsdatum=start,
+                                          eintritt_jahrgang=gruppe.jahrgang, status="aktiv",
+                                          religionsunterricht=d["religionsunterricht"])
+        e = hinzufuegen(gruppe, [s], start)
+    for f in e["fehler"]:
+        messages.error(request, f)
+    messages.success(request, gettext("%(name)s angelegt (Schülernummer %(nr)s) und %(gruppe)s zugeordnet. "
+                                      "Weitere Angaben in der Schülerakte.") % {
+        "name": person.anzeigename, "nr": s.schuelernummer, "gruppe": gruppe.name})
+    return _zurueck(gruppe.schuljahr, gruppe)

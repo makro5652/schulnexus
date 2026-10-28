@@ -139,6 +139,7 @@ class ZuordnungTest(TestCase):
         self.anmelden("verwaltung")
         self.client.post(reverse("sprache_wechseln"), {"sprache": "en", "next": "/"})
         r = self.client.get(reverse("zuordnung"))
-        self.assertContains(r, "Assign classes and groups")
+        self.assertContains(r, "Classes and groups")
+        self.assertContains(r, "Subjects and teachers")
         self.assertContains(r, "Add students")
         self.assertIsNotNone(User)

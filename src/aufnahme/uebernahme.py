@@ -74,7 +74,7 @@ def hinweise(a):
     """Keine Hindernisse, aber vor der Übernahme zu beachten."""
     h = []
     if not a.vorlaeufige_klasse_id:
-        h.append(gettext("Keine vorläufige Klasse – die Klassenzuordnung kann später unter „Zuordnen“ erfolgen."))
+        h.append(gettext("Keine vorläufige Klasse – die Klassenzuordnung kann später unter „Klassen und Gruppen“ erfolgen."))
     if not a.kontakte.exists():
         h.append(gettext("Es sind keine Erziehungsberechtigten erfasst."))
     if a.bildungsgang_id and a.jahrgang:

@@ -41,13 +41,15 @@ BESCHREIBUNG = {
     MITTELSTUFE: _("Wie Lehrer:in, zusätzlich für alle Klassen der Mittelstufe: Schülerakten, Notenübersichten, Fehlzeiten, "
                    "Zeugnisse und Konferenzen (leiten, Zeugnisse freigeben), "
                    "Gesundheitshinweise, Förderpläne und Nachteilsausgleiche (bearbeiten), Schullaufbahn und Versetzungsvermerke, "
-                   "Klassen und Lerngruppen der Stufe bilden und Schüler:innen zuordnen, Neuanmeldungen der Stufe bearbeiten."),
+                   "Klassen und Lerngruppen der Stufe bilden, Schüler:innen zuordnen und Fächer mit Lehrkräften festlegen, "
+                   "Neuanmeldungen der Stufe bearbeiten."),
     OBERSTUFE: _("Wie Mittelstufenkoordination, bezogen auf die Jahrgänge der Oberstufe."),
     SCHULLEITUNG: _("Alle Rechte, einschließlich Genehmigung von Nachteilsausgleichen, HR-Daten und Benutzerverwaltung."),
     STELLVERTRETUNG: _("Wie Stufenkoordination für alle Jahrgänge; plant Elternsprechtage und Lern- und Entwicklungsgespräche "
                         "(Zeitraster, Teilnahme, Buchungszeitraum), pflegt Schulkalender und Räume."),
-    SEKRETARIAT: _("Schüler- und Elternstammdaten, Klassen und Gruppen, Fehlzeiten, AGs, Einwilligungen, Anhänge, "
-                   "Gesundheitsangaben, Neuanmeldungen einschließlich Übernahme, Zeugnisse vorbereiten und drucken. Noten, Unterrichtsverteilung, Kataloge und Personal nur lesend; keine Förderpläne, keine HR-Daten."),
+    SEKRETARIAT: _("Schüler- und Elternstammdaten, Klassen und Gruppen einschließlich Fächern und Lehrkräften (Unterrichtsverteilung), "
+                   "Fehlzeiten, AGs, Einwilligungen, Anhänge, "
+                   "Gesundheitsangaben, Neuanmeldungen einschließlich Übernahme, Zeugnisse vorbereiten und drucken. Noten, Kataloge und Personal nur lesend; keine Förderpläne, keine HR-Daten."),
     VERWALTUNGSLEITUNG: _("Wie Sekretariat, zusätzlich Schuljahre, Zeitraster, Fächer, Notenskalen, Unterrichtsverteilung, "
                           "eigene Datenfelder, Benutzerkonten und Rollen, Personal einschließlich HR-Daten, Dienstleister und Finanzen. "
                           "Keine Noteneingabe, keine Förderpläne."),
@@ -134,13 +136,16 @@ _ZEUGNIS_VERWALTUNG = r(("view", "change"), "zeugnis") | r("view", "zeugnisfachn
 # (akademische Verwaltung), Löschfristen ändern nur Schulleitung und IT.
 _LAUFBAHN = r(ALLE, "laufbahnereignis") | r("view", "schuljahreswechsel", "wechselposten")
 
-_SEKRETARIAT = (_SCHUELERDATEN | _LAUFBAHN | _TERMINE_VERWALTUNG | _AUFNAHME_VOLL | _ZEUGNIS_VERWALTUNG | _ELTERNKONTAKT_VERWALTUNG | r("view", *_KATALOGE) | _NOTEN_LESEN | r("view", "personalprofil", "dienstleister")
+# Unterricht (Fach, Lehrkraft) einer Klasse festlegen – Seite „Klassen und Gruppen“, zeilenweise in portal/klassenunterricht.py
+_UNTERRICHT = r(ALLE, "unterricht")
+
+_SEKRETARIAT = (_SCHUELERDATEN | _UNTERRICHT | _LAUFBAHN | _TERMINE_VERWALTUNG | _AUFNAHME_VOLL | _ZEUGNIS_VERWALTUNG | _ELTERNKONTAKT_VERWALTUNG | r("view", *_KATALOGE) | _NOTEN_LESEN | r("view", "personalprofil", "dienstleister")
                 | r("view", "nachteilsausgleich", "foerderschwerpunkt", "ausgleichsmassnahme"))
 
 ROLLEN_RECHTE = {
     LEHRER: _LEHRER,
-    MITTELSTUFE: _STUFE | _AUFNAHME_STUFE,
-    OBERSTUFE: _STUFE | _AUFNAHME_STUFE,
+    MITTELSTUFE: _STUFE | _AUFNAHME_STUFE | _UNTERRICHT,
+    OBERSTUFE: _STUFE | _AUFNAHME_STUFE | _UNTERRICHT,
     SCHULLEITUNG: "__alle__",
     STELLVERTRETUNG: _STUFE | _AUFNAHME_STUFE | _TERMINE_PLANUNG | r("view", "laufbahnereignis", "schuljahreswechsel", "wechselposten"),
     IT: "__alle__",
@@ -179,7 +184,7 @@ BEREICHE = [
     ("foerderung", _("Förderpläne")),
     ("nta", _("Nachteilsausgleiche")),
     ("stammdaten", _("Schüler- und Elternstammdaten")),
-    ("zuordnung", _("Klassen und Gruppen zuordnen")),
+    ("zuordnung", _("Klassen und Gruppen, Fächer und Lehrkräfte")),
     ("aufnahme", _("Neuanmeldungen")),
     ("personal", _("Personal")),
     ("hr", _("HR-Daten")),

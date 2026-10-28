@@ -1,12 +1,12 @@
 {% extends "portal/base.html" %}
 {% load i18n static formate %}
-{% block title %}{% translate "Klassen und Gruppen zuordnen" %}{% endblock %}
+{% block title %}{% translate "Klassen und Gruppen" %}{% endblock %}
 {% block inhaltsklasse %}breit{% endblock %}
 {% block inhalt %}
 <div class="zo-kopf">
   <div>
-    <p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › {% translate "Klassen und Gruppen zuordnen" %}</p>
-    <h1>{% translate "Klassen und Gruppen zuordnen" %}</h1>
+    <p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › {% translate "Klassen und Gruppen" %}</p>
+    <h1>{% translate "Klassen und Gruppen" %}</h1>
   </div>
   <form method="get" class="zo-sj">
     <label>{% translate "Schuljahr" %}
@@ -25,7 +25,7 @@
       <h2>{{ t.grouper }}</h2>
       <ul>
       {% for g in t.list %}
-        <li data-name="{{ g.name|lower }}"><a href="?sj={{ sj.pk }}&amp;gruppe={{ g.pk }}" class="{% if gruppe and g.pk == gruppe.pk %}aktiv{% endif %}"{% if gruppe and g.pk == gruppe.pk %} aria-current="page"{% endif %}>
+        <li data-name="{{ g.name|lower }}"><a href="?sj={{ sj.pk }}&amp;gruppe={{ g.pk }}{% if ansicht == 'faecher' %}&amp;ansicht=faecher{% endif %}" class="{% if gruppe and g.pk == gruppe.pk %}aktiv{% endif %}"{% if gruppe and g.pk == gruppe.pk %} aria-current="page"{% endif %}>
           <span>{{ g.name }}</span><small>{{ g.anzahl }}</small></a></li>
       {% endfor %}
       </ul>
@@ -33,7 +33,7 @@
 
     {% if neu_form %}
     <details class="zo-neu"{% if not gruppen %} open{% endif %}>
-      <summary>{% translate "Neue Gruppe" %}</summary>
+      <summary>{% translate "Neue Klasse / Gruppe" %}</summary>
       <form method="post" action="{% url 'gruppe_anlegen' %}" class="formular">
         {% csrf_token %}<input type="hidden" name="sj" value="{{ sj.pk }}">
         <label>{{ neu_form.name.label }} {{ neu_form.name }}</label>
@@ -44,25 +44,55 @@
           <label>{{ neu_form.kuerzel.label }} {{ neu_form.kuerzel }}</label>
           <label>{{ neu_form.vorgaenger.label }} {{ neu_form.vorgaenger }}</label>
         </details>
-        <button type="submit" class="knopf klein">{% translate "Gruppe anlegen" %}</button>
+        <button type="submit" class="knopf klein">{% translate "Anlegen" %}</button>
+        <p class="klein leise">{% translate "Danach Schüler:innen hinzufügen und unter „Fächer und Lehrkräfte“ den Unterricht festlegen." %}</p>
       </form>
     </details>
     {% endif %}
   </aside>
 
   {% if gruppe %}
-  {# ------------------------------------------------ Spalte 2: Mitglieder #}
-  <section class="karte zo-mitglieder" id="zo-mitglieder" aria-label="{% translate 'Mitglieder' %}">
+  <div class="zo-haupt">
+  {# ------------------------------------------------ Kopf der Gruppe mit Reitern #}
+  <div class="karte zo-gruppenkarte">
     <div class="zo-gruppenkopf">
       <div>
         <h2>{{ gruppe.name }}</h2>
-        <p class="unterzeile klein">{{ gruppe.get_typ_display }}{% if gruppe.jahrgang %} · {% blocktranslate with jg=gruppe.jahrgang %}Jahrgang {{ jg }}{% endblocktranslate %}{% endif %}{% if gruppe.leitung %} · {{ gruppe.leitung.person.anzeigename }}{% endif %}</p>
+        <p class="unterzeile klein">{{ gruppe.get_typ_display }}{% if gruppe.jahrgang %} · {% blocktranslate with jg=gruppe.jahrgang %}Jahrgang {{ jg }}{% endblocktranslate %}{% endif %}{% if gruppe.leitung %} · {{ gruppe.leitung.person.anzeigename }}{% endif %} · {% blocktranslate count n=mitglieder|length %}{{ n }} Mitglied{% plural %}{{ n }} Mitglieder{% endblocktranslate %}</p>
       </div>
       <div class="knopfreihe">
         {% if gruppe.typ == "stammklasse" %}<a class="knopf zweitrangig klein" href="{% url 'klassenliste' gruppe.pk %}">{% translate "Klassenliste" %}</a>{% endif %}
-        {% if user.is_staff %}<a class="knopf zweitrangig klein" href="{% url 'admin:stammdaten_gruppe_change' gruppe.pk %}">{% translate "Gruppe bearbeiten" %}</a>{% endif %}
       </div>
     </div>
+    {% if mit_faechern %}
+    <nav class="zo-reiter" aria-label="{% translate 'Ansicht' %}">
+      <a href="?sj={{ sj.pk }}&amp;gruppe={{ gruppe.pk }}" {% if ansicht == "schueler" %}class="aktiv" aria-current="page"{% endif %}>{% translate "Schüler:innen" %}</a>
+      <a href="?sj={{ sj.pk }}&amp;gruppe={{ gruppe.pk }}&amp;ansicht=faecher" {% if ansicht == "faecher" %}class="aktiv" aria-current="page"{% endif %}>{% translate "Fächer und Lehrkräfte" %}</a>
+    </nav>
+    {% endif %}
+    {% if bearbeiten_form %}
+    <details class="zo-bearbeiten">
+      <summary>{% translate "Klasse / Gruppe bearbeiten" %}</summary>
+      <form method="post" action="{% url 'gruppe_bearbeiten' gruppe.pk %}" class="formular zo-bearbeiten-form">
+        {% csrf_token %}
+        <label>{{ bearbeiten_form.name.label }} {{ bearbeiten_form.name }}</label>
+        <label>{{ bearbeiten_form.jahrgang.label }} {{ bearbeiten_form.jahrgang }}</label>
+        <label>{{ bearbeiten_form.leitung.label }} {{ bearbeiten_form.leitung }}</label>
+        <label>{{ bearbeiten_form.kuerzel.label }} {{ bearbeiten_form.kuerzel }}</label>
+        <label>{{ bearbeiten_form.vorgaenger.label }} {{ bearbeiten_form.vorgaenger }}</label>
+        <div><button type="submit" class="knopf klein">{% translate "Speichern" %}</button>
+        {% if user.is_staff %}<a class="klein" href="{% url 'admin:stammdaten_gruppe_change' gruppe.pk %}">{% translate "alle Angaben" %}</a>{% endif %}</div>
+      </form>
+    </details>
+    {% endif %}
+  </div>
+
+  {% if ansicht == "faecher" %}
+  {% include "portal/_zuordnung_faecher.html" %}
+  {% else %}
+  <div class="zo-spalten">
+  {# ------------------------------------------------ Spalte 2: Mitglieder #}
+  <section class="karte zo-mitglieder" id="zo-mitglieder" aria-label="{% translate 'Mitglieder' %}">
 
     <label class="zo-stichtag">{% translate "Stichtag für Ein- und Austritte" %}
       <input type="date" id="zo-datum" value="{{ stichtag|date:'Y-m-d' }}" min="{{ sj.beginn|date:'Y-m-d' }}" max="{{ sj.ende|date:'Y-m-d' }}">
@@ -83,7 +113,7 @@
     <div class="zo-liste-kopf">
       <label class="haken klein"><input type="checkbox" id="zo-alle-mitglieder"{% if not darf_bearbeiten %} disabled{% endif %}> {% blocktranslate count n=mitglieder|length %}{{ n }} Mitglied{% plural %}{{ n }} Mitglieder{% endblocktranslate %}</label>
       {% if darf_bearbeiten %}<button type="submit" form="zo-entfernen" class="knopf zweitrangig klein gefahr" id="zo-entfernen-knopf" disabled
-        data-text="{% translate 'Entfernen' %}">{% translate "Entfernen" %}</button>{% endif %}
+        data-text="{% translate 'Abmelden' context 'Gruppe' %}" title="{% translate 'Mitgliedschaft zum Stichtag beenden (die Historie bleibt erhalten)' %}">{% translate "Abmelden" context "Gruppe" %}</button>{% endif %}
     </div>
 
     <div class="zo-ablage" data-ablage>
@@ -110,6 +140,21 @@
            data-vorfilter-klassen="{{ vorfilter.klassen|join:',' }}" data-vorfilter-religion="{{ vorfilter.religion }}"
            data-vorfilter-ohne="{% if vorfilter.ohne_klasse %}1{% endif %}">
     <h2>{% translate "Schüler:innen hinzufügen" %}</h2>
+    {% if schueler_form %}
+    <details class="zo-neu zo-neu-schueler"{% if request.GET.neu %} open{% endif %}>
+      <summary>{% translate "Neue:n Schüler:in anlegen" %}</summary>
+      <form method="post" action="{% url 'zuordnung_schueler_anlegen' gruppe.pk %}" class="formular zo-bearbeiten-form">
+        {% csrf_token %}<input type="hidden" name="datum" value="{{ stichtag|date:'Y-m-d' }}" class="zo-datum-kopie">
+        <label>{{ schueler_form.vorname.label }} {{ schueler_form.vorname }}</label>
+        <label>{{ schueler_form.nachname.label }} {{ schueler_form.nachname }}</label>
+        <label>{{ schueler_form.geschlecht.label }} {{ schueler_form.geschlecht }}</label>
+        <label>{{ schueler_form.geburtsdatum.label }} {{ schueler_form.geburtsdatum }}</label>
+        <label>{{ schueler_form.religionsunterricht.label }} {{ schueler_form.religionsunterricht }}</label>
+        {% if request.GET.neu %}<label class="haken klein">{{ schueler_form.trotzdem }} {{ schueler_form.trotzdem.label }}</label>{% endif %}
+        <div><button type="submit" class="knopf klein">{% blocktranslate with name=gruppe.name %}Anlegen und {{ name }} zuordnen{% endblocktranslate %}</button></div>
+      </form>
+    </details>
+    {% endif %}
     <div class="zo-filter">
       <input type="search" class="zo-suche" id="zo-suche" placeholder="{% translate 'Name suchen … (Taste /)' %}" aria-label="{% translate 'Name suchen' %}">
       <div class="zo-chips" role="group" aria-label="{% translate 'Klassen' %}">
@@ -143,9 +188,13 @@
       <p class="leer" id="zo-keine" hidden>{% translate "Keine Treffer – Filter anpassen." %}</p>
     </div>
   </section>
+  </div>
+  {% endif %}
+  </div>
   {% else %}
   <section class="karte zo-mitglieder"><p class="leer">{% translate "Bitte links eine Gruppe wählen oder eine neue Gruppe anlegen." %}</p></section>
   {% endif %}
 </div>
 <script src="{% static 'zuordnung.js' %}" defer></script>
+{% if ansicht == "faecher" %}<script src="{% static 'zuordnung_faecher.js' %}" defer></script>{% endif %}
 {% endblock %}

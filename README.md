@@ -46,7 +46,7 @@ http://localhost:8000. Die Zugangsdaten stehen in der Datei `.env`
 
 ## Klassen und Gruppen zuordnen
 
-**Menüband › Schüler:innen › Zuordnen** (oder in der Klassenliste „Mitglieder zuordnen“) öffnet eine
+**Menüband › Schüler:innen › Klassen und Gruppen** (oder in der Klassenliste „Mitglieder zuordnen“) öffnet eine
 Arbeitsseite mit drei Spalten:
 
 1. **Gruppen** des gewählten Schuljahres (Stammklassen, Lerngruppen, AGs) mit Suchfeld und
@@ -66,8 +66,9 @@ Arbeitsseite mit drei Spalten:
   „Alle übernehmen“ deren Schüler:innen mit einem Klick.
 - **Lerngruppen** (z. B. Ethik 9): Der Filter ist auf die Ursprungs-Stammklassen und – wenn der
   Name es nahelegt – auf Ethik bzw. Religion voreingestellt.
-- **Rechte:** Sekretariat, Verwaltungsleitung, Schulleitung alle Gruppen; Stufenkoordination die
+- **Rechte:** Sekretariat, Verwaltungsleitung, Schulleitung und IT-Administration alle Gruppen; Stufenkoordination die
   Gruppen ihrer Stufe (AGs ohne Jahrgang bleiben bei der Verwaltung).
+- **Fächer und Lehrkräfte, Klasse bearbeiten, neue Schüler:innen:** siehe „Klassen und Gruppen: Fächer und Lehrkräfte (ab 0.4.14.0)“.
 
 ## Quellcode von GitHub holen
 
@@ -792,6 +793,30 @@ Es sind keine Geheimnisse hinterlegt; verwendet werden nur erfundene Demodaten u
 Die Oberflächenprüfung lässt sich auch lokal ausführen (Playwright für Python nötig): `python tools/oberflaeche_pruefen.py http://localhost:8000 ausgabeordner`. Rückgabewert 1 bei Befunden.
 
 Hinweis: Private Repositories haben ein monatliches Kontingent an Actions-Minuten (je nach Tarif; der genaue Wert sollte auf GitHub unter „Settings → Billing“ nachgesehen werden). Ein vollständiger Lauf dauert etwa 10–15 Minuten.
+
+## Klassen und Gruppen: Fächer und Lehrkräfte (ab 0.4.14.0)
+
+Die Seite **Menüband › Schüler:innen › Klassen und Gruppen** (vorher „Zuordnen“) deckt jetzt den ganzen Ablauf ab:
+Klasse anlegen → Schüler:innen hinzufügen → Fächer wählen → Lehrkräfte zuweisen.
+
+1. **Klasse anlegen:** links „Neue Klasse / Gruppe“ (Name, Typ, Jahrgang, Klassenleitung).
+2. **Schüler:innen** (Reiter „Schüler:innen“): wie bisher aus der Liste rechts hinzufügen; „Abmelden“ beendet die
+   Mitgliedschaft zum Stichtag (die Historie bleibt). Neu: **„Neue:n Schüler:in anlegen“** – Vorname, Nachname,
+   Geschlecht, Geburtsdatum, Religion/Ethik; die Person erhält eine Schülernummer und ist sofort Mitglied der Gruppe.
+   Gibt es schon eine gleichnamige Person, muss „Trotzdem anlegen“ angekreuzt werden. Alles Weitere in der Schülerakte.
+3. **Fächer und Lehrkräfte** (Reiter): Tabelle mit allen Fächern und je einer Spalte pro Halbjahr. Wer eine Lehrkraft
+   wählt, legt den Unterricht an; Lehrkräfte mit passender Lehrbefähigung stehen oben. Eine Wahl im 1. Halbjahr füllt das
+   leere 2. Halbjahr gleich mit, „1. Halbjahr → 2. Halbjahr“ übernimmt alle auf einmal. „–“ entfernt einen Unterricht,
+   solange es keine Noten gibt; sonst lässt sich nur die Lehrkraft wechseln. Notenskala und Startvorlage werden wie bei
+   den anderen Klassen des Jahrgangs gesetzt (sonst Sek I bzw. für die Oberstufe Sek II). Geänderte Felder sind
+   markiert; was inzwischen von anderer Seite geändert wurde, wird nicht überschrieben.
+4. **Klasse bearbeiten:** „Klasse / Gruppe bearbeiten“ im Kopf (Name, Jahrgang, Klassenleitung, Kürzel, Vorjahresklasse).
+
+**Rechte:** Sekretariat, Verwaltungsleitung, Schulleitung und IT-Administration für alle Klassen; Mittel- und
+Oberstufenkoordination für die Jahrgänge ihrer Stufe. Sekretariat und Koordinationen erhalten dafür beim Start
+(`grundeinrichtung`) die Rechte für Unterricht. Neue Schüler:innen anlegen dürfen nur Rollen mit dem Recht auf
+Schülerstammdaten (Sekretariat, Verwaltungsleitung, Schulleitung, IT); die Koordinationen nehmen Schüler:innen über
+Neuanmeldungen auf.
 
 ## Zeugnisnoten aus Excel und Klassenübersicht (ab 0.4.13.0)
 

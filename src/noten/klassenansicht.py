@@ -29,7 +29,7 @@ from . import rechte
 from . import zeugnisnoten as Z
 from .ansichten import gewicht_text
 from .berechnung import Baum, Vorhalbjahr, vorschlagsnote
-from .models import Note, Unterricht, Zeugnisnote
+from .models import Note, Unterricht
 
 
 def _abschnitte():
@@ -139,8 +139,6 @@ def notentabelle_daten(request, u, eingaben=None, fehler=None):
 def klassenuebersicht(klasse, abschnitt, kurse, user=None):
     """Schüler:innen × Fächer: je Zelle der rechnerische Stand (Schnitt, Tendenz, ganze Note) und die Zeugnisnote – wer sie
     festsetzen darf, trägt sie hier direkt ein (ab 0.4.13.0)."""
-    from .sperre import gesperrte_schueler
-
     from zeugnisse.noten import klassen_mitglieder
 
     schueler = klassen_mitglieder(klasse, abschnitt)

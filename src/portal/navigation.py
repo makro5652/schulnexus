@@ -141,8 +141,8 @@ def menueband(request):
         .add(_("Benachrichtigungsregeln"), _url("elternkontakt_regeln"), "glocke", bedingung=darf_regeln(user),
              hinweis=_("Automatische Benachrichtigung bei Fehlzeiten und Verspätungen")),
         Gruppe(_("Klassen und Gruppen"))
-        .add(_("Zuordnen"), _url("zuordnung"), "person_plus", gross=True, bedingung=darf_zuordnen(user),
-             hinweis=_("Schüler:innen Klassen, Lerngruppen und AGs zuordnen")),
+        .add(_("Klassen und Gruppen"), _url("zuordnung"), "person_plus", gross=True, bedingung=darf_zuordnen(user),
+             hinweis=_("Klassen anlegen, Schüler:innen zuordnen und abmelden, Fächer und Lehrkräfte festlegen")),
         Gruppe(_("Fehlzeiten"))
         .add(_("Fehlzeiten"), _url("admin:fehlzeiten_fehlzeit_changelist"), "uhr", gross=True, bedingung=p("fehlzeiten.view_fehlzeit"))
         .add(_("Offene Entschuldigungen"), _url("admin:fehlzeiten_fehlzeit_changelist", query="?status__exact=offen"), "warnung",
