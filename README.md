@@ -793,6 +793,25 @@ Die Oberflächenprüfung lässt sich auch lokal ausführen (Playwright für Pyth
 
 Hinweis: Private Repositories haben ein monatliches Kontingent an Actions-Minuten (je nach Tarif; der genaue Wert sollte auf GitHub unter „Settings → Billing“ nachgesehen werden). Ein vollständiger Lauf dauert etwa 10–15 Minuten.
 
+## Zeugnisnoten aus Excel und Klassenübersicht (ab 0.4.13.0)
+
+Die **festgesetzte Zeugnisnote** lässt sich jetzt auf zwei weiteren Wegen setzen. Beide nutzen dieselben Regeln wie die
+Seite „Zeugnisnoten“ (Lehrkraft des Unterrichts und Schulleitung; gesperrte Schüler:innen und freigegebene Zeugnisse
+bleiben unverändert; ohne Einzelnoten nur mit der Freigabe „Zeugnisnote ohne Einzelnoten“; eine Abweichung vom Vorschlag
+wird nur markiert). Die Note gilt sofort für das Zeugnis.
+
+- **Excel-Import:** Die Spalte **„Zeugnisnote (festgesetzt)“** wird beim Hochladen mit übernommen – im 1. Halbjahr aus
+  dem Blatt „1. Halbjahr“, im 2. Halbjahr aus dem Blatt „2. Halbjahr“, bei einem Kurs mit Jahresnote aus dem Blatt
+  „Jahresnote“. Erlaubt sind ganze Noten 1–6 sowie nb und befreit. Die Vorschau zeigt je Schüler:in bisher/neu; leere
+  Zellen ändern nichts. Ungültige Eingaben blockieren die Übernahme, nicht übernehmbare Zeilen (gesperrt, ohne
+  Einzelnoten) werden gemeldet und ausgelassen.
+- **Klassenübersicht:** Wo man die Zeugnisnote festsetzen darf, steht in der Zelle **ZN** eine Auswahl (für alle Fächer der
+  Klasse). „Zeugnisnoten speichern“ übernimmt nur geänderte Zellen; eine inzwischen von anderer Seite geänderte Zelle wird
+  nicht überschrieben. „–“ entfernt die Zeugnisnote wieder.
+- **Hinweis in den Einzelnoten:** In der Notentabelle eines Kurses erscheint die Spalte **Zeugnisnote**; darunter steht,
+  woher sie stammt („aus der Excel-Notentabelle übernommen“ bzw. „in der Klassenübersicht festgesetzt“). Wird die Note
+  auf der Seite „Zeugnisnoten“ geändert, entfällt der Hinweis. Die Herkunft steht auch im Änderungsprotokoll.
+
 ## Noten nach Klasse (ab 0.4.12.0)
 
 Menüband „Unterricht“ → **Noten nach Klasse** (`/noten/`):

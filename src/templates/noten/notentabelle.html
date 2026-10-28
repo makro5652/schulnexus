@@ -77,6 +77,22 @@
     </tbody>
   </table></div>
 
+  {% if vorschau.zeugnis.zeilen %}
+  <h3>{% translate "Zeugnisnoten (festgesetzt)" %}</h3>
+  <p class="leise">{% blocktranslate with blatt=vorschau.zeugnis.blatt %}Aus der Spalte „Zeugnisnote (festgesetzt)“ im Blatt „{{ blatt }}“. Die Noten werden als festgesetzte Zeugnisnoten übernommen und gelten für das Zeugnis; abweichend vom Vorschlag wird nur markiert. Leere Zellen ändern nichts.{% endblocktranslate %}</p>
+  <div class="rollbar"><table class="liste kompakt">
+    <thead><tr><th>{% translate "Schüler:in" %}</th><th>{% translate "bisher" %}</th><th>{% translate "neu" %}</th><th>{% translate "Aktion" %}</th></tr></thead>
+    <tbody>{% for z in vorschau.zeugnis.zeilen %}
+      <tr{% if z.status == "fehler" or z.status == "gesperrt" %} class="nt-fehler"{% endif %}>
+        <td>{{ z.s.person }}</td><td>{{ z.alt|default:"–" }}</td><td><strong>{{ z.neu }}</strong></td>
+        <td>{% if z.status == "neu" %}<span class="etikett">{% translate "festsetzen" %}</span>
+          {% elif z.status == "geaendert" %}<span class="etikett">{% translate "ändern" %}</span>
+          {% elif z.status == "gleich" %}<span class="leise">{% translate "unverändert" %}</span>
+          {% else %}<span class="etikett warnend">{{ z.text }}</span>{% endif %}</td></tr>
+    {% endfor %}</tbody>
+  </table></div>
+  {% endif %}
+
   <h3>{% translate "Schüler:innen" %}</h3>
   <div class="rollbar"><table class="liste kompakt">
     <thead><tr><th class="zahl">{% translate "Zeile" %}</th><th>{% translate "Name in der Datei" %}</th><th>{% translate "Zuordnung" %}</th></tr></thead>
@@ -94,7 +110,7 @@
     &nbsp;|&nbsp; {% translate "SoMi" %}: {% translate "Datei" %} {{ vorschau.datei_gewichte.somi|default:"–" }} · {% translate "Kurs" %} {{ vorschau.kurs_gewichte.somi|default:"–" }}
     {% if u.abschnitt.nummer == 2 %}&nbsp;|&nbsp; {% translate "Anteil 1. Halbjahr" %}: {% translate "Datei" %} {{ vorschau.anteil_datei|default:"–" }} % · {% translate "Kurs" %} {{ vorschau.anteil_kurs|default:"–" }} %{% endif %}</p>
 
-  <p class="leise">{% translate "Leere Zellen löschen keine vorhandenen Noten. Kommentare und Einzelgewichte vorhandener Noten bleiben erhalten." %}</p>
+  <p class="leise">{% translate "Leere Zellen löschen keine vorhandenen Noten oder Zeugnisnoten. Kommentare und Einzelgewichte vorhandener Noten bleiben erhalten." %}</p>
   <p class="knopfreihe">
     {% if not vorschau.fehler %}<button type="submit" class="knopf" name="aktion" value="uebernehmen">{% translate "Noten übernehmen" %}</button>{% endif %}
     <button type="submit" class="knopf zweitrangig" name="aktion" value="verwerfen">{% translate "Verwerfen" %}</button>

@@ -196,6 +196,7 @@ def unterricht(request, pk):
                         bestehend.pop(s.pk).delete()
                     continue
                 z = bestehend.get(s.pk) or Zeugnisnote(unterricht=u, schueler=s)
+                vorher = Zeugnisnote(stufe_id=z.stufe_id, vermerk=z.vermerk)
                 v = vorschlagsnote(u, s, noten_je.get(s.pk, []), baum, jahr=jahr)
                 z.vorschlag = v.schnitt
                 z.begruendung = begruendung
@@ -210,6 +211,8 @@ def unterricht(request, pk):
                                                "und diesen Jahrgang nicht freigegeben (Schulleitung › Notenregeln).")
                         continue
                     z.vermerk, z.stufe = "", stufe
+                if z.pk and (z.stufe_id, z.vermerk) != (vorher.stufe_id, vorher.vermerk):
+                    z.quelle = ""
                 try:
                     z.full_clean()
                 except ValidationError as e:

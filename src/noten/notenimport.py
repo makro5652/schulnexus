@@ -22,6 +22,7 @@ from django.utils.translation import gettext as _, ngettext
 
 from . import eingabe as E
 from . import notentabelle as T
+from . import zeugnisnoten as Z
 from .berechnung import Baum
 from .models import KAUFMAENNISCH, Bewertungsordner, Leistungsnachweis, Note, Unterricht
 
@@ -250,7 +251,34 @@ def lesen(datei):
                             "datum": datum.isoformat() if datum else None,
                             "gewicht": str(gewicht) if gewicht is not None else None, "noten": noten, "fehler": fehler})
         tabelle["blaetter"][str(nr)] = spalten
+    tabelle["zeugnis"] = _zeugnisspalten(wb)
     return tabelle
+
+
+def _zeugnisspalten(wb):
+    """Spalte „Zeugnisnote (festgesetzt)“: {Blatt: {Zeile: Text}} für beide Halbjahre (Spalte W) und die Jahresnote (Spalte K)."""
+    quellen = {str(nr): (wb[blatt], T.ERG + 5) for nr, blatt in T.BLATT_HJ.items()}
+    if "Jahresnote" in wb.sheetnames:
+        quellen["jahr"] = (wb["Jahresnote"], 11)
+    ergebnis = {}
+    for name, (ws, spalte) in quellen.items():
+        zellen = {}
+        for i in range(T.ANZAHL):
+            text = _zelltext(ws.cell(row=T.ERSTE + i, column=spalte).value)
+            if text:
+                zellen[str(i)] = text
+        ergebnis[name] = zellen
+    return ergebnis
+
+
+def zeugnis_zellen(u, tabelle):
+    """(Zellen, Blattname) der Zeugnisnoten, die zu diesem Unterricht gehören: im 2. Halbjahr mit Jahresnote das Blatt
+    „Jahresnote“, sonst die Spalte des Halbjahresblattes."""
+    zn = tabelle.get("zeugnis") or {}
+    nr = u.abschnitt.nummer
+    if nr == 2 and u.mit_jahresnote and zn.get("jahr"):
+        return zn["jahr"], "Jahresnote"
+    return zn.get(str(nr), {}), T.BLATT_HJ[nr]
 
 
 # ---------------------------------------------------------------- Prüfen
@@ -317,8 +345,9 @@ def _eingabe_fuer_skala(text, verzeichnis, stufen_nach_wert):
     return text
 
 
-def pruefen(u, tabelle, wahl=None):
-    """Vorschau ohne zu speichern. Ergebnis: dict mit fehler (blockierend), warnungen, spalten, zeilen, zuordnung."""
+def pruefen(u, tabelle, wahl=None, zeugnis_darf=True):
+    """Vorschau ohne zu speichern. Ergebnis: dict mit fehler (blockierend), warnungen, spalten, zeilen, zuordnung, zeugnis.
+    `zeugnis_darf`: ob die Zeugnisnoten der Datei übernommen werden dürfen (Lehrkraft des Unterrichts, Schulleitung)."""
     from .sperre import gesperrte_schueler
 
     nr = u.abschnitt.nummer
@@ -432,7 +461,8 @@ def pruefen(u, tabelle, wahl=None):
         if info["fehler"]:
             fehler.extend(f"„{sp['titel']}“: {f}" for f in info["fehler"])
         spalten.append(info)
-    if not spalten and not fehler:
+    zeugnis = _zeugnis_vorschau(u, tabelle, zuordnung, index, spalten, fehler, warnungen, zeugnis_darf)
+    if not spalten and not zeugnis["zeilen"] and not fehler:
         fehler.append(_("Im Blatt „%(blatt)s“ stehen keine Noten.") % {"blatt": T.BLATT_HJ[nr]})
 
     gew = tabelle.get("gewichte", {})
@@ -447,16 +477,52 @@ def pruefen(u, tabelle, wahl=None):
             "datei_gewichte": datei_gewichte, "kurs_gewichte": kurs_gewichte,
             "anteil_datei": E._zahl(Decimal(anteil)) if anteil else None,
             "anteil_kurs": E._zahl(u.anteil_vorhalbjahr) if u.anteil_vorhalbjahr is not None else None,
-            "anteil_wert": anteil,
+            "anteil_wert": anteil, "zeugnis": zeugnis,
             "summe": {k: sum(s[k] for s in spalten) for k in ("neu", "geaendert", "gleich", "ignoriert")}}
+
+
+def _zeugnis_vorschau(u, tabelle, zuordnung, index, spalten, fehler, warnungen, zeugnis_darf, mit_noten=None):
+    """Zeugnisnoten der Datei: gültig? Was würde sich ändern? Ungültige Eingaben sind Fehler, nicht übernehmbare Zeilen
+    (gesperrt, ohne Einzelnoten) nur Hinweise."""
+    zellen, blatt = zeugnis_zellen(u, tabelle)
+    leer = {"blatt": blatt, "zeilen": [], "wuensche": {}, "summe": {}, "gesperrt_hinweis": False}
+    if not zellen:
+        return leer
+    if not zeugnis_darf:
+        warnungen.append(_("Die Zeugnisnoten der Datei werden nicht übernommen – sie dürfen nur von der Lehrkraft des Unterrichts "
+                           "und der Schulleitung festgesetzt werden."))
+        return leer
+    stufen = Z.ganze_stufen(u.skala)
+    nach_pk = {s.pk: s for s in index.values()}
+    wuensche = {}
+    for zeile, text in zellen.items():
+        s_pk = zuordnung.get(zeile)
+        if s_pk is None:
+            continue
+        try:
+            wunsch = Z.lesen(text, stufen)
+        except ValueError as f:
+            fehler.append(_("Zeugnisnote, Zeile %(zeile)s: %(fehler)s") % {"zeile": int(zeile) + 1, "fehler": f})
+            continue
+        if wunsch is not None:
+            wuensche[nach_pk[s_pk]] = wunsch
+    # Noten, die dieser Upload erst anlegt, zählen als Einzelnoten
+    if mit_noten is None:
+        mit_noten = {pk for sp in spalten if sp["aktion"] != "uebersprungen" for pk, _t in sp["zellen"]}
+    zeilen = Z.pruefen(u, wuensche, mit_noten=mit_noten)
+    summe = {k: sum(1 for z in zeilen if z["status"] == k) for k in ("neu", "geaendert", "gleich", "gesperrt", "fehler")}
+    for z in zeilen:
+        if z["status"] == "fehler":
+            warnungen.append(f"{z['s'].person}: {z['text']}")
+    return {"blatt": blatt, "zeilen": zeilen, "wuensche": wuensche, "summe": summe}
 
 
 # ---------------------------------------------------------------- Übernehmen
 
 @transaction.atomic
-def uebernehmen(u, tabelle, wahl, gewichte_uebernehmen=False):
+def uebernehmen(u, tabelle, wahl, gewichte_uebernehmen=False, zeugnis_darf=True):
     """Speichert nach erneuter Prüfung. Gibt die Vorschau (mit Zählung) zurück; wirft ImportFehler bei Fehlern."""
-    vorschau = pruefen(u, tabelle, wahl)
+    vorschau = pruefen(u, tabelle, wahl, zeugnis_darf=zeugnis_darf)
     if vorschau["fehler"]:
         raise ImportFehler(" ".join(vorschau["fehler"]))
     baum = Baum(u)
@@ -512,4 +578,10 @@ def uebernehmen(u, tabelle, wahl, gewichte_uebernehmen=False):
         if fehler:
             raise ImportFehler(" ".join(fehler.values()))
         E.speichern(ln, ergebnisse)
+    zn = vorschau["zeugnis"]
+    if zn["wuensche"]:
+        # nach den Einzelnoten erneut prüfen: Vorschlag und „hat Einzelnoten“ beziehen die neuen Noten ein
+        zeilen = Z.pruefen(u, zn["wuensche"])
+        zn["gespeichert"] = Z.speichern(u, zeilen, "excel")
+        zn["zeilen"] = zeilen
     return vorschau

@@ -8,6 +8,8 @@ from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext as _, gettext_lazy, ngettext
 
+from zeugnisse import rechte as zeugnisrechte
+
 from . import notenimport as I
 from .ansichten import _unterricht
 from .berechnung import Baum
@@ -44,6 +46,7 @@ def notentabelle(request, pk):
     u = _unterricht(request, pk)
     schluessel = SITZUNG.format(pk=u.pk)
     tabelle = request.session.get(schluessel)
+    zeugnis_darf = zeugnisrechte.darf_zeugnisnote_setzen(request.user, u)
     wahl = {b: request.POST.get(f"ordner_{b}") or request.GET.get(f"ordner_{b}") for b in I.BEREICHE}
     form = DateiForm()
     if request.method == "POST":
@@ -69,7 +72,8 @@ def notentabelle(request, pk):
             return redirect(weiter or reverse("notentabelle", args=[u.pk]))
         elif aktion == "uebernehmen" and tabelle:
             try:
-                ergebnis = I.uebernehmen(u, tabelle, wahl, gewichte_uebernehmen=bool(request.POST.get("gewichte")))
+                ergebnis = I.uebernehmen(u, tabelle, wahl, gewichte_uebernehmen=bool(request.POST.get("gewichte")),
+                                         zeugnis_darf=zeugnis_darf)
             except I.ImportFehler as f:
                 messages.error(request, _("Es wurde nichts gespeichert: %(fehler)s") % {"fehler": f})
             else:
@@ -78,13 +82,16 @@ def notentabelle(request, pk):
                 anzahl = sum(1 for sp in ergebnis["spalten"] if sp["aktion"] != "uebersprungen" and sp["zellen"])
                 text = ngettext("%(n)s Leistungsnachweis übernommen", "%(n)s Leistungsnachweise übernommen", anzahl) % {"n": anzahl}
                 text += " – " + _("%(neu)s Noten neu, %(geaendert)s geändert, %(gleich)s unverändert.") % s
+                if ergebnis["zeugnis"].get("gespeichert"):
+                    text += " " + ngettext("%(n)s Zeugnisnote festgesetzt.", "%(n)s Zeugnisnoten festgesetzt.",
+                                           ergebnis["zeugnis"]["gespeichert"]) % {"n": ergebnis["zeugnis"]["gespeichert"]}
                 _protokoll(request, u, _("Noten aus Excel übernommen") + f" ({text})")
                 messages.success(request, text)
                 return redirect(tabelle.get("weiter") or reverse("notenuebersicht", args=[u.pk]))
         elif aktion == "pruefen" and tabelle:
             url = reverse("notentabelle", args=[u.pk]) + "?" + "&".join(f"ordner_{b}={wahl[b]}" for b in I.BEREICHE if wahl[b])
             return redirect(url)
-    vorschau = I.pruefen(u, tabelle, wahl) if tabelle else None
+    vorschau = I.pruefen(u, tabelle, wahl, zeugnis_darf=zeugnis_darf) if tabelle else None
     return render(request, "noten/notentabelle.html", {
         "u": u, "form": form, "tabelle": tabelle, "vorschau": vorschau, "sek1": I.nur_sek1(u),
         "ordner": I.ordner_auswahl(u, Baum(u)),

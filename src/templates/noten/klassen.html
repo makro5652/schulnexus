@@ -51,6 +51,9 @@
   <div class="karte-kopf"><h2>{% blocktranslate with k=klasse.name %}Klassenübersicht {{ k }}{% endblocktranslate %}</h2>
     <span class="leise">{% translate "je Fach der aktuelle rechnerische Stand: Tendenz, darunter der Schnitt; ZN = festgesetzte Zeugnisnote" %}</span></div>
   {% if uebersicht.spalten %}
+  <form method="post" id="zn-form" data-verlassen="{% translate 'Es gibt ungespeicherte Zeugnisnoten.' %}">{% csrf_token %}
+  <input type="hidden" name="aktion" value="zeugnis">
+  <p class="leise nk-hilfe">{% translate "Wo Sie die Zeugnisnote festsetzen dürfen, wählen Sie sie direkt in der Zelle (ZN). Sie gilt sofort für das Zeugnis; ein Punkt (●) kennzeichnet Noten, die aus Excel übernommen oder hier gesetzt wurden." %}</p>
   <div class="rollbar"><table class="noten nk-klasse">
     <thead><tr><th class="links">{% translate "Schüler:in" %}</th>
       {% for f in uebersicht.spalten %}<th scope="col">{% for u in f.kurse %}<a href="?abschnitt={{ abschnitt.pk }}&amp;klasse={{ klasse.pk }}&amp;kurs={{ u.pk }}#kurs" title="{{ u.fach.lokal_name }} · {{ u.gruppe.name }} · {{ u.lehrkraft.person.anzeigename }}">{% if forloop.first %}{{ f.fach.kuerzel }}{% else %}·{% endif %}</a>{% endfor %}
@@ -58,10 +61,34 @@
       <th>{% translate "gefährdet" %}</th></tr></thead>
     <tbody>{% for z in uebersicht.zeilen %}
       <tr><th class="links" scope="row">{{ z.s.person }}</th>
-        {% for c in z.zellen %}<td class="{% if c.gefaehrdet %}nk-gefaehrdet{% endif %}">{% if c %}{% if c.schnitt is not None %}<strong>{{ c.stufe.bezeichnung|default:"–" }}</strong><small class="blockzeile">{{ c.schnitt|floatformat:2 }}</small>{% endif %}{% if c.zeugnis %}<small class="blockzeile nk-zn">ZN {{ c.zeugnis }}</small>{% endif %}{% if c.schnitt is None and not c.zeugnis %}<span class="leise">·</span>{% endif %}{% else %}<span class="leise">–</span>{% endif %}</td>{% endfor %}
+        {% for c in z.zellen %}<td class="{% if c.gefaehrdet %}nk-gefaehrdet{% endif %}">{% if c %}{% if c.schnitt is not None %}<strong>{{ c.stufe.bezeichnung|default:"–" }}</strong><small class="blockzeile">{{ c.schnitt|floatformat:2 }}</small>{% endif %}{% if c.bearbeitbar %}<label class="blockzeile nk-zn nk-zn-wahl">ZN
+            <select name="{{ c.name }}" data-orig="{{ c.wert }}" aria-label="{% translate 'Zeugnisnote' %} {{ z.s.person }} {{ c.u.fach.kuerzel }}">
+              <option value=""{% if not c.wert %} selected{% endif %}>–</option>
+              {% for w, text in c.optionen %}<option value="{{ w }}"{% if w == c.wert %} selected{% endif %}>{{ text }}</option>{% endfor %}
+              <option value="nb"{% if c.wert == "nb" %} selected{% endif %}>nb</option>
+              <option value="befreit"{% if c.wert == "befreit" %} selected{% endif %}>{% translate "befreit" %}</option>
+              {% if c.extra %}<option value="{{ c.extra }}" selected>{{ c.extra }}</option>{% endif %}
+            </select>{% if c.quelle %}<span class="nk-quelle" title="{{ c.quelle }}" aria-label="{{ c.quelle }}">●</span>{% endif %}</label>
+            <input type="hidden" name="zo_{{ c.name|slice:'3:' }}" value="{{ c.wert }}">
+          {% elif c.zeugnis %}<small class="blockzeile nk-zn">ZN {{ c.zeugnis }}{% if c.quelle %} <span class="nk-quelle" title="{{ c.quelle }}" aria-label="{{ c.quelle }}">●</span>{% endif %}{% if c.gesperrt %} <span class="ne-schloss" title="{% translate 'Noten gesperrt' %}">🔒</span>{% endif %}</small>{% endif %}{% if c.schnitt is None and not c.zeugnis and not c.bearbeitbar %}<span class="leise">·</span>{% endif %}{% else %}<span class="leise">–</span>{% endif %}</td>{% endfor %}
         <td>{% if z.gefaehrdet %}<span class="etikett warnend">{{ z.gefaehrdet }}</span>{% endif %}</td></tr>
     {% endfor %}</tbody>
   </table></div>
+  <p class="nk-speichern"><button type="submit" class="knopf">{% translate "Zeugnisnoten speichern" %}</button>
+    <span class="leise" id="zn-zaehler" aria-live="polite"></span></p>
+  </form>
+  <script>
+  (function () {
+    var f = document.getElementById("zn-form"); if (!f) return;
+    var sel = Array.prototype.slice.call(f.querySelectorAll("select[data-orig]")), fertig = false;
+    function z() { var n = sel.filter(function (s) { return s.value !== s.dataset.orig; }).length;
+      sel.forEach(function (s) { s.classList.toggle("geaendert", s.value !== s.dataset.orig); });
+      document.getElementById("zn-zaehler").textContent = n ? n + " ungespeichert" : ""; return n; }
+    sel.forEach(function (s) { s.addEventListener("change", z); });
+    f.addEventListener("submit", function () { fertig = true; });
+    window.addEventListener("beforeunload", function (e) { if (!fertig && z()) { e.preventDefault(); e.returnValue = f.dataset.verlassen || ""; } });
+  })();
+  </script>
   {% else %}<p class="leer">{% translate "Noch keine Noten in den sichtbaren Kursen." %}</p>{% endif %}
 </section>
 {% endif %}
@@ -102,7 +129,8 @@
           {% for g in tabelle.gruppen %}<th colspan="{{ g.breite }}" class="nk-ordner">{{ g.pfad }}</th>{% endfor %}
           {% for b in tabelle.bereiche %}<th rowspan="2" class="nk-erg">Ø {{ b }}</th>{% endfor %}
           <th rowspan="2" class="nk-erg">{% if tabelle.jahresnote %}{% translate "Jahres-schnitt" %}{% else %}{% translate "Halbjahres-schnitt" %}{% endif %}</th>
-          <th rowspan="2" class="nk-erg">{% translate "Tendenz" %}</th><th rowspan="2" class="nk-erg">{% translate "Note (Vorschlag)" %}</th></tr>
+          <th rowspan="2" class="nk-erg">{% translate "Tendenz" %}</th><th rowspan="2" class="nk-erg">{% translate "Note (Vorschlag)" %}</th>
+          {% if tabelle.zeugnis_vorhanden %}<th rowspan="2" class="nk-erg nk-zn-kopf">{% translate "Zeugnisnote" %}</th>{% endif %}</tr>
         <tr>{% for sp in tabelle.spalten %}
           <th class="nk-ln" scope="col">{% if tabelle.darf_eintragen %}<a href="{% url 'noten_bearbeiten' kurs.pk sp.ln.pk %}" title="{% translate 'Leistungsnachweis bearbeiten' %}">{{ sp.ln.titel }}</a>{% else %}{{ sp.ln.titel }}{% endif %}
             <small>{{ sp.ln.datum|kurzdatum }} · {{ sp.gewicht }}{% if sp.nur_lesen %} · {% translate "BE" %}{% endif %}</small></th>
@@ -120,9 +148,11 @@
           <td class="nk-erg"><strong>{% if z.vorschlag.schnitt is not None %}{{ z.vorschlag.schnitt|floatformat:2 }}{% else %}–{% endif %}</strong></td>
           <td class="nk-erg">{{ z.vorschlag.stufe.bezeichnung|default:"–" }}</td>
           <td class="nk-erg{% if z.vorschlag.gefaehrdet %} nk-gefaehrdet{% endif %}"><strong>{% if z.ganz is not None %}{{ z.ganz|floatformat:0 }}{% else %}–{% endif %}</strong></td>
+          {% if tabelle.zeugnis_vorhanden %}<td class="nk-erg nk-zn-zelle"><strong>{{ z.zeugnisnote|default:"–" }}</strong>{% if z.zeugnis_quelle %}<small class="blockzeile nk-quelle-text">● {{ z.zeugnis_quelle }}</small>{% endif %}</td>{% endif %}
         </tr>{% endfor %}
       </tbody>
     </table></div>
+    {% if tabelle.zeugnis_quellen %}<p class="nk-hinweis" role="note">● {% translate "Zeugnisnoten:" %} {{ tabelle.zeugnis_quellen|join:"; " }}. {% translate "Sie gelten für das Zeugnis." %}</p>{% endif %}
     {% if tabelle.darf_eintragen %}<p class="nk-speichern"><button type="submit" class="knopf" name="aktion" value="speichern">{% translate "Änderungen speichern" %}</button>
       <span class="leise" id="nk-zaehler" aria-live="polite"></span></p>{% endif %}
   </form>
