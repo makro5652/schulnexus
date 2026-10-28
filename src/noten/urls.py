@@ -4,10 +4,12 @@ from . import ansichten as A
 from . import klausurregeln as KR
 from . import export as X
 from . import importseite as IS
+from . import klassenansicht as KA
 from . import kurswahl as K
 from . import sperrseite as SP
 
 urlpatterns = [
+    path("", KA.noten_klassen, name="noten_klassen"),
     path("kurs/", K.kurs_oeffnen, name="kurs_oeffnen"),
     path("klausurregeln/", KR.klausurregeln, name="klausurregeln"),
     path("sperre/", SP.notensperre, name="notensperre"),

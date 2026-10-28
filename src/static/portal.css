@@ -1089,3 +1089,41 @@ td.zn-abweichung small { color: #c06a1c; font-weight: 600; }
 .nt-liste { padding-left: 1.1rem; font-size: 0.88rem; }
 .nt-fehler td { background: var(--gefahr-flaeche); }
 .nt-haken { font-weight: 600; margin: 0.3rem 0; }
+
+/* Noten nach Klasse (ab 0.4.12.0) */
+.nk-chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.nk-chip { display: inline-block; min-width: 2.8rem; text-align: center; padding: 0.35rem 0.8rem; border-radius: 999px; border: 1px solid var(--linie); background: var(--flaeche); color: var(--text); text-decoration: none; font-weight: 600; }
+.nk-chip:hover { border-color: var(--akzent); color: var(--akzent); }
+.nk-chip.aktiv { background: var(--akzent); border-color: var(--akzent); color: var(--flaeche); }
+.nk-kurse tr.aktiv td { background: var(--akzent-hell); }
+.nk-aktionen { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-bottom: 0.8rem; }
+.nk-hochladen { display: inline; margin: 0; }
+.nk-datei { position: relative; overflow: hidden; cursor: pointer; }
+.nk-datei input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+.nk-datei:focus-within { outline: 2px solid var(--akzent); outline-offset: 2px; }
+.nk-hilfe { font-size: 0.82rem; margin: 0 0 0.5rem; }
+.nk-matrix th.links, .nk-klasse th.links { position: sticky; left: 0; z-index: 1; background: var(--flaeche); text-align: left; }
+.nk-matrix thead th.nk-ln { min-width: 4.2rem; max-width: 7rem; font-size: 0.8rem; }
+.nk-matrix thead th.nk-ln small, .nk-klasse thead th small { display: block; font-weight: 400; color: var(--leise); font-size: 0.72rem; }
+.nk-matrix thead th.nk-ordner { font-size: 0.75rem; color: var(--leise); font-weight: 600; border-bottom: 1px solid var(--linie); }
+.nk-matrix td { padding: 0.2rem 0.25rem; }
+.nk-matrix input[type=text] { width: 3.4rem; text-align: center; font: inherit; padding: 0.3rem 0.2rem; border: 1px solid var(--linie); border-radius: 6px; background: var(--grund); color: var(--text); }
+.nk-matrix input[type=text]:focus { outline: 2px solid var(--akzent); outline-offset: 0; background: var(--flaeche); }
+.nk-matrix input.geaendert { background: var(--hinweis-flaeche); border-color: var(--hinweis-text); }
+.nk-matrix input.ungueltig, .nk-matrix td.nk-fehler input { border-color: var(--warnung); background: var(--gefahr-flaeche); }
+.nk-matrix .nk-wert { display: inline-block; min-width: 2rem; color: var(--leise); }
+.nk-erg { background: var(--akzent-hell); font-variant-numeric: tabular-nums; }
+.nk-matrix thead th.nk-erg { background: var(--akzent-hell); color: var(--akzent); font-size: 0.78rem; min-width: 4rem; }
+.nk-gefaehrdet { background: var(--gefahr-flaeche) !important; color: var(--warnung); }
+.nk-klasse td { min-width: 3.4rem; line-height: 1.2; }
+.nk-klasse td small.blockzeile { display: block; color: var(--leise); font-size: 0.72rem; }
+.nk-klasse td .nk-zn { color: var(--akzent); font-weight: 600; }
+.nk-klasse thead th a { font-weight: 700; }
+.nk-speichern { position: sticky; bottom: 0; background: var(--flaeche); padding: 0.6rem 0; margin: 0; display: flex; gap: 0.8rem; align-items: center; border-top: 1px solid var(--linie); }
+.nk-zurueck { margin: 0 0 0.6rem; }
+.nk-kursliste > summary { cursor: pointer; list-style: none; display: flex; flex-wrap: wrap; gap: 0.3rem 1rem; align-items: baseline; }
+.nk-kursliste > summary::-webkit-details-marker { display: none; }
+.nk-kursliste > summary h2 { margin: 0; }
+.nk-kursliste > summary h2::before { content: "▸ "; color: var(--akzent); }
+.nk-kursliste[open] > summary h2::before { content: "▾ "; }
+.nk-kursliste[open] > summary { margin-bottom: 0.8rem; }

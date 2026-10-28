@@ -164,6 +164,8 @@ def menueband(request):
         "unterricht", pgettext("Menüband", "Unterricht"),
         mein_unterricht,
         Gruppe(_("Bewertung"))
+        .add(_("Noten nach Klasse"), _url("noten_klassen"), "tafel", gross=True, bedingung=p("noten.view_note"),
+             hinweis=_("Klasse und Kurs wählen, Noten in der Tabelle eintragen, Excel-Tabelle laden"))
         .add(_("Leistungsvorgaben"), _url("leistungsvorgaben"), "haken", gross=True, bedingung=p("noten.view_leistungsvorgabe"),
              hinweis=_("Pflichtnoten mit Frist"))
         .add(_("Leistungsnachweise"), _url("admin:noten_leistungsnachweis_changelist"), "stift",

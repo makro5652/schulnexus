@@ -793,6 +793,26 @@ Die Oberflächenprüfung lässt sich auch lokal ausführen (Playwright für Pyth
 
 Hinweis: Private Repositories haben ein monatliches Kontingent an Actions-Minuten (je nach Tarif; der genaue Wert sollte auf GitHub unter „Settings → Billing“ nachgesehen werden). Ein vollständiger Lauf dauert etwa 10–15 Minuten.
 
+## Noten nach Klasse (ab 0.4.12.0)
+
+Menüband „Unterricht“ → **Noten nach Klasse** (`/noten/`):
+
+1. **Halbjahr** wählen (Voreinstellung: das laufende) und die **Klasse** antippen. Angeboten werden die Klassen, in denen
+   man Unterricht sehen darf.
+2. **Kurse bzw. Lerngruppen** der Klasse mit Fach, Gruppe und **zugewiesener Lehrkraft**. Lerngruppen und Kurse
+   (z. B. Religion/Ethik, zweite Fremdsprache) erscheinen bei jeder Klasse, aus der sie Schüler:innen haben.
+   Darunter die **Klassenübersicht** – gedacht für die Klassenleitung: je Schüler:in eine Zeile, je Fach eine Spalte mit
+   dem aktuellen Stand (Tendenz, darunter der Schnitt, „ZN“ = festgesetzte Zeugnisnote), gefährdete Fächer rot und
+   gezählt. Ein Klick auf das Fach öffnet den Kurs.
+3. **Kurs geöffnet:** die Notentabelle wie in der Excel-Tabelle – Schüler:innen untereinander, Leistungsnachweise
+   nebeneinander (nach Ordnern gruppiert), rechts Ø je Bereich, Halbjahres- bzw. Jahresschnitt, Tendenz und Note.
+   Wer Noten eintragen darf, bearbeitet die Zellen direkt (2+, 2, 2-, e, u, b, nb; leeren = Note entfernen; Enter und
+   Pfeiltasten springen zeilenweise; geänderte Zellen sind markiert) und speichert alles auf einmal. Ungültige Eingaben
+   verhindern das Speichern; eine inzwischen von anderer Seite geänderte Zelle wird nicht überschrieben (Hinweis).
+   Leistungsnachweise mit Notenschlüssel (BE) und gesperrte Schüler:innen sind nur lesbar. Von hier aus: neuer
+   Leistungsnachweis, Bewertungsstruktur, ausführliche Notenübersicht, **Excel-Tabelle herunterladen und hochladen**
+   (nach der Vorschau führt die Übernahme hierher zurück).
+
 ## Excel-Notentabelle: herunterladen, offline ausfüllen, hochladen (ab 0.4.11.0)
 
 In der **Notenübersicht** eines Unterrichts (Sek I, Noten 1–6) führt „Excel-Notentabelle“ zu einer eigenen Seite:

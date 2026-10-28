@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext as _, gettext_lazy, ngettext
 
 from . import notenimport as I
@@ -56,12 +57,16 @@ def notentabelle(request, pk):
                     form.add_error("datei", str(f))
                 else:
                     tabelle["dateiname"] = form.cleaned_data["datei"].name[:120]
+                    weiter = request.POST.get("weiter", "")
+                    if weiter and url_has_allowed_host_and_scheme(weiter, allowed_hosts={request.get_host()}):
+                        tabelle["weiter"] = weiter[:500]
                     request.session[schluessel] = tabelle
                     return redirect("notentabelle", pk=u.pk)
         elif aktion == "verwerfen":
+            weiter = (tabelle or {}).get("weiter")
             request.session.pop(schluessel, None)
             messages.info(request, _("Die hochgeladene Tabelle wurde verworfen."))
-            return redirect("notentabelle", pk=u.pk)
+            return redirect(weiter or reverse("notentabelle", args=[u.pk]))
         elif aktion == "uebernehmen" and tabelle:
             try:
                 ergebnis = I.uebernehmen(u, tabelle, wahl, gewichte_uebernehmen=bool(request.POST.get("gewichte")))
@@ -75,7 +80,7 @@ def notentabelle(request, pk):
                 text += " – " + _("%(neu)s Noten neu, %(geaendert)s geändert, %(gleich)s unverändert.") % s
                 _protokoll(request, u, _("Noten aus Excel übernommen") + f" ({text})")
                 messages.success(request, text)
-                return redirect("notenuebersicht", pk=u.pk)
+                return redirect(tabelle.get("weiter") or reverse("notenuebersicht", args=[u.pk]))
         elif aktion == "pruefen" and tabelle:
             url = reverse("notentabelle", args=[u.pk]) + "?" + "&".join(f"ordner_{b}={wahl[b]}" for b in I.BEREICHE if wahl[b])
             return redirect(url)

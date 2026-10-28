@@ -1,0 +1,135 @@
+{% extends "portal/base.html" %}
+{% load i18n static formate %}
+{% block title %}{% translate "Noten nach Klasse" %}{% endblock %}
+{% block inhaltsklasse %}breit{% endblock %}
+{% block inhalt %}
+<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › {% translate "Noten nach Klasse" %}</p>
+<div class="zo-kopf">
+  <div>
+    <h1>{% translate "Noten nach Klasse" %}</h1>
+    <p class="unterzeile">{% translate "Klasse wählen, dann den Kurs bzw. die Lerngruppe – die Noten lassen sich direkt in der Tabelle eintragen und ändern." %}</p>
+  </div>
+  {% if abschnitte %}<form method="get" class="zo-sj">
+    {% if klasse %}<input type="hidden" name="klasse" value="{{ klasse.pk }}">{% endif %}
+    <label>{% translate "Halbjahr" %}
+      <select name="abschnitt" onchange="this.form.submit()">{% for a in abschnitte %}<option value="{{ a.pk }}"{% if a == abschnitt %} selected{% endif %}>{{ a.schuljahr }} · {{ a.lokal_name }}</option>{% endfor %}</select></label>
+    <noscript><button class="knopf klein">{% translate "Anzeigen" %}</button></noscript>
+  </form>{% endif %}
+</div>
+
+{% if not klassen %}
+<section class="karte"><p class="leer">{% translate "In diesem Halbjahr gibt es keinen Unterricht, den Sie sehen dürfen." %}</p></section>
+{% else %}
+<nav class="karte nk-klassen" aria-label="{% translate 'Klassen' %}">
+  <h2>{% translate "1. Klasse" %}</h2>
+  <ul class="nk-chips">{% for k in klassen %}
+    <li><a class="nk-chip{% if k == klasse %} aktiv{% endif %}" href="?abschnitt={{ abschnitt.pk }}&amp;klasse={{ k.pk }}"{% if k == klasse %} aria-current="page"{% endif %}>{{ k.name }}</a></li>
+  {% endfor %}</ul>
+</nav>
+
+{% if klasse %}
+<details class="karte nk-kursliste"{% if not kurs %} open{% endif %}>
+  <summary><h2>{% blocktranslate with k=klasse.name %}2. Kurs bzw. Lerngruppe der Klasse {{ k }}{% endblocktranslate %}</h2>
+    {% if kurs %}<span class="leise">{% blocktranslate with fach=kurs.fach.lokal_name gruppe=kurs.gruppe.name %}geöffnet: {{ fach }} · {{ gruppe }} – zum Wechseln aufklappen{% endblocktranslate %}</span>{% endif %}</summary>
+  <div class="rollbar"><table class="liste nk-kurse">
+    <thead><tr><th>{% translate "Fach" %}</th><th>{% translate "Gruppe" %}</th><th>{% translate "Lehrkraft" %}</th><th class="zahl">{% translate "Leistungsnachweise" %}</th><th></th></tr></thead>
+    <tbody>{% for x in kurse %}
+      <tr{% if x.u == kurs %} class="aktiv"{% endif %}>
+        <td><a href="?abschnitt={{ abschnitt.pk }}&amp;klasse={{ klasse.pk }}&amp;kurs={{ x.u.pk }}">{{ x.u.fach.lokal_name }}</a></td>
+        <td>{{ x.u.gruppe.name }}{% if x.lerngruppe %} <span class="etikett">{% translate "Lerngruppe" %}</span>{% endif %}</td>
+        <td>{{ x.u.lehrkraft.person.anzeigename }}{% if x.u.lehrkraft.kuerzel %} <span class="leise">({{ x.u.lehrkraft.kuerzel }})</span>{% endif %}</td>
+        <td class="zahl">{{ x.anzahl_ln }}</td>
+        <td>{% if x.u == kurs %}<span class="etikett">{% translate "geöffnet" %}</span>{% else %}<a class="knopf zweitrangig klein" href="?abschnitt={{ abschnitt.pk }}&amp;klasse={{ klasse.pk }}&amp;kurs={{ x.u.pk }}">{% if x.darf %}{% translate "Noten bearbeiten" %}{% else %}{% translate "Noten ansehen" %}{% endif %}</a>{% endif %}</td>
+      </tr>{% endfor %}
+    </tbody>
+  </table></div>
+</details>
+{% endif %}
+
+{% if uebersicht %}
+<section class="karte nk-uebersicht" id="uebersicht">
+  <div class="karte-kopf"><h2>{% blocktranslate with k=klasse.name %}Klassenübersicht {{ k }}{% endblocktranslate %}</h2>
+    <span class="leise">{% translate "je Fach der aktuelle rechnerische Stand: Tendenz, darunter der Schnitt; ZN = festgesetzte Zeugnisnote" %}</span></div>
+  {% if uebersicht.spalten %}
+  <div class="rollbar"><table class="noten nk-klasse">
+    <thead><tr><th class="links">{% translate "Schüler:in" %}</th>
+      {% for f in uebersicht.spalten %}<th scope="col">{% for u in f.kurse %}<a href="?abschnitt={{ abschnitt.pk }}&amp;klasse={{ klasse.pk }}&amp;kurs={{ u.pk }}#kurs" title="{{ u.fach.lokal_name }} · {{ u.gruppe.name }} · {{ u.lehrkraft.person.anzeigename }}">{% if forloop.first %}{{ f.fach.kuerzel }}{% else %}·{% endif %}</a>{% endfor %}
+        <small>{% for u in f.kurse %}{{ u.lehrkraft.kuerzel|default:u.lehrkraft.person.nachname }}{% if not forloop.last %}/{% endif %}{% endfor %}</small></th>{% endfor %}
+      <th>{% translate "gefährdet" %}</th></tr></thead>
+    <tbody>{% for z in uebersicht.zeilen %}
+      <tr><th class="links" scope="row">{{ z.s.person }}</th>
+        {% for c in z.zellen %}<td class="{% if c.gefaehrdet %}nk-gefaehrdet{% endif %}">{% if c %}{% if c.schnitt is not None %}<strong>{{ c.stufe.bezeichnung|default:"–" }}</strong><small class="blockzeile">{{ c.schnitt|floatformat:2 }}</small>{% endif %}{% if c.zeugnis %}<small class="blockzeile nk-zn">ZN {{ c.zeugnis }}</small>{% endif %}{% if c.schnitt is None and not c.zeugnis %}<span class="leise">·</span>{% endif %}{% else %}<span class="leise">–</span>{% endif %}</td>{% endfor %}
+        <td>{% if z.gefaehrdet %}<span class="etikett warnend">{{ z.gefaehrdet }}</span>{% endif %}</td></tr>
+    {% endfor %}</tbody>
+  </table></div>
+  {% else %}<p class="leer">{% translate "Noch keine Noten in den sichtbaren Kursen." %}</p>{% endif %}
+</section>
+{% endif %}
+
+{% if kurs %}
+<p class="nk-zurueck"><a href="?abschnitt={{ abschnitt.pk }}&amp;klasse={{ klasse.pk }}">‹ {% blocktranslate with k=klasse.name %}Klassenübersicht {{ k }}{% endblocktranslate %}</a></p>
+<section class="karte nk-kurs" id="kurs">
+  <div class="karte-kopf">
+    <h2>{% blocktranslate with fach=kurs.fach.lokal_name gruppe=kurs.gruppe.name %}3. Noten {{ fach }} · {{ gruppe }}{% endblocktranslate %}</h2>
+    <span class="leise">{% blocktranslate with name=kurs.lehrkraft.person.anzeigename %}Lehrkraft {{ name }}{% endblocktranslate %} · {{ kurs.abschnitt.lokal_name }}</span>
+  </div>
+  <div class="knopfreihe nk-aktionen">
+    {% if tabelle.darf_eintragen %}
+      <a class="knopf" href="{% url 'noten_eintragen' kurs.pk %}">{% translate "Neuer Leistungsnachweis" %}</a>
+      <a class="knopf zweitrangig" href="{% url 'bewertungsstruktur' kurs.pk %}">{% translate "Bewertungsstruktur" %}</a>
+    {% endif %}
+    <a class="knopf zweitrangig" href="{% url 'notenuebersicht' kurs.pk %}">{% translate "Notenübersicht mit Vorschlägen" %}</a>
+    {% if tabelle.darf_eintragen and sek1 %}
+      <a class="knopf zweitrangig" href="{% url 'notentabelle_vorlage' kurs.pk %}">{% translate "Excel-Tabelle herunterladen" %}</a>
+      <form method="post" action="{% url 'notentabelle' kurs.pk %}" enctype="multipart/form-data" class="nk-hochladen">{% csrf_token %}
+        <input type="hidden" name="aktion" value="hochladen"><input type="hidden" name="weiter" value="{{ hier }}#kurs">
+        <label class="knopf zweitrangig nk-datei">{% translate "Excel-Tabelle hochladen" %}
+          <input type="file" name="datei" accept=".xlsx" onchange="this.form.submit()"></label>
+        <noscript><button class="knopf klein">{% translate "Hochladen" %}</button></noscript>
+      </form>
+    {% endif %}
+  </div>
+  {% if tabelle.gesperrt_anzahl %}<p class="ne-sperre">{% blocktranslate count n=tabelle.gesperrt_anzahl %}Die Noten von {{ n }} Schüler:in sind gesperrt (Zeugnisfreigabe bzw. Konferenz).{% plural %}Die Noten von {{ n }} Schüler:innen sind gesperrt (Zeugnisfreigabe bzw. Konferenz).{% endblocktranslate %}</p>{% endif %}
+
+  {% if not tabelle.spalten %}
+    <p class="leer">{% if tabelle.ordner_fehlen %}{% translate "Noch keine Bewertungsordner – bitte zuerst die Bewertungsstruktur anlegen (z. B. „Schriftlich“ und „Sonstige Mitarbeit“)." %}{% else %}{% translate "Noch keine Leistungsnachweise. Über „Neuer Leistungsnachweis“ oder die Excel-Tabelle anlegen." %}{% endif %}</p>
+  {% else %}
+  <form method="post" id="nk-form" data-verlassen="{% translate 'Es gibt ungespeicherte Eingaben.' %}" data-zaehler="{% translate 'Ungespeicherte Änderungen: %n' %}">{% csrf_token %}
+    {% if tabelle.darf_eintragen %}<p class="leise nk-hilfe">{% translate "Eingabe: 1+ … 6 (Tendenzen), e = entschuldigt, u = unentschuldigt, b = befreit, nb = nicht bewertbar; leeren = Note entfernen. Enter bzw. Pfeiltasten springen zur nächsten Zeile." %}</p>{% endif %}
+    <div class="rollbar nk-rollbar"><table class="noten nk-matrix">
+      <thead>
+        <tr><th class="links" rowspan="2">{% translate "Schüler:in" %}</th>
+          {% for g in tabelle.gruppen %}<th colspan="{{ g.breite }}" class="nk-ordner">{{ g.pfad }}</th>{% endfor %}
+          {% for b in tabelle.bereiche %}<th rowspan="2" class="nk-erg">Ø {{ b }}</th>{% endfor %}
+          <th rowspan="2" class="nk-erg">{% if tabelle.jahresnote %}{% translate "Jahres-schnitt" %}{% else %}{% translate "Halbjahres-schnitt" %}{% endif %}</th>
+          <th rowspan="2" class="nk-erg">{% translate "Tendenz" %}</th><th rowspan="2" class="nk-erg">{% translate "Note (Vorschlag)" %}</th></tr>
+        <tr>{% for sp in tabelle.spalten %}
+          <th class="nk-ln" scope="col">{% if tabelle.darf_eintragen %}<a href="{% url 'noten_bearbeiten' kurs.pk sp.ln.pk %}" title="{% translate 'Leistungsnachweis bearbeiten' %}">{{ sp.ln.titel }}</a>{% else %}{{ sp.ln.titel }}{% endif %}
+            <small>{{ sp.ln.datum|kurzdatum }} · {{ sp.gewicht }}{% if sp.nur_lesen %} · {% translate "BE" %}{% endif %}</small></th>
+        {% endfor %}</tr>
+      </thead>
+      <tbody>{% for z in tabelle.zeilen %}
+        <tr>
+          <th class="links" scope="row">{{ z.s.person }}{% if tabelle.gemischt and z.klasse %} <span class="leise">({{ z.klasse }})</span>{% endif %}{% if z.gesperrt %} <span class="ne-schloss" title="{% translate 'Noten gesperrt' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-schluessel"/></svg><span class="mb-unsichtbar">{% translate "gesperrt" %}</span></span>{% endif %}</th>
+          {% for c in z.zellen %}<td{% if c.fehler %} class="nk-fehler" title="{{ c.fehler }}"{% endif %}>
+            {% if c.bearbeitbar %}<input type="text" name="{{ c.name }}" value="{{ c.wert }}" data-orig="{{ c.orig }}" autocomplete="off" spellcheck="false"
+              aria-label="{{ z.s.person }} – {{ forloop.counter }}"><input type="hidden" name="o{{ c.name|slice:'1:' }}" value="{{ c.orig }}">
+            {% else %}<span class="nk-wert"{% if c.be %} title="{{ c.be }} {% translate 'BE' %}"{% endif %}>{{ c.anzeige|default:"·" }}</span>{% endif %}
+            {% if c.fehler %}<span class="mb-unsichtbar">{{ c.fehler }}</span>{% endif %}</td>{% endfor %}
+          {% for w in z.bereiche %}<td class="nk-erg">{% if w is not None %}{{ w|floatformat:2 }}{% else %}–{% endif %}</td>{% endfor %}
+          <td class="nk-erg"><strong>{% if z.vorschlag.schnitt is not None %}{{ z.vorschlag.schnitt|floatformat:2 }}{% else %}–{% endif %}</strong></td>
+          <td class="nk-erg">{{ z.vorschlag.stufe.bezeichnung|default:"–" }}</td>
+          <td class="nk-erg{% if z.vorschlag.gefaehrdet %} nk-gefaehrdet{% endif %}"><strong>{% if z.ganz is not None %}{{ z.ganz|floatformat:0 }}{% else %}–{% endif %}</strong></td>
+        </tr>{% endfor %}
+      </tbody>
+    </table></div>
+    {% if tabelle.darf_eintragen %}<p class="nk-speichern"><button type="submit" class="knopf" name="aktion" value="speichern">{% translate "Änderungen speichern" %}</button>
+      <span class="leise" id="nk-zaehler" aria-live="polite"></span></p>{% endif %}
+  </form>
+  {{ tabelle.erlaubt|json_script:"nk-erlaubt" }}
+  <script src="{% static 'noten_matrix.js' %}" defer></script>
+  {% endif %}
+</section>
+{% endif %}
+{% endif %}
+{% endblock %}
