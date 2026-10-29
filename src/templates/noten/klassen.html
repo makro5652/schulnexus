@@ -57,6 +57,8 @@
   {% if uebersicht.spalten %}
   <form method="post" id="zn-form" data-verlassen="{% translate 'Es gibt ungespeicherte Zeugnisnoten.' %}">{% csrf_token %}
   <input type="hidden" name="aktion" value="zeugnis">
+  {% if uebersicht.freigegeben %}<p class="nk-hinweis" role="note">🔒 {% blocktranslate count n=uebersicht.freigegeben %}{{ n }} Zeugnis dieser Klasse ist freigegeben – dessen Zeugnisnoten bleiben gesperrt, auch wenn die Noten zur Korrektur freigegeben sind.{% plural %}{{ n }} Zeugnisse dieser Klasse sind freigegeben – deren Zeugnisnoten bleiben gesperrt, auch wenn die Noten zur Korrektur freigegeben sind.{% endblocktranslate %}
+    <a href="{% url 'zeugnis_klasse' klasse.pk abschnitt.pk %}">{% translate "Zu den Zeugnissen der Klasse (Freigabe aufheben)" %}</a></p>{% endif %}
   <p class="leise nk-hilfe">{% translate "Ohne Festsetzung gilt automatisch die gerundete Note aus den Einzelnoten. Wo Sie die Zeugnisnote festsetzen dürfen, wählen Sie eine andere direkt in der Zelle (ZN); ein Punkt (●) kennzeichnet festgesetzte Noten (aus Excel oder hier). „–“ stellt wieder auf automatisch." %}</p>
   <div class="rollbar"><table class="noten nk-klasse">
     <thead><tr><th class="links">{% translate "Schüler:in" %}</th>
@@ -74,7 +76,7 @@
               {% if c.extra %}<option value="{{ c.extra }}" selected>{{ c.extra }}</option>{% endif %}
             </select>{% if c.quelle %}<span class="nk-quelle" title="{{ c.quelle }}" aria-label="{{ c.quelle }}">●</span>{% endif %}</label>
             <input type="hidden" name="zo_{{ c.name|slice:'3:' }}" value="{{ c.wert }}">
-          {% elif c.zeugnis %}<small class="blockzeile nk-zn">ZN {{ c.zeugnis }}{% if c.quelle %} <span class="nk-quelle" title="{{ c.quelle }}" aria-label="{{ c.quelle }}">●</span>{% endif %}{% if c.gesperrt %} <span class="ne-schloss" title="{% translate 'Noten gesperrt' %}">🔒</span>{% endif %}</small>{% endif %}{% if c.schnitt is None and not c.zeugnis and not c.bearbeitbar %}<span class="leise">·</span>{% endif %}{% else %}<span class="leise">–</span>{% endif %}</td>{% endfor %}
+          {% elif c.zeugnis %}<small class="blockzeile nk-zn">ZN {{ c.zeugnis }}{% if c.quelle %} <span class="nk-quelle" title="{{ c.quelle }}" aria-label="{{ c.quelle }}">●</span>{% endif %}{% if c.gesperrt %} <span class="ne-schloss" title="{% if c.zeugnis_frei %}{% translate 'Zeugnis freigegeben – erst die Freigabe aufheben' %}{% else %}{% translate 'Noten gesperrt (Konferenz bzw. Notensperre)' %}{% endif %}">🔒</span>{% endif %}</small>{% endif %}{% if c.schnitt is None and not c.zeugnis and not c.bearbeitbar %}<span class="leise">·</span>{% endif %}{% else %}<span class="leise">–</span>{% endif %}</td>{% endfor %}
         <td>{% if z.gefaehrdet %}<span class="etikett warnend">{{ z.gefaehrdet }}</span>{% endif %}</td></tr>
     {% endfor %}</tbody>
   </table></div>

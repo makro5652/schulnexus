@@ -54,6 +54,14 @@ def gesperrt(u, schueler_ids):
     return frei | gesperrte_schueler(u, ids)
 
 
+def freigegebene(u, schueler_ids):
+    """Schüler-IDs mit freigegebenem Zeugnis im Halbjahr des Unterrichts (ein Grund für `gesperrt`)."""
+    from zeugnisse.models import Zeugnis
+
+    return set(Zeugnis.objects.filter(abschnitt=u.abschnitt, schueler__in=list(schueler_ids), status=Zeugnis.FREIGEGEBEN)
+               .values_list("schueler_id", flat=True))
+
+
 def aktuell(u, schueler_ids=None):
     """{Schüler-ID: Zeugnisnote} des Unterrichts."""
     qs = Zeugnisnote.objects.filter(unterricht=u).select_related("stufe")

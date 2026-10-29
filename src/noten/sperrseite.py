@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.utils.translation import gettext
+from django.utils.translation import gettext, ngettext
 
 from sicherung.models import Protokoll
 from stammdaten.models import Abschnitt, Gruppe, Mitgliedschaft
@@ -40,6 +40,16 @@ def notensperre(request):
             raise PermissionDenied
         Protokoll.schreiben(request.user, "noten", f"{k.name} {a}: {text}" + (f" – {grund}" if grund else ""))
         messages.success(request, f"{k.name}: {text}.")
+        if aktion == "freigeben":
+            from zeugnisse.models import Zeugnis
+
+            frei = Zeugnis.objects.filter(abschnitt=a, klasse=k, status=Zeugnis.FREIGEGEBEN).count()
+            if frei:
+                messages.warning(request, ngettext(
+                    "%(n)s Zeugnis der Klasse ist freigegeben – dessen Zeugnisnoten bleiben gesperrt, bis die Freigabe aufgehoben ist "
+                    "(Zeugnisse › Klasse › „Freigabe aufheben“).",
+                    "%(n)s Zeugnisse der Klasse sind freigegeben – deren Zeugnisnoten bleiben gesperrt, bis die Freigabe aufgehoben ist "
+                    "(Zeugnisse › Klasse › „Freigabe aufheben“).", frei) % {"n": frei})
         return redirect(reverse("notensperre") + f"?abschnitt={a.pk}")
 
     abschnitte, a = _abschnitt_waehlen(request)

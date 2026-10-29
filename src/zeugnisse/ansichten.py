@@ -27,7 +27,7 @@ from . import rechte
 from .models import Abzeichnung, Anmerkung, Beschluss, Konferenz, Zeugnis, ZeugnisFachnote
 from .noten import (
     BILDUNGSGANG_TEXT, WORTE, fach_sortierung, fachnoten, ganze_note, kernfach_ids, klassen_mitglieder, laufbahn, note_text, stammklasse_im_abschnitt,
-    versetzungsvorschlag,
+    unterrichte_fuer, versetzungsvorschlag,
 )
 
 DATUM = forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d")
@@ -346,6 +346,17 @@ def klasse(request, gruppe, abschnitt):
                     n += 1
             messages.success(request, ngettext("%(n)s Zeugnis freigegeben.", "%(n)s Zeugnisse freigegeben.", n) % {"n": n})
             return redirect("zeugnis_klasse", gruppe=klasse.pk, abschnitt=abschnitt.pk)
+        if aktion == "aufheben":
+            n = 0
+            with transaction.atomic():
+                for z in Zeugnis.objects.filter(abschnitt=abschnitt, klasse=klasse, status=Zeugnis.FREIGEGEBEN).select_related("schueler"):
+                    if rechte.darf_freigeben(user, z):
+                        freigabe_aufheben(z)
+                        n += 1
+            messages.success(request, ngettext("Freigabe von %(n)s Zeugnis aufgehoben – Noten und Zeugnisnoten sind wieder änderbar.",
+                                               "Freigabe von %(n)s Zeugnissen aufgehoben – Noten und Zeugnisnoten sind wieder änderbar.",
+                                               n) % {"n": n})
+            return redirect("zeugnis_klasse", gruppe=klasse.pk, abschnitt=abschnitt.pk)
         raise Http404
     zeilen = _klassen_zeilen(klasse, abschnitt)
     from elternkontakt.ansichten import zeugnisempfang_status
@@ -402,6 +413,16 @@ def freigabe_hinweise(z):
     if z.art == Zeugnis.JAHR and not z.versetzung and (z.jahrgang or 0) <= 10:
         h.append(gettext("Kein Versetzungsvermerk eingetragen."))
     return h
+
+
+def freigabe_aufheben(z):
+    """Zeugnis wieder zum Entwurf machen; die Zeugnisnoten sind danach wieder änderbar (automatische neu berechnet)."""
+    from noten.automatik import vormerken
+
+    z.status, z.freigegeben_am, z.freigegeben_von = Zeugnis.ENTWURF, None, None
+    z.save()
+    for u in unterrichte_fuer(z.schueler, z.abschnitt):
+        vormerken(u.pk)
 
 
 @transaction.atomic
@@ -468,8 +489,7 @@ def zeugnis(request, pk):
             if not (z.freigegeben and user.has_perm("zeugnisse.freigeben_zeugnis")
                     and (ist_schulleitung(user) or rechte.ist_stufe(user, z.jahrgang))):
                 raise PermissionDenied
-            z.status, z.freigegeben_am, z.freigegeben_von = Zeugnis.ENTWURF, None, None
-            z.save()
+            freigabe_aufheben(z)
             messages.success(request, gettext("Freigabe aufgehoben – das Zeugnis ist wieder ein Entwurf."))
             return redirect("zeugnis", pk=z.pk)
         else:

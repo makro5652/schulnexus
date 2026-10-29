@@ -157,6 +157,7 @@ def klassenuebersicht(klasse, abschnitt, kurse, user=None):
         zn = Z.aktuell(u)
         darf = bool(user) and zeugnisrechte.darf_zeugnisnote_setzen(user, u)
         sperre = Z.gesperrt(u, [s.pk for s in teilnehmer]) if darf else set()
+        frei = Z.freigegebene(u, sperre) if sperre else set()
         optionen = [(str(w), st.bezeichnung) for w, st in sorted(Z.ganze_stufen(u.skala).items())]
         for s in teilnehmer:
             v = vorschlagsnote(u, s, noten[s.pk], baum, jahr=jahr)
@@ -169,7 +170,7 @@ def klassenuebersicht(klasse, abschnitt, kurse, user=None):
                 "quelle": z.get_quelle_display() if z and z.quelle and z.quelle != Z.AUTO else "",
                 "name": f"zn_{u.pk}_{s.pk}", "optionen": optionen, "wert": Z.formwert(z),
                 "extra": Z.formwert(z) if Z.formwert(z) not in {w for w, _t in optionen} | {"", "nb", "befreit"} else "",
-                "bearbeitbar": darf and s.pk not in sperre, "gesperrt": darf and s.pk in sperre,
+                "bearbeitbar": darf and s.pk not in sperre, "gesperrt": darf and s.pk in sperre, "zeugnis_frei": s.pk in frei,
                 "anzahl": len([n for n in noten[s.pk] if n.stufe_id or n.sonderstatus]),
             }
     spalten = sorted(faecher.values(), key=lambda f: (f["fach"].reihenfolge, f["fach"].name))
@@ -177,7 +178,8 @@ def klassenuebersicht(klasse, abschnitt, kurse, user=None):
     for s in schueler:
         reihe = [zellen[s.pk].get(f["fach"].pk) for f in spalten]
         zeilen.append({"s": s, "zellen": reihe, "gefaehrdet": sum(1 for c in reihe if c and c["gefaehrdet"])})
-    return {"spalten": spalten, "zeilen": zeilen}
+    freigegeben = len({s.pk for s in schueler for c in zellen[s.pk].values() if c["zeugnis_frei"]})
+    return {"spalten": spalten, "zeilen": zeilen, "freigegeben": freigegeben}
 
 
 @transaction.atomic

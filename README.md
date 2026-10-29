@@ -806,6 +806,11 @@ Hinweis: Private Repositories haben ein monatliches Kontingent an Actions-Minute
   wählen – auch vergangene und gesperrte – und alle Zeugnisnoten wie in der Konferenz sehen: Kernfächer, 5/6 markiert,
   fehlende Noten (?), Schnitt und Gefährdung bzw. Versetzungsvorschlag. Nur lesend; mit Links zur Konferenz und zu den
   Zeugnissen der Klasse. Sichtbar für Verwaltung, Schulleitung, Klassenleitung (eigene Klasse) und Koordination (Stufe).
+- **Freigegebene Zeugnisse (0.4.15.1):** Die Zeugnisnoten eines freigegebenen Zeugnisses bleiben gesperrt, auch wenn die
+  Klasse unter „Notensperre“ zur Korrektur freigegeben ist – das gedruckte Zeugnis soll sich nicht nachträglich ändern.
+  Neu: „Freigabe aufheben (n)“ auf der Seite „Zeugnisse“ der Klasse hebt die Freigabe für alle Zeugnisse der Klasse auf
+  (Schulleitung, Stufenkoordination). Klassenübersicht, Notensperre-Seite und die Meldung beim Entsperren weisen auf
+  freigegebene Zeugnisse hin; das Schloss nennt den Grund der Sperre.
 - **Noten nach Klasse:** Ist ein Kurs geöffnet, stehen alle Fächer der Klasse als Schaltflächen unter Schritt 2 – ein
   Klick wechselt das Fach.
 

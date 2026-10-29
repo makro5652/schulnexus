@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-29 18:55+0300\n"
+"POT-Creation-Date: 2026-10-29 19:28+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -349,7 +349,7 @@ msgstr "Application number"
 #: templates/elternkontakt/regeln.html:19 templates/foerderung/_akte.html:16
 #: templates/foerderung/_akte.html:36 templates/foerderung/plan.html:25
 #: templates/laufbahn/loeschfristen.html:76 templates/laufbahn/wechsel.html:92
-#: templates/sicherung/benutzer.html:17 templates/zeugnisse/klasse.html:31
+#: templates/sicherung/benutzer.html:17 templates/zeugnisse/klasse.html:32
 #: termine/models.py:160 zeugnisse/models.py:72 zeugnisse/models.py:196
 msgid "Status"
 msgstr "Status"
@@ -370,7 +370,7 @@ msgstr "Year"
 
 #: aufnahme/models.py:134 stammdaten/admin.py:298 stammdaten/models.py:799
 #: stammdaten/models.py:827 templates/aufnahme/anmeldung.html:215
-#: templates/portal/schuelerakte.html:90 templates/zeugnisse/klasse.html:30
+#: templates/portal/schuelerakte.html:90 templates/zeugnisse/klasse.html:31
 #: zeugnisse/models.py:52
 msgid "Bildungsgang"
 msgstr "School track"
@@ -1017,7 +1017,7 @@ msgstr "Absences (automatic)"
 #: templates/noten/klassen.html:64 templates/noten/klassen.html:134
 #: templates/noten/notentabelle.html:84 templates/portal/klassenliste.html:13
 #: templates/portal/notenuebersicht.html:28
-#: templates/termine/sprechzeiten.html:86 templates/zeugnisse/klasse.html:30
+#: templates/termine/sprechzeiten.html:86 templates/zeugnisse/klasse.html:31
 #: templates/zeugnisse/konferenz.html:52
 #: templates/zeugnisse/notenliste.html:46
 #: templates/zeugnisse/unterricht.html:23 termine/models.py:278
@@ -1182,7 +1182,7 @@ msgid "Vermerkt von"
 msgstr "Recorded by"
 
 #: elternkontakt/models.py:102 templates/elternkontakt/gespraech.html:56
-#: templates/zeugnisse/klasse.html:31 templates/zeugnisse/zeugnis.html:120
+#: templates/zeugnisse/klasse.html:32 templates/zeugnisse/zeugnis.html:120
 #: zeugnisse/models.py:123
 msgid "Vermerk"
 msgstr "Endorsement"
@@ -1638,7 +1638,7 @@ msgid "Unentschuldigt"
 msgstr "Unexcused"
 
 #: fehlzeiten/models.py:46 noten/export.py:124 noten/export.py:251
-#: noten/models.py:193 templates/noten/klassen.html:41
+#: noten/models.py:193 templates/noten/klassen.html:39
 #: templates/noten/vorgaben.html:51 templates/portal/start.html:65
 #: templates/termine/sprechtag.html:89 templates/zeugnisse/zeugnis.html:39
 #: termine/models.py:245 termine/models.py:275 zeugnisse/models.py:141
@@ -2065,7 +2065,7 @@ msgid "nicht erreicht"
 msgstr "not achieved"
 
 #: foerderung/models.py:147 noten/models.py:192 stammdaten/models.py:669
-#: templates/noten/klassen.html:41 templates/portal/_zuordnung_faecher.html:22
+#: templates/noten/klassen.html:39 templates/portal/_zuordnung_faecher.html:22
 #: templates/portal/schuelerakte.html:134 templates/portal/start.html:65
 #: templates/zeugnisse/druck.html:34 templates/zeugnisse/zeugnis.html:39
 #: zeugnisse/models.py:119
@@ -3282,7 +3282,7 @@ msgstr "Assessment folder"
 #: templates/noten/notensperre.html:21 templates/noten/struktur.html:43
 #: templates/portal/notenuebersicht.html:3
 #: templates/portal/notenuebersicht.html:97 templates/portal/start.html:69
-#: templates/zeugnisse/klasse.html:30
+#: templates/zeugnisse/klasse.html:31
 msgid "Noten"
 msgstr "Grades"
 
@@ -3314,7 +3314,7 @@ msgid "Anteil an der Gesamtnote"
 msgstr "Share of the overall grade"
 
 #: noten/admin.py:220 noten/export.py:177 noten/models.py:368
-#: portal/navigation.py:171 templates/noten/klassen.html:41
+#: portal/navigation.py:171 templates/noten/klassen.html:39
 #: templates/noten/notentabelle.html:64
 #: templates/portal/notenuebersicht.html:87
 msgid "Leistungsnachweise"
@@ -3375,7 +3375,7 @@ msgid_plural "„%(titel)s“ gespeichert, %(n)s Noten geändert."
 msgstr[0] "“%(titel)s” saved, %(n)s grade changed."
 msgstr[1] "“%(titel)s” saved, %(n)s grades changed."
 
-#: noten/ansichten.py:160 noten/klassenansicht.py:307
+#: noten/ansichten.py:160 noten/klassenansicht.py:309
 #, python-format
 msgid "%(n)s Eingabe ist nicht gültig – es wurde nichts gespeichert."
 msgid_plural "%(n)s Eingaben sind nicht gültig – es wurde nichts gespeichert."
@@ -3701,7 +3701,7 @@ msgid "Note"
 msgstr "Grade"
 
 #: noten/export.py:315 noten/models.py:420 templates/noten/eingabe.html:50
-#: templates/noten/eingabe.html:60 templates/zeugnisse/klasse.html:31
+#: templates/noten/eingabe.html:60 templates/zeugnisse/klasse.html:32
 #: templates/zeugnisse/unterricht.html:24
 #: templates/zeugnisse/unterricht.html:59
 msgid "Kommentar"
@@ -3789,7 +3789,7 @@ msgstr[1] "%(n)s assessments imported"
 msgid "%(neu)s Noten neu, %(geaendert)s geändert, %(gleich)s unverändert."
 msgstr "%(neu)s grades new, %(geaendert)s changed, %(gleich)s unchanged."
 
-#: noten/importseite.py:86 noten/klassenansicht.py:319
+#: noten/importseite.py:86 noten/klassenansicht.py:321
 #, python-format
 msgid "%(n)s Zeugnisnote festgesetzt."
 msgid_plural "%(n)s Zeugnisnoten festgesetzt."
@@ -3808,17 +3808,17 @@ msgstr "Class tests"
 msgid "Sonstige Mitarbeit (SoMi)"
 msgstr "Class participation (SoMi)"
 
-#: noten/klassenansicht.py:270
+#: noten/klassenansicht.py:272
 #, python-format
 msgid "%(name)s: inzwischen von anderer Seite geändert – nicht überschrieben."
 msgstr "%(name)s: changed elsewhere in the meantime – not overwritten."
 
-#: noten/klassenansicht.py:272
+#: noten/klassenansicht.py:274
 #, python-format
 msgid "%(name)s: gesperrt – nicht geändert."
 msgstr "%(name)s: locked – not changed."
 
-#: noten/klassenansicht.py:311
+#: noten/klassenansicht.py:313
 #, python-format
 msgid ""
 "Inzwischen von anderer Seite geändert und daher nicht überschrieben: "
@@ -3826,18 +3826,18 @@ msgid ""
 msgstr ""
 "Changed elsewhere in the meantime and therefore not overwritten: %(liste)s"
 
-#: noten/klassenansicht.py:313
+#: noten/klassenansicht.py:315
 #, python-format
 msgid "%(n)s Note gespeichert."
 msgid_plural "%(n)s Noten gespeichert."
 msgstr[0] "%(n)s grade saved."
 msgstr[1] "%(n)s grades saved."
 
-#: noten/klassenansicht.py:322
+#: noten/klassenansicht.py:324
 msgid "Nicht gespeichert:"
 msgstr "Not saved:"
 
-#: noten/klassenansicht.py:324 portal/klassenunterricht.py:163
+#: noten/klassenansicht.py:326 portal/klassenunterricht.py:163
 msgid "Keine Änderungen."
 msgstr "No changes."
 
@@ -4271,7 +4271,7 @@ msgstr "Please explain why this grade is weighted differently."
 msgid "Die erreichten BE überschreiten die maximalen BE."
 msgstr "The marks achieved exceed the maximum marks."
 
-#: noten/models.py:455 noten/models.py:523 noten/zeugnisnoten.py:105
+#: noten/models.py:455 noten/models.py:523 noten/zeugnisnoten.py:113
 msgid "Die Note gehört nicht zur Notenskala des Unterrichts."
 msgstr "The grade does not belong to the grading scale of the course."
 
@@ -4621,8 +4621,8 @@ msgstr ""
 msgid "Zeugnisnote, Zeile %(zeile)s: %(fehler)s"
 msgstr "Report grade, row %(zeile)s: %(fehler)s"
 
-#: noten/sperrseite.py:35 templates/noten/klassen.html:79
-#: templates/noten/klassen.html:147 templates/portal/notenuebersicht.html:50
+#: noten/sperrseite.py:35 templates/noten/klassen.html:147
+#: templates/portal/notenuebersicht.html:50
 msgid "Noten gesperrt"
 msgstr "Grades locked"
 
@@ -4633,6 +4633,23 @@ msgstr "Grades released for correction"
 #: noten/sperrseite.py:38
 msgid "Notensperre wieder automatisch (Konferenz/Zeugnisfreigabe)"
 msgstr "Grade lock automatic again (conference/report release)"
+
+#: noten/sperrseite.py:49
+#, python-format
+msgid ""
+"%(n)s Zeugnis der Klasse ist freigegeben – dessen Zeugnisnoten bleiben "
+"gesperrt, bis die Freigabe aufgehoben ist (Zeugnisse › Klasse › „Freigabe "
+"aufheben“)."
+msgid_plural ""
+"%(n)s Zeugnisse der Klasse sind freigegeben – deren Zeugnisnoten bleiben "
+"gesperrt, bis die Freigabe aufgehoben ist (Zeugnisse › Klasse › „Freigabe "
+"aufheben“)."
+msgstr[0] ""
+"%(n)s report of the class is released – its report grades stay locked until "
+"the release is revoked (Reports › class › “Revoke release”)."
+msgstr[1] ""
+"%(n)s reports of the class are released – their report grades stay locked "
+"until the release is revoked (Reports › class › “Revoke release”)."
 
 #: noten/vorgaben.py:25
 msgid "erfüllt"
@@ -4652,11 +4669,11 @@ msgid ""
 "„%(text)s“ ist keine Zeugnisnote (ganze Note 1 bis 6, nb oder befreit)."
 msgstr "“%(text)s” is not a report grade (whole grade 1 to 6, nb or exempt)."
 
-#: noten/zeugnisnoten.py:103
+#: noten/zeugnisnoten.py:111
 msgid "gesperrt – nicht geändert"
 msgstr "locked – not changed"
 
-#: noten/zeugnisnoten.py:107 zeugnisse/ansichten.py:210
+#: noten/zeugnisnoten.py:115 zeugnisse/ansichten.py:210
 msgid ""
 "Keine Einzelnoten vorhanden. Eine Zeugnisnote ohne Einzelnoten ist für "
 "dieses Fach und diesen Jahrgang nicht freigegeben (Schulleitung › "
@@ -6723,7 +6740,7 @@ msgid "Schülerakte"
 msgstr "Student record"
 
 #: stammdaten/admin.py:352 templates/portal/_start_hr.html:18
-#: templates/zeugnisse/klasse.html:41 templates/zeugnisse/zeugnis.html:44
+#: templates/zeugnisse/klasse.html:42 templates/zeugnisse/zeugnis.html:44
 msgid "fehlt"
 msgstr "missing"
 
@@ -7451,7 +7468,7 @@ msgstr "Change history: group"
 msgid "Gruppen / Klassen"
 msgstr "Groups / Classes"
 
-#: stammdaten/models.py:601 templates/noten/klassen.html:41
+#: stammdaten/models.py:601 templates/noten/klassen.html:39
 #: templates/portal/start.html:65
 msgid "Gruppe"
 msgstr "Group"
@@ -8028,7 +8045,7 @@ msgstr "My open checklist items"
 #: templates/aufnahme/uebernahme.html:29
 #: templates/elternkontakt/neu_auswahl.html:13
 #: templates/laufbahn/wechsel.html:92 templates/portal/schuelerakte.html:90
-#: templates/zeugnisse/klasse.html:37 templates/zeugnisse/konferenz.html:60
+#: templates/zeugnisse/klasse.html:38 templates/zeugnisse/konferenz.html:60
 #: templates/zeugnisse/notenliste.html:54
 msgid "Jg."
 msgstr "Year"
@@ -9519,7 +9536,7 @@ msgstr "No. %(nr)s"
 #: templates/laufbahn/schueler.html:7 templates/laufbahn/wechsel.html:90
 #: templates/zeugnisse/gefaehrdung.html:19
 #: templates/zeugnisse/protokoll.html:16 templates/zeugnisse/zeugnis.html:11
-#: zeugnisse/ansichten.py:586
+#: zeugnisse/ansichten.py:606
 #, python-format
 msgid "Klasse %(k)s"
 msgstr "Class %(k)s"
@@ -10100,32 +10117,32 @@ msgstr "2. Course or learning group of class %(k)s"
 msgid "Details aufklappen"
 msgstr "Show details"
 
-#: templates/noten/klassen.html:35
+#: templates/noten/klassen.html:34
 msgid "Fach wählen"
 msgstr "Choose subject"
 
-#: templates/noten/klassen.html:45
+#: templates/noten/klassen.html:43
 msgid "Lerngruppe"
 msgstr "Learning group"
 
-#: templates/noten/klassen.html:48
+#: templates/noten/klassen.html:46
 msgid "geöffnet"
 msgstr "open"
 
-#: templates/noten/klassen.html:48
+#: templates/noten/klassen.html:46
 msgid "Noten bearbeiten"
 msgstr "Edit grades"
 
-#: templates/noten/klassen.html:48
+#: templates/noten/klassen.html:46
 msgid "Noten ansehen"
 msgstr "View grades"
 
-#: templates/noten/klassen.html:57 templates/noten/klassen.html:103
+#: templates/noten/klassen.html:55 templates/noten/klassen.html:103
 #, python-format
 msgid "Klassenübersicht %(k)s"
 msgstr "Class overview %(k)s"
 
-#: templates/noten/klassen.html:58
+#: templates/noten/klassen.html:56
 msgid ""
 "je Fach der aktuelle rechnerische Stand: Tendenz, darunter der Schnitt; ZN ="
 " Zeugnisnote"
@@ -10133,9 +10150,28 @@ msgstr ""
 "current calculated standing per subject: grade with +/-, average below; ZN ="
 " report grade"
 
-#: templates/noten/klassen.html:60
+#: templates/noten/klassen.html:58
 msgid "Es gibt ungespeicherte Zeugnisnoten."
 msgstr "There are unsaved report grades."
+
+#: templates/noten/klassen.html:60
+#, python-format
+msgid ""
+"%(n)s Zeugnis dieser Klasse ist freigegeben – dessen Zeugnisnoten bleiben "
+"gesperrt, auch wenn die Noten zur Korrektur freigegeben sind."
+msgid_plural ""
+"%(n)s Zeugnisse dieser Klasse sind freigegeben – deren Zeugnisnoten bleiben "
+"gesperrt, auch wenn die Noten zur Korrektur freigegeben sind."
+msgstr[0] ""
+"%(n)s report of this class is released – its report grades stay locked even "
+"if the grades are unlocked for correction."
+msgstr[1] ""
+"%(n)s reports of this class are released – their report grades stay locked "
+"even if the grades are unlocked for correction."
+
+#: templates/noten/klassen.html:61
+msgid "Zu den Zeugnissen der Klasse (Freigabe aufheben)"
+msgstr "Go to the class reports (revoke release)"
 
 #: templates/noten/klassen.html:62
 msgid ""
@@ -10152,6 +10188,14 @@ msgstr ""
 #: templates/noten/klassen.html:67
 msgid "gefährdet"
 msgstr "at risk"
+
+#: templates/noten/klassen.html:79
+msgid "Zeugnis freigegeben – erst die Freigabe aufheben"
+msgstr "Report released – revoke the release first"
+
+#: templates/noten/klassen.html:79
+msgid "Noten gesperrt (Konferenz bzw. Notensperre)"
+msgstr "Grades locked (conference or grade lock)"
 
 #: templates/noten/klassen.html:83 templates/zeugnisse/unterricht.html:73
 msgid "Zeugnisnoten speichern"
@@ -10388,6 +10432,13 @@ msgstr "locked manually"
 #: templates/noten/notensperre.html:28
 msgid "von Hand freigegeben"
 msgstr "released manually"
+
+#: templates/noten/notensperre.html:28
+#, python-format
+msgid "%(n)s Zeugnis freigegeben – Zeugnisnoten bleiben gesperrt"
+msgid_plural "%(n)s Zeugnisse freigegeben – Zeugnisnoten bleiben gesperrt"
+msgstr[0] "%(n)s report released – report grades stay locked"
+msgstr[1] "%(n)s reports released – report grades stay locked"
 
 #: templates/noten/notensperre.html:28
 msgid "automatisch: Konferenz durchgeführt"
@@ -10822,7 +10873,7 @@ msgctxt "Vorgabe"
 msgid "Stand"
 msgstr "Status"
 
-#: templates/noten/vorgaben.html:51 templates/zeugnisse/klasse.html:38
+#: templates/noten/vorgaben.html:51 templates/zeugnisse/klasse.html:39
 msgid "vollständig"
 msgstr "complete"
 
@@ -13219,41 +13270,56 @@ msgstr "Release all complete reports? They will then be read-only."
 msgid "Vollständige freigeben"
 msgstr "Release complete ones"
 
-#: templates/zeugnisse/klasse.html:31
+#: templates/zeugnisse/klasse.html:25
+msgid ""
+"Freigabe aller freigegebenen Zeugnisse dieser Klasse aufheben? Sie werden "
+"wieder zu Entwürfen, Noten und Zeugnisnoten sind wieder änderbar."
+msgstr ""
+"Revoke the release of all released reports of this class? They become drafts"
+" again, and grades and report grades can be changed again."
+
+#: templates/zeugnisse/klasse.html:25
+#, python-format
+msgid "Freigabe aufheben (%(n)s)"
+msgid_plural "Freigabe aufheben (%(n)s)"
+msgstr[0] "Revoke release (%(n)s)"
+msgstr[1] "Revoke release (%(n)s)"
+
+#: templates/zeugnisse/klasse.html:32
 msgid "Versetzung (Vorschlag)"
 msgstr "Promotion (suggestion)"
 
-#: templates/zeugnisse/klasse.html:31
+#: templates/zeugnisse/klasse.html:32
 msgid "Erhalt (Eltern)"
 msgstr "Receipt (parents)"
 
-#: templates/zeugnisse/klasse.html:38
+#: templates/zeugnisse/klasse.html:39
 #, python-format
 msgid "%(n)s fehlt"
 msgid_plural "%(n)s fehlen"
 msgstr[0] "%(n)s missing"
 msgstr[1] "%(n)s missing"
 
-#: templates/zeugnisse/klasse.html:41
+#: templates/zeugnisse/klasse.html:42
 #, python-format
 msgid "%(a)s/%(p)s abgezeichnet"
 msgstr "%(a)s/%(p)s initialled"
 
-#: templates/zeugnisse/klasse.html:44
+#: templates/zeugnisse/klasse.html:45
 #, python-format
 msgid "%(b)s/%(g)s bestätigt"
 msgstr "%(b)s/%(g)s confirmed"
 
-#: templates/zeugnisse/klasse.html:45
+#: templates/zeugnisse/klasse.html:46
 msgid "Druck"
 msgstr "Print"
 
-#: templates/zeugnisse/klasse.html:47 templates/zeugnisse/konferenz.html:90
+#: templates/zeugnisse/klasse.html:48 templates/zeugnisse/konferenz.html:90
 #: templates/zeugnisse/notenliste.html:62
 msgid "Keine Schüler:innen in dieser Klasse."
 msgstr "No students in this class."
 
-#: templates/zeugnisse/klasse.html:52
+#: templates/zeugnisse/klasse.html:53
 msgid ""
 "Der Versetzungsvorschlag folgt Ziffer 5.3 der Richtlinie Sek I für Deutsche "
 "Schulen im Ausland; die Entscheidung trifft die Klassenkonferenz als "
@@ -14226,11 +14292,11 @@ msgid ""
 msgstr ""
 "Save the conference first; the students of the class can then be selected."
 
-#: zeugnisse/admin.py:88 zeugnisse/ansichten.py:624
+#: zeugnisse/admin.py:88 zeugnisse/ansichten.py:644
 msgid "Lehrkräfte der Klasse"
 msgstr "Teachers of the class"
 
-#: zeugnisse/admin.py:88 zeugnisse/ansichten.py:625
+#: zeugnisse/admin.py:88 zeugnisse/ansichten.py:645
 msgid "Alle Lehrkräfte der Klasse übernehmen"
 msgstr "Add all teachers of the class"
 
@@ -14262,20 +14328,35 @@ msgid_plural "%(n)s Zeugnisse freigegeben."
 msgstr[0] "%(n)s report released."
 msgstr[1] "%(n)s reports released."
 
-#: zeugnisse/ansichten.py:385
+#: zeugnisse/ansichten.py:356
+#, python-format
+msgid ""
+"Freigabe von %(n)s Zeugnis aufgehoben – Noten und Zeugnisnoten sind wieder "
+"änderbar."
+msgid_plural ""
+"Freigabe von %(n)s Zeugnissen aufgehoben – Noten und Zeugnisnoten sind "
+"wieder änderbar."
+msgstr[0] ""
+"Release of %(n)s report revoked – grades and report grades can be changed "
+"again."
+msgstr[1] ""
+"Release of %(n)s reports revoked – grades and report grades can be changed "
+"again."
+
+#: zeugnisse/ansichten.py:396
 #, python-format
 msgid "Zeugnisnoten fehlen: %(faecher)s"
 msgstr "Report grades missing: %(faecher)s"
 
-#: zeugnisse/ansichten.py:387
+#: zeugnisse/ansichten.py:398
 msgid "Keine Fächer gefunden."
 msgstr "No subjects found."
 
-#: zeugnisse/ansichten.py:389
+#: zeugnisse/ansichten.py:400
 msgid "Das Datum des Zeugnisses fehlt."
 msgstr "The report date is missing."
 
-#: zeugnisse/ansichten.py:398
+#: zeugnisse/ansichten.py:409
 #, python-format
 msgid "Der Kommentar ist von %(n)s Lehrkraft noch nicht abgezeichnet."
 msgid_plural ""
@@ -14283,56 +14364,56 @@ msgid_plural ""
 msgstr[0] "The comment has not yet been initialled by %(n)s teacher."
 msgstr[1] "The comment has not yet been initialled by %(n)s teachers."
 
-#: zeugnisse/ansichten.py:401
+#: zeugnisse/ansichten.py:412
 msgid "Es gibt offene Anmerkungen zum Kommentar."
 msgstr "There are open notes on the comment."
 
-#: zeugnisse/ansichten.py:403
+#: zeugnisse/ansichten.py:414
 msgid "Kein Versetzungsvermerk eingetragen."
 msgstr "No promotion endorsement entered."
 
-#: zeugnisse/ansichten.py:448
+#: zeugnisse/ansichten.py:469
 msgid "Zeugnis gespeichert."
 msgstr "Report saved."
 
-#: zeugnisse/ansichten.py:455
+#: zeugnisse/ansichten.py:476
 msgid "Kommentar gespeichert. Bisherige Abzeichnungen müssen erneuert werden."
 msgstr "Comment saved. Existing initials must be renewed."
 
-#: zeugnisse/ansichten.py:465
+#: zeugnisse/ansichten.py:486
 msgid "Zeugnis freigegeben."
 msgstr "Report released."
 
-#: zeugnisse/ansichten.py:473
+#: zeugnisse/ansichten.py:493
 msgid "Freigabe aufgehoben – das Zeugnis ist wieder ein Entwurf."
 msgstr "Release revoked – the report is a draft again."
 
-#: zeugnisse/ansichten.py:512
+#: zeugnisse/ansichten.py:532
 msgid "sie"
 msgstr "she"
 
-#: zeugnisse/ansichten.py:512
+#: zeugnisse/ansichten.py:532
 msgid "er"
 msgstr "he"
 
-#: zeugnisse/ansichten.py:512
+#: zeugnisse/ansichten.py:532
 msgid "sie/er"
 msgstr "she/he"
 
-#: zeugnisse/ansichten.py:533
+#: zeugnisse/ansichten.py:553
 #, python-format
 msgid "Versetzt in die Jahrgangsstufe %(jg)s."
 msgstr "Promoted to year %(jg)s."
 
-#: zeugnisse/ansichten.py:533
+#: zeugnisse/ansichten.py:553
 msgid "Versetzt."
 msgstr "Promoted."
 
-#: zeugnisse/ansichten.py:534
+#: zeugnisse/ansichten.py:554
 msgid "Nicht versetzt."
 msgstr "Not promoted."
 
-#: zeugnisse/ansichten.py:535
+#: zeugnisse/ansichten.py:555
 #, python-format
 msgid ""
 "Die Berechtigung zum Übergang in die Qualifikationsphase hat %(pron)s "
@@ -14343,53 +14424,53 @@ msgstr ""
 "qualification phase includes the intermediate school-leaving certificate "
 "(Mittlerer Schulabschluss)."
 
-#: zeugnisse/ansichten.py:537
+#: zeugnisse/ansichten.py:557
 #, python-format
 msgid ""
 "Die Berechtigung zum Übergang in die Qualifikationsphase hat %(pron)s nicht "
 "erhalten."
 msgstr "%(pron)s has not been granted entry to the qualification phase."
 
-#: zeugnisse/ansichten.py:538
+#: zeugnisse/ansichten.py:558
 msgid "Die Jahrgangsstufe wird freiwillig wiederholt."
 msgstr "The year is repeated voluntarily."
 
-#: zeugnisse/ansichten.py:544
+#: zeugnisse/ansichten.py:564
 #, python-format
 msgid "%(name)s verlässt die Schule am %(datum)s."
 msgstr "%(name)s leaves the school on %(datum)s."
 
-#: zeugnisse/ansichten.py:547
+#: zeugnisse/ansichten.py:567
 #, python-format
 msgid "%(name)s verlässt die Schule."
 msgstr "%(name)s leaves the school."
 
-#: zeugnisse/ansichten.py:692
+#: zeugnisse/ansichten.py:712
 #, python-format
 msgid "%(name)s: keine Entscheidung."
 msgstr "%(name)s: no decision."
 
-#: zeugnisse/ansichten.py:694
+#: zeugnisse/ansichten.py:714
 #, python-format
 msgid "%(name)s: Die Nichtversetzung bedarf einer Begründung im Protokoll."
 msgstr "%(name)s: non-promotion requires a reason in the minutes."
 
-#: zeugnisse/ansichten.py:696
+#: zeugnisse/ansichten.py:716
 #, python-format
 msgid "%(name)s: Bitte den Notenausgleich im Protokoll vermerken."
 msgstr "%(name)s: please record the compensation in the minutes."
 
-#: zeugnisse/ansichten.py:698
+#: zeugnisse/ansichten.py:718
 msgid "Das Datum der Konferenz fehlt."
 msgstr "The conference date is missing."
 
-#: zeugnisse/ansichten.py:746
+#: zeugnisse/ansichten.py:766
 msgid ""
 "Konferenz abgeschlossen. Die Beschlüsse sind in die Zeugnisse übernommen."
 msgstr ""
 "Conference closed. The decisions have been transferred to the reports."
 
-#: zeugnisse/ansichten.py:749
+#: zeugnisse/ansichten.py:769
 msgid "Konferenz gespeichert."
 msgstr "Conference saved."
 
