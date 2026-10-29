@@ -30,7 +30,11 @@
 {% if klasse %}
 <details class="karte nk-kursliste"{% if not kurs %} open{% endif %}>
   <summary><h2>{% blocktranslate with k=klasse.name %}2. Kurs bzw. Lerngruppe der Klasse {{ k }}{% endblocktranslate %}</h2>
-    {% if kurs %}<span class="leise">{% blocktranslate with fach=kurs.fach.lokal_name gruppe=kurs.gruppe.name %}geöffnet: {{ fach }} · {{ gruppe }} – zum Wechseln aufklappen{% endblocktranslate %}</span>{% endif %}</summary>
+    {% if kurs %}<span class="leise klein">{% translate "Details aufklappen" %}</span>
+  <ul class="nk-chips nk-fachwahl" aria-label="{% translate 'Fach wählen' %}">{% for x in kurse %}
+    <li><a class="nk-chip{% if x.u == kurs %} aktiv{% endif %}" href="?abschnitt={{ abschnitt.pk }}&amp;klasse={{ klasse.pk }}&amp;kurs={{ x.u.pk }}#kurs"
+           title="{{ x.u.fach.lokal_name }} · {{ x.u.gruppe.name }} · {{ x.u.lehrkraft.person.anzeigename }}"{% if x.u == kurs %} aria-current="page"{% endif %}>{{ x.u.fach.lokal_name }}{% if x.u.gruppe_id != klasse.pk %} <small>{{ x.u.gruppe.name }}</small>{% endif %}</a></li>
+  {% endfor %}</ul>{% endif %}</summary>
   <div class="rollbar"><table class="liste nk-kurse">
     <thead><tr><th>{% translate "Fach" %}</th><th>{% translate "Gruppe" %}</th><th>{% translate "Lehrkraft" %}</th><th class="zahl">{% translate "Leistungsnachweise" %}</th><th></th></tr></thead>
     <tbody>{% for x in kurse %}
@@ -49,11 +53,11 @@
 {% if uebersicht %}
 <section class="karte nk-uebersicht" id="uebersicht">
   <div class="karte-kopf"><h2>{% blocktranslate with k=klasse.name %}Klassenübersicht {{ k }}{% endblocktranslate %}</h2>
-    <span class="leise">{% translate "je Fach der aktuelle rechnerische Stand: Tendenz, darunter der Schnitt; ZN = festgesetzte Zeugnisnote" %}</span></div>
+    <span class="leise">{% translate "je Fach der aktuelle rechnerische Stand: Tendenz, darunter der Schnitt; ZN = Zeugnisnote" %}</span></div>
   {% if uebersicht.spalten %}
   <form method="post" id="zn-form" data-verlassen="{% translate 'Es gibt ungespeicherte Zeugnisnoten.' %}">{% csrf_token %}
   <input type="hidden" name="aktion" value="zeugnis">
-  <p class="leise nk-hilfe">{% translate "Wo Sie die Zeugnisnote festsetzen dürfen, wählen Sie sie direkt in der Zelle (ZN). Sie gilt sofort für das Zeugnis; ein Punkt (●) kennzeichnet Noten, die aus Excel übernommen oder hier gesetzt wurden." %}</p>
+  <p class="leise nk-hilfe">{% translate "Ohne Festsetzung gilt automatisch die gerundete Note aus den Einzelnoten. Wo Sie die Zeugnisnote festsetzen dürfen, wählen Sie eine andere direkt in der Zelle (ZN); ein Punkt (●) kennzeichnet festgesetzte Noten (aus Excel oder hier). „–“ stellt wieder auf automatisch." %}</p>
   <div class="rollbar"><table class="noten nk-klasse">
     <thead><tr><th class="links">{% translate "Schüler:in" %}</th>
       {% for f in uebersicht.spalten %}<th scope="col">{% for u in f.kurse %}<a href="?abschnitt={{ abschnitt.pk }}&amp;klasse={{ klasse.pk }}&amp;kurs={{ u.pk }}#kurs" title="{{ u.fach.lokal_name }} · {{ u.gruppe.name }} · {{ u.lehrkraft.person.anzeigename }}">{% if forloop.first %}{{ f.fach.kuerzel }}{% else %}·{% endif %}</a>{% endfor %}
@@ -62,7 +66,7 @@
     <tbody>{% for z in uebersicht.zeilen %}
       <tr><th class="links" scope="row">{{ z.s.person }}</th>
         {% for c in z.zellen %}<td class="{% if c.gefaehrdet %}nk-gefaehrdet{% endif %}">{% if c %}{% if c.schnitt is not None %}<strong>{{ c.stufe.bezeichnung|default:"–" }}</strong><small class="blockzeile">{{ c.schnitt|floatformat:2 }}</small>{% endif %}{% if c.bearbeitbar %}<label class="blockzeile nk-zn nk-zn-wahl">ZN
-            <select name="{{ c.name }}" data-orig="{{ c.wert }}" aria-label="{% translate 'Zeugnisnote' %} {{ z.s.person }} {{ c.u.fach.kuerzel }}">
+            <select name="{{ c.name }}" data-orig="{{ c.wert }}" aria-label="{% translate 'Zeugnisnote' %} {{ z.s.person }} {{ c.u.fach.kuerzel }}"{% if c.auto %} title="{% translate 'automatisch aus den Einzelnoten' %}"{% endif %}>
               <option value=""{% if not c.wert %} selected{% endif %}>–</option>
               {% for w, text in c.optionen %}<option value="{{ w }}"{% if w == c.wert %} selected{% endif %}>{{ text }}</option>{% endfor %}
               <option value="nb"{% if c.wert == "nb" %} selected{% endif %}>nb</option>

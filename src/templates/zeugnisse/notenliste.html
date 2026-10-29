@@ -1,0 +1,69 @@
+{% extends "portal/base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Notenliste" %}{% endblock %}
+{% block inhaltsklasse %}breit{% endblock %}
+{% block inhalt %}
+<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › <a href="{% url 'zeugnisse' %}">{% translate "Zeugnisse" %}</a> › {% translate "Notenliste" %}</p>
+<h1>{% translate "Notenliste" %}</h1>
+<p class="unterzeile">{% translate "Klasse wählen – alle Zeugnisnoten wie in der Konferenz, auch für vergangene und gesperrte Halbjahre." %}</p>
+
+<section class="karte nl-wahl">
+  <form method="get" class="nl-zeile">
+    <label>{% translate "Schuljahr" %}
+      <select name="sj" onchange="this.form.submit()">{% for s in schuljahre %}<option value="{{ s.pk }}"{% if s == sj %} selected{% endif %}>{{ s.name }}{% if s.aktiv %} ({% translate "aktuell" %}){% endif %}</option>{% endfor %}</select>
+    </label>
+    <noscript><button class="knopf klein">{% translate "Anzeigen" %}</button></noscript>
+  </form>
+  {% if abschnitte %}
+  <div class="nl-zeile"><span class="leise">{% translate "Halbjahr" %}</span>
+    <ul class="nk-chips">{% for a in abschnitte %}
+      <li><a class="nk-chip{% if a == abschnitt %} aktiv{% endif %}" href="?sj={{ sj.pk }}&amp;abschnitt={{ a.pk }}{% if klasse %}&amp;klasse={{ klasse.pk }}{% endif %}"{% if a == abschnitt %} aria-current="page"{% endif %}>{{ a.lokal_name }}</a></li>
+    {% endfor %}</ul>
+  </div>
+  {% endif %}
+  <div class="nl-zeile"><span class="leise">{% translate "Klasse" %}</span>
+    {% if klassen %}<ul class="nk-chips">{% for k in klassen %}
+      <li><a class="nk-chip{% if k == klasse %} aktiv{% endif %}" href="?sj={{ sj.pk }}&amp;abschnitt={{ abschnitt.pk }}&amp;klasse={{ k.pk }}"{% if k == klasse %} aria-current="page"{% endif %}>{{ k.name }}</a></li>
+    {% endfor %}</ul>{% else %}<span class="leer">{% translate "Keine Klassen in diesem Schuljahr, die Sie sehen dürfen." %}</span>{% endif %}
+  </div>
+</section>
+
+{% if klasse %}
+<section class="karte zg-konferenzliste">
+  <div class="karte-kopf">
+    <h2>{% blocktranslate with k=klasse.name hj=abschnitt.lokal_name sj=sj.name %}Klasse {{ k }} · {{ hj }} {{ sj }}{% endblocktranslate %}</h2>
+    <span class="leise"><span class="zg-kern">K</span> {% translate "Kernfach" %} · <span class="zg-n5">5</span>/<span class="zg-n6">6</span> {% translate "nicht ausreichend" %} · <span class="auffaellig">?</span> {% translate "Zeugnisnote fehlt" %}</span>
+  </div>
+  <p class="knopfreihe">
+    {% if klasse.leitung %}<span class="leise">{% blocktranslate with name=klasse.leitung.person.anzeigename %}Klassenleitung {{ name }}{% endblocktranslate %} · </span>{% endif %}
+    <span class="leise">{% blocktranslate count n=zeilen|length %}{{ n }} Schüler:in{% plural %}{{ n }} Schüler:innen{% endblocktranslate %}{% if gefaehrdet %} · {% if halbjahr %}{% blocktranslate count n=gefaehrdet %}{{ n }} gefährdet{% plural %}{{ n }} gefährdet{% endblocktranslate %}{% else %}{% blocktranslate count n=gefaehrdet %}{{ n }} nicht versetzt / gefährdet{% plural %}{{ n }} nicht versetzt / gefährdet{% endblocktranslate %}{% endif %}{% endif %}{% if fehlen %} · <span class="auffaellig">{% blocktranslate count n=fehlen %}{{ n }} Zeugnisnote fehlt{% plural %}{{ n }} Zeugnisnoten fehlen{% endblocktranslate %}</span>{% endif %}</span>
+    {% if konferenz %}<a class="knopf zweitrangig klein" href="{% url 'konferenz' konferenz.pk %}">{% translate "Zur Konferenz" %}</a>{% endif %}
+    <a class="knopf zweitrangig klein" href="{% url 'zeugnis_klasse' klasse.pk abschnitt.pk %}">{% translate "Zeugnisse der Klasse" %}</a>
+  </p>
+  <div class="tabellenrahmen">
+  <table class="zg-matrix nl-matrix">
+    <thead><tr>
+      <th class="links">{% translate "Schüler:in" %}</th>
+      {% for f in spalten %}<th title="{{ f.lokal_name }}">{{ f.kuerzel }}</th>{% endfor %}
+      <th>Ø</th><th class="links">{% translate "Vorschlag" %}</th>
+    </tr></thead>
+    <tbody>
+    {% for zl in zeilen %}
+      <tr>
+        <th class="links">{% if zl.z %}<a href="{% url 'zeugnis' zl.z.pk %}">{{ zl.s.person.nachname }}, {{ zl.s.person.rufname|default:zl.s.person.vorname }}</a>{% else %}{{ zl.s.person.nachname }}, {{ zl.s.person.rufname|default:zl.s.person.vorname }}{% endif %}
+          <small class="leise blockzeile">{{ zl.bg.kuerzel|default:"" }}{% if zl.jg %} · {% translate "Jg." %} {{ zl.jg }}{% endif %}</small></th>
+        {% for c in zl.zellen %}
+          <td class="{% if c.kern %}kern {% endif %}{% if c.e.note == 5 and not c.e.punkte %}zg-n5{% elif c.e.note == 6 and not c.e.punkte %}zg-n6{% endif %}"
+              title="{% if c.e %}{{ c.e.fachname }}: {{ c.e.text|default:'–' }}{% if c.e.zn.quelle == 'auto' %} ({% translate 'automatisch aus den Einzelnoten' %}){% endif %}{% endif %}">{% if c.e %}{% if c.e.fehlt %}<span class="auffaellig">?</span>{% elif c.e.vermerk %}{{ c.e.text }}{% else %}{{ c.e.note }}{% endif %}{% else %}<span class="leer">·</span>{% endif %}</td>
+        {% endfor %}
+        <td>{{ zl.schnitt|default_if_none:"–" }}</td>
+        <td class="links zg-vorschlag"><small class="{% if zl.ergebnis and zl.ergebnis.gefaehrdet %}auffaellig{% endif %}">{% if zl.ergebnis %}{% if halbjahr %}{% if zl.ergebnis.gefaehrdet %}{% translate "Versetzung gefährdet" %}{% if zl.defizite %}: {{ zl.defizite }}{% endif %}{% else %}{% translate "keine Gefährdung" %}{% endif %}{% else %}{{ zl.ergebnis.kurztext }}{% endif %}{% else %}{{ zl.hinweis }}{% endif %}</small></td>
+      </tr>
+    {% empty %}<tr><td class="leer">{% translate "Keine Schüler:innen in dieser Klasse." %}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

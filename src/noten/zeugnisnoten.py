@@ -5,12 +5,17 @@ Die Regeln sind die der Zeugnisnoten-Seite: Die Lehrkraft des Unterrichts (und d
 gesperrte Schüler:innen und freigegebene Zeugnisse bleiben unverändert, ohne Einzelnoten braucht es die Freigabe
 „Zeugnisnote ohne Einzelnoten“. Eine Abweichung vom Vorschlag wird nur markiert (`weicht_ab`), nicht verhindert.
 Gespeichert wird nur, was sich ändert; `quelle` hält fest, woher die Note stammt.
+
+Ab 0.4.15.0 gilt ohne festgesetzte Note automatisch die gerundete Note aus den Einzelnoten (`automatisch`).
 """
+from collections import defaultdict
+from decimal import Decimal
+
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 
 from .berechnung import Baum, Vorhalbjahr, vorschlagsnote
-from .models import Zeugnisnote, Zeugnisnotenfreigabe
+from .models import Note, Zeugnisnote, Zeugnisnotenfreigabe
 from .sperre import gesperrte_schueler
 
 VERMERKE = {"nb": "nb", "n.b.": "nb", "n.b": "nb", "befreit": "befreit", "b": "befreit"}
@@ -134,3 +139,51 @@ def speichern(u, zeilen, quelle, begruendungen=None):
         z.save()
         gespeichert += 1
     return gespeichert
+
+
+AUTO = "auto"
+
+
+def automatisch(u):
+    """
+    Zeugnisnote = gerundeter Vorschlag aus den Einzelnoten, solange niemand sie selbst festgesetzt hat (ab 0.4.15.0).
+    Ohne eigene Einzelnoten in diesem Unterricht gibt es keine automatische Note (eine vorhandene wird entfernt).
+    Festgesetzte Noten (Excel, Klassenübersicht, Zeugnisnoten-Seite), gesperrte Schüler:innen und freigegebene
+    Zeugnisse bleiben unverändert. Gibt die Zahl der geänderten Zeugnisnoten zurück.
+    """
+    schueler = list(u.schueler())
+    ids = [s.pk for s in schueler]
+    if not ids:
+        return 0
+    bestehend = aktuell(u, ids)
+    sperre = gesperrt(u, ids)
+    stufen = ganze_stufen(u.skala)
+    baum = Baum(u)
+    jahr = Vorhalbjahr(u) if u.mit_jahresnote else False
+    noten_je = defaultdict(list)
+    for n in Note.objects.filter(leistungsnachweis__unterricht=u, schueler__in=ids).select_related("stufe"):
+        noten_je[n.schueler_id].append(n)
+    geaendert = 0
+    for s in schueler:
+        z = bestehend.get(s.pk)
+        if s.pk in sperre or (z is not None and z.quelle != AUTO):
+            continue
+        noten = noten_je.get(s.pk, [])
+        stufe = schnitt = None
+        if any(n.stufe_id or n.sonderstatus == "unentschuldigt" for n in noten):
+            schnitt = vorschlagsnote(u, s, noten, baum, jahr=jahr).schnitt
+            ganz = u.skala.ganz_runden(schnitt)
+            stufe = stufen.get(int(ganz)) if ganz is not None else None
+        if stufe is None:
+            if z is not None:
+                z.delete()
+                geaendert += 1
+            continue
+        schnitt = Decimal(schnitt).quantize(Decimal("0.01"))
+        if z is not None and z.stufe_id == stufe.pk and not z.vermerk and z.vorschlag == schnitt:
+            continue
+        z = z or Zeugnisnote(unterricht=u, schueler=s)
+        z.stufe, z.vermerk, z.vorschlag, z.quelle = stufe, "", schnitt, AUTO
+        z.save()
+        geaendert += 1
+    return geaendert

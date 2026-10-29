@@ -495,9 +495,11 @@ class Zeugnisnote(models.Model):
     begruendung = models.TextField(_("Pädagogische Begründung"), blank=True,
                                    help_text=_("Freiwillig. Die Lehrkraft setzt die Zeugnisnote in eigener Verantwortung fest; "
                                                "Abweichungen vom rechnerischen Vorschlag werden nur markiert."))
-    QUELLEN = [("", "—"), ("excel", _("aus der Excel-Notentabelle übernommen")), ("klasse", _("in der Klassenübersicht festgesetzt"))]
+    QUELLEN = [("", "—"), ("excel", _("aus der Excel-Notentabelle übernommen")), ("klasse", _("in der Klassenübersicht festgesetzt")),
+               ("auto", _("automatisch aus den Einzelnoten"))]
     quelle = models.CharField(_("Herkunft"), max_length=10, choices=QUELLEN, blank=True, default="",
-                              help_text=_("Wie die Zeugnisnote zuletzt gesetzt wurde; leer = in der Zeugnisnoten-Eingabe."))
+                              help_text=_("Wie die Zeugnisnote zuletzt gesetzt wurde; leer = in der Zeugnisnoten-Eingabe. "
+                                          "„automatisch“ folgt den Einzelnoten, bis jemand die Note selbst festsetzt."))
     festgesetzt_am = models.DateTimeField(auto_now=True)
     history = HistoricalRecords(verbose_name=_("Änderungsprotokoll Zeugnisnote"))
 

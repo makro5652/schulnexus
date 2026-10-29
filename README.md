@@ -794,6 +794,21 @@ Die Oberflächenprüfung lässt sich auch lokal ausführen (Playwright für Pyth
 
 Hinweis: Private Repositories haben ein monatliches Kontingent an Actions-Minuten (je nach Tarif; der genaue Wert sollte auf GitHub unter „Settings → Billing“ nachgesehen werden). Ein vollständiger Lauf dauert etwa 10–15 Minuten.
 
+## Automatische Zeugnisnote und Notenliste (ab 0.4.15.0)
+
+- **Zeugnisnote automatisch:** Solange niemand eine Zeugnisnote festsetzt, gilt die gerundete Note aus den Einzelnoten
+  (wie in der Spalte „Vorschlag“). Sie folgt jeder Änderung der Einzelnoten, Gewichte und Ordner. Ohne Einzelnoten in dem
+  Kurs gibt es keine automatische Note. Festgesetzte Noten (Excel-Spalte „Zeugnisnote (festgesetzt)“, Klassenübersicht,
+  Seite „Zeugnisnoten“) haben Vorrang und bleiben stehen; „–“ stellt wieder auf automatisch. Gesperrte Noten und
+  freigegebene Zeugnisse werden nicht verändert. Herkunft im Änderungsprotokoll: „automatisch aus den Einzelnoten“.
+  Beim Start des Containers zieht `manage.py zeugnisnoten_automatisch` fehlende Noten für vorhandene Einzelnoten nach.
+- **Notenliste** (Menüband › Unterricht › Notenliste, ersetzt „Zeugnisnoten (Liste)“): Schuljahr, Halbjahr und Klasse
+  wählen – auch vergangene und gesperrte – und alle Zeugnisnoten wie in der Konferenz sehen: Kernfächer, 5/6 markiert,
+  fehlende Noten (?), Schnitt und Gefährdung bzw. Versetzungsvorschlag. Nur lesend; mit Links zur Konferenz und zu den
+  Zeugnissen der Klasse. Sichtbar für Verwaltung, Schulleitung, Klassenleitung (eigene Klasse) und Koordination (Stufe).
+- **Noten nach Klasse:** Ist ein Kurs geöffnet, stehen alle Fächer der Klasse als Schaltflächen unter Schritt 2 – ein
+  Klick wechselt das Fach.
+
 ## Klassen und Gruppen: Fächer und Lehrkräfte (ab 0.4.14.0)
 
 Die Seite **Menüband › Schüler:innen › Klassen und Gruppen** (vorher „Zuordnen“) deckt jetzt den ganzen Ablauf ab:

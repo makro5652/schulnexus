@@ -1129,6 +1129,9 @@ td.zn-abweichung small { color: #c06a1c; font-weight: 600; }
 .nk-kursliste > summary h2::before { content: "▸ "; color: var(--akzent); }
 .nk-kursliste[open] > summary h2::before { content: "▾ "; }
 .nk-kursliste[open] > summary { margin-bottom: 0.8rem; }
+.nk-fachwahl { flex-basis: 100%; margin-top: 0.4rem; }
+.nk-kursliste[open] .nk-fachwahl { display: none; }
+.nk-fachwahl .nk-chip small { font-weight: 400; opacity: 0.75; }
 
 /* Zeugnisnote in Klassenübersicht und Einzelnoten (ab 0.4.13.0) */
 .nk-zn-wahl { display:flex; align-items:center; gap:.25rem; justify-content:center; font-size:.8em; }
@@ -1158,3 +1161,9 @@ td.zn-abweichung small { color: #c06a1c; font-weight: 600; }
 .zo-faechertabelle select.geaendert { border-color: var(--akzent); box-shadow: 0 0 0 2px var(--akzent-hell); }
 .zo-faechertabelle tr[hidden] { display: none; }
 .zo-noten { display: block; color: var(--leise); font-size: 0.72rem; margin-top: 0.15rem; }
+
+/* Notenliste je Klasse (ab 0.4.15.0) */
+.nl-wahl { display: grid; gap: 0.7rem; }
+.nl-zeile { display: flex; flex-wrap: wrap; gap: 0.5rem 0.8rem; align-items: center; }
+.nl-zeile label { display: flex; gap: 0.5rem; align-items: center; }
+.nl-matrix tbody tr { border-bottom: 1px solid var(--linie); }

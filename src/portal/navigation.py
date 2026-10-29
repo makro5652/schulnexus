@@ -176,8 +176,8 @@ def menueband(request):
         Gruppe(_("Zeugnis"))
         .add(_("Zeugnisse"), _url("zeugnisse"), "zeugnis", gross=True, bedingung=p("zeugnisse.view_zeugnis"),
              hinweis=_("Zeugnisnoten, Kommentare, Zeugnisse und Konferenzen"))
-        .add(_("Zeugnisnoten (Liste)"), _url("admin:noten_zeugnisnote_changelist"), "liste",
-             bedingung=admin and p("noten.view_zeugnisnote"))
+        .add(_("Notenliste"), _url("notenliste"), "liste", bedingung=p("zeugnisse.view_zeugnis"),
+             hinweis=_("Alle Zeugnisnoten einer Klasse wie in der Konferenz – auch vergangene Halbjahre"))
         .add(_("Konferenzen"), _url("admin:zeugnisse_konferenz_changelist"), "gruppen",
              bedingung=admin and p("zeugnisse.change_konferenz"))
         .add(_("Notensperre"), _url("notensperre"), "schild",

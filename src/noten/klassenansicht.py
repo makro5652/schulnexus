@@ -165,7 +165,8 @@ def klassenuebersicht(klasse, abschnitt, kurse, user=None):
             zellen[s.pk][u.fach_id] = {
                 "u": u, "schnitt": v.schnitt, "stufe": v.stufe, "gefaehrdet": v.gefaehrdet or zn_gefaehrdet,
                 "ganz": u.skala.ganz_runden(v.schnitt) if v.schnitt is not None else None,
-                "zeugnis": Z.anzeige(z), "zn": z, "quelle": z.get_quelle_display() if z and z.quelle else "",
+                "zeugnis": Z.anzeige(z), "zn": z, "auto": bool(z and z.quelle == Z.AUTO),
+                "quelle": z.get_quelle_display() if z and z.quelle and z.quelle != Z.AUTO else "",
                 "name": f"zn_{u.pk}_{s.pk}", "optionen": optionen, "wert": Z.formwert(z),
                 "extra": Z.formwert(z) if Z.formwert(z) not in {w for w, _t in optionen} | {"", "nb", "befreit"} else "",
                 "bearbeitbar": darf and s.pk not in sperre, "gesperrt": darf and s.pk in sperre,
