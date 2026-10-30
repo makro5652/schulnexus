@@ -29,14 +29,14 @@
         <td>
           <form method="post" class="ns-form">{% csrf_token %}<input type="hidden" name="abschnitt" value="{{ a.pk }}"><input type="hidden" name="klasse" value="{{ z.k.pk }}">
             <input name="grund" maxlength="200" placeholder="{% translate 'Grund (optional)' %}" aria-label="{% translate 'Grund' %}">
-            {% if not z.gesperrt %}<button type="submit" name="aktion" value="sperren" class="knopf klein">{% translate "Sperren" %}</button>{% endif %}
-            {% if z.gesperrt or z.teilweise %}<button type="submit" name="aktion" value="freigeben" class="knopf zweitrangig klein">{% translate "Zur Korrektur freigeben" %}</button>{% endif %}
+            {% if not z.gesperrt %}<button type="submit" name="aktion" value="sperren" class="knopf klein">{% translate "Noten sperren" %}</button>{% endif %}
+            {% if z.gesperrt or z.teilweise %}<button type="submit" name="aktion" value="freigeben" class="knopf zweitrangig klein">{% translate "Noten freigeben" %}</button>{% endif %}
             {% if z.explizit %}<button type="submit" name="aktion" value="automatik" class="link">{% translate "zurück zur Automatik" %}</button>{% endif %}
           </form></td>
       </tr>{% endfor %}</tbody>
   </table></div>
   {% else %}<p class="leer">{% translate "Keine Klassen in Ihrem Bereich für dieses Halbjahr." %}</p>{% endif %}
-  <p class="hinweistext">{% translate "„Zur Korrektur freigeben“ hebt die automatische Sperre auf, bis die Klasse wieder gesperrt oder auf Automatik gestellt wird. Eine einzelne bereits freigegebene Zeugnisnote ändert man weiterhin über die Rücknahme der Zeugnisfreigabe. Alle Schritte stehen im Protokoll." %}</p>
+  <p class="hinweistext">{% translate "„Noten freigeben“ hebt die automatische Sperre auf, bis die Klasse wieder gesperrt oder auf Automatik gestellt wird. Eine einzelne bereits freigegebene Zeugnisnote ändert man weiterhin über die Rücknahme der Zeugnisfreigabe. Alle Schritte stehen im Protokoll." %}</p>
 </section>
 
 {% if a %}
@@ -57,7 +57,7 @@
     <label>{% translate "Notenschluss am" %} <input type="date" name="datum" min="{{ a.beginn|date:'Y-m-d' }}" max="{{ a.ende|date:'Y-m-d' }}" required></label>
     <button type="submit" name="aktion" value="schluss_neu" class="knopf klein">{% translate "Notenschluss eintragen" %}</button>
   </form>
-  <p class="hinweistext">{% translate "„Zur Korrektur freigeben“ bei einer Klasse geht dem Notenschluss vor." %}</p>
+  <p class="hinweistext">{% translate "„Noten freigeben“ bei einer Klasse geht dem Notenschluss vor." %}</p>
 </section>
 {% endif %}
 {% endblock %}

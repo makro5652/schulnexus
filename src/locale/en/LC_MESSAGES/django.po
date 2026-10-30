@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 17:12+0300\n"
+"POT-Creation-Date: 2026-10-30 18:29+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -10672,12 +10672,12 @@ msgid "Grund (optional)"
 msgstr "Reason (optional)"
 
 #: templates/noten/notensperre.html:32
-msgid "Sperren"
-msgstr "Lock"
+msgid "Noten sperren"
+msgstr "Lock grades"
 
 #: templates/noten/notensperre.html:33
-msgid "Zur Korrektur freigeben"
-msgstr "Release for correction"
+msgid "Noten freigeben"
+msgstr "Release grades"
 
 #: templates/noten/notensperre.html:34
 msgid "zurück zur Automatik"
@@ -10689,15 +10689,15 @@ msgstr "No classes in your area for this semester."
 
 #: templates/noten/notensperre.html:39
 msgid ""
-"„Zur Korrektur freigeben“ hebt die automatische Sperre auf, bis die Klasse "
-"wieder gesperrt oder auf Automatik gestellt wird. Eine einzelne bereits "
+"„Noten freigeben“ hebt die automatische Sperre auf, bis die Klasse wieder "
+"gesperrt oder auf Automatik gestellt wird. Eine einzelne bereits "
 "freigegebene Zeugnisnote ändert man weiterhin über die Rücknahme der "
 "Zeugnisfreigabe. Alle Schritte stehen im Protokoll."
 msgstr ""
-"“Release for correction” lifts the automatic lock until the class is locked "
-"again or set back to automatic. A single report grade that has already been "
-"released is still changed by withdrawing the report release. All steps are "
-"logged."
+"“Release grades” lifts the automatic lock until the class is locked again or"
+" set back to automatic. A single report grade that has already been released"
+" is still changed by revoking the report release. All steps are recorded in "
+"the log."
 
 #: templates/noten/notensperre.html:45
 msgid ""
@@ -10712,10 +10712,9 @@ msgid "Notenschluss eintragen"
 msgstr "Add grade deadline"
 
 #: templates/noten/notensperre.html:60
-msgid "„Zur Korrektur freigeben“ bei einer Klasse geht dem Notenschluss vor."
+msgid "„Noten freigeben“ bei einer Klasse geht dem Notenschluss vor."
 msgstr ""
-"“Unlock for correction” for a class takes precedence over the grade "
-"deadline."
+"“Release grades” for a class takes precedence over the grade deadline."
 
 #: templates/noten/notentabelle.html:17
 msgid "1. Vorlage herunterladen"
