@@ -4,6 +4,7 @@ Menüband (Ribbon) für Portal und Verwaltungsoberfläche.
 Jede Registerkarte enthält Befehlsgruppen; jeder Befehl erscheint nur, wenn die angemeldete Person
 die nötigen Rechte hat. Leere Gruppen und Karten werden ausgeblendet.
 """
+from django.db.models import Q
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import gettext as _, pgettext
 
@@ -100,7 +101,7 @@ def menueband(request):
     # ------------------------------------------------------------ Schüler:innen
     meine_klassen = Gruppe(_("Meine Klassen"))
     if personal and sj:
-        for g in Lerngruppe.objects.filter(leitung=personal, schuljahr=sj).order_by("typ", "name"):
+        for g in Lerngruppe.objects.filter(Q(leitung=personal) | Q(leitung2=personal), schuljahr=sj).order_by("typ", "name"):
             meine_klassen.add(g.name, _url("klassenliste", g.pk), "tafel" if g.typ == Lerngruppe.STAMMKLASSE else "gruppen",
                               gross=g.typ == Lerngruppe.STAMMKLASSE,
                               hinweis=_("Klassenliste %(name)s") % {"name": g.name})
@@ -182,7 +183,11 @@ def menueband(request):
              bedingung=admin and p("zeugnisse.change_konferenz"))
         .add(_("Notensperre"), _url("notensperre"), "schild",
              bedingung=noten_rechte.darf_noten_sperren(user, None) or noten_rechte.ist_koordination(user),
-             hinweis=_("Noten einer Klasse nach Zeugnisfreigabe bzw. Konferenz sperren oder wieder freigeben")),
+             hinweis=_("Noten einer Klasse nach Zeugnisfreigabe bzw. Konferenz sperren oder wieder freigeben; Notenschluss-Termine"))
+        .add(_("Textbausteine"), _url("admin:zeugnisse_textbaustein_changelist"), "notiz",
+             bedingung=admin and p("zeugnisse.change_textbaustein"), hinweis=_("Textbausteine für Zeugniskommentare"))
+        .add(_("Unterzeichnung"), _url("admin:zeugnisse_unterzeichner_changelist"), "stift",
+             bedingung=admin and p("zeugnisse.change_unterzeichner"), hinweis=_("Wer die Zeugnisse für die Schulleitung unterschreibt")),
     )
 
     # ------------------------------------------------------------ Förderung
@@ -246,6 +251,10 @@ def menueband(request):
         .add(_("Unterrichtsverteilung"), _url("admin:noten_unterricht_changelist"), "tafel", gross=True,
              bedingung=leitung and p("noten.view_unterricht"))
         .add(_("Fächer"), _url("admin:stammdaten_fach_changelist"), "buch", bedingung=leitung and p("stammdaten.view_fach"))
+        .add(_("Fachbereiche"), _url("admin:stammdaten_fachbereich_changelist"), "gruppen",
+             bedingung=leitung and p("stammdaten.view_fachbereich"), hinweis=_("Fachbereiche mit Fachleitung und Farbe"))
+        .add(_("Stundentafel"), _url("stundentafel"), "uhr", bedingung=leitung and p("stammdaten.view_stundentafel"),
+             hinweis=_("Wochenstunden je Fach und Jahrgang"))
         .add(_("Notenskalen"), _url("admin:noten_notenskala_changelist"), "lineal", bedingung=leitung and p("noten.view_notenskala"))
         .add(_("Gewichtungsvorlagen"), _url("admin:noten_gewichtungsvorlage_changelist"), "regler",
              bedingung=leitung and p("noten.view_gewichtungsvorlage"))

@@ -7,6 +7,7 @@ Lehrkraft wechseln. Übernommen werden nur Zellen, die auf der Seite geändert w
 anderer Seite geändert wurde, bleibt unangetastet.
 """
 from collections import Counter
+from decimal import Decimal
 
 from django.conf import settings
 from django.contrib import messages
@@ -19,7 +20,7 @@ from django.utils.translation import gettext
 from django.views.decorators.http import require_POST
 
 from noten.models import Leistungsnachweis, Notenskala, Unterricht, Zeugnisnote
-from stammdaten.models import Abschnitt, Fach, Gruppe, Personalprofil
+from stammdaten.models import Abschnitt, Fach, Gruppe, Personalprofil, Stundentafel
 
 from .zuordnung import _zurueck, darf_gruppe_bearbeiten
 
@@ -81,13 +82,39 @@ def tabelle(gruppe):
     for p in personal:
         for f in p.lehrbefaehigungen.all():
             befaehigt.setdefault(f.pk, []).append(p)
+    tafel = dict(Stundentafel.objects.filter(jahrgang=gruppe.jahrgang).values_list("fach_id", "wochenstunden")) if gruppe.jahrgang else {}
     zeilen = []
-    for fach in Fach.objects.all():
+    for fach in Fach.objects.select_related("fachbereich"):
         zellen = [{"abschnitt": a, "feld": _feld(fach.pk, a.pk), "u": vorhanden.get((fach.pk, a.pk))} for a in abschnitte]
         mit = befaehigt.get(fach.pk, [])
-        zeilen.append({"fach": fach, "zellen": zellen, "belegt": any(z["u"] for z in zellen),
+        zeilen.append({"fach": fach, "zellen": zellen, "belegt": any(z["u"] for z in zellen), "stunden": tafel.get(fach.pk),
                        "befaehigt": mit, "weitere": [p for p in personal if p not in mit]})
-    return {"abschnitte": abschnitte, "zeilen": zeilen, "belegt": any(z["belegt"] for z in zeilen)}
+    return {"abschnitte": abschnitte, "zeilen": zeilen, "belegt": any(z["belegt"] for z in zeilen),
+            "deputate": deputate(gruppe, abschnitte, vorhanden.values())}
+
+
+def stunden_von(u, tafel):
+    return u.wochenstunden if u.wochenstunden is not None else tafel.get((u.fach_id, u.gruppe.jahrgang))
+
+
+def deputate(gruppe, abschnitte, unterrichte_der_gruppe):
+    """Je Lehrkraft der Gruppe und Halbjahr: Stunden in dieser Gruppe, insgesamt im Halbjahr und Soll (ab 0.4.16.0)."""
+    lehrkraefte = {u.lehrkraft_id for u in unterrichte_der_gruppe}
+    if not lehrkraefte:
+        return []
+    tafel = {(f, j): w for f, j, w in Stundentafel.objects.values_list("fach_id", "jahrgang", "wochenstunden")}
+    alle = Unterricht.objects.filter(abschnitt__in=abschnitte, lehrkraft_id__in=lehrkraefte).select_related("gruppe")
+    summe = {}
+    for u in alle:
+        schluessel = (u.lehrkraft_id, u.abschnitt_id)
+        hier, gesamt = summe.get(schluessel, (Decimal(0), Decimal(0)))
+        h = stunden_von(u, tafel) or Decimal(0)
+        summe[schluessel] = (hier + (h if u.gruppe_id == gruppe.pk else 0), gesamt + h)
+    zeilen = []
+    for p in Personalprofil.objects.filter(pk__in=lehrkraefte).select_related("person").order_by("person__nachname"):
+        soll = (p.wochenstunden - (p.ermaessigung or 0)) if p.wochenstunden is not None else None
+        zeilen.append({"p": p, "soll": soll, "halbjahre": [summe.get((p.pk, a.pk), (Decimal(0), Decimal(0))) for a in abschnitte]})
+    return zeilen
 
 
 @transaction.atomic
@@ -119,7 +146,8 @@ def speichern(gruppe, aenderungen):
                 ergebnis["fehler"].append(gettext("Es gibt noch keine Notenskala – bitte zuerst eine anlegen."))
                 break
             Unterricht.objects.create(abschnitt=abschnitt, gruppe=gruppe, fach=fach, lehrkraft=personal[neu], skala=skala,
-                                      gewichtung=_gewichtung(gruppe, fach))
+                                      gewichtung=_gewichtung(gruppe, fach),
+                                      wochenstunden=Stundentafel.stunden(fach.pk, gruppe.jahrgang))
             ergebnis["neu"] += 1
         elif u is not None and neu:
             u.lehrkraft = personal[neu]

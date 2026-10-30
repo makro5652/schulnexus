@@ -794,6 +794,32 @@ Die Oberflächenprüfung lässt sich auch lokal ausführen (Playwright für Pyth
 
 Hinweis: Private Repositories haben ein monatliches Kontingent an Actions-Minuten (je nach Tarif; der genaue Wert sollte auf GitHub unter „Settings → Billing“ nachgesehen werden). Ein vollständiger Lauf dauert etwa 10–15 Minuten.
 
+## Neu in 0.4.16.0 (angelehnt an Ed-admin)
+
+- **Noten nach Klasse als Kacheln:** Nach der Klassenwahl stehen alle Fächer der Klasse als Kacheln mit Fach- und
+  Lehrkraftkürzel (z. B. „CH KRA“) über der Eingabetabelle; vorne die Kachel „Klasse“ für die Klassenübersicht. Grün
+  hinterlegt = es gibt schon Leistungsnachweise; links die Fachfarbe. Die bisherige Liste steht aufklappbar darunter.
+- **Textbausteine für Zeugniskommentare** (Verwaltung › Textbausteine; Schulleitung und Koordination pflegen sie): je
+  Kategorie und optional je Jahrgangsbereich. Auf der Zeugnisseite fügt „Textbausteine einfügen“ den Text an der
+  Schreibmarke ein; `{vorname}` wird durch den Rufnamen, `{sie_er}` durch „sie“/„er“ ersetzt.
+  **Zeichengrenze:** `ZEUGNIS_KOMMENTAR_MAX` in der `.env` (0 = keine Grenze).
+- **Bewertungsstruktur kopieren** (Seite „Bewertungsstruktur“ eines Kurses): von einem anderen Kurs übernehmen (gleiches
+  Fach oder gleiche Lehrkraft, auch Vorhalbjahr und Vorjahr) oder auf andere Kurse übertragen (Parallelklassen, alle
+  Fächer des Jahrgangs – als Schulleitung). Optional mit den Leistungsnachweisen ohne Noten. Ziele mit Leistungsnachweisen
+  oder gesperrten Noten werden nicht überschrieben; Vorgaben der Klausurregel bleiben.
+- **Notenschluss zu einem Datum** (Seite „Notensperre“): je Halbjahr und Jahrgangsbereich ein Termin; ab dem Folgetag
+  sind die Noten automatisch gesperrt. „Zur Korrektur freigeben“ geht vor.
+- **Fachbereiche** (Schulleitung › Fachbereiche) mit bis zu zwei Fachleitungen und Farbe; Fächer erhalten Fachbereich und
+  eigene Farbe. Die **Fachleitung sieht alle Kurse der Fächer ihres Fachbereichs** (lesend, z. B. Notenübersicht).
+- **Klassen-Details:** stellvertretende Klassenleitung (mit denselben Rechten wie die Klassenleitung), Klassenraum und
+  Höchstzahl der Schüler:innen (Warnung beim Zuordnen).
+- **Stundentafel** (Schulleitung › Stundentafel): Wochenstunden je Fach und Jahrgang. Neuer Unterricht übernimmt die
+  Stunden; im Reiter „Fächer und Lehrkräfte“ stehen die Stunden je Fach und eine Übersicht der Lehrkräfte (in dieser
+  Gruppe, gesamt im Halbjahr, Soll = Deputat minus Ermäßigung).
+- **Unterzeichnung der Zeugnisse** (Verwaltung › Unterzeichnung): wer für welche Jahrgänge als Schulleitung unterschreibt
+  (z. B. „Leiterin der Grundschule“). Funktion und Name stehen unter der Unterschriftslinie, ebenso der Name der
+  Klassenleitung.
+
 ## Automatische Zeugnisnote und Notenliste (ab 0.4.15.0)
 
 - **Zeugnisnote automatisch:** Solange niemand eine Zeugnisnote festsetzt, gilt die gerundete Note aus den Einzelnoten

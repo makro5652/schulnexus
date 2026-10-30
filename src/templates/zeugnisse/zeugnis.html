@@ -67,9 +67,19 @@
       <form method="post" class="zg-kommentarform">
         {% csrf_token %}<input type="hidden" name="aktion" value="kommentar">
         <label for="kommentar" class="unsichtbar">{% translate "Zeugniskommentar" %}</label>
-        <textarea id="kommentar" name="kommentar" rows="8" data-zaehler="kommentar-zeichen">{{ z.kommentar }}</textarea>
+        <textarea id="kommentar" name="kommentar" rows="8" data-zaehler="kommentar-zeichen"{% if kommentar_max %} maxlength="{{ kommentar_max }}"{% endif %}>{{ z.kommentar }}</textarea>
+        {% if textbausteine %}
+        <details class="zg-bausteine">
+          <summary>{% translate "Textbausteine einfügen" %}</summary>
+          {% for kategorie, liste in textbausteine %}
+          <div class="zg-bausteingruppe">{% if kategorie %}<span class="leise klein">{{ kategorie }}</span>{% endif %}
+            {% for titel, text in liste %}<button type="button" class="zg-baustein" data-text="{{ text }}" title="{{ text }}">{{ titel }}</button>{% endfor %}
+          </div>
+          {% endfor %}
+        </details>
+        {% endif %}
         <div class="knopfreihe"><button type="submit" class="knopf">{% translate "Kommentar speichern" %}</button>
-          <small class="leise"><span id="kommentar-zeichen">{{ zeichen }}</span> {% translate "Zeichen" %} · {% translate "Nach einer Änderung müssen alle Lehrkräfte erneut abzeichnen." %}</small></div>
+          <small class="leise"><span id="kommentar-zeichen">{{ zeichen }}</span>{% if kommentar_max %} / {{ kommentar_max }}{% endif %} {% translate "Zeichen" %} · {% translate "Nach einer Änderung müssen alle Lehrkräfte erneut abzeichnen." %}</small></div>
       </form>
       {% endif %}
       {% url 'zeugnis' z.pk as hier %}

@@ -219,6 +219,8 @@ SCHULNAME = os.environ.get("SCHULNAME", "Deutsche Schule Nairobi")
 SCHULORT = os.environ.get("SCHULORT", "Nairobi")
 # Fehltage auf dem Zeugnis ausweisen (im KMK-Muster nicht vorgesehen; 1 = ja)
 ZEUGNIS_FEHLZEITEN = env_bool("ZEUGNIS_FEHLZEITEN", False)
+# Höchstzahl Zeichen im Zeugniskommentar (ab 0.4.16.0; 0 = keine Grenze)
+ZEUGNIS_KOMMENTAR_MAX = env_int("ZEUGNIS_KOMMENTAR_MAX", 0)
 
 # ---------------------------------------------------------------- Sicherung, Wiederherstellung, PDF-Export (ab 0.4.3.0)
 # Ablage der Modulsicherungen und PDF-Exporte – muss auf einem dauerhaften Datenträger liegen (Docker: eigenes Volume).

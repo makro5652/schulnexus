@@ -12,6 +12,7 @@ from portal.rechte import ist_verwaltung
 
 from .berechnung import nominale_anteile
 from .models import (
+    Notenschluss,
     Bewertungsordner,
     Klausurregel,
     Notensperre,
@@ -346,3 +347,9 @@ class ZeugnisnoteAdmin(EigeneDatenMixin, SimpleHistoryAdmin):
         if obj is not None and ist_gesperrt(obj, obj.unterricht):
             return False
         return super().has_change_permission(request, obj)
+
+
+@admin.register(Notenschluss)
+class NotenschlussAdmin(SimpleHistoryAdmin):
+    list_display = ["abschnitt", "jahrgang_von", "jahrgang_bis", "datum", "angelegt_von"]
+    list_filter = ["abschnitt"]

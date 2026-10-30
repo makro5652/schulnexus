@@ -7,7 +7,7 @@ from simple_history.admin import SimpleHistoryAdmin
 from portal.suchauswahl import SuchauswahlAdminMixin
 from stammdaten.models import Schuelerprofil
 
-from .models import Abzeichnung, Anmerkung, Beschluss, Konferenz, Zeugnis, ZeugnisFachnote
+from .models import Abzeichnung, Anmerkung, Beschluss, Konferenz, Textbaustein, Unterzeichner, Zeugnis, ZeugnisFachnote
 from .rechte import darf_konferenz_sehen, darf_zeugnis_sehen, konferenz_kandidaten
 
 
@@ -97,3 +97,17 @@ class KonferenzAdmin(SuchauswahlAdminMixin, SimpleHistoryAdmin):
     @admin.display(description=_("Portal"))
     def portal(self, obj):
         return format_html('<a href="{}">{}</a>', reverse("konferenz", args=[obj.pk]), _("öffnen"))
+
+
+@admin.register(Textbaustein)
+class TextbausteinAdmin(admin.ModelAdmin):
+    list_display = ["titel", "kategorie", "jahrgang_von", "jahrgang_bis", "aktiv", "reihenfolge"]
+    list_editable = ["aktiv", "reihenfolge"]
+    list_filter = ["kategorie", "aktiv"]
+    search_fields = ["titel", "text", "kategorie"]
+
+
+@admin.register(Unterzeichner)
+class UnterzeichnerAdmin(admin.ModelAdmin):
+    list_display = ["funktion", "person", "jahrgang_von", "jahrgang_bis"]
+    autocomplete_fields = ["person"]

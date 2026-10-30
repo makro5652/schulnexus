@@ -41,6 +41,9 @@
         <label>{{ neu_form.jahrgang.label }} {{ neu_form.jahrgang }}</label>
         <label>{{ neu_form.leitung.label }} {{ neu_form.leitung }}</label>
         <details><summary class="klein">{% translate "Weitere Angaben" %}</summary>
+          <label>{{ neu_form.leitung2.label }} {{ neu_form.leitung2 }}</label>
+          <label>{{ neu_form.raum.label }} {{ neu_form.raum }}</label>
+          <label>{{ neu_form.kapazitaet.label }} {{ neu_form.kapazitaet }}</label>
           <label>{{ neu_form.kuerzel.label }} {{ neu_form.kuerzel }}</label>
           <label>{{ neu_form.vorgaenger.label }} {{ neu_form.vorgaenger }}</label>
         </details>
@@ -58,7 +61,7 @@
     <div class="zo-gruppenkopf">
       <div>
         <h2>{{ gruppe.name }}</h2>
-        <p class="unterzeile klein">{{ gruppe.get_typ_display }}{% if gruppe.jahrgang %} · {% blocktranslate with jg=gruppe.jahrgang %}Jahrgang {{ jg }}{% endblocktranslate %}{% endif %}{% if gruppe.leitung %} · {{ gruppe.leitung.person.anzeigename }}{% endif %} · {% blocktranslate count n=mitglieder|length %}{{ n }} Mitglied{% plural %}{{ n }} Mitglieder{% endblocktranslate %}</p>
+        <p class="unterzeile klein">{{ gruppe.get_typ_display }}{% if gruppe.jahrgang %} · {% blocktranslate with jg=gruppe.jahrgang %}Jahrgang {{ jg }}{% endblocktranslate %}{% endif %}{% if gruppe.leitung %} · {{ gruppe.leitung.person.anzeigename }}{% endif %}{% if gruppe.leitung2 %} ({% translate "Stellv." %} {{ gruppe.leitung2.person.anzeigename }}){% endif %}{% if gruppe.raum %} · {% translate "Raum" %} {{ gruppe.raum }}{% endif %} · <span class="{% if gruppe.kapazitaet and mitglieder|length > gruppe.kapazitaet %}auffaellig{% endif %}">{% if gruppe.kapazitaet %}{% blocktranslate with n=mitglieder|length max=gruppe.kapazitaet %}{{ n }} von höchstens {{ max }} Mitgliedern{% endblocktranslate %}{% else %}{% blocktranslate count n=mitglieder|length %}{{ n }} Mitglied{% plural %}{{ n }} Mitglieder{% endblocktranslate %}{% endif %}</span></p>
       </div>
       <div class="knopfreihe">
         {% if gruppe.typ == "stammklasse" %}<a class="knopf zweitrangig klein" href="{% url 'klassenliste' gruppe.pk %}">{% translate "Klassenliste" %}</a>{% endif %}
@@ -78,6 +81,9 @@
         <label>{{ bearbeiten_form.name.label }} {{ bearbeiten_form.name }}</label>
         <label>{{ bearbeiten_form.jahrgang.label }} {{ bearbeiten_form.jahrgang }}</label>
         <label>{{ bearbeiten_form.leitung.label }} {{ bearbeiten_form.leitung }}</label>
+        <label>{{ bearbeiten_form.leitung2.label }} {{ bearbeiten_form.leitung2 }}</label>
+        <label>{{ bearbeiten_form.raum.label }} {{ bearbeiten_form.raum }}</label>
+        <label>{{ bearbeiten_form.kapazitaet.label }} {{ bearbeiten_form.kapazitaet }}</label>
         <label>{{ bearbeiten_form.kuerzel.label }} {{ bearbeiten_form.kuerzel }}</label>
         <label>{{ bearbeiten_form.vorgaenger.label }} {{ bearbeiten_form.vorgaenger }}</label>
         <div><button type="submit" class="knopf klein">{% translate "Speichern" %}</button>

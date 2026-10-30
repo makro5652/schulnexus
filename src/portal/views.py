@@ -56,7 +56,7 @@ def start(request):
             Unterricht.objects.filter(lehrkraft=person.personal, abschnitt__schuljahr=sj)
             .select_related("gruppe", "fach", "abschnitt")
         )
-        meine_klassen = Gruppe.objects.filter(leitung=person.personal, schuljahr=sj)
+        meine_klassen = Gruppe.objects.filter(Q(leitung=person.personal) | Q(leitung2=person.personal), schuljahr=sj)
 
     kennzahlen = None
     if ist_verwaltung(request.user):

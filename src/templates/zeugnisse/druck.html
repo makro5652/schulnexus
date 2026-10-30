@@ -66,8 +66,8 @@
 
   <p class="ortdatum">{% blocktranslate with ort=d.z.ort datum=d.z.zeugnisdatum|kurzdatum %}<span class="feld">{{ ort }}</span>, den <span class="feld">{{ datum }}</span>{% endblocktranslate %}</p>
   <div class="unterschriften">
-    <div>{% translate "Schulleiterin oder Schulleiter" %}</div>
-    <div>{% translate "Klassenlehrerin oder Klassenlehrer" %}</div>
+    <div>{% if d.unterzeichner %}{{ d.unterzeichner.funktion }}<span class="name">{{ d.unterzeichner.person.person.anzeigename }}</span>{% else %}{% translate "Schulleiterin oder Schulleiter" %}{% endif %}</div>
+    <div>{% translate "Klassenlehrerin oder Klassenlehrer" %}{% if d.klassenleitung %}<span class="name">{{ d.klassenleitung }}</span>{% endif %}</div>
     <div>{% translate "Erziehungsberechtigte oder Erziehungsberechtigter" %}</div>
   </div>
   <p class="fussnote">{% translate "Notenstufen (§ 3 Sek I-PO)" %}: {% for w in notenstufen %}{{ w }} ({{ forloop.counter }}){% if not forloop.last %}, {% endif %}{% endfor %}. {% translate "n.b. = nicht bewertet." %}</p>
@@ -81,7 +81,7 @@
   <div class="kommentar">{{ d.kommentar|linebreaks }}</div>
   <p class="ortdatum">{% blocktranslate with ort=d.z.ort datum=d.z.zeugnisdatum|kurzdatum %}<span class="feld">{{ ort }}</span>, den <span class="feld">{{ datum }}</span>{% endblocktranslate %}</p>
   <div class="unterschriften zwei">
-    <div>{% translate "Klassenlehrerin oder Klassenlehrer" %}</div>
+    <div>{% translate "Klassenlehrerin oder Klassenlehrer" %}{% if d.klassenleitung %}<span class="name">{{ d.klassenleitung }}</span>{% endif %}</div>
     <div>{% translate "Erziehungsberechtigte oder Erziehungsberechtigter" %}</div>
   </div>
 </section>

@@ -28,13 +28,21 @@
 </nav>
 
 {% if klasse %}
-<details class="karte nk-kursliste"{% if not kurs %} open{% endif %}>
-  <summary><h2>{% blocktranslate with k=klasse.name %}2. Kurs bzw. Lerngruppe der Klasse {{ k }}{% endblocktranslate %}</h2>
-    {% if kurs %}<span class="leise klein">{% translate "Details aufklappen" %}</span>
-  <ul class="nk-chips nk-fachwahl" aria-label="{% translate 'Fach wählen' %}">{% for x in kurse %}
-    <li><a class="nk-chip{% if x.u == kurs %} aktiv{% endif %}" href="?abschnitt={{ abschnitt.pk }}&amp;klasse={{ klasse.pk }}&amp;kurs={{ x.u.pk }}#kurs"
-           title="{{ x.u.fach.lokal_name }} · {{ x.u.gruppe.name }} · {{ x.u.lehrkraft.person.anzeigename }}"{% if x.u == kurs %} aria-current="page"{% endif %}>{{ x.u.fach.lokal_name }}{% if x.u.gruppe_id != klasse.pk %} <small>{{ x.u.gruppe.name }}</small>{% endif %}</a></li>
-  {% endfor %}</ul>{% endif %}</summary>
+<section class="karte nk-kacheln-karte" aria-label="{% translate 'Fächer der Klasse' %}">
+  <h2>{% blocktranslate with k=klasse.name %}2. Fach der Klasse {{ k }}{% endblocktranslate %}</h2>
+  <ul class="nk-kacheln">
+    <li><a class="nk-kachel nk-kachel-klasse{% if not kurs %} aktiv{% endif %}" href="?abschnitt={{ abschnitt.pk }}&amp;klasse={{ klasse.pk }}#uebersicht"{% if not kurs %} aria-current="page"{% endif %}>
+      <span>{{ klasse.name }}</span><strong>{% translate "Klasse" %}</strong></a></li>
+    {% for x in kurse %}
+    <li><a class="nk-kachel{% if x.u == kurs %} aktiv{% elif x.anzahl_ln %} mit-noten{% endif %}" href="?abschnitt={{ abschnitt.pk }}&amp;klasse={{ klasse.pk }}&amp;kurs={{ x.u.pk }}#kurs"
+           {% if x.u.fach.anzeigefarbe %}style="--fachfarbe: {{ x.u.fach.anzeigefarbe }}"{% endif %}
+           title="{{ x.u.fach.lokal_name }} · {{ x.u.gruppe.name }} · {{ x.u.lehrkraft.person.anzeigename }} · {% blocktranslate count n=x.anzahl_ln %}{{ n }} Leistungsnachweis{% plural %}{{ n }} Leistungsnachweise{% endblocktranslate %}"{% if x.u == kurs %} aria-current="page"{% endif %}>
+      <span>{% if x.lerngruppe %}{{ x.u.gruppe.name }}{% else %}{{ klasse.name }}{% endif %}</span>
+      <strong>{{ x.u.fach.kuerzel }} {{ x.u.lehrkraft.kuerzel|default:x.u.lehrkraft.person.nachname }}</strong></a></li>
+    {% endfor %}
+  </ul>
+  <p class="nk-legende klein leise"><span class="nk-punkt mit-noten"></span> {% translate "mit Leistungsnachweisen" %} · <span class="nk-punkt"></span> {% translate "noch leer" %}</p>
+  <details class="nk-kursdetails"><summary class="klein">{% translate "Als Liste mit Lehrkräften und Anzahl der Leistungsnachweise" %}</summary>
   <div class="rollbar"><table class="liste nk-kurse">
     <thead><tr><th>{% translate "Fach" %}</th><th>{% translate "Gruppe" %}</th><th>{% translate "Lehrkraft" %}</th><th class="zahl">{% translate "Leistungsnachweise" %}</th><th></th></tr></thead>
     <tbody>{% for x in kurse %}
@@ -47,7 +55,8 @@
       </tr>{% endfor %}
     </tbody>
   </table></div>
-</details>
+  </details>
+</section>
 {% endif %}
 
 {% if uebersicht %}

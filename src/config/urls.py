@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
 
-from portal import anhaenge, klassenunterricht, sicherheit, startseite, views, zuordnung
+from portal import anhaenge, klassenunterricht, sicherheit, startseite, stundentafel, views, zuordnung
 
 urlpatterns = [
     path("", views.start, name="start"),
@@ -32,6 +32,7 @@ urlpatterns = [
     path("stufe/<slug:schluessel>/", startseite.stufe, name="stufe"),
     path("rollen/", startseite.rollenuebersicht, name="rollen"),
     path("zuordnung/", zuordnung.zuordnung, name="zuordnung"),
+    path("stundentafel/", stundentafel.stundentafel, name="stundentafel"),
     path("zuordnung/gruppe/<int:pk>/", zuordnung.zuordnung_aktion, name="zuordnung_aktion"),
     path("zuordnung/neue-gruppe/", zuordnung.gruppe_anlegen, name="gruppe_anlegen"),
     path("zuordnung/gruppe/<int:pk>/bearbeiten/", zuordnung.gruppe_bearbeiten, name="gruppe_bearbeiten"),

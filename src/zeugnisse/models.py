@@ -248,3 +248,58 @@ class Beschluss(models.Model):
 
     def __str__(self):
         return f"{self.schueler}: {self.get_entscheidung_display()}"
+
+
+class Textbaustein(models.Model):
+    """Textbaustein für Zeugniskommentare (ab 0.4.16.0); {vorname} wird beim Einfügen durch den Rufnamen ersetzt."""
+
+    titel = models.CharField(_("Titel"), max_length=80, help_text=_("kurz, z. B. „Arbeitsverhalten sehr gut“"))
+    kategorie = models.CharField(_("Kategorie"), max_length=60, blank=True, help_text=_("z. B. Arbeitsverhalten, Sozialverhalten"))
+    text = models.TextField(_("Text"), help_text=_("{vorname} wird durch den Rufnamen ersetzt, {sie_er} durch „sie“ bzw. „er“."))
+    jahrgang_von = models.PositiveSmallIntegerField(_("ab Jahrgang"), null=True, blank=True)
+    jahrgang_bis = models.PositiveSmallIntegerField(_("bis Jahrgang"), null=True, blank=True)
+    aktiv = models.BooleanField(_("Aktiv"), default=True)
+    reihenfolge = models.PositiveSmallIntegerField(_("Reihenfolge"), default=10)
+
+    class Meta:
+        verbose_name = _("Textbaustein")
+        verbose_name_plural = _("Textbausteine für Zeugniskommentare")
+        ordering = ["kategorie", "reihenfolge", "titel"]
+
+    def __str__(self):
+        return f"{self.kategorie} – {self.titel}" if self.kategorie else self.titel
+
+    @classmethod
+    def fuer(cls, jahrgang):
+        qs = cls.objects.filter(aktiv=True)
+        if jahrgang:
+            qs = qs.filter(models.Q(jahrgang_von__isnull=True) | models.Q(jahrgang_von__lte=jahrgang)).filter(
+                models.Q(jahrgang_bis__isnull=True) | models.Q(jahrgang_bis__gte=jahrgang))
+        return qs
+
+    def fuer_schueler(self, person):
+        sie_er = {"w": "sie", "m": "er"}.get(person.geschlecht, (person.rufname or person.vorname))
+        return self.text.replace("{vorname}", person.rufname or person.vorname).replace("{sie_er}", sie_er)
+
+
+class Unterzeichner(models.Model):
+    """Wer das Zeugnis für die Schulleitung unterschreibt (ab 0.4.16.0), je Jahrgangsbereich – Name steht unter der Linie."""
+
+    person = models.ForeignKey("stammdaten.Personalprofil", on_delete=models.CASCADE, related_name="+", verbose_name=_("Person"))
+    funktion = models.CharField(_("Funktion"), max_length=80, help_text=_("wie unter der Unterschrift, z. B. Schulleiter, Leiterin der Grundschule"))
+    jahrgang_von = models.PositiveSmallIntegerField(_("ab Jahrgang"))
+    jahrgang_bis = models.PositiveSmallIntegerField(_("bis Jahrgang"))
+
+    class Meta:
+        verbose_name = _("Unterzeichner:in")
+        verbose_name_plural = _("Unterzeichnung der Zeugnisse")
+        ordering = ["jahrgang_von"]
+
+    def __str__(self):
+        return f"{self.funktion}: {self.person} (Jg. {self.jahrgang_von}–{self.jahrgang_bis})"
+
+    @classmethod
+    def fuer(cls, jahrgang):
+        if not jahrgang:
+            return None
+        return cls.objects.filter(jahrgang_von__lte=jahrgang, jahrgang_bis__gte=jahrgang).select_related("person__person").first()

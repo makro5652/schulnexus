@@ -117,7 +117,7 @@ def klassenleitung_schueler_ids(user) -> set:
     ids = set()
     if personal:
         ids = set(Mitgliedschaft.objects.aktiv().filter(
-            gruppe__leitung=personal, gruppe__typ=Gruppe.STAMMKLASSE, gruppe__schuljahr=Schuljahr.aktuelles(),
+            Q(gruppe__leitung=personal) | Q(gruppe__leitung2=personal), gruppe__typ=Gruppe.STAMMKLASSE, gruppe__schuljahr=Schuljahr.aktuelles(),
         ).values_list("schueler_id", flat=True))
     user._kl_ids = ids
     return ids
@@ -177,7 +177,7 @@ def darf_klassenliste_sehen(user, gruppe) -> bool:
     if ist_verwaltung(user):
         return True
     person = getattr(user, "person", None) if user.is_authenticated else None
-    if person and gruppe.leitung_id and gruppe.leitung.person_id == person.pk:
+    if person and any(p is not None and p.person_id == person.pk for p in (gruppe.leitung, gruppe.leitung2)):
         return True
     return gruppe.jahrgang is not None and gruppe.jahrgang in koordinierte_jahrgaenge(user)
 
@@ -198,8 +198,13 @@ def darf_unterricht_sehen(user, unterricht) -> bool:
         if unterricht.gruppe.jahrgang is None and set(
                 unterricht.gruppe.mitgliedschaften.values_list("schueler_id", flat=True)) & koordinierte_schueler_ids(user):
             return True
+    # Fachleitung: alle Kurse der Fächer ihres Fachbereichs (ab 0.4.16.0)
+    fb = unterricht.fach.fachbereich if unterricht.fach.fachbereich_id else None
+    if fb is not None and any(p.person_id == person.pk for p in fb.leitungen()):
+        return True
     # Klassenleitung darf die Noten der eigenen Stammklasse einsehen.
-    return unterricht.gruppe.leitung_id is not None and unterricht.gruppe.leitung.person_id == person.pk
+    g = unterricht.gruppe
+    return any(p is not None and p.person_id == person.pk for p in (g.leitung, g.leitung2))
 
 
 # ---------------------------------------------------------------- Dokumente / Anhänge

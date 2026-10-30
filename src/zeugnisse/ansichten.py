@@ -24,7 +24,7 @@ from portal.rechte import darf_akte_sehen, darf_unterricht_sehen, ist_schulleitu
 from stammdaten.models import Abschnitt, Gruppe, Personalprofil
 
 from . import rechte
-from .models import Abzeichnung, Anmerkung, Beschluss, Konferenz, Zeugnis, ZeugnisFachnote
+from .models import Abzeichnung, Anmerkung, Beschluss, Konferenz, Textbaustein, Unterzeichner, Zeugnis, ZeugnisFachnote
 from .noten import (
     BILDUNGSGANG_TEXT, WORTE, fach_sortierung, fachnoten, ganze_note, kernfach_ids, klassen_mitglieder, laufbahn, note_text, stammklasse_im_abschnitt,
     unterrichte_fuer, versetzungsvorschlag,
@@ -471,6 +471,10 @@ def zeugnis(request, pk):
         elif aktion == "kommentar":
             if not darf["kommentar"]:
                 raise PermissionDenied
+            grenze = settings.ZEUGNIS_KOMMENTAR_MAX
+            if grenze and len((request.POST.get("kommentar") or "").strip()) > grenze:
+                messages.error(request, gettext("Der Kommentar ist zu lang: höchstens %(max)s Zeichen.") % {"max": grenze})
+                return redirect(reverse("zeugnis", args=[z.pk]) + "#kommentar")
             if z.kommentar_setzen(request.POST.get("kommentar", ""), user):
                 z.save()
                 messages.success(request, gettext("Kommentar gespeichert. Bisherige Abzeichnungen müssen erneuert werden."))
@@ -522,8 +526,17 @@ def zeugnis(request, pk):
         "hindernisse": freigabe_hindernisse(z, zeilen) if not z.freigegeben else [],
         "hinweise": freigabe_hinweise(z) if not z.freigegeben else [],
         "konferenz": Konferenz.objects.filter(klasse=z.klasse, abschnitt=z.abschnitt).first() if z.klasse else None,
-        "nachbarn": dict(geschwister), "zeichen": len(z.kommentar),
+        "nachbarn": dict(geschwister), "zeichen": len(z.kommentar), "kommentar_max": settings.ZEUGNIS_KOMMENTAR_MAX,
+        "textbausteine": _textbausteine(z) if darf["kommentar"] else [],
     })
+
+
+def _textbausteine(z):
+    """[(Kategorie, [(Titel, Text für diese Person)])] – passend zum Jahrgang (ab 0.4.16.0)."""
+    gruppen = {}
+    for t in Textbaustein.fuer(z.jahrgang):
+        gruppen.setdefault(t.kategorie, []).append((t.titel, t.fuer_schueler(z.schueler.person)))
+    return list(gruppen.items())
 
 
 # ---------------------------------------------------------------- Druck
@@ -573,6 +586,9 @@ def druckdaten(z):
         "bildungsgang": BILDUNGSGANG_TEXT.get(getattr(bg, "kuerzel", ""), getattr(bg, "lokal_name", "")) if bg else "",
         "kommentar": z.kommentar if z.kommentar and z.kommentar_drucken else "",
         "entwurf": not z.freigegeben, "fehlzeiten": settings.ZEUGNIS_FEHLZEITEN,
+        # Namen unter den Unterschriftslinien (ab 0.4.16.0)
+        "unterzeichner": Unterzeichner.fuer(z.jahrgang),
+        "klassenleitung": z.klasse.leitung.person.anzeigename if z.klasse and z.klasse.leitung_id else "",
     }
 
 
@@ -825,7 +841,7 @@ def start_hinweise(user):
         eigene = next((a for a in z.abzeichnungen.all() if a.lehrkraft_id == personal.pk), None)
         if eigene is None or not eigene.aktuell:
             abzeichnen += 1
-    klassen = list(Gruppe.objects.filter(leitung=personal, schuljahr=abschnitt.schuljahr, typ=Gruppe.STAMMKLASSE))
+    klassen = list(Gruppe.objects.filter(Q(leitung=personal) | Q(leitung2=personal), schuljahr=abschnitt.schuljahr, typ=Gruppe.STAMMKLASSE))
     ohne_kommentar = 0
     for g in klassen:
         mitglieder = [s.pk for s in klassen_mitglieder(g, abschnitt)]

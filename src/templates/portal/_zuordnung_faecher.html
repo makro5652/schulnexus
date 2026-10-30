@@ -25,7 +25,7 @@
       <tbody>
       {% for z in unterricht.zeilen %}
         <tr class="zo-fachzeile{% if z.belegt %} belegt{% endif %}" data-belegt="{% if z.belegt %}1{% endif %}" data-name="{{ z.fach.lokal_name|lower }} {{ z.fach.kuerzel|lower }}">
-          <th scope="row">{{ z.fach.lokal_name }} <small class="leise">{{ z.fach.kuerzel }}</small></th>
+          <th scope="row">{% if z.fach.anzeigefarbe %}<span class="st-farbe" style="background:{{ z.fach.anzeigefarbe }}"></span>{% endif %}{{ z.fach.lokal_name }} <small class="leise">{{ z.fach.kuerzel }}</small>{% if z.stunden %} <small class="leise" title="{% translate 'laut Stundentafel' %}">· {{ z.stunden|floatformat:"-1" }} {% translate "Std." %}</small>{% endif %}</th>
           {% for c in z.zellen %}
           <td>
             <input type="hidden" name="vorher_{{ c.feld }}" value="{{ c.u.lehrkraft_id|default:'' }}">
@@ -47,6 +47,18 @@
       </tbody>
     </table>
     </div>
+    {% if unterricht.deputate %}
+    <h3 class="zo-deputat-titel">{% translate "Stunden der Lehrkräfte" %}</h3>
+    <div class="tabellenrahmen"><table class="liste kompakt">
+      <thead><tr><th>{% translate "Lehrkraft" %}</th>{% for a in unterricht.abschnitte %}<th class="zahl">{{ a.lokal_name }}: {% translate "in dieser Gruppe / gesamt" %}</th>{% endfor %}<th class="zahl">{% translate "Soll" %}</th></tr></thead>
+      <tbody>{% for d in unterricht.deputate %}<tr>
+        <td>{{ d.p.person.anzeigename }}{% if d.p.kuerzel %} <small class="leise">{{ d.p.kuerzel }}</small>{% endif %}</td>
+        {% for hier, gesamt in d.halbjahre %}<td class="zahl">{{ hier|floatformat:"-1" }} / <strong class="{% if d.soll and gesamt > d.soll %}auffaellig{% endif %}">{{ gesamt|floatformat:"-1" }}</strong></td>{% endfor %}
+        <td class="zahl">{% if d.soll is not None %}{{ d.soll|floatformat:"-1" }}{% else %}–{% endif %}</td>
+      </tr>{% endfor %}</tbody>
+    </table></div>
+    <p class="klein leise">{% translate "Stunden laut Stundentafel bzw. am Unterricht; rot = mehr als das Soll (Deputat abzüglich Ermäßigung)." %}</p>
+    {% endif %}
     <p class="leer" id="zo-keine-faecher" hidden>{% translate "Noch keine Fächer belegt – Häkchen „nur belegte Fächer“ entfernen, um alle Fächer zu sehen." %}</p>
     <p class="klein leise">{% translate "Eine Lehrkraft wählen legt den Unterricht an, „–“ entfernt ihn wieder (nur solange es keine Noten gibt). Notenskala und Startvorlage werden wie bei den anderen Klassen des Jahrgangs gesetzt." %}</p>
   </form>

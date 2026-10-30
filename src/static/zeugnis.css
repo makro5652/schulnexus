@@ -43,6 +43,7 @@ table { border-collapse: collapse; width: 100%; }
 .unterschriften { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8mm; margin-top: 14mm; font-size: 9pt; text-align: center; }
 .unterschriften.zwei { grid-template-columns: repeat(2, 1fr); }
 .unterschriften div { border-top: 1px solid #000; padding-top: 1.5mm; }
+.unterschriften .name { display: block; font-size: 8pt; color: #333; margin-top: 0.5mm; }
 .fussnote { margin: 6mm 0 0; padding-top: 1.5mm; border-top: 1px solid #999; font-size: 7.5pt; color: #333; }
 .beiblatt .kommentar { margin: 4mm 0; text-align: justify; line-height: 1.5; }
 .leer { text-align: center; padding: 3rem; }

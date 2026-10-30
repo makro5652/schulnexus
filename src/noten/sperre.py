@@ -5,6 +5,7 @@ Die Noten einer Schülerin / eines Schülers in einem Halbjahr sind gesperrt, we
 - für die Stammklasse und das Halbjahr eine ausdrückliche Notensperre gesetzt ist (geht allem anderen vor; eine
   ausdrückliche *Freigabe* hebt umgekehrt die automatische Sperre auf), sonst
 - die Zeugniskonferenz der Klasse durchgeführt oder abgeschlossen ist, oder
+- der Notenschluss für den Jahrgang vorbei ist (ab 0.4.16.0: Termin auf der Seite „Notensperre“), oder
 - das Zeugnis der Schülerin / des Schülers freigegeben ist.
 
 Gesperrt heißt: keine Noten eintragen oder ändern, keine Gewichte ändern, keine Leistungsnachweise mit diesen Noten
@@ -15,7 +16,7 @@ from django.utils import timezone
 
 from stammdaten.models import Gruppe, Mitgliedschaft
 
-from .models import Notensperre
+from .models import Notenschluss, Notensperre
 
 AUTOMATIK, GESPERRT, OFFEN = "automatik", "gesperrt", "offen"
 
@@ -30,6 +31,17 @@ class Sperrstand:
         self.explizit = {s.klasse_id: s for s in Notensperre.objects.filter(abschnitt=abschnitt).select_related("geaendert_von")}
         self.konferenz = {k.klasse_id: k for k in Konferenz.objects.filter(abschnitt=abschnitt)}
         self.freigegeben = set(Zeugnis.objects.filter(abschnitt=abschnitt, status=Zeugnis.FREIGEGEBEN).values_list("schueler_id", flat=True))
+        self.schluesse = list(Notenschluss.objects.filter(abschnitt=abschnitt).order_by("datum"))
+        self.jahrgang = dict(Gruppe.objects.filter(schuljahr_id=abschnitt.schuljahr_id, typ=Gruppe.STAMMKLASSE)
+                             .values_list("pk", "jahrgang")) if self.schluesse else {}
+
+    def notenschluss(self, klasse_id):
+        jg = self.jahrgang.get(klasse_id)
+        return next((n for n in self.schluesse if jg is not None and n.jahrgang_von <= jg <= n.jahrgang_bis), None)
+
+    def schluss_vorbei(self, klasse_id):
+        n = self.notenschluss(klasse_id)
+        return n is not None and timezone.localdate() > n.datum
 
     def konferenz_gehalten(self, klasse_id):
         k = self.konferenz.get(klasse_id)
@@ -38,12 +50,12 @@ class Sperrstand:
     def klasse_gesperrt(self, klasse_id):
         if klasse_id in self.explizit:
             return self.explizit[klasse_id].gesperrt
-        return self.konferenz_gehalten(klasse_id)
+        return self.konferenz_gehalten(klasse_id) or self.schluss_vorbei(klasse_id)
 
     def schueler_gesperrt(self, schueler_id, klasse_id):
         if klasse_id in self.explizit:
             return self.explizit[klasse_id].gesperrt
-        return self.konferenz_gehalten(klasse_id) or schueler_id in self.freigegeben
+        return self.konferenz_gehalten(klasse_id) or self.schluss_vorbei(klasse_id) or schueler_id in self.freigegeben
 
 
 def stammklassen(schueler_ids, abschnitt):

@@ -80,4 +80,33 @@
     <button type="submit" class="knopf zweitrangig">{% translate "Anlegen" %}</button>
   </form>
 </section>
+
+<section class="karte ne-kopieren" id="kopieren">
+  <h2>{% translate "Struktur kopieren" %}</h2>
+  <div class="ne-kopieren-raster">
+    <form method="post">{% csrf_token %}<input type="hidden" name="aktion" value="kopieren_von">
+      <h3>{% translate "Von einem anderen Kurs übernehmen" %}</h3>
+      {% if ziel_hindernis %}<p class="leise">{% blocktranslate with grund=ziel_hindernis %}Nicht möglich: Dieser Kurs {{ grund }}.{% endblocktranslate %}</p>
+      {% elif kopierquellen %}
+      <label class="sy-feld">{% translate "Kurs" %}
+        <select name="quelle">{% for q in kopierquellen %}<option value="{{ q.pk }}">{{ q.fach.kuerzel }} {{ q.gruppe.name }} · {{ q.lehrkraft.kuerzel|default:q.lehrkraft }} · {{ q.abschnitt.schuljahr.name }} {{ q.abschnitt.lokal_name }}</option>{% endfor %}</select></label>
+      <label class="haken klein"><input type="checkbox" name="mit_nachweisen" value="1" checked> {% translate "Leistungsnachweise ohne Noten mitkopieren (nur aus demselben Halbjahr)" %}</label>
+      <button type="submit" class="knopf zweitrangig" onclick="return confirm('{% translate "Die bisherigen Ordner dieses Kurses werden ersetzt. Fortfahren?" as f %}{{ f|escapejs }}')">{% translate "Übernehmen" %}</button>
+      {% else %}<p class="leise">{% translate "Kein passender Kurs mit Struktur gefunden." %}</p>{% endif %}
+    </form>
+    <form method="post">{% csrf_token %}<input type="hidden" name="aktion" value="uebertragen">
+      <h3>{% translate "Auf andere Kurse übertragen" %}</h3>
+      {% if kopierziele %}
+      <label class="haken klein"><input type="checkbox" onclick="document.querySelectorAll('.ne-ziel:not(:disabled)').forEach(c => c.checked = this.checked)"> <strong>{% translate "alle verfügbaren" %}</strong></label>
+      <div class="ne-zielliste">{% for z in kopierziele %}
+        <label class="haken klein"><input type="checkbox" class="ne-ziel" name="ziel" value="{{ z.pk }}"{% if z.hindernis %} disabled{% endif %}>
+          {{ z.fach.kuerzel }} {{ z.gruppe.name }} <span class="leise">· {{ z.lehrkraft.kuerzel|default:z.lehrkraft }}{% if z.hindernis %} · {{ z.hindernis }}{% endif %}</span></label>
+      {% endfor %}</div>
+      <label class="haken klein"><input type="checkbox" name="mit_nachweisen" value="1" checked> {% translate "Leistungsnachweise ohne Noten mitkopieren" %}</label>
+      <button type="submit" class="knopf zweitrangig" onclick="return confirm('{% translate "Die bisherigen Ordner der gewählten Kurse werden ersetzt. Fortfahren?" as f %}{{ f|escapejs }}')">{% translate "Übertragen" %}</button>
+      {% else %}<p class="leise">{% translate "Keine weiteren Kurse, die Sie bearbeiten dürfen." %}</p>{% endif %}
+    </form>
+  </div>
+  <p class="hinweistext">{% translate "Vorgaben der Schulleitung (Klausurregel) bleiben erhalten. Kurse mit Leistungsnachweisen oder gesperrten Noten lassen sich nicht überschreiben." %}</p>
+</section>
 {% endblock %}

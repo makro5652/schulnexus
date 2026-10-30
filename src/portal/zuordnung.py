@@ -135,13 +135,14 @@ def entfernen(gruppe, schueler_ids, datum=None):
 class GruppeForm(forms.ModelForm):
     class Meta:
         model = Gruppe
-        fields = ["name", "typ", "jahrgang", "leitung", "kuerzel", "vorgaenger"]
+        fields = ["name", "typ", "jahrgang", "leitung", "leitung2", "raum", "kapazitaet", "kuerzel", "vorgaenger"]
 
     def __init__(self, *args, schuljahr=None, user=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.schuljahr = schuljahr
-        self.fields["leitung"].queryset = Personalprofil.objects.filter(aktiv=True).select_related("person").order_by("person__nachname")
-        self.fields["leitung"].label_from_instance = lambda p: f"{p.person.anzeigename}{f' ({p.kuerzel})' if p.kuerzel else ''}"
+        for feld in ("leitung", "leitung2"):
+            self.fields[feld].queryset = Personalprofil.objects.filter(aktiv=True).select_related("person").order_by("person__nachname")
+            self.fields[feld].label_from_instance = lambda p: f"{p.person.anzeigename}{f' ({p.kuerzel})' if p.kuerzel else ''}"
         vorjahr = Schuljahr.objects.filter(beginn__lt=schuljahr.beginn).order_by("-beginn").first() if schuljahr else None
         self.fields["vorgaenger"].queryset = Gruppe.objects.filter(schuljahr=vorjahr) if vorjahr else Gruppe.objects.none()
         for f in ("kuerzel", "name"):
@@ -171,7 +172,7 @@ class GruppeBearbeitenForm(GruppeForm):
     """Wie „Neue Gruppe“, aber ohne Typ – ein Typwechsel würde die Regeln für Stammklassen umgehen."""
 
     class Meta(GruppeForm.Meta):
-        fields = ["name", "jahrgang", "leitung", "kuerzel", "vorgaenger"]
+        fields = ["name", "jahrgang", "leitung", "leitung2", "raum", "kapazitaet", "kuerzel", "vorgaenger"]
 
 
 class SchuelerNeuForm(forms.Form):
@@ -219,7 +220,7 @@ def zuordnung(request):
     heute = timezone.localdate()
     stichtag = min(max(heute, sj.beginn), sj.ende)
 
-    gruppen = list(gruppen_fuer(request.user, sj).select_related("leitung__person")
+    gruppen = list(gruppen_fuer(request.user, sj).select_related("leitung__person", "leitung2__person")
                    .annotate(anzahl=Count("mitgliedschaften", filter=Q(mitgliedschaften__von__lte=stichtag)
                                           & (Q(mitgliedschaften__bis__isnull=True) | Q(mitgliedschaften__bis__gte=stichtag)), distinct=True),
                              rang=Case(When(typ=Gruppe.STAMMKLASSE, then=Value(0)), When(typ=Gruppe.LERNGRUPPE, then=Value(1)),
@@ -302,6 +303,7 @@ def zuordnung_aktion(request, pk):
         messages.success(request, " · ".join(teile))
         for f in e["fehler"]:
             messages.error(request, f)
+        _kapazitaet_pruefen(request, gruppe, datum)
     elif aktion == "entfernen":
         n = entfernen(gruppe, ids, datum)
         messages.success(request, gettext("%(n)s Mitgliedschaft(en) zum %(datum)s beendet.") % {
@@ -338,6 +340,14 @@ def gruppe_anlegen(request):
     messages.error(request, gettext("Gruppe nicht angelegt: %(fehler)s") % {
         "fehler": " ".join(f"{form.fields[f].label}: {' '.join(e)}" if f in form.fields else " ".join(e) for f, e in form.errors.items())})
     return _zurueck(sj)
+
+
+def _kapazitaet_pruefen(request, gruppe, datum):
+    if gruppe.kapazitaet:
+        n = gruppe.aktuelle_mitglieder(stichtag_fuer(gruppe, datum)).count()
+        if n > gruppe.kapazitaet:
+            messages.warning(request, gettext("%(gruppe)s hat jetzt %(n)s Mitglieder – mehr als die Höchstzahl von %(max)s.")
+                             % {"gruppe": gruppe.name, "n": n, "max": gruppe.kapazitaet})
 
 
 def _fehlertext(form):
@@ -381,6 +391,7 @@ def schueler_anlegen(request, pk):
                                           eintritt_jahrgang=gruppe.jahrgang, status="aktiv",
                                           religionsunterricht=d["religionsunterricht"])
         e = hinzufuegen(gruppe, [s], start)
+    _kapazitaet_pruefen(request, gruppe, start)
     for f in e["fehler"]:
         messages.error(request, f)
     messages.success(request, gettext("%(name)s angelegt (Schülernummer %(nr)s) und %(gruppe)s zugeordnet. "

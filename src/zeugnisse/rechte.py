@@ -16,7 +16,7 @@ from portal.rechte import ist_schulleitung, ist_verwaltung, koordinierte_jahrgae
 
 def ist_klassenleitung(user, klasse):
     p = personal_von(user)
-    return bool(p and klasse and klasse.leitung_id == p.pk)
+    return bool(p and klasse and p.pk in (klasse.leitung_id, klasse.leitung2_id))   # auch die Stellvertretung (ab 0.4.16.0)
 
 
 def ist_stufe(user, jahrgang):
@@ -37,8 +37,7 @@ def konferenz_kandidaten(k):
     ids = set()
     for s in klassen_mitglieder(k.klasse, k.abschnitt):
         ids |= lehrkraefte_ids(s, k.abschnitt)
-    if k.klasse.leitung_id:
-        ids.add(k.klasse.leitung_id)
+    ids |= {k.klasse.leitung_id, k.klasse.leitung2_id}
     ids.discard(None)
     return ids
 

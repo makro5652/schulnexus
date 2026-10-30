@@ -12,6 +12,8 @@ from portal.suchauswahl import SuchauswahlAdminMixin
 from portal.rechte import ist_personalverwaltung, ist_verwaltung
 
 from .models import (
+    Fachbereich,
+    Stundentafel,
     Abschluss,
     Abschlussart,
     Abschnitt,
@@ -441,7 +443,7 @@ class GruppeAdmin(SuchauswahlAdminMixin, SimpleHistoryAdmin):
     list_display = ["name", "typ", "jahrgang", "schuljahr", "leitung", "anzahl_mitglieder"]
     list_filter = ["schuljahr", "typ", "jahrgang"]
     search_fields = ["name", "kuerzel"]
-    autocomplete_fields = ["leitung"]
+    autocomplete_fields = ["leitung", "leitung2"]
     inlines = [GruppenMitgliederInline]
     actions = ["aus_stammklassen_fuellen"]
 
@@ -471,10 +473,25 @@ class MitgliedschaftAdmin(SimpleHistoryAdmin):
     autocomplete_fields = ["schueler", "gruppe"]
 
 
+@admin.register(Fachbereich)
+class FachbereichAdmin(admin.ModelAdmin):
+    list_display = ["name", "leitung", "leitung2", "farbe", "reihenfolge"]
+    list_editable = ["reihenfolge"]
+    autocomplete_fields = ["leitung", "leitung2"]
+    search_fields = ["name", "name_en"]
+
+
+@admin.register(Stundentafel)
+class StundentafelAdmin(admin.ModelAdmin):
+    list_display = ["jahrgang", "fach", "wochenstunden"]
+    list_filter = ["jahrgang", "fach"]
+
+
 @admin.register(Fach)
 class FachAdmin(admin.ModelAdmin):
-    list_display = ["kuerzel", "name", "name_en", "reihenfolge", "zeugnisrolle", "zeugnisspalte", "auf_zeugnis"]
-    list_editable = ["reihenfolge", "zeugnisrolle", "zeugnisspalte", "auf_zeugnis"]
+    list_display = ["kuerzel", "name", "name_en", "reihenfolge", "zeugnisrolle", "zeugnisspalte", "auf_zeugnis", "fachbereich", "farbe"]
+    list_editable = ["reihenfolge", "zeugnisrolle", "zeugnisspalte", "auf_zeugnis", "fachbereich", "farbe"]
+    list_filter = ["fachbereich"]
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)

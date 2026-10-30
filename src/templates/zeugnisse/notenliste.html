@@ -44,7 +44,7 @@
   <table class="zg-matrix nl-matrix">
     <thead><tr>
       <th class="links">{% translate "Schüler:in" %}</th>
-      {% for f in spalten %}<th title="{{ f.lokal_name }}">{{ f.kuerzel }}</th>{% endfor %}
+      {% for f in spalten %}<th title="{{ f.lokal_name }}{% if f.fachbereich %} · {{ f.fachbereich.lokal_name }}{% endif %}"{% if f.anzeigefarbe %} style="box-shadow: inset 0 3px 0 {{ f.anzeigefarbe }}"{% endif %}>{{ f.kuerzel }}</th>{% endfor %}
       <th>Ø</th><th class="links">{% translate "Vorschlag" %}</th>
     </tr></thead>
     <tbody>

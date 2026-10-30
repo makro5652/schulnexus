@@ -25,7 +25,7 @@
         <td>{% if z.konferenz %}{{ z.konferenz.get_status_display }}{% if z.konferenz.datum %} · {{ z.konferenz.datum|kurzdatum }}{% endif %}{% else %}<span class="leise">–</span>{% endif %}</td>
         <td class="zahl">{{ z.freigegeben }}/{{ z.anzahl }}</td>
         <td>{% if z.gesperrt %}<span class="etikett warnend">{% translate "gesperrt" %}</span>{% elif z.teilweise %}<span class="etikett">{% translate "teilweise gesperrt" %}</span>{% else %}<span class="etikett">{% translate "offen" %}</span>{% endif %}
-          <small class="blockzeile leise">{% if z.explizit %}{% if z.explizit.gesperrt %}{% translate "von Hand gesperrt" %}{% else %}{% translate "von Hand freigegeben" %}{% if z.freigegeben %} · <a href="{% url 'zeugnis_klasse' z.k.pk a.pk %}" class="auffaellig">{% blocktranslate count n=z.freigegeben %}{{ n }} Zeugnis freigegeben – Zeugnisnoten bleiben gesperrt{% plural %}{{ n }} Zeugnisse freigegeben – Zeugnisnoten bleiben gesperrt{% endblocktranslate %}</a>{% endif %}{% endif %} · {{ z.explizit.geaendert_von.get_username|default:"" }} · {{ z.explizit.geaendert_am|date:"SHORT_DATETIME_FORMAT" }}{% if z.explizit.grund %} · {{ z.explizit.grund }}{% endif %}{% elif z.konferenz_gehalten %}{% translate "automatisch: Konferenz durchgeführt" %}{% elif z.teilweise %}{% translate "automatisch: einzelne Zeugnisse freigegeben" %}{% else %}{% translate "automatisch" %}{% endif %}</small></td>
+          <small class="blockzeile leise">{% if z.explizit %}{% if z.explizit.gesperrt %}{% translate "von Hand gesperrt" %}{% else %}{% translate "von Hand freigegeben" %}{% if z.freigegeben %} · <a href="{% url 'zeugnis_klasse' z.k.pk a.pk %}" class="auffaellig">{% blocktranslate count n=z.freigegeben %}{{ n }} Zeugnis freigegeben – Zeugnisnoten bleiben gesperrt{% plural %}{{ n }} Zeugnisse freigegeben – Zeugnisnoten bleiben gesperrt{% endblocktranslate %}</a>{% endif %}{% endif %} · {{ z.explizit.geaendert_von.get_username|default:"" }} · {{ z.explizit.geaendert_am|date:"SHORT_DATETIME_FORMAT" }}{% if z.explizit.grund %} · {{ z.explizit.grund }}{% endif %}{% elif z.konferenz_gehalten %}{% translate "automatisch: Konferenz durchgeführt" %}{% elif z.schluss_vorbei %}{% blocktranslate with datum=z.schluss.datum|kurzdatum %}automatisch: Notenschluss am {{ datum }}{% endblocktranslate %}{% elif z.teilweise %}{% translate "automatisch: einzelne Zeugnisse freigegeben" %}{% else %}{% translate "automatisch" %}{% if z.schluss %} · {% blocktranslate with datum=z.schluss.datum|kurzdatum %}Notenschluss am {{ datum }}{% endblocktranslate %}{% endif %}{% endif %}</small></td>
         <td>
           <form method="post" class="ns-form">{% csrf_token %}<input type="hidden" name="abschnitt" value="{{ a.pk }}"><input type="hidden" name="klasse" value="{{ z.k.pk }}">
             <input name="grund" maxlength="200" placeholder="{% translate 'Grund (optional)' %}" aria-label="{% translate 'Grund' %}">
@@ -38,4 +38,26 @@
   {% else %}<p class="leer">{% translate "Keine Klassen in Ihrem Bereich für dieses Halbjahr." %}</p>{% endif %}
   <p class="hinweistext">{% translate "„Zur Korrektur freigeben“ hebt die automatische Sperre auf, bis die Klasse wieder gesperrt oder auf Automatik gestellt wird. Eine einzelne bereits freigegebene Zeugnisnote ändert man weiterhin über die Rücknahme der Zeugnisfreigabe. Alle Schritte stehen im Protokoll." %}</p>
 </section>
+
+{% if a %}
+<section class="karte" id="notenschluss">
+  <div class="karte-kopf"><h2>{% translate "Notenschluss" %}</h2>
+    <span class="leise">{% translate "Nach dem Datum sperrt Schulnexus die Noten der Jahrgänge automatisch – wie nach der Konferenz." %}</span></div>
+  {% if schluesse %}<table class="liste kompakt">
+    <thead><tr><th>{% translate "Jahrgänge" %}</th><th>{% translate "Notenschluss am" %}</th><th>{% translate "Stand" %}</th><th></th></tr></thead>
+    <tbody>{% for n in schluesse %}<tr>
+      <td>{{ n.jahrgang_von }}–{{ n.jahrgang_bis }}</td><td>{{ n.datum|kurzdatum }}</td>
+      <td>{% if n.datum < heute %}<span class="etikett warnend">{% translate "gesperrt" %}</span>{% else %}<span class="etikett">{% translate "offen" %}</span>{% endif %} <small class="leise">{{ n.angelegt_von.get_username|default:"" }}</small></td>
+      <td>{% if n.darf %}<form method="post">{% csrf_token %}<input type="hidden" name="abschnitt" value="{{ a.pk }}"><input type="hidden" name="schluss" value="{{ n.pk }}">
+        <button type="submit" name="aktion" value="schluss_loeschen" class="link">{% translate "löschen" %}</button></form>{% endif %}</td>
+    </tr>{% endfor %}</tbody></table>{% endif %}
+  <form method="post" class="ns-form ns-schluss">{% csrf_token %}<input type="hidden" name="abschnitt" value="{{ a.pk }}">
+    <label>{% translate "ab Jahrgang" %} <input type="number" name="von" min="1" max="13" required></label>
+    <label>{% translate "bis Jahrgang" %} <input type="number" name="bis" min="1" max="13" required></label>
+    <label>{% translate "Notenschluss am" %} <input type="date" name="datum" min="{{ a.beginn|date:'Y-m-d' }}" max="{{ a.ende|date:'Y-m-d' }}" required></label>
+    <button type="submit" name="aktion" value="schluss_neu" class="knopf klein">{% translate "Notenschluss eintragen" %}</button>
+  </form>
+  <p class="hinweistext">{% translate "„Zur Korrektur freigeben“ bei einer Klasse geht dem Notenschluss vor." %}</p>
+</section>
+{% endif %}
 {% endblock %}

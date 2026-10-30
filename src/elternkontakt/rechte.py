@@ -106,6 +106,6 @@ def darf_zeugnisempfang(user, klasse) -> bool:
     if ist_verwaltung(user):
         return True
     person = getattr(user, "person", None)
-    if person and klasse.leitung_id and klasse.leitung.person_id == person.pk:
+    if person and any(p is not None and p.person_id == person.pk for p in (klasse.leitung, klasse.leitung2)):
         return True
     return klasse.jahrgang in koordinierte_jahrgaenge(user)

@@ -564,6 +564,15 @@ class Gruppe(models.Model):
         Personalprofil, null=True, blank=True, on_delete=models.SET_NULL,
         related_name="geleitete_gruppen", verbose_name=_("Leitung (Klassenleitung / AG-Leitung)"),
     )
+    # ab 0.4.16.0: Stellvertretung mit denselben Rechten wie die Klassenleitung, Klassenraum, Höchstzahl
+    leitung2 = models.ForeignKey(
+        Personalprofil, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="vertretene_gruppen", verbose_name=_("Stellvertretende Leitung"),
+        help_text=_("Hat dieselben Rechte wie die Klassenleitung."),
+    )
+    raum = models.CharField(_("Klassenraum"), max_length=40, blank=True)
+    kapazitaet = models.PositiveSmallIntegerField(_("Höchstzahl Schüler:innen"), null=True, blank=True,
+                                                  help_text=_("leer = keine Grenze; beim Zuordnen wird gewarnt"))
     gebildet_aus = models.ManyToManyField(
         "self", symmetrical=False, blank=True, related_name="abgeleitete_gruppen",
         limit_choices_to={"typ": STAMMKLASSE}, verbose_name=_("Gebildet aus (Stammklassen)"),
@@ -640,6 +649,30 @@ class Mitgliedschaft(models.Model):
         super().save(*args, **kwargs)
 
 
+class Fachbereich(LokalerNameMixin, models.Model):
+    """Fachbereich / Fachschaft (ab 0.4.16.0), z. B. Naturwissenschaften, mit bis zu zwei Fachleitungen."""
+
+    name = models.CharField(_("Bezeichnung"), max_length=80, unique=True, help_text=_("z. B. Naturwissenschaften"))
+    name_en = models.CharField(_("Bezeichnung (Englisch)"), max_length=80, blank=True)
+    leitung = models.ForeignKey(Personalprofil, null=True, blank=True, on_delete=models.SET_NULL, related_name="fachbereiche",
+                                verbose_name=_("Fachleitung"))
+    leitung2 = models.ForeignKey(Personalprofil, null=True, blank=True, on_delete=models.SET_NULL, related_name="fachbereiche2",
+                                 verbose_name=_("Zweite Fachleitung"))
+    farbe = models.CharField(_("Farbe"), max_length=7, blank=True, help_text=_("z. B. #2E7D6B; gilt für Fächer ohne eigene Farbe"))
+    reihenfolge = models.PositiveSmallIntegerField(_("Reihenfolge"), default=10)
+
+    class Meta:
+        verbose_name = _("Fachbereich")
+        verbose_name_plural = _("Fachbereiche")
+        ordering = ["reihenfolge", "name"]
+
+    def __str__(self):
+        return self.lokal_name
+
+    def leitungen(self):
+        return [p for p in (self.leitung, self.leitung2) if p is not None]
+
+
 class Fach(LokalerNameMixin, models.Model):
     kuerzel = models.CharField(_("Kürzel"), max_length=10, unique=True, help_text=_("wie im Stundenplan, z. B. CH"))
     name = models.CharField(_("Bezeichnung"), max_length=60)
@@ -664,6 +697,9 @@ class Fach(LokalerNameMixin, models.Model):
         help_text=_("Muster: links Sprachen, Gesellschaftswissenschaften, Religion; rechts Mathematik, Naturwissenschaften, Kunst, Musik, Sport."),
     )
     auf_zeugnis = models.BooleanField(_("Auf dem Zeugnis ausweisen"), default=True)
+    fachbereich = models.ForeignKey(Fachbereich, null=True, blank=True, on_delete=models.SET_NULL, related_name="faecher",
+                                    verbose_name=_("Fachbereich"))
+    farbe = models.CharField(_("Farbe"), max_length=7, blank=True, help_text=_("z. B. #4A90D9; für Übersichten und den Stundenplan"))
 
     class Meta:
         verbose_name = _("Fach")
@@ -672,6 +708,33 @@ class Fach(LokalerNameMixin, models.Model):
 
     def __str__(self):
         return f"{self.lokal_name} ({self.kuerzel})"
+
+    @property
+    def anzeigefarbe(self):
+        return self.farbe or (self.fachbereich.farbe if self.fachbereich_id else "")
+
+
+class Stundentafel(models.Model):
+    """Wochenstunden je Fach und Jahrgang (ab 0.4.16.0) – Vorgabe für neuen Unterricht und die Übersicht der Deputate."""
+
+    fach = models.ForeignKey(Fach, on_delete=models.CASCADE, related_name="stundentafel", verbose_name=_("Fach"))
+    jahrgang = models.PositiveSmallIntegerField(_("Jahrgang"))
+    wochenstunden = models.DecimalField(_("Wochenstunden"), max_digits=4, decimal_places=1)
+
+    class Meta:
+        verbose_name = _("Stundentafel")
+        verbose_name_plural = _("Stundentafel")
+        unique_together = [("fach", "jahrgang")]
+        ordering = ["jahrgang", "fach__reihenfolge"]
+
+    def __str__(self):
+        return f"{self.fach.kuerzel} Jg. {self.jahrgang}: {self.wochenstunden}"
+
+    @classmethod
+    def stunden(cls, fach_id, jahrgang):
+        if not jahrgang:
+            return None
+        return cls.objects.filter(fach_id=fach_id, jahrgang=jahrgang).values_list("wochenstunden", flat=True).first()
 
 
 class Einwilligung(models.Model):

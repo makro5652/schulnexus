@@ -1167,3 +1167,40 @@ td.zn-abweichung small { color: #c06a1c; font-weight: 600; }
 .nl-zeile { display: flex; flex-wrap: wrap; gap: 0.5rem 0.8rem; align-items: center; }
 .nl-zeile label { display: flex; gap: 0.5rem; align-items: center; }
 .nl-matrix tbody tr { border-bottom: 1px solid var(--linie); }
+
+/* Textbausteine für Zeugniskommentare (ab 0.4.16.0) */
+.zg-bausteine { margin: 0.5rem 0; }
+.zg-bausteine > summary { cursor: pointer; color: var(--akzent); font-weight: 600; font-size: 0.9rem; }
+.zg-bausteingruppe { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; margin-top: 0.5rem; }
+.zg-baustein { font: inherit; font-size: 0.82rem; padding: 0.25rem 0.65rem; border-radius: 999px; border: 1px solid var(--linie); background: var(--flaeche); color: var(--text); cursor: pointer; }
+.zg-baustein:hover { border-color: var(--akzent); color: var(--akzent); }
+
+/* Stundentafel, Fachfarben (ab 0.4.16.0) */
+.st-tabelle input { width: 3.6rem; text-align: right; font: inherit; padding: 0.2rem 0.3rem; border: 1px solid var(--linie); border-radius: 5px; background: var(--grund); color: var(--text); }
+.st-farbe { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 3px; margin-right: 0.4rem; vertical-align: middle; }
+.zo-deputat-titel { font-size: 1rem; margin: 1.2rem 0 0.4rem; }
+/* Bewertungsstruktur kopieren (ab 0.4.16.0) */
+.ne-kopieren-raster { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.2rem; }
+.ne-kopieren-raster form { display: grid; gap: 0.5rem; align-content: start; }
+.ne-kopieren-raster h3 { font-size: 0.95rem; margin: 0; }
+.ne-zielliste { display: grid; gap: 0.2rem; max-height: 14rem; overflow-y: auto; padding: 0.3rem; border: 1px solid var(--linie); border-radius: 6px; }
+/* Noten nach Klasse: Fächer als Kacheln wie im Notenbuch (ab 0.4.16.0) */
+.nk-kacheln { list-style: none; margin: 0.6rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr)); gap: 0.4rem; }
+.nk-kachel { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 3.2rem; padding: 0.35rem 0.4rem;
+  border: 1px solid var(--linie); border-left: 5px solid var(--fachfarbe, var(--linie)); border-radius: 7px; background: var(--flaeche);
+  color: var(--text); text-decoration: none; line-height: 1.2; text-align: center; }
+.nk-kachel span { font-size: 0.75rem; color: var(--leise); }
+.nk-kachel strong { font-size: 0.92rem; }
+.nk-kachel:hover { border-color: var(--akzent); }
+.nk-kachel.mit-noten { background: var(--akzent-hell); }
+.nk-kachel-klasse { background: var(--hinweis-flaeche); border-left-color: var(--warnung); }
+.nk-kachel.aktiv { background: var(--akzent); border-color: var(--akzent); color: var(--flaeche); }
+.nk-kachel.aktiv span { color: inherit; opacity: 0.85; }
+.nk-legende { margin: 0.5rem 0 0; }
+.nk-punkt { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 3px; border: 1px solid var(--linie); background: var(--flaeche); vertical-align: middle; }
+.nk-punkt.mit-noten { background: var(--akzent-hell); }
+.nk-kursdetails { margin-top: 0.6rem; }
+.nk-kursdetails > summary { cursor: pointer; color: var(--akzent); }
+.ns-schluss { margin-top: 0.6rem; }
+.ns-schluss input[type=number] { width: 4.5rem; }
+.ns-schluss input[type=date] { width: auto; }

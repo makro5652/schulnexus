@@ -24,6 +24,23 @@
     t.addEventListener("input", zaehlen);
     zaehlen();
   });
+  // Textbausteine an der Schreibmarke einfügen (ab 0.4.16.0)
+  var kommentar = document.querySelector("textarea[name=kommentar]");
+  var benutzt = false;     // ohne Klick ins Feld kommt der Baustein ans Ende
+  if (kommentar) ["focus", "click", "keyup"].forEach(function (ev) { kommentar.addEventListener(ev, function () { benutzt = true; }); });
+  $$(".zg-baustein").forEach(function (b) {
+    b.addEventListener("click", function () {
+      if (!kommentar) return;
+      var v = kommentar.value, a = benutzt ? kommentar.selectionStart : v.length, e = benutzt ? kommentar.selectionEnd : v.length;
+      var vorher = v.slice(0, a), nachher = v.slice(e), text = b.dataset.text;
+      if (vorher && !/\s$/.test(vorher)) text = " " + text;
+      if (nachher && !/^\s/.test(nachher)) text = text + " ";
+      kommentar.value = vorher + text + nachher;
+      kommentar.selectionStart = kommentar.selectionEnd = (vorher + text).length;
+      kommentar.focus();
+      kommentar.dispatchEvent(new Event("input"));
+    });
+  });
   // Anmerkungsfelder wachsen mit
   $$(".zg-anmerken textarea").forEach(function (t) {
     t.addEventListener("input", function () { t.style.height = "auto"; t.style.height = t.scrollHeight + "px"; });

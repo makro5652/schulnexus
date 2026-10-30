@@ -1,9 +1,14 @@
-"""Seite „Notensperre“ (ab 0.4.8.0): Stand je Klasse und Halbjahr, sperren, freigeben, zurück zur Automatik."""
+"""Seite „Notensperre“ (ab 0.4.8.0): Stand je Klasse und Halbjahr, sperren, freigeben, zurück zur Automatik.
+Ab 0.4.16.0 zusätzlich Notenschluss-Termine je Jahrgangsbereich."""
+from datetime import timedelta
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import formats, timezone
+from django.utils.dateparse import parse_date
 from django.utils.translation import gettext, ngettext
 
 from sicherung.models import Protokoll
@@ -11,7 +16,7 @@ from stammdaten.models import Abschnitt, Gruppe, Mitgliedschaft
 
 from . import rechte
 from .ansichten import _abschnitt_waehlen
-from .models import Notensperre
+from .models import Notenschluss, Notensperre
 from .sperre import Sperrstand
 
 
@@ -23,6 +28,8 @@ def _darf_seite(user):
 def notensperre(request):
     if not _darf_seite(request.user):
         raise PermissionDenied
+    if request.method == "POST" and request.POST.get("aktion") in ("schluss_neu", "schluss_loeschen"):
+        return _notenschluss(request)
     if request.method == "POST":
         a = get_object_or_404(Abschnitt, pk=request.POST.get("abschnitt"))
         k = get_object_or_404(Gruppe, pk=request.POST.get("klasse"), typ=Gruppe.STAMMKLASSE)
@@ -68,6 +75,44 @@ def notensperre(request):
                            "konferenz_gehalten": stand.konferenz_gehalten(k.pk), "freigegeben": freigegeben,
                            "anzahl": len(mitglieder), "gesperrt": stand.klasse_gesperrt(k.pk),
                            "teilweise": not stand.klasse_gesperrt(k.pk) and freigegeben > 0
-                           and k.pk not in stand.explizit})
+                           and k.pk not in stand.explizit,
+                           "schluss": stand.notenschluss(k.pk), "schluss_vorbei": stand.schluss_vorbei(k.pk)})
 
-    return render(request, "noten/notensperre.html", {"abschnitte": abschnitte, "a": a, "zeilen": zeilen})
+    schluesse = [n for n in Notenschluss.objects.filter(abschnitt=a).select_related("angelegt_von")] if a else []
+    for n in schluesse:
+        n.darf = _darf_bereich(request.user, n.jahrgang_von, n.jahrgang_bis)
+    return render(request, "noten/notensperre.html", {"abschnitte": abschnitte, "a": a, "zeilen": zeilen, "schluesse": schluesse,
+                                                      "heute": timezone.localdate()})
+
+
+def _darf_bereich(user, von, bis):
+    return all(rechte.darf_noten_sperren(user, jg) for jg in range(von, bis + 1))
+
+
+def _notenschluss(request):
+    """Notenschluss-Termin anlegen oder löschen (ab 0.4.16.0)."""
+    a = get_object_or_404(Abschnitt, pk=request.POST.get("abschnitt"))
+    zurueck = redirect(reverse("notensperre") + f"?abschnitt={a.pk}")
+    if request.POST["aktion"] == "schluss_loeschen":
+        n = get_object_or_404(Notenschluss, pk=request.POST.get("schluss"), abschnitt=a)
+        if not _darf_bereich(request.user, n.jahrgang_von, n.jahrgang_bis):
+            raise PermissionDenied
+        Protokoll.schreiben(request.user, "noten", gettext("%(n)s gelöscht") % {"n": n})
+        n.delete()
+        messages.success(request, gettext("Notenschluss gelöscht."))
+        return zurueck
+    try:
+        von, bis = int(request.POST.get("von", "")), int(request.POST.get("bis", ""))
+        datum = parse_date(request.POST.get("datum", ""))
+    except ValueError:
+        von = bis = datum = None
+    if not (von and bis and datum) or bis < von:
+        messages.error(request, gettext("Bitte Jahrgänge (von ≤ bis) und Datum angeben."))
+        return zurueck
+    if not _darf_bereich(request.user, von, bis):
+        raise PermissionDenied
+    n = Notenschluss.objects.create(abschnitt=a, jahrgang_von=von, jahrgang_bis=bis, datum=datum, angelegt_von=request.user)
+    Protokoll.schreiben(request.user, "noten", gettext("%(n)s angelegt") % {"n": n})
+    messages.success(request, gettext("Notenschluss gespeichert: Ab dem %(tag)s sind die Noten der Jahrgänge %(von)s–%(bis)s gesperrt.")
+                     % {"tag": formats.date_format(datum + timedelta(days=1), "SHORT_DATE_FORMAT"), "von": von, "bis": bis})
+    return zurueck

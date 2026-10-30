@@ -205,6 +205,8 @@ class Unterricht(models.Model):
         help_text=_("Nur im 2. Halbjahr: so viel Prozent zählt das 1. Halbjahr im Vorschlag, z. B. 40. Leer oder 0 = nur 2. Halbjahr."),
     )
     vorhalbjahr_basis = models.CharField(_("Grundlage 1. Halbjahr"), max_length=8, choices=BASEN, default=SCHNITT)
+    wochenstunden = models.DecimalField(_("Wochenstunden"), max_digits=4, decimal_places=1, null=True, blank=True,
+                                        help_text=_("leer = laut Stundentafel des Jahrgangs"))
 
     class Meta:
         verbose_name = _("Unterricht")
@@ -756,3 +758,31 @@ class Zeugnisnotenfreigabe(models.Model):
             return None
         return (cls.objects.filter(jahrgang_von__lte=j, jahrgang_bis__gte=j)
                 .filter(Q(faecher__isnull=True) | Q(faecher=unterricht.fach_id)).distinct().first())
+
+
+class Notenschluss(models.Model):
+    """
+    Notenschluss zu einem Datum (ab 0.4.16.0): Ab dem Tag nach dem Datum sind die Noten der Klassen in den Jahrgängen
+    automatisch gesperrt – wie nach der Zeugniskonferenz. Eine ausdrückliche Notensperre bzw. Freigabe geht vor.
+    """
+
+    abschnitt = models.ForeignKey(Abschnitt, on_delete=models.CASCADE, related_name="notenschluesse", verbose_name=_("Halbjahr"))
+    jahrgang_von = models.PositiveSmallIntegerField(_("ab Jahrgang"))
+    jahrgang_bis = models.PositiveSmallIntegerField(_("bis Jahrgang"))
+    datum = models.DateField(_("Notenschluss am"), help_text=_("Letzter Tag, an dem Noten eingetragen werden können"))
+    angelegt_von = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="+",
+                                     verbose_name=_("Angelegt von"))
+    history = HistoricalRecords(verbose_name=_("Änderungsprotokoll Notenschluss"))
+
+    class Meta:
+        verbose_name = _("Notenschluss")
+        verbose_name_plural = _("Notenschlüsse (Termine)")
+        ordering = ["abschnitt", "jahrgang_von"]
+
+    def __str__(self):
+        return gettext("Notenschluss Jg. %(von)s–%(bis)s: %(datum)s") % {"von": self.jahrgang_von, "bis": self.jahrgang_bis,
+                                                                         "datum": self.datum.strftime("%d.%m.%Y")}
+
+    def clean(self):
+        if self.jahrgang_von and self.jahrgang_bis and self.jahrgang_bis < self.jahrgang_von:
+            raise ValidationError(_("„bis Jahrgang“ darf nicht vor „ab Jahrgang“ liegen."))

@@ -46,7 +46,8 @@ def klassen_und_kurse(user, abschnitt):
     """{Stammklasse: [Unterricht, …]} der für `user` sichtbaren Kurse im Halbjahr. Lerngruppen/Kurse erscheinen bei jeder
     Stammklasse, aus der sie Schüler:innen haben."""
     kurse = [u for u in Unterricht.objects.filter(abschnitt=abschnitt)
-             .select_related("fach", "gruppe", "lehrkraft__person", "skala", "abschnitt__schuljahr")
+             .select_related("fach__fachbereich__leitung", "fach__fachbereich__leitung2", "gruppe__leitung", "gruppe__leitung2",
+                             "lehrkraft__person", "skala", "abschnitt__schuljahr")
              if darf_unterricht_sehen(user, u)]
     stichtag = min(max(timezone.localdate(), abschnitt.beginn), abschnitt.ende)
     stammklasse_von = dict(Mitgliedschaft.objects.aktiv(stichtag)

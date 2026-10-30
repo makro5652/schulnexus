@@ -13,12 +13,13 @@ from django.utils import timezone
 from django.utils.translation import get_language, gettext, gettext_lazy as _, ngettext
 from django.views.decorators.http import require_POST
 
-from portal.rechte import ist_schulleitung, ist_verwaltung, personal_von
+from portal.rechte import darf_unterricht_sehen, ist_schulleitung, ist_verwaltung, personal_von
 from stammdaten.models import Abschnitt, Fach, Schuljahr
 
 from . import eingabe as E
 from . import kurswahl
 from . import sperre as S
+from . import strukturkopie as K
 from . import rechte
 from . import vorgaben as V
 from .berechnung import Baum, nominale_anteile
@@ -204,6 +205,8 @@ def noten_eintragen(request, pk, ln_pk=None):
 def struktur(request, pk):
     u = _unterricht(request, pk)
     gesperrt = S.gesperrte_schueler(u)
+    if request.method == "POST" and request.POST.get("aktion") in ("kopieren_von", "uebertragen"):
+        return _struktur_kopieren(request, u)
     if request.method == "POST":
         aktion, _sep, ziel = (request.POST.get("aktion") or "").partition(":")
         try:
@@ -277,7 +280,37 @@ def struktur(request, pk):
         "regel": regel, "ziele": ziele, "basen": Unterricht.BASEN, "gesperrt_anzahl": len(gesperrt),
         "ordner_liste": [(o, "\u00a0\u00a0\u00a0" * ebene + o.name) for o, ebene, _p in baum.in_reihenfolge() if ebene < Bewertungsordner.MAX_TIEFE - 1],
         "kurswahl": kurswahl.auswahl(request, u, nur_wenn_enthalten=True),
+        "kopierquellen": [q for q in K.quellen(u) if darf_unterricht_sehen(request.user, q)],
+        "kopierziele": K.ziele(u, request.user), "ziel_hindernis": K.hindernis(u),
     })
+
+
+def _struktur_kopieren(request, u):
+    """Bewertungsstruktur von einem anderen Kurs übernehmen bzw. auf andere Kurse übertragen (ab 0.4.16.0)."""
+    mit_ln = request.POST.get("mit_nachweisen") == "1"
+    if request.POST["aktion"] == "kopieren_von":
+        quelle = get_object_or_404(Unterricht, pk=request.POST.get("quelle"))
+        if not darf_unterricht_sehen(request.user, quelle):
+            raise PermissionDenied
+        paare = [(quelle, u)]
+    else:
+        erlaubt = {z.pk: z for z in K.ziele(u, request.user)}
+        paare = [(u, erlaubt[int(i)]) for i in request.POST.getlist("ziel") if i.isdigit() and int(i) in erlaubt]
+        if not paare:
+            messages.error(request, gettext("Bitte mindestens einen Kurs auswählen."))
+            return redirect("bewertungsstruktur", pk=u.pk)
+    for quelle, ziel in paare:
+        name = f"{ziel.fach.kuerzel} {ziel.gruppe.name}"
+        try:
+            n_o, n_ln, ueber = K.kopieren(quelle, ziel, mit_ln)
+        except ValueError as e:
+            messages.error(request, f"{name}: {e}")
+            continue
+        text = gettext("%(kurs)s: Struktur übernommen (%(o)s Ordner, %(ln)s Leistungsnachweise).") % {"kurs": name, "o": n_o, "ln": n_ln}
+        if ueber:
+            text += " " + gettext("Nicht übernommen, weil die oberste Ebene vorgegeben ist: %(liste)s.") % {"liste": ", ".join(ueber)}
+        messages.success(request, text)
+    return redirect("bewertungsstruktur", pk=u.pk)
 
 
 def _gewicht_pruefen(gewicht, art, wo):

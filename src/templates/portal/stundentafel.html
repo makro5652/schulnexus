@@ -1,0 +1,21 @@
+{% extends "portal/base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Stundentafel" %}{% endblock %}
+{% block inhaltsklasse %}breit{% endblock %}
+{% block inhalt %}
+<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › {% translate "Stundentafel" %}</p>
+<h1>{% translate "Stundentafel" %}</h1>
+<p class="unterzeile">{% translate "Wochenstunden je Fach und Jahrgang. Neuer Unterricht übernimmt diese Stunden; unter „Klassen und Gruppen“ erscheinen damit die Stunden je Lehrkraft." %}</p>
+<form method="post" class="karte">{% csrf_token %}
+  <div class="tabellenrahmen"><table class="liste kompakt st-tabelle">
+    <thead><tr><th>{% translate "Fach" %}</th>{% for j in jahrgaenge %}<th class="zahl">{% blocktranslate %}Jg. {{ j }}{% endblocktranslate %}</th>{% endfor %}</tr></thead>
+    <tbody>{% for z in zeilen %}<tr>
+      <th scope="row">{% if z.f.anzeigefarbe %}<span class="st-farbe" style="background:{{ z.f.anzeigefarbe }}"></span>{% endif %}{{ z.f.lokal_name }} <small class="leise">{{ z.f.kuerzel }}</small></th>
+      {% for c in z.zellen %}<td class="zahl"><input name="{{ c.feld }}" value="{{ c.wert|default_if_none:''|floatformat:'-1' }}" inputmode="decimal" size="3"
+        aria-label="{{ z.f.kuerzel }} {% blocktranslate with j=c.jg %}Jahrgang {{ j }}{% endblocktranslate %}"{% if not darf %} disabled{% endif %}></td>{% endfor %}
+    </tr>{% endfor %}</tbody>
+    <tfoot><tr><th>{% translate "Summe" %}</th>{% for s in summen %}<td class="zahl"><strong>{{ s|floatformat:"-1" }}</strong></td>{% endfor %}</tr></tfoot>
+  </table></div>
+  {% if darf %}<p><button type="submit" class="knopf">{% translate "Stundentafel speichern" %}</button></p>{% endif %}
+</form>
+{% endblock %}

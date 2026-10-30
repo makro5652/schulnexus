@@ -92,7 +92,7 @@ def _gruppen_fuer(user):
     if personal:
         from noten.models import Unterricht
 
-        q |= Q(leitung=personal, typ=Gruppe.STAMMKLASSE)
+        q |= Q(leitung=personal, typ=Gruppe.STAMMKLASSE) | Q(leitung2=personal, typ=Gruppe.STAMMKLASSE)
         q |= Q(pk__in=Unterricht.objects.filter(lehrkraft=personal, abschnitt__schuljahr=sj).values("gruppe"))
     jahrgaenge = koordinierte_jahrgaenge(user)
     if jahrgaenge:

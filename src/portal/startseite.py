@@ -46,7 +46,7 @@ def schnellzugriff(user, sj):
     personal = personal_von(user)
     klassen, kurse = [], []
     if personal and sj:
-        for g in Gruppe.objects.filter(leitung=personal, schuljahr=sj).order_by("typ", "name"):
+        for g in Gruppe.objects.filter(Q(leitung=personal) | Q(leitung2=personal), schuljahr=sj).order_by("typ", "name"):
             klassen.append({"titel": g.name, "unter": g.get_typ_display(), "url": reverse("klassenliste", args=[g.pk]),
                             "anzahl": Mitgliedschaft.objects.aktiv().filter(gruppe=g).count()})
         for u in (Unterricht.objects.filter(lehrkraft=personal, abschnitt__schuljahr=sj)
@@ -93,7 +93,7 @@ def sichtbare_schueler_fuer_geburtstage(user):
     if not personal:
         return qs.none()
     sj = Schuljahr.aktuelles()
-    geleitet = Mitgliedschaft.objects.aktiv().filter(gruppe__leitung=personal, gruppe__schuljahr=sj).values("schueler")
+    geleitet = Mitgliedschaft.objects.aktiv().filter(Q(gruppe__leitung=personal) | Q(gruppe__leitung2=personal), gruppe__schuljahr=sj).values("schueler")
     ids = unterrichtete_schueler_ids(user) | klassenleitung_schueler_ids(user) | koordinierte_schueler_ids(user)
     return qs.filter(Q(pk__in=ids) | Q(pk__in=geleitet))
 
