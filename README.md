@@ -794,6 +794,26 @@ Die Oberflächenprüfung lässt sich auch lokal ausführen (Playwright für Pyth
 
 Hinweis: Private Repositories haben ein monatliches Kontingent an Actions-Minuten (je nach Tarif; der genaue Wert sollte auf GitHub unter „Settings → Billing“ nachgesehen werden). Ein vollständiger Lauf dauert etwa 10–15 Minuten.
 
+## Maschinenlesbare Spezifikation
+
+`docs/schulnexus-spezifikation.json` beschreibt das gesamte Projekt so, dass eine KI es nachbauen kann: Zweck,
+Technik und Leitlinien, je Modul die fachlichen Regeln, alle Modelle mit Feldern, Beziehungen, Auswahlwerten und
+Verwaltungsoberfläche, alle Python-Module mit Klassen, Funktionen und Docstrings, URLs mit Ansichten, Rollen und
+Standardrechte, Umgebungsvariablen, Verwaltungsbefehle, Templates, CSS/JS, Tests (Fälle als Akzeptanzkriterien),
+Docker- und Server-Betrieb sowie eine Bau-Reihenfolge. Sie enthält nur die Programmstruktur, keine Daten.
+
+Neu erzeugen nach Änderungen am Code (die fachlichen Abschnitte stehen in `FACHLICH` im Skript):
+
+```sh
+# mit dem Image des Web-Containers (im Projektordner):
+docker run --rm -v "$PWD":/x -w /x --entrypoint python -e SECRET_KEY=x -e DATABASE_URL=postgres://x:x@localhost/x \
+  schulnexus-web tools/spezifikation_erzeugen.py > docs/schulnexus-spezifikation.json
+# oder mit lokal installierten Abhängigkeiten aus requirements.txt:
+SECRET_KEY=x DATABASE_URL=postgres://x:x@localhost/x python tools/spezifikation_erzeugen.py > docs/schulnexus-spezifikation.json
+```
+
+Eine Datenbank ist dafür nicht nötig.
+
 ## Noten schnell eintragen (ab 0.4.17.0)
 
 - **Vorlage über die Notenregel** (Schulleitung › Notenregeln): je Jahrgangsbereich und Fächern zwei vorgegebene Ordner,
