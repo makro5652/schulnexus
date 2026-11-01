@@ -133,11 +133,25 @@
   </div>
   {% if tabelle.gesperrt_anzahl %}<p class="ne-sperre">{% blocktranslate count n=tabelle.gesperrt_anzahl %}Die Noten von {{ n }} Schüler:in sind gesperrt (Zeugnisfreigabe bzw. Konferenz).{% plural %}Die Noten von {{ n }} Schüler:innen sind gesperrt (Zeugnisfreigabe bzw. Konferenz).{% endblocktranslate %}</p>{% endif %}
 
-  {% if not tabelle.spalten %}
-    <p class="leer">{% if tabelle.ordner_fehlen %}{% translate "Noch keine Bewertungsordner – bitte zuerst die Bewertungsstruktur anlegen (z. B. „Schriftlich“ und „Sonstige Mitarbeit“)." %}{% else %}{% translate "Noch keine Leistungsnachweise. Über „Neuer Leistungsnachweis“ oder die Excel-Tabelle anlegen." %}{% endif %}</p>
+  {% if tabelle.ordner_fehlen %}
+    <p class="leer">{% translate "Noch keine Bewertungsordner – bitte zuerst die Bewertungsstruktur anlegen (z. B. „Schriftlich“ und „Sonstige Mitarbeit“)." %}</p>
   {% else %}
   <form method="post" id="nk-form" data-verlassen="{% translate 'Es gibt ungespeicherte Eingaben.' %}" data-zaehler="{% translate 'Ungespeicherte Änderungen: %n' %}">{% csrf_token %}
-    {% if tabelle.darf_eintragen %}<p class="leise nk-hilfe">{% translate "Eingabe: 1+ … 6 (Tendenzen), e = entschuldigt, u = unentschuldigt, b = befreit, nb = nicht bewertbar; leeren = Note entfernen. Enter bzw. Pfeiltasten springen zur nächsten Zeile." %}</p>{% endif %}
+    <button type="submit" name="aktion" value="speichern" class="mb-unsichtbar" tabindex="-1" aria-hidden="true">{% translate "Speichern" %}</button>
+    {% if tabelle.neue_spalten %}
+    <div class="nk-neu" role="group" aria-label="{% translate 'Neue Spalte' %}">
+      <span class="leise">{% translate "Neue Spalte:" %}</span>
+      {% for k in tabelle.neue_spalten %}
+      <button type="submit" name="aktion" value="spalte:{{ k.ziel.pk }}" class="knopf zweitrangig klein"{% if k.voll %} disabled title="{% translate 'Höchstzahl erreicht' %}"{% endif %}>+ {{ k.label }}
+        <small>({{ k.anzahl }}{% if k.max is not None %}/{{ k.max }}{% endif %})</small></button>
+      {% endfor %}
+      <small class="leise">{% translate "speichert die Eingaben und legt eine Spalte mit heutigem Datum an" %}</small>
+    </div>
+    {% endif %}
+    {% if not tabelle.spalten %}
+    <p class="leer">{% translate "Noch keine Leistungsnachweise – oben „+ Klassenarbeit“ bzw. „+ SoMi-Note“ wählen." %}</p>
+    {% else %}
+    {% if tabelle.darf_eintragen %}<p class="leise nk-hilfe">{% translate "Eingabe: 1+ … 6 (Tendenzen), e = entschuldigt, u = unentschuldigt, b = befreit, nb = nicht bewertbar; leeren = Note entfernen. Enter bzw. Pfeiltasten springen zur nächsten Zeile. Das Gewicht jeder Spalte steht im Kopf." %}</p>{% endif %}
     <div class="rollbar nk-rollbar"><table class="noten nk-matrix">
       <thead>
         <tr><th class="links" rowspan="2">{% translate "Schüler:in" %}</th>
@@ -145,10 +159,14 @@
           {% for b in tabelle.bereiche %}<th rowspan="2" class="nk-erg">Ø {{ b }}</th>{% endfor %}
           <th rowspan="2" class="nk-erg">{% if tabelle.jahresnote %}{% translate "Jahres-schnitt" %}{% else %}{% translate "Halbjahres-schnitt" %}{% endif %}</th>
           <th rowspan="2" class="nk-erg">{% translate "Tendenz" %}</th><th rowspan="2" class="nk-erg">{% translate "Note (Vorschlag)" %}</th>
-          {% if tabelle.zeugnis_vorhanden %}<th rowspan="2" class="nk-erg nk-zn-kopf">{% translate "Zeugnisnote" %}</th>{% endif %}</tr>
+          {% if tabelle.zeugnis_vorhanden or tabelle.darf_zn %}<th rowspan="2" class="nk-erg nk-zn-kopf">{% translate "Zeugnisnote" %}</th>{% endif %}</tr>
         <tr>{% for sp in tabelle.spalten %}
-          <th class="nk-ln" scope="col">{% if tabelle.darf_eintragen %}<a href="{% url 'noten_bearbeiten' kurs.pk sp.ln.pk %}" title="{% translate 'Leistungsnachweis bearbeiten' %}">{{ sp.ln.titel }}</a>{% else %}{{ sp.ln.titel }}{% endif %}
-            <small>{{ sp.ln.datum|kurzdatum }} · {{ sp.gewicht }}{% if sp.nur_lesen %} · {% translate "BE" %}{% endif %}</small></th>
+          <th class="nk-ln{% if request.GET.neu == sp.ln.pk|stringformat:'s' %} nk-neu-spalte{% endif %}" scope="col">{% if tabelle.darf_eintragen %}<a href="{% url 'noten_bearbeiten' kurs.pk sp.ln.pk %}" title="{% translate 'Leistungsnachweis bearbeiten (Titel, Datum, Kommentare)' %}">{{ sp.ln.titel }}</a>{% else %}{{ sp.ln.titel }}{% endif %}
+            <small>{{ sp.ln.datum|kurzdatum }}{% if sp.nur_lesen %} · {% translate "BE" %}{% endif %}</small>
+            {% if sp.gewicht_bearbeitbar %}<label class="nk-gewicht" title="{% translate 'Gewicht dieser Spalte' %}">{% if sp.prozent %}%{% else %}×{% endif %}
+              <input type="text" name="g_{{ sp.ln.pk }}" value="{{ sp.gewicht_zahl }}" data-gewicht="{{ sp.gewicht_zahl }}" inputmode="decimal" size="3" autocomplete="off"
+                aria-label="{% translate 'Gewicht' %} {{ sp.ln.titel }}"><input type="hidden" name="go_{{ sp.ln.pk }}" value="{{ sp.gewicht_zahl }}"></label>
+            {% else %}<small>{{ sp.gewicht }}</small>{% endif %}</th>
         {% endfor %}</tr>
       </thead>
       <tbody>{% for z in tabelle.zeilen %}
@@ -163,12 +181,23 @@
           <td class="nk-erg"><strong>{% if z.vorschlag.schnitt is not None %}{{ z.vorschlag.schnitt|floatformat:2 }}{% else %}–{% endif %}</strong></td>
           <td class="nk-erg">{{ z.vorschlag.stufe.bezeichnung|default:"–" }}</td>
           <td class="nk-erg{% if z.vorschlag.gefaehrdet %} nk-gefaehrdet{% endif %}"><strong>{% if z.ganz is not None %}{{ z.ganz|floatformat:0 }}{% else %}–{% endif %}</strong></td>
-          {% if tabelle.zeugnis_vorhanden %}<td class="nk-erg nk-zn-zelle"><strong>{{ z.zeugnisnote|default:"–" }}</strong>{% if z.zeugnis_quelle %}<small class="blockzeile nk-quelle-text">● {{ z.zeugnis_quelle }}</small>{% endif %}</td>{% endif %}
+          {% if tabelle.zeugnis_vorhanden or tabelle.darf_zn %}<td class="nk-erg nk-zn-zelle{% if z.zn_fehler %} nk-fehler{% endif %}"{% if z.zn_fehler %} title="{{ z.zn_fehler }}"{% endif %}>
+            {% if z.zn_wahl %}{% with wert=z.zn_eingabe|default_if_none:z.zn_wert %}
+              <select name="zk_{{ z.s.pk }}" data-zn="{{ z.zn_wert }}" aria-label="{% translate 'Zeugnisnote' %} {{ z.s.person }}">
+                <option value="">{% if z.zn_auto %}{% blocktranslate with n=z.zn_auto %}auto: {{ n }}{% endblocktranslate %}{% else %}{% translate "automatisch" %}{% endif %}</option>
+                {% for w, text in tabelle.zn_optionen %}<option value="{{ w }}"{% if w == wert %} selected{% endif %}>{{ text }}</option>{% endfor %}
+                <option value="nb"{% if wert == "nb" %} selected{% endif %}>nb</option>
+                <option value="befreit"{% if wert == "befreit" %} selected{% endif %}>{% translate "befreit" %}</option>
+              </select><input type="hidden" name="zko_{{ z.s.pk }}" value="{{ z.zn_wert }}">{% endwith %}
+              {% if z.zn_fehler %}<small class="blockzeile fehler">{{ z.zn_fehler }}</small>{% endif %}
+            {% else %}<strong>{{ z.zeugnisnote|default:"–" }}</strong>{% if z.zeugnis_quelle %}<small class="blockzeile nk-quelle-text">● {{ z.zeugnis_quelle }}</small>{% endif %}{% endif %}</td>{% endif %}
         </tr>{% endfor %}
       </tbody>
     </table></div>
+    {% if tabelle.darf_zn %}<p class="leise nk-hilfe">{% translate "Zeugnisnote: „auto“ übernimmt die gerundete Note aus den Einzelnoten und rechnet bei jeder Änderung mit. Wer eine andere Note festsetzt, überschreibt sie; „auto“ stellt wieder zurück." %}</p>{% endif %}
     {% if tabelle.zeugnis_quellen %}<p class="nk-hinweis" role="note">● {% translate "Zeugnisnoten:" %} {{ tabelle.zeugnis_quellen|join:"; " }}. {% translate "Sie gelten für das Zeugnis." %}</p>{% endif %}
-    {% if tabelle.darf_eintragen %}<p class="nk-speichern"><button type="submit" class="knopf" name="aktion" value="speichern">{% translate "Änderungen speichern" %}</button>
+    {% endif %}
+    {% if tabelle.darf_eintragen or tabelle.darf_zn %}<p class="nk-speichern"><button type="submit" class="knopf" name="aktion" value="speichern">{% translate "Änderungen speichern" %}</button>
       <span class="leise" id="nk-zaehler" aria-live="polite"></span></p>{% endif %}
   </form>
   {{ tabelle.erlaubt|json_script:"nk-erlaubt" }}

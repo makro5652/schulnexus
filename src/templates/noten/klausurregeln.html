@@ -13,12 +13,13 @@
     <h2>{% translate "Regeln" %}</h2>
     {% if regeln %}
     <div class="rollbar"><table class="liste">
-      <thead><tr><th>{% translate "Fächer" %}</th><th>{% translate "Jahrgänge" %}</th><th class="zahl">{% translate "Klausuren" %}</th><th class="zahl">{% translate "Sonstige" %}</th><th class="zahl">{% translate "Kurse" %}</th><th></th></tr></thead>
+      <thead><tr><th>{% translate "Fächer" %}</th><th>{% translate "Jahrgänge" %}</th><th class="zahl">{% translate "Klausuren" %}</th><th class="zahl">{% translate "Sonstige" %}</th><th class="zahl">{% translate "Höchstzahl je Halbjahr" %}</th><th class="zahl">{% translate "Kurse" %}</th><th></th></tr></thead>
       <tbody>{% for r in regeln %}
         <tr{% if regel and r.pk == regel.pk %} class="ausgewaehlt"{% endif %}>
           <td>{% for f in r.faecher.all %}{{ f.lokal_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if r.bemerkung %}<small class="blockzeile leise">{{ r.bemerkung }}</small>{% endif %}</td>
           <td>{{ r.jahrgang_von }}–{{ r.jahrgang_bis }}</td>
           <td class="zahl">{{ r.anteil_klausur|floatformat:-2 }} %</td><td class="zahl">{{ r.anteil_mitarbeit|floatformat:-2 }} %</td>
+          <td class="zahl">{{ r.max_klausuren|default_if_none:"–" }} / {{ r.max_mitarbeit|default_if_none:"–" }}</td>
           <td class="zahl">{{ r.kurse }}</td>
           <td class="aktionen"><a href="{% url 'klausurregel_bearbeiten' r.pk %}">{% translate "Bearbeiten" %}</a>
             <form method="post" action="{% url 'klausurregel_loeschen' r.pk %}" class="zg-inline" onsubmit="return confirm('{% translate "Regel löschen? Die Ordner in den Kursen bleiben erhalten, sind dann aber frei bearbeitbar." as f %}{{ f|escapejs }}')">{% csrf_token %}<button type="submit" class="link">{% translate "löschen" %}</button></form></td>
@@ -42,6 +43,11 @@
         <label class="sy-feld">{{ form.name_klausur.label }} {{ form.name_klausur }}</label>
         <label class="sy-feld">{{ form.name_mitarbeit.label }} {{ form.name_mitarbeit }}{% for e in form.name_mitarbeit.errors %}<small class="fehler">{{ e }}</small>{% endfor %}</label>
       </div>
+      <div class="lb-zwei sy-zeitraum">
+        <label class="sy-feld">{{ form.max_klausuren.label }} {{ form.max_klausuren }}{% for e in form.max_klausuren.errors %}<small class="fehler">{{ e }}</small>{% endfor %}</label>
+        <label class="sy-feld">{{ form.max_mitarbeit.label }} {{ form.max_mitarbeit }}{% for e in form.max_mitarbeit.errors %}<small class="fehler">{{ e }}</small>{% endfor %}</label>
+      </div>
+      <p class="hinweistext">{% translate "Leer = keine Grenze. Lehrkräfte legen Leistungsnachweise bis zur Höchstzahl an; das Gewicht jeder Note der sonstigen Mitarbeit stellen sie selbst ein." %}</p>
       <label class="sy-feld">{{ form.bemerkung.label }} {{ form.bemerkung }}<small class="leise">{{ form.bemerkung.help_text }}</small></label>
       <div class="knopfreihe"><button type="submit" class="knopf">{% translate "Speichern und anwenden" %}</button>
         {% if regel %}<a class="knopf zweitrangig" href="{% url 'klausurregeln' %}">{% translate "Abbrechen" %}</a>{% endif %}</div>

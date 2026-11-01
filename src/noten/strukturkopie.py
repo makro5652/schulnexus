@@ -56,7 +56,7 @@ def kopieren(quelle, ziel, mit_nachweisen=False):
     n_ln = 0
     if mit_nachweisen and quelle.abschnitt_id == ziel.abschnitt_id:
         for ln in Leistungsnachweis.objects.filter(unterricht=quelle).order_by("datum", "pk"):
-            if ln.ordner_id not in zuordnung:
+            if ln.ordner_id not in zuordnung or zuordnung[ln.ordner_id].voll():     # Höchstzahl laut Notenregel
                 continue
             neu = Leistungsnachweis.objects.create(
                 ordner=zuordnung[ln.ordner_id], titel=ln.titel, datum=ln.datum, gewicht=ln.gewicht,

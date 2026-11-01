@@ -1204,3 +1204,11 @@ td.zn-abweichung small { color: #c06a1c; font-weight: 600; }
 .ns-schluss { margin-top: 0.6rem; }
 .ns-schluss input[type=number] { width: 4.5rem; }
 .ns-schluss input[type=date] { width: auto; }
+/* Noten nach Klasse: neue Spalten, Gewicht im Kopf, Zeugnisnote wählbar (ab 0.4.17.0) */
+.nk-neu { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin: 0.4rem 0 0.8rem; }
+.nk-neu .knopf small { font-weight: 400; opacity: 0.75; }
+.nk-gewicht { display: flex; align-items: center; justify-content: center; gap: 0.2rem; font-size: 0.72rem; color: var(--leise); margin-top: 0.2rem; }
+.nk-gewicht input { width: 3.2rem; font: inherit; font-size: 0.8rem; text-align: center; padding: 0.1rem 0.2rem; border: 1px solid var(--linie); border-radius: 5px; background: var(--grund); color: var(--text); }
+.nk-gewicht input.geaendert, .nk-zn-zelle select.geaendert { border-color: var(--akzent); box-shadow: 0 0 0 2px var(--akzent-hell); }
+.nk-zn-zelle select { font: inherit; font-size: 0.85rem; padding: 0.15rem 0.3rem; border: 1px solid var(--linie); border-radius: 5px; background: var(--grund); color: var(--text); }
+th.nk-neu-spalte { background: var(--akzent-hell); }

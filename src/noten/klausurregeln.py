@@ -19,12 +19,15 @@ from .models import Klausurregel, Zeugnisnotenfreigabe
 class RegelForm(forms.ModelForm):
     class Meta:
         model = Klausurregel
-        fields = ["faecher", "jahrgang_von", "jahrgang_bis", "anteil_klausur", "name_klausur", "name_mitarbeit", "bemerkung"]
+        fields = ["faecher", "jahrgang_von", "jahrgang_bis", "anteil_klausur", "name_klausur", "name_mitarbeit",
+                  "max_klausuren", "max_mitarbeit", "bemerkung"]
         widgets = {
             "faecher": forms.CheckboxSelectMultiple,
             "jahrgang_von": forms.NumberInput(attrs={"min": 1, "max": 13}),
             "jahrgang_bis": forms.NumberInput(attrs={"min": 1, "max": 13}),
             "anteil_klausur": forms.TextInput(attrs={"inputmode": "decimal", "size": 5}),
+            "max_klausuren": forms.NumberInput(attrs={"min": 0, "max": 20}),
+            "max_mitarbeit": forms.NumberInput(attrs={"min": 0, "max": 99}),
         }
 
     def __init__(self, *args, **kwargs):

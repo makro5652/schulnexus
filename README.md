@@ -794,6 +794,19 @@ Die Oberflächenprüfung lässt sich auch lokal ausführen (Playwright für Pyth
 
 Hinweis: Private Repositories haben ein monatliches Kontingent an Actions-Minuten (je nach Tarif; der genaue Wert sollte auf GitHub unter „Settings → Billing“ nachgesehen werden). Ein vollständiger Lauf dauert etwa 10–15 Minuten.
 
+## Noten schnell eintragen (ab 0.4.17.0)
+
+- **Vorlage über die Notenregel** (Schulleitung › Notenregeln): je Jahrgangsbereich und Fächern zwei vorgegebene Ordner,
+  z. B. „Klassenarbeiten“ (bzw. „Klausuren“) und „Sonstige Mitarbeit“ mit festem Anteil. Neu: **Höchstzahl je Halbjahr**
+  (Standard 2 Klassenarbeiten/Klausuren und 30 Noten sonstige Mitarbeit; leer = keine Grenze). Die Grenze gilt beim
+  Anlegen, im Excel-Import, beim Kopieren der Struktur und beim Verschieben eines Leistungsnachweises.
+- **Noten nach Klasse › Fach:** Über der Tabelle legen „+ Klassenarbeit (1/2)“ und „+ SoMi-Note (5/30)“ sofort eine neue
+  Spalte mit heutigem Datum an (vorher werden die Eingaben gespeichert); der Cursor steht danach in der neuen Spalte.
+  Das **Gewicht jeder Spalte** steht im Tabellenkopf und lässt sich direkt ändern (z. B. 0,5 für eine kurze
+  Mitarbeitsphase). Titel, Datum und Kommentare über den Spaltentitel.
+- **Zeugnisnote:** In der letzten Spalte wählt die Lehrkraft eine Note – oder lässt „auto“ stehen (gerundete Note aus
+  den Einzelnoten, rechnet bei jeder Änderung mit). Sie muss also nichts eintragen, kann aber.
+
 ## Neu in 0.4.16.0 (angelehnt an Ed-admin)
 
 - **Noten nach Klasse als Kacheln:** Nach der Klassenwahl stehen alle Fächer der Klasse als Kacheln mit Fach- und

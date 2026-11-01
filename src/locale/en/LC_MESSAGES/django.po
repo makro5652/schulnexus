@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 18:29+0300\n"
+"POT-Creation-Date: 2026-11-01 12:52+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: aufnahme/admin.py:25 templates/elternkontakt/regeln.html:18
-#: templates/noten/klausurregeln.html:16 templates/noten/klausurregeln.html:59
+#: templates/noten/klausurregeln.html:16 templates/noten/klausurregeln.html:65
 #: templates/noten/notensperre.html:47
 msgid "Jahrgänge"
 msgstr "Year groups"
@@ -208,7 +208,7 @@ msgstr "School management"
 #: aufnahme/models.py:69 elternkontakt/models.py:197 foerderung/models.py:23
 #: foerderung/models.py:37 laufbahn/ansichten.py:37 noten/export.py:178
 #: noten/models.py:40 noten/models.py:117 noten/models.py:157
-#: noten/models.py:353 noten/models.py:544 stammdaten/models.py:22
+#: noten/models.py:388 noten/models.py:587 stammdaten/models.py:22
 #: stammdaten/models.py:56 stammdaten/models.py:201 stammdaten/models.py:358
 #: stammdaten/models.py:560 stammdaten/models.py:655 stammdaten/models.py:678
 #: stammdaten/models.py:853 stammdaten/models.py:923 stammdaten/models.py:1044
@@ -217,7 +217,7 @@ msgid "Bezeichnung"
 msgstr "Name"
 
 #: aufnahme/models.py:70 foerderung/models.py:24 foerderung/models.py:38
-#: noten/models.py:41 noten/models.py:545 stammdaten/models.py:57
+#: noten/models.py:41 noten/models.py:588 stammdaten/models.py:57
 #: stammdaten/models.py:202 stammdaten/models.py:359 stammdaten/models.py:656
 #: stammdaten/models.py:679 stammdaten/models.py:854 stammdaten/models.py:924
 #: stammdaten/models.py:1045
@@ -232,8 +232,8 @@ msgstr "Name (English)"
 msgid "Beschreibung"
 msgstr "Description"
 
-#: aufnahme/models.py:72 nachmittag/models.py:29 noten/models.py:547
-#: noten/models.py:606 noten/models.py:733 noten/models.py:770
+#: aufnahme/models.py:72 nachmittag/models.py:29 noten/models.py:590
+#: noten/models.py:649 noten/models.py:779 noten/models.py:816
 #: stammdaten/models.py:857 stammdaten/models.py:976
 #: templates/noten/notensperre.html:55 termine/models.py:149
 #: zeugnisse/models.py:259 zeugnisse/models.py:290
@@ -244,8 +244,8 @@ msgstr "from year"
 msgid "Wird bei passendem Jahrgang vorgeschlagen."
 msgstr "Suggested when the year group matches."
 
-#: aufnahme/models.py:74 nachmittag/models.py:30 noten/models.py:548
-#: noten/models.py:607 noten/models.py:734 noten/models.py:771
+#: aufnahme/models.py:74 nachmittag/models.py:30 noten/models.py:591
+#: noten/models.py:650 noten/models.py:780 noten/models.py:817
 #: stammdaten/models.py:858 stammdaten/models.py:977
 #: templates/noten/notensperre.html:56 termine/models.py:150
 #: zeugnisse/models.py:260 zeugnisse/models.py:291
@@ -717,10 +717,10 @@ msgid "Erledigt von"
 msgstr "Completed by"
 
 #: aufnahme/models.py:355 foerderung/models.py:319 laufbahn/ansichten.py:261
-#: laufbahn/models.py:137 noten/models.py:612 noten/models.py:735
+#: laufbahn/models.py:137 noten/models.py:658 noten/models.py:781
 #: sicherung/ansichten.py:71 sicherung/models.py:27 stammdaten/models.py:382
 #: stammdaten/models.py:426 stammdaten/models.py:898 stammdaten/models.py:941
-#: templates/aufnahme/anmeldung.html:81 templates/noten/klausurregeln.html:59
+#: templates/aufnahme/anmeldung.html:81 templates/noten/klausurregeln.html:65
 #: templates/portal/schuelerakte.html:90
 msgid "Bemerkung"
 msgstr "Remark"
@@ -1013,8 +1013,8 @@ msgstr "Absences (automatic)"
 #: fehlzeiten/models.py:52 foerderung/admin.py:413 foerderung/models.py:84
 #: foerderung/models.py:185 foerderung/models.py:218 laufbahn/models.py:89
 #: laufbahn/models.py:133 nachmittag/models.py:68 nachmittag/models.py:93
-#: noten/export.py:128 noten/export.py:278 noten/models.py:411
-#: noten/models.py:488 portal/rollen.py:34 stammdaten/admin.py:155
+#: noten/export.py:128 noten/export.py:278 noten/models.py:454
+#: noten/models.py:531 portal/rollen.py:34 stammdaten/admin.py:155
 #: stammdaten/admin.py:273 stammdaten/models.py:168 stammdaten/models.py:529
 #: stammdaten/models.py:611 stammdaten/models.py:749 stammdaten/models.py:887
 #: stammdaten/models.py:935 stammdaten/models.py:954 stammdaten/models.py:973
@@ -1022,7 +1022,7 @@ msgstr "Absences (automatic)"
 #: templates/aufnahme/uebernahme.html:41
 #: templates/elternkontakt/uebersicht.html:39
 #: templates/laufbahn/wechsel.html:92 templates/noten/eingabe.html:50
-#: templates/noten/klassen.html:73 templates/noten/klassen.html:143
+#: templates/noten/klassen.html:73 templates/noten/klassen.html:157
 #: templates/noten/notentabelle.html:84 templates/portal/klassenliste.html:13
 #: templates/portal/notenuebersicht.html:28
 #: templates/termine/sprechzeiten.html:86 templates/zeugnisse/klasse.html:31
@@ -1216,7 +1216,7 @@ msgid "Eltern (Portal)"
 msgstr "Parents (portal)"
 
 #: elternkontakt/models.py:135 sicherung/models.py:17
-#: templates/elternkontakt/uebersicht.html:53
+#: templates/elternkontakt/uebersicht.html:53 templates/noten/klassen.html:187
 #: templates/noten/notensperre.html:28 templates/sicherung/sicherungen.html:53
 msgid "automatisch"
 msgstr "automatic"
@@ -1337,14 +1337,14 @@ msgid ""
 msgstr ""
 "Added below the automatic message, e.g. a reference to the school rules."
 
-#: elternkontakt/models.py:212 laufbahn/models.py:44 noten/models.py:561
-#: noten/models.py:614 noten/models.py:737 noten/models.py:774
+#: elternkontakt/models.py:212 laufbahn/models.py:44 noten/models.py:604
+#: noten/models.py:660 noten/models.py:783 noten/models.py:820
 #: termine/models.py:162
 msgid "Angelegt von"
 msgstr "Created by"
 
-#: elternkontakt/models.py:213 laufbahn/models.py:183 noten/models.py:615
-#: noten/models.py:713 noten/models.py:738 portal/models.py:55
+#: elternkontakt/models.py:213 laufbahn/models.py:183 noten/models.py:661
+#: noten/models.py:759 noten/models.py:784 portal/models.py:55
 msgid "Geändert am"
 msgstr "Changed on"
 
@@ -1688,7 +1688,7 @@ msgstr "To period"
 msgid "Verspätung (Minuten)"
 msgstr "Late by (minutes)"
 
-#: fehlzeiten/models.py:60 laufbahn/models.py:210 noten/models.py:710
+#: fehlzeiten/models.py:60 laufbahn/models.py:210 noten/models.py:756
 #: templates/laufbahn/loeschfristen.html:32
 #: templates/noten/notensperre.html:31
 msgid "Grund"
@@ -1790,7 +1790,7 @@ msgstr "Teachers of this student"
 msgid "Alle unterrichtenden Lehrkräfte übernehmen"
 msgstr "Add all of the student's teachers"
 
-#: foerderung/admin.py:227 foerderung/admin.py:322 noten/models.py:708
+#: foerderung/admin.py:227 foerderung/admin.py:322 noten/models.py:754
 #: templates/aufnahme/anmeldung.html:193 templates/aufnahme/uebernahme.html:27
 #: templates/elternkontakt/uebersicht.html:24
 #: templates/laufbahn/schuljahre.html:10 templates/laufbahn/wechsel.html:77
@@ -1840,11 +1840,11 @@ msgstr "Measures"
 msgid "Geltung und Beschluss"
 msgstr "Validity and decision"
 
-#: foerderung/admin.py:331 foerderung/models.py:226 noten/models.py:549
-#: noten/models.py:605 noten/models.py:731 portal/navigation.py:253
+#: foerderung/admin.py:331 foerderung/models.py:226 noten/models.py:592
+#: noten/models.py:648 noten/models.py:777 portal/navigation.py:253
 #: stammdaten/models.py:706 templates/foerderung/_akte.html:16
 #: templates/foerderung/nachteilsausgleich.html:32
-#: templates/noten/klausurregeln.html:16 templates/noten/klausurregeln.html:59
+#: templates/noten/klausurregeln.html:16 templates/noten/klausurregeln.html:65
 msgid "Fächer"
 msgstr "Subjects"
 
@@ -2170,7 +2170,7 @@ msgid "Sonstiges"
 msgstr "Other"
 
 #: foerderung/models.py:188 noten/export.py:178 noten/export.py:314
-#: noten/models.py:354 portal/models.py:48 stammdaten/models.py:457
+#: noten/models.py:389 portal/models.py:48 stammdaten/models.py:457
 #: stammdaten/models.py:937 stammdaten/models.py:1032
 #: templates/noten/notentabelle.html:66 templates/termine/raumplan.html:15
 #: templates/termine/termin.html:43 templates/zeugnisse/protokoll.html:18
@@ -2289,8 +2289,8 @@ msgid ""
 "Bei einem genehmigten Nachteilsausgleich bitte das Beschlussdatum angeben."
 msgstr "Please enter the decision date for approved access arrangements."
 
-#: foerderung/models.py:274 noten/ansichten.py:485 noten/klausurregeln.py:95
-#: templates/noten/klausurregeln.html:61
+#: foerderung/models.py:274 noten/ansichten.py:485 noten/klausurregeln.py:98
+#: templates/noten/klausurregeln.html:67
 msgid "alle Fächer"
 msgstr "all subjects"
 
@@ -2835,7 +2835,7 @@ msgstr "To school year"
 msgid "Aktuelles Schuljahr umgestellt"
 msgstr "Current school year switched"
 
-#: laufbahn/models.py:45 noten/models.py:562 termine/models.py:163
+#: laufbahn/models.py:45 noten/models.py:605 termine/models.py:163
 msgid "Angelegt am"
 msgstr "Created on"
 
@@ -3018,7 +3018,7 @@ msgstr "When the period expires"
 msgid "Grundlage / Hinweis"
 msgstr "Basis / note"
 
-#: laufbahn/models.py:182 noten/models.py:712
+#: laufbahn/models.py:182 noten/models.py:758
 msgid "Geändert von"
 msgstr "Changed by"
 
@@ -3185,8 +3185,8 @@ msgstr "Friday"
 msgid "Samstag"
 msgstr "Saturday"
 
-#: nachmittag/models.py:19 noten/models.py:190 noten/models.py:546
-#: noten/models.py:707 noten/models.py:769 templates/noten/klassen.html:14
+#: nachmittag/models.py:19 noten/models.py:190 noten/models.py:589
+#: noten/models.py:753 noten/models.py:815 templates/noten/klassen.html:14
 #: templates/noten/notensperre.html:12 templates/noten/vorgaben.html:16
 #: templates/portal/schuelerakte.html:134 templates/portal/start.html:65
 #: templates/zeugnisse/notenliste.html:18
@@ -3281,17 +3281,17 @@ msgid "Kategorien"
 msgstr "Categories"
 
 #: noten/admin.py:94 noten/models.py:212 noten/models.py:279
-#: noten/models.py:350 noten/models.py:487 templates/noten/notensperre.html:6
+#: noten/models.py:385 noten/models.py:530 templates/noten/notensperre.html:6
 #: templates/noten/vorgaben.html:6 templates/noten/vorgaben.html:51
 msgid "Unterricht"
 msgstr "Course"
 
-#: noten/admin.py:108 noten/admin.py:152 noten/models.py:300
-#: noten/models.py:301 portal/navigation.py:175
+#: noten/admin.py:108 noten/admin.py:152 noten/models.py:302
+#: noten/models.py:303 portal/navigation.py:175
 msgid "Bewertungsordner"
 msgstr "Assessment folder"
 
-#: noten/admin.py:147 noten/apps.py:8 noten/export.py:178 noten/models.py:427
+#: noten/admin.py:147 noten/apps.py:8 noten/export.py:178 noten/models.py:470
 #: templates/noten/notensperre.html:21 templates/noten/struktur.html:43
 #: templates/portal/notenuebersicht.html:3
 #: templates/portal/notenuebersicht.html:97 templates/portal/start.html:69
@@ -3316,7 +3316,7 @@ msgstr "Assessments in this folder (enter grades via “Change”)"
 
 #: noten/admin.py:210 noten/admin.py:278 noten/ansichten.py:69
 #: noten/export.py:178 noten/export.py:198 noten/export.py:314
-#: noten/export.py:326 noten/models.py:352 templates/noten/eingabe.html:20
+#: noten/export.py:326 noten/models.py:387 templates/noten/eingabe.html:20
 #: templates/noten/notentabelle.html:67
 #: templates/portal/notenuebersicht.html:87
 msgid "Ordner"
@@ -3326,7 +3326,7 @@ msgstr "Folder"
 msgid "Anteil an der Gesamtnote"
 msgstr "Share of the overall grade"
 
-#: noten/admin.py:221 noten/export.py:177 noten/models.py:370
+#: noten/admin.py:221 noten/export.py:177 noten/models.py:405
 #: portal/navigation.py:172 templates/noten/klassen.html:47
 #: templates/noten/notentabelle.html:64
 #: templates/portal/notenuebersicht.html:87
@@ -3388,7 +3388,7 @@ msgid_plural "„%(titel)s“ gespeichert, %(n)s Noten geändert."
 msgstr[0] "“%(titel)s” saved, %(n)s grade changed."
 msgstr[1] "“%(titel)s” saved, %(n)s grades changed."
 
-#: noten/ansichten.py:161 noten/klassenansicht.py:310
+#: noten/ansichten.py:161 noten/klassenansicht.py:445
 #, python-format
 msgid "%(n)s Eingabe ist nicht gültig – es wurde nichts gespeichert."
 msgid_plural "%(n)s Eingaben sind nicht gültig – es wurde nichts gespeichert."
@@ -3403,9 +3403,9 @@ msgstr "excused"
 msgid "unentschuldigt"
 msgstr "unexcused"
 
-#: noten/ansichten.py:189 noten/models.py:434 noten/models.py:490
-#: templates/noten/klassen.html:84 templates/zeugnisse/unterricht.html:38
-#: zeugnisse/noten.py:17
+#: noten/ansichten.py:189 noten/models.py:477 noten/models.py:533
+#: templates/noten/klassen.html:84 templates/noten/klassen.html:190
+#: templates/zeugnisse/unterricht.html:38 zeugnisse/noten.py:17
 msgid "befreit"
 msgstr "exempt"
 
@@ -3505,12 +3505,12 @@ msgstr "%(wo)s: The weight must be a number of 0 or more."
 msgid "%(wo)s: In einem Prozent-Ordner höchstens 100."
 msgstr "%(wo)s: At most 100 in a percentage folder."
 
-#: noten/ansichten.py:329 noten/models.py:343
+#: noten/ansichten.py:329 noten/models.py:372
 msgid ""
 "Ein Ordner kann nicht in sich selbst oder einem seiner Unterordner liegen."
 msgstr "A folder cannot be placed inside itself or one of its subfolders."
 
-#: noten/ansichten.py:334 noten/models.py:345
+#: noten/ansichten.py:334 noten/models.py:374
 #, python-format
 msgid "Höchstens %(n)s Ordnerebenen sind möglich."
 msgstr "A maximum of %(n)s folder levels is possible."
@@ -3642,8 +3642,9 @@ msgstr "Ø suggestion"
 msgid "Vorschlag"
 msgstr "Suggestion"
 
-#: noten/export.py:139 noten/models.py:509 templates/noten/klassen.html:80
-#: templates/noten/klassen.html:148 templates/portal/notenuebersicht.html:34
+#: noten/export.py:139 noten/klassenansicht.py:350 noten/models.py:552
+#: templates/noten/klassen.html:80 templates/noten/klassen.html:162
+#: templates/noten/klassen.html:186 templates/portal/notenuebersicht.html:34
 #: templates/zeugnisse/unterricht.html:23
 #: templates/zeugnisse/unterricht.html:34
 msgid "Zeugnisnote"
@@ -3664,9 +3665,10 @@ msgstr "Orange: the report grade differs from the calculated suggestion."
 
 #: noten/export.py:178 noten/export.py:198 noten/export.py:314
 #: noten/export.py:326 noten/models.py:286 templates/noten/eingabe.html:27
-#: templates/noten/notentabelle.html:66 templates/noten/struktur.html:22
-#: templates/noten/struktur.html:35 templates/noten/struktur.html:49
-#: templates/noten/struktur.html:79 templates/portal/notenuebersicht.html:87
+#: templates/noten/klassen.html:168 templates/noten/notentabelle.html:66
+#: templates/noten/struktur.html:22 templates/noten/struktur.html:35
+#: templates/noten/struktur.html:49 templates/noten/struktur.html:79
+#: templates/portal/notenuebersicht.html:87
 msgid "Gewicht"
 msgstr "Weight"
 
@@ -3714,7 +3716,7 @@ msgstr ""
 "The suggestion is calculated; the teacher sets the report grade. Shaded: at "
 "risk. Ties are rounded to the better grade."
 
-#: noten/export.py:314 noten/models.py:369 noten/models.py:410
+#: noten/export.py:314 noten/models.py:404 noten/models.py:453
 msgid "Leistungsnachweis"
 msgstr "Assessment"
 
@@ -3722,13 +3724,13 @@ msgstr "Assessment"
 msgid "Anteil"
 msgstr "Share"
 
-#: noten/export.py:315 noten/models.py:413 noten/models.py:426
+#: noten/export.py:315 noten/models.py:456 noten/models.py:469
 #: templates/noten/eingabe.html:50 templates/zeugnisse/druck.html:34
 #: templates/zeugnisse/zeugnis.html:39 zeugnisse/models.py:121
 msgid "Note"
 msgstr "Grade"
 
-#: noten/export.py:315 noten/models.py:422 templates/noten/eingabe.html:50
+#: noten/export.py:315 noten/models.py:465 templates/noten/eingabe.html:50
 #: templates/noten/eingabe.html:60 templates/zeugnisse/klasse.html:32
 #: templates/zeugnisse/unterricht.html:24
 #: templates/zeugnisse/unterricht.html:59
@@ -3817,7 +3819,7 @@ msgstr[1] "%(n)s assessments imported"
 msgid "%(neu)s Noten neu, %(geaendert)s geändert, %(gleich)s unverändert."
 msgstr "%(neu)s grades new, %(geaendert)s changed, %(gleich)s unchanged."
 
-#: noten/importseite.py:86 noten/klassenansicht.py:322
+#: noten/importseite.py:86 noten/klassenansicht.py:465
 #, python-format
 msgid "%(n)s Zeugnisnote festgesetzt."
 msgid_plural "%(n)s Zeugnisnoten festgesetzt."
@@ -3836,17 +3838,42 @@ msgstr "Class tests"
 msgid "Sonstige Mitarbeit (SoMi)"
 msgstr "Class participation (SoMi)"
 
-#: noten/klassenansicht.py:273
+#: noten/klassenansicht.py:162
+msgid "Klassenarbeit"
+msgstr "Class test"
+
+#: noten/klassenansicht.py:164
+msgid "Klausur"
+msgstr "Exam"
+
+#: noten/klassenansicht.py:166 noten/klassenansicht.py:201
+msgid "SoMi-Note"
+msgstr "Class-work grade"
+
+#: noten/klassenansicht.py:191
+msgid "Ordner nicht gefunden."
+msgstr "Folder not found."
+
+#: noten/klassenansicht.py:315
+#, python-format
+msgid ""
+"%(titel)s: Gewicht „%(wert)s“ muss eine Zahl größer als 0 (höchstens "
+"%(max)s) sein."
+msgstr ""
+"%(titel)s: weight “%(wert)s” must be a number greater than 0 (at most "
+"%(max)s)."
+
+#: noten/klassenansicht.py:407
 #, python-format
 msgid "%(name)s: inzwischen von anderer Seite geändert – nicht überschrieben."
 msgstr "%(name)s: changed elsewhere in the meantime – not overwritten."
 
-#: noten/klassenansicht.py:275
+#: noten/klassenansicht.py:409
 #, python-format
 msgid "%(name)s: gesperrt – nicht geändert."
 msgstr "%(name)s: locked – not changed."
 
-#: noten/klassenansicht.py:314
+#: noten/klassenansicht.py:449
 #, python-format
 msgid ""
 "Inzwischen von anderer Seite geändert und daher nicht überschrieben: "
@@ -3854,48 +3881,53 @@ msgid ""
 msgstr ""
 "Changed elsewhere in the meantime and therefore not overwritten: %(liste)s"
 
-#: noten/klassenansicht.py:316
+#: noten/klassenansicht.py:452
 #, python-format
-msgid "%(n)s Note gespeichert."
-msgid_plural "%(n)s Noten gespeichert."
-msgstr[0] "%(n)s grade saved."
-msgstr[1] "%(n)s grades saved."
+msgid "%(n)s Änderung gespeichert."
+msgid_plural "%(n)s Änderungen gespeichert."
+msgstr[0] "%(n)s change saved."
+msgstr[1] "%(n)s changes saved."
 
-#: noten/klassenansicht.py:325
+#: noten/klassenansicht.py:458
+#, python-format
+msgid "Neue Spalte „%(titel)s“ angelegt – jetzt die Noten eintragen."
+msgstr "New column “%(titel)s” created – now enter the grades."
+
+#: noten/klassenansicht.py:468
 msgid "Nicht gespeichert:"
 msgstr "Not saved:"
 
-#: noten/klassenansicht.py:327 portal/klassenunterricht.py:191
+#: noten/klassenansicht.py:470 portal/klassenunterricht.py:191
 msgid "Keine Änderungen."
 msgstr "No changes."
 
-#: noten/klausurregeln.py:44
+#: noten/klausurregeln.py:47
 #, python-format
 msgid "Für %(f)s gibt es in diesen Jahrgängen schon eine Regel (%(r)s)."
 msgstr "There is already a rule for %(f)s in these year groups (%(r)s)."
 
-#: noten/klausurregeln.py:94
+#: noten/klausurregeln.py:97
 #, python-format
 msgid "Zeugnisnote ohne Einzelnoten freigegeben: %(f)s, %(fa)s"
 msgstr "Report grade without individual grades enabled: %(f)s, %(fa)s"
 
-#: noten/klausurregeln.py:96
+#: noten/klausurregeln.py:99
 msgid "Freigabe gespeichert."
 msgstr "Permission saved."
 
-#: noten/klausurregeln.py:111
+#: noten/klausurregeln.py:114
 #, python-format
 msgid "Klausurregel gespeichert: %(r)s, %(f)s"
 msgstr "Exam rule saved: %(r)s, %(f)s"
 
-#: noten/klausurregeln.py:113
+#: noten/klausurregeln.py:116
 #, python-format
 msgid "Regel gespeichert und auf %(n)s Kurs angewendet."
 msgid_plural "Regel gespeichert und auf %(n)s Kurse angewendet."
 msgstr[0] "Rule saved and applied to %(n)s course."
 msgstr[1] "Rule saved and applied to %(n)s courses."
 
-#: noten/klausurregeln.py:115
+#: noten/klausurregeln.py:118
 #, python-format
 msgid "%(v)s weiterer Ordner der obersten Ebene wurde in „%(m)s“ verschoben."
 msgid_plural ""
@@ -3903,21 +3935,21 @@ msgid_plural ""
 msgstr[0] "%(v)s further top-level folder was moved to “%(m)s”."
 msgstr[1] "%(v)s further top-level folders were moved to “%(m)s”."
 
-#: noten/klausurregeln.py:135
+#: noten/klausurregeln.py:138
 #, python-format
 msgid "Freigabe „Zeugnisnote ohne Einzelnoten“ aufgehoben: %(f)s"
 msgstr "Permission “report grade without individual grades” revoked: %(f)s"
 
-#: noten/klausurregeln.py:137
+#: noten/klausurregeln.py:140
 msgid "Freigabe aufgehoben."
 msgstr "Permission revoked."
 
-#: noten/klausurregeln.py:152
+#: noten/klausurregeln.py:155
 #, python-format
 msgid "Klausurregel gelöscht: %(r)s"
 msgstr "Exam rule deleted: %(r)s"
 
-#: noten/klausurregeln.py:153
+#: noten/klausurregeln.py:156
 #, python-format
 msgid "Regel gelöscht; in %(n)s Kurs sind die Ordner wieder frei."
 msgid_plural "Regel gelöscht; in %(n)s Kursen sind die Ordner wieder frei."
@@ -3931,7 +3963,7 @@ msgstr[1] "Rule deleted; the folders are free again in %(n)s courses."
 msgid "Noten eintragen"
 msgstr "Enter grades"
 
-#: noten/kurswahl.py:20 noten/models.py:510
+#: noten/kurswahl.py:20 noten/models.py:553
 #: templates/zeugnisse/uebersicht.html:23
 msgid "Zeugnisnoten"
 msgstr "Report grades"
@@ -4031,7 +4063,7 @@ msgstr "Grade"
 msgid "Notenstufen"
 msgstr "Grades"
 
-#: noten/models.py:122 noten/models.py:123 noten/models.py:361
+#: noten/models.py:122 noten/models.py:123 noten/models.py:396
 msgid "Notenschlüssel"
 msgstr "Grading key"
 
@@ -4198,79 +4230,96 @@ msgid ""
 msgstr "Set by an exam rule of school management: name and weight are locked."
 
 #: noten/models.py:297
+msgid "Höchstzahl Leistungsnachweise"
+msgstr "Maximum number of assessments"
+
+#: noten/models.py:298
+msgid "Vorgabe der Notenregel, gilt einschließlich der Unterordner."
+msgstr "Set by the grading rule, including subfolders."
+
+#: noten/models.py:299
 msgid "Änderungsprotokoll Bewertungsordner"
 msgstr "Change history: assessment folder"
 
-#: noten/models.py:341
+#: noten/models.py:370
 msgid "Der übergeordnete Ordner gehört zu einem anderen Unterricht."
 msgstr "The parent folder belongs to a different course."
 
-#: noten/models.py:353
+#: noten/models.py:379
+#, python-format
+msgid ""
+"In „%(ordner)s“ sind höchstens %(n)s Leistungsnachweise je Halbjahr "
+"vorgesehen (Notenregel der Schulleitung)."
+msgstr ""
+"At most %(n)s assessments per term are intended in “%(ordner)s” (grading "
+"rule of the school management)."
+
+#: noten/models.py:388
 msgid "frei wählbar, z. B. 1. Klassenarbeit oder Referat Säuren"
 msgstr "any name, e.g. 1st class test or Presentation on acids"
 
-#: noten/models.py:356
+#: noten/models.py:391
 msgid "Gewicht im Ordner"
 msgstr "Weight in folder"
 
-#: noten/models.py:358
+#: noten/models.py:393
 msgid "Relativ zu den anderen Einträgen im selben Ordner."
 msgstr "Relative to the other entries in the same folder."
 
-#: noten/models.py:362
+#: noten/models.py:397
 msgid "Optional: Note wird aus erreichten Bewertungseinheiten (BE) berechnet."
 msgstr "Optional: the grade is calculated from the marks achieved."
 
-#: noten/models.py:364
+#: noten/models.py:399
 msgid "Maximale BE"
 msgstr "Maximum marks"
 
-#: noten/models.py:366
+#: noten/models.py:401
 msgid "Änderungsprotokoll Leistungsnachweis"
 msgstr "Change history: assessment"
 
-#: noten/models.py:381
+#: noten/models.py:416
 #, python-format
 msgid "Das Datum muss im Halbjahr liegen (%(von)s bis %(bis)s)."
 msgstr "The date must lie within the semester (%(von)s to %(bis)s)."
 
-#: noten/models.py:384
+#: noten/models.py:419
 msgid "Bei Verwendung eines Notenschlüssels bitte die maximalen BE angeben."
 msgstr "Please enter the maximum marks when using a grading key."
 
-#: noten/models.py:386
+#: noten/models.py:429
 msgid "Der Notenschlüssel passt nicht zur Notenskala des Unterrichts."
 msgstr "The grading key does not match the grading scale of the course."
 
-#: noten/models.py:404
+#: noten/models.py:447
 msgid "Entschuldigt gefehlt"
 msgstr "Absent (excused)"
 
-#: noten/models.py:405
+#: noten/models.py:448
 msgid "Unentschuldigt gefehlt"
 msgstr "Absent (unexcused)"
 
-#: noten/models.py:406
+#: noten/models.py:449
 msgid "Befreit"
 msgstr "Exempt"
 
-#: noten/models.py:407
+#: noten/models.py:450
 msgid "Nicht bewertbar"
 msgstr "Not assessable"
 
-#: noten/models.py:412
+#: noten/models.py:455
 msgid "Erreichte BE"
 msgstr "Marks achieved"
 
-#: noten/models.py:414
+#: noten/models.py:457
 msgid "Sonderstatus"
 msgstr "Special status"
 
-#: noten/models.py:416
+#: noten/models.py:459
 msgid "Individuelles Gewicht"
 msgstr "Individual weight"
 
-#: noten/models.py:418
+#: noten/models.py:461
 msgid ""
 "Nur ausfüllen, wenn diese eine Note anders zählen soll als der "
 "Leistungsnachweis (z. B. Nachschreibarbeit, Nachteilsausgleich). Leer = "
@@ -4279,55 +4328,55 @@ msgstr ""
 "Only fill in if this one grade should count differently from the assessment "
 "(e.g. resit, access arrangements). Empty = weight of the assessment."
 
-#: noten/models.py:421
+#: noten/models.py:464
 msgid "Begründung für abweichendes Gewicht"
 msgstr "Reason for the different weight"
 
-#: noten/models.py:423
+#: noten/models.py:466
 msgid "Änderungsprotokoll Note"
 msgstr "Change history: grade"
 
-#: noten/models.py:434
+#: noten/models.py:477
 msgid "entsch."
 msgstr "exc."
 
-#: noten/models.py:434
+#: noten/models.py:477
 msgid "unentsch."
 msgstr "unexc."
 
-#: noten/models.py:434
+#: noten/models.py:477
 msgid "n. b."
 msgstr "n/a"
 
-#: noten/models.py:452
+#: noten/models.py:495
 msgid "Bitte begründen, warum diese Note anders gewichtet wird."
 msgstr "Please explain why this grade is weighted differently."
 
-#: noten/models.py:455
+#: noten/models.py:498
 msgid "Die erreichten BE überschreiten die maximalen BE."
 msgstr "The marks achieved exceed the maximum marks."
 
-#: noten/models.py:457 noten/models.py:525 noten/zeugnisnoten.py:113
+#: noten/models.py:500 noten/models.py:568 noten/zeugnisnoten.py:113
 msgid "Die Note gehört nicht zur Notenskala des Unterrichts."
 msgstr "The grade does not belong to the grading scale of the course."
 
-#: noten/models.py:489
+#: noten/models.py:532
 msgid "Berechneter Vorschlag"
 msgstr "Calculated suggestion"
 
-#: noten/models.py:490 templates/zeugnisse/unterricht.html:37
+#: noten/models.py:533 templates/zeugnisse/unterricht.html:37
 msgid "n.b. (nicht bewertet)"
 msgstr "n.a. (not assessed)"
 
-#: noten/models.py:492
+#: noten/models.py:535
 msgid "Festgesetzte Note"
 msgstr "Final grade"
 
-#: noten/models.py:494
+#: noten/models.py:537
 msgid "Vermerk statt Note"
 msgstr "Note instead of grade"
 
-#: noten/models.py:495
+#: noten/models.py:538
 msgid ""
 "n.b., wenn weniger als sechs Wochen am Stück bzw. acht Wochen insgesamt "
 "teilgenommen (Rili Sek I, 3.8)"
@@ -4335,11 +4384,11 @@ msgstr ""
 "n.a. if the student attended for less than six consecutive weeks or eight "
 "weeks in total (Rili Sek I, 3.8)"
 
-#: noten/models.py:497
+#: noten/models.py:540
 msgid "Pädagogische Begründung"
 msgstr "Educational justification"
 
-#: noten/models.py:498
+#: noten/models.py:541
 msgid ""
 "Freiwillig. Die Lehrkraft setzt die Zeugnisnote in eigener Verantwortung "
 "fest; Abweichungen vom rechnerischen Vorschlag werden nur markiert."
@@ -4347,24 +4396,28 @@ msgstr ""
 "Optional. The teacher sets the report grade on their own responsibility; "
 "differences from the calculated suggestion are only marked."
 
-#: noten/models.py:500
+#: noten/models.py:543
 msgid "aus der Excel-Notentabelle übernommen"
 msgstr "imported from the Excel grade sheet"
 
-#: noten/models.py:500
+#: noten/models.py:543
 msgid "in der Klassenübersicht festgesetzt"
 msgstr "set in the class overview"
 
-#: noten/models.py:501 templates/noten/klassen.html:80
+#: noten/models.py:544 templates/noten/klassen.html:80
 #: templates/zeugnisse/notenliste.html:57
 msgid "automatisch aus den Einzelnoten"
 msgstr "automatically from the individual grades"
 
-#: noten/models.py:502
+#: noten/models.py:544
+msgid "in der Notentabelle festgesetzt"
+msgstr "set in the grade table"
+
+#: noten/models.py:545
 msgid "Herkunft"
 msgstr "Source"
 
-#: noten/models.py:503
+#: noten/models.py:546
 msgid ""
 "Wie die Zeugnisnote zuletzt gesetzt wurde; leer = in der Zeugnisnoten-"
 "Eingabe. „automatisch“ folgt den Einzelnoten, bis jemand die Note selbst "
@@ -4373,27 +4426,27 @@ msgstr ""
 "How the report grade was last set; empty = on the report grade entry page. "
 "“automatic” follows the individual grades until someone sets the grade."
 
-#: noten/models.py:506
+#: noten/models.py:549
 msgid "Änderungsprotokoll Zeugnisnote"
 msgstr "Change history: report grade"
 
-#: noten/models.py:521
+#: noten/models.py:564
 msgid "Bitte eine Note oder einen Vermerk angeben."
 msgstr "Please enter a grade or a note."
 
-#: noten/models.py:544
+#: noten/models.py:587
 msgid "z. B. Quartalsnote Sonstige Mitarbeit Q1"
 msgstr "e.g. quarter grade class participation Q1"
 
-#: noten/models.py:550 noten/models.py:732
+#: noten/models.py:593 noten/models.py:778
 msgid "Keine Auswahl = alle Fächer."
 msgstr "No selection = all subjects."
 
-#: noten/models.py:552
+#: noten/models.py:595
 msgid "Ordner enthält"
 msgstr "Folder contains"
 
-#: noten/models.py:553
+#: noten/models.py:596
 msgid ""
 "Optional: Nur Leistungsnachweise in Ordnern, deren Pfad diesen Text enthält,"
 " z. B. „Schriftlich“ oder „Quartal 1“."
@@ -4401,11 +4454,11 @@ msgstr ""
 "Optional: only assessments in folders whose path contains this text, e.g. "
 "“Written” or “Quarter 1”."
 
-#: noten/models.py:555
+#: noten/models.py:598
 msgid "Bezeichnung enthält"
 msgstr "Title contains"
 
-#: noten/models.py:556
+#: noten/models.py:599
 msgid ""
 "Optional: Nur Leistungsnachweise, deren Bezeichnung diesen Text enthält, z. "
 "B. „Klassenarbeit“."
@@ -4413,141 +4466,149 @@ msgstr ""
 "Optional: only assessments whose title contains this text, e.g. “class "
 "test”."
 
-#: noten/models.py:557
+#: noten/models.py:600
 msgid "Mindestanzahl"
 msgstr "Minimum number"
 
-#: noten/models.py:558
+#: noten/models.py:601
 msgid "Frist"
 msgstr "Deadline"
 
-#: noten/models.py:559
+#: noten/models.py:602
 msgid "Hinweis für Lehrkräfte"
 msgstr "Note for teachers"
 
-#: noten/models.py:563
+#: noten/models.py:606
 msgid "Änderungsprotokoll Leistungsvorgabe"
 msgstr "Change log assessment requirement"
 
-#: noten/models.py:566
+#: noten/models.py:609
 msgid "Leistungsvorgabe"
 msgstr "Assessment requirement"
 
-#: noten/models.py:567 portal/navigation.py:170 templates/noten/_start.html:3
+#: noten/models.py:610 portal/navigation.py:170 templates/noten/_start.html:3
 #: templates/noten/_vorgaben_unterricht.html:3
 #: templates/noten/vorgabe_form.html:5 templates/noten/vorgaben.html:3
 #: templates/noten/vorgaben.html:6 templates/noten/vorgaben.html:9
 msgid "Leistungsvorgaben"
 msgstr "Assessment requirements"
 
-#: noten/models.py:585 noten/models.py:632 noten/models.py:751
+#: noten/models.py:628 noten/models.py:678 noten/models.py:797
 msgid "„bis Jahrgang“ darf nicht kleiner sein als „ab Jahrgang“."
 msgstr "“to year group” must not be smaller than “from year group”."
 
-#: noten/models.py:587
+#: noten/models.py:630
 #, python-format
 msgid "Die Frist muss im Halbjahr liegen (%(von)s bis %(bis)s)."
 msgstr "The deadline must lie within the term (%(von)s to %(bis)s)."
 
-#: noten/models.py:608
+#: noten/models.py:651
 msgid "Anteil Klausuren (%)"
 msgstr "Share of exams (%)"
 
-#: noten/models.py:610
+#: noten/models.py:653
 msgid "Name des Klausurordners"
 msgstr "Name of the exam folder"
 
-#: noten/models.py:611
+#: noten/models.py:654
 msgid "Name des Ordners für die übrigen Leistungen"
 msgstr "Name of the folder for other performance"
 
-#: noten/models.py:612
+#: noten/models.py:656
+msgid "Höchstens Klausuren / Klassenarbeiten je Halbjahr"
+msgstr "Maximum exams / class tests per term"
+
+#: noten/models.py:657
+msgid "Höchstens Noten sonstige Mitarbeit je Halbjahr"
+msgstr "Maximum class-work grades per term"
+
+#: noten/models.py:658
 msgid "z. B. Beschluss der Fachkonferenz vom …"
 msgstr "e.g. decision of the subject conference of …"
 
-#: noten/models.py:616
+#: noten/models.py:662
 msgid "Änderungsprotokoll Klausurregel"
 msgstr "Change log exam rule"
 
-#: noten/models.py:619
+#: noten/models.py:665
 msgid "Klausurregel"
 msgstr "Exam rule"
 
-#: noten/models.py:620
+#: noten/models.py:666
 msgid "Klausurregeln"
 msgstr "Exam rules"
 
-#: noten/models.py:624
+#: noten/models.py:670
 #, python-format
 msgid "Klausuren Jahrgang %(von)s–%(bis)s"
 msgstr "Exams year %(von)s–%(bis)s"
 
-#: noten/models.py:634
+#: noten/models.py:680
 msgid "Die beiden Ordner brauchen verschiedene Namen."
 msgstr "The two folders need different names."
 
-#: noten/models.py:709
+#: noten/models.py:755
 msgid "Gesperrt"
 msgstr "Locked"
 
-#: noten/models.py:714
+#: noten/models.py:760
 msgid "Änderungsprotokoll Notensperre"
 msgstr "Change log grade lock"
 
-#: noten/models.py:717 portal/navigation.py:184 sicherung/models.py:89
+#: noten/models.py:763 portal/navigation.py:184 sicherung/models.py:89
 #: templates/noten/notensperre.html:3 templates/noten/notensperre.html:6
 #: templates/noten/notensperre.html:9
 msgid "Notensperre"
 msgstr "Grade lock"
 
-#: noten/models.py:718
+#: noten/models.py:764
 msgid "Notensperren"
 msgstr "Grade locks"
 
-#: noten/models.py:739
+#: noten/models.py:785
 msgid "Änderungsprotokoll Zeugnisnotenfreigabe"
 msgstr "Change log report grade permission"
 
-#: noten/models.py:742
+#: noten/models.py:788
 msgid "Freigabe: Zeugnisnote ohne Einzelnoten"
 msgstr "Permission: report grade without individual grades"
 
-#: noten/models.py:743
+#: noten/models.py:789
 msgid "Freigaben: Zeugnisnote ohne Einzelnoten"
 msgstr "Permissions: report grade without individual grades"
 
-#: noten/models.py:747
+#: noten/models.py:793
 #, python-format
 msgid "Nur Zeugnisnote, Jahrgang %(von)s–%(bis)s"
 msgstr "Report grade only, years %(von)s–%(bis)s"
 
-#: noten/models.py:772 templates/noten/notensperre.html:47
+#: noten/models.py:818 templates/noten/notensperre.html:47
 #: templates/noten/notensperre.html:57
 msgid "Notenschluss am"
 msgstr "Grade deadline"
 
-#: noten/models.py:772
+#: noten/models.py:818
 msgid "Letzter Tag, an dem Noten eingetragen werden können"
 msgstr "Last day on which grades can be entered"
 
-#: noten/models.py:775
+#: noten/models.py:821
 msgid "Änderungsprotokoll Notenschluss"
 msgstr "Change history: grade deadline"
 
-#: noten/models.py:778 templates/noten/notensperre.html:44
+#: noten/models.py:824 templates/noten/notensperre.html:44
 msgid "Notenschluss"
 msgstr "Grade deadline"
 
-#: noten/models.py:779
+#: noten/models.py:825
 msgid "Notenschlüsse (Termine)"
 msgstr "Grade deadlines"
 
-#: noten/models.py:783
+#: noten/models.py:829
 #, python-format
 msgid "Notenschluss Jg. %(von)s–%(bis)s: %(datum)s"
 msgstr "Grade deadline years %(von)s–%(bis)s: %(datum)s"
 
-#: noten/models.py:788
+#: noten/models.py:834
 msgid "„bis Jahrgang“ darf nicht vor „ab Jahrgang“ liegen."
 msgstr "“Year to” must not be before “Year from”."
 
@@ -4688,7 +4749,7 @@ msgid "Zeugnisnote, Zeile %(zeile)s: %(fehler)s"
 msgstr "Report grade, row %(zeile)s: %(fehler)s"
 
 #: noten/sperrseite.py:42 noten/strukturkopie.py:23
-#: templates/noten/klassen.html:156 templates/portal/notenuebersicht.html:50
+#: templates/noten/klassen.html:174 templates/portal/notenuebersicht.html:50
 msgid "Noten gesperrt"
 msgstr "Grades locked"
 
@@ -6406,7 +6467,7 @@ msgstr "add"
 msgid "ändern"
 msgstr "change"
 
-#: sicherung/ansichten.py:372 templates/noten/klausurregeln.html:24
+#: sicherung/ansichten.py:372 templates/noten/klausurregeln.html:25
 #: templates/noten/notensperre.html:52 templates/noten/struktur.html:44
 #: templates/noten/struktur.html:54 templates/termine/raumplan.html:38
 msgid "löschen"
@@ -6523,7 +6584,7 @@ msgid "aktiv"
 msgstr "active"
 
 #: sicherung/konten.py:102 templates/noten/eingabe.html:58
-#: templates/noten/klassen.html:156 templates/noten/notensperre.html:27
+#: templates/noten/klassen.html:174 templates/noten/notensperre.html:27
 #: templates/noten/notensperre.html:50
 #: templates/portal/notenuebersicht.html:50
 #: templates/sicherung/benutzer.html:28
@@ -8356,7 +8417,8 @@ msgstr "More actions"
 
 #: templates/aufnahme/anmeldung.html:82 templates/aufnahme/anmeldung.html:145
 #: templates/aufnahme/formular.html:140 templates/elternkontakt/regel.html:29
-#: templates/noten/eingabe.html:72 templates/noten/vorgabe_form.html:29
+#: templates/noten/eingabe.html:72 templates/noten/klassen.html:140
+#: templates/noten/vorgabe_form.html:29
 #: templates/portal/_zuordnung_faecher.html:15
 #: templates/portal/zuordnung.html:89
 #: templates/sicherung/benutzer_bearbeiten.html:52
@@ -8581,7 +8643,7 @@ msgstr "Edit application %(nr)s"
 
 #: templates/aufnahme/formular.html:6
 #: templates/foerderung/nachteilsausgleich.html:20
-#: templates/foerderung/plan.html:19 templates/noten/klausurregeln.html:23
+#: templates/foerderung/plan.html:19 templates/noten/klausurregeln.html:24
 #: templates/noten/vorgabe_form.html:6 templates/noten/vorgaben.html:38
 #: templates/portal/_notizen.html:12 templates/portal/_notizen.html:39
 msgid "Bearbeiten"
@@ -8653,7 +8715,7 @@ msgstr "Create application"
 
 #: templates/aufnahme/formular.html:141 templates/aufnahme/uebernahme.html:73
 #: templates/elternkontakt/neu.html:52 templates/elternkontakt/regel.html:31
-#: templates/noten/eingabe.html:74 templates/noten/klausurregeln.html:47
+#: templates/noten/eingabe.html:74 templates/noten/klausurregeln.html:53
 #: templates/noten/vorgabe_form.html:30 templates/portal/login_code.html:15
 #: templates/termine/termin.html:31
 msgid "Abbrechen"
@@ -9181,7 +9243,7 @@ msgstr "Search"
 
 #: templates/elternkontakt/regel.html:3 templates/elternkontakt/regel.html:5
 #: templates/elternkontakt/regeln.html:13
-#: templates/noten/klausurregeln.html:32
+#: templates/noten/klausurregeln.html:33
 msgid "Neue Regel"
 msgstr "New rule"
 
@@ -10444,60 +10506,97 @@ msgstr ""
 "No assessment folders yet – please create the assessment structure first "
 "(e.g. “Written” and “Participation”)."
 
-#: templates/noten/klassen.html:137
-msgid ""
-"Noch keine Leistungsnachweise. Über „Neuer Leistungsnachweis“ oder die "
-"Excel-Tabelle anlegen."
-msgstr ""
-"No assessments yet. Create them via “New assessment” or the Excel sheet."
-
 #: templates/noten/klassen.html:139
 #, python-format
 msgid "Ungespeicherte Änderungen: %%n"
 msgstr "Unsaved changes: %%n"
 
-#: templates/noten/klassen.html:140
+#: templates/noten/klassen.html:142
+msgid "Neue Spalte"
+msgstr "New column"
+
+#: templates/noten/klassen.html:143
+msgid "Neue Spalte:"
+msgstr "New column:"
+
+#: templates/noten/klassen.html:145
+msgid "Höchstzahl erreicht"
+msgstr "Maximum reached"
+
+#: templates/noten/klassen.html:148
+msgid "speichert die Eingaben und legt eine Spalte mit heutigem Datum an"
+msgstr "saves the entries and adds a column dated today"
+
+#: templates/noten/klassen.html:152
+msgid ""
+"Noch keine Leistungsnachweise – oben „+ Klassenarbeit“ bzw. „+ SoMi-Note“ "
+"wählen."
+msgstr ""
+"No assessments yet – choose “+ Class test” or “+ Class-work grade” above."
+
+#: templates/noten/klassen.html:154
 msgid ""
 "Eingabe: 1+ … 6 (Tendenzen), e = entschuldigt, u = unentschuldigt, b = "
 "befreit, nb = nicht bewertbar; leeren = Note entfernen. Enter bzw. "
-"Pfeiltasten springen zur nächsten Zeile."
+"Pfeiltasten springen zur nächsten Zeile. Das Gewicht jeder Spalte steht im "
+"Kopf."
 msgstr ""
 "Input: 1+ … 6 (with +/-), e = excused, u = unexcused, b = exempt, nb = not "
-"assessable; empty = remove grade. Enter or arrow keys move to the next row."
+"assessable; clear = remove grade. Enter or arrow keys move to the next row. "
+"The weight of each column is in its header."
 
-#: templates/noten/klassen.html:146
+#: templates/noten/klassen.html:160
 msgid "Jahres-schnitt"
 msgstr "Year average"
 
-#: templates/noten/klassen.html:146
+#: templates/noten/klassen.html:160
 msgid "Halbjahres-schnitt"
 msgstr "Half-year average"
 
-#: templates/noten/klassen.html:147
+#: templates/noten/klassen.html:161
 msgid "Tendenz"
 msgstr "Grade (+/-)"
 
-#: templates/noten/klassen.html:147
+#: templates/noten/klassen.html:161
 msgid "Note (Vorschlag)"
 msgstr "Grade (suggested)"
 
-#: templates/noten/klassen.html:150
-msgid "Leistungsnachweis bearbeiten"
-msgstr "Edit assessment"
+#: templates/noten/klassen.html:164
+msgid "Leistungsnachweis bearbeiten (Titel, Datum, Kommentare)"
+msgstr "Edit assessment (title, date, comments)"
 
-#: templates/noten/klassen.html:151 templates/noten/klassen.html:160
+#: templates/noten/klassen.html:165 templates/noten/klassen.html:178
 msgid "BE"
 msgstr "marks"
 
-#: templates/noten/klassen.html:170
+#: templates/noten/klassen.html:166
+msgid "Gewicht dieser Spalte"
+msgstr "Weight of this column"
+
+#: templates/noten/klassen.html:187
+#, python-format
+msgid "auto: %(n)s"
+msgstr "auto: %(n)s"
+
+#: templates/noten/klassen.html:197
+msgid ""
+"Zeugnisnote: „auto“ übernimmt die gerundete Note aus den Einzelnoten und "
+"rechnet bei jeder Änderung mit. Wer eine andere Note festsetzt, überschreibt"
+" sie; „auto“ stellt wieder zurück."
+msgstr ""
+"Report grade: “auto” takes the rounded grade from the individual grades and "
+"updates with every change. Setting another grade overrides it; “auto” "
+"switches back."
+
+#: templates/noten/klassen.html:198
 msgid "Zeugnisnoten:"
 msgstr "Report grades:"
 
-#: templates/noten/klassen.html:170
+#: templates/noten/klassen.html:198
 msgid "Sie gelten für das Zeugnis."
 msgstr "They apply to the report."
 
-#: templates/noten/klassen.html:171
+#: templates/noten/klassen.html:200
 msgid "Änderungen speichern"
 msgstr "Save changes"
 
@@ -10529,10 +10628,14 @@ msgid "Klausuren"
 msgstr "Exams"
 
 #: templates/noten/klausurregeln.html:16
+msgid "Höchstzahl je Halbjahr"
+msgstr "Maximum per term"
+
+#: templates/noten/klausurregeln.html:16
 msgid "Kurse"
 msgstr "Courses"
 
-#: templates/noten/klausurregeln.html:24
+#: templates/noten/klausurregeln.html:25
 msgid ""
 "Regel löschen? Die Ordner in den Kursen bleiben erhalten, sind dann aber "
 "frei bearbeitbar."
@@ -10540,11 +10643,11 @@ msgstr ""
 "Delete rule? The folders in the courses remain but can then be edited "
 "freely."
 
-#: templates/noten/klausurregeln.html:27
+#: templates/noten/klausurregeln.html:28
 msgid "Noch keine Regeln – alle Fächer sind frei gestaltbar."
 msgstr "No rules yet – all subjects are freely configurable."
 
-#: templates/noten/klausurregeln.html:28
+#: templates/noten/klausurregeln.html:29
 msgid ""
 "„Kurse“ zählt den betroffenen Unterricht des laufenden und künftiger "
 "Halbjahre. Abgeschlossene Halbjahre bleiben unverändert."
@@ -10552,19 +10655,27 @@ msgstr ""
 "“Courses” counts the affected courses of the current and future semesters. "
 "Completed semesters remain unchanged."
 
-#: templates/noten/klausurregeln.html:32
+#: templates/noten/klausurregeln.html:33
 msgid "Regel bearbeiten"
 msgstr "Edit rule"
 
-#: templates/noten/klausurregeln.html:46
+#: templates/noten/klausurregeln.html:50
+msgid ""
+"Leer = keine Grenze. Lehrkräfte legen Leistungsnachweise bis zur Höchstzahl "
+"an; das Gewicht jeder Note der sonstigen Mitarbeit stellen sie selbst ein."
+msgstr ""
+"Empty = no limit. Teachers create assessments up to the maximum; they set "
+"the weight of each class-work grade themselves."
+
+#: templates/noten/klausurregeln.html:52
 msgid "Speichern und anwenden"
 msgstr "Save and apply"
 
-#: templates/noten/klausurregeln.html:52
+#: templates/noten/klausurregeln.html:58
 msgid "Zeugnisnote ohne Einzelnoten"
 msgstr "Report grade without individual grades"
 
-#: templates/noten/klausurregeln.html:53
+#: templates/noten/klausurregeln.html:59
 msgid ""
 "Die Lehrkraft hat die Notenhoheit. Hier gibt die Schulleitung frei, in "
 "welchen Fächern und Jahrgängen Lehrkräfte die Zeugnisnote auch ohne "
@@ -10580,15 +10691,15 @@ msgstr ""
 "calculated suggestion, this is only marked in colour; the report always "
 "shows the report grade that was set."
 
-#: templates/noten/klausurregeln.html:56
+#: templates/noten/klausurregeln.html:62
 msgid "Freigaben"
 msgstr "Permissions"
 
-#: templates/noten/klausurregeln.html:63
+#: templates/noten/klausurregeln.html:69
 msgid "aufheben"
 msgstr "revoke"
 
-#: templates/noten/klausurregeln.html:66
+#: templates/noten/klausurregeln.html:72
 msgid ""
 "Keine Freigaben – eine Zeugnisnote braucht überall mindestens eine "
 "Einzelnote."
@@ -10596,11 +10707,11 @@ msgstr ""
 "No permissions – a report grade needs at least one individual grade "
 "everywhere."
 
-#: templates/noten/klausurregeln.html:69
+#: templates/noten/klausurregeln.html:75
 msgid "Neue Freigabe"
 msgstr "New permission"
 
-#: templates/noten/klausurregeln.html:78
+#: templates/noten/klausurregeln.html:84
 msgid "Freigeben"
 msgstr "Enable"
 
@@ -10990,6 +11101,11 @@ msgstr "Set by school management"
 #: templates/noten/struktur.html:34
 msgid "Vorgabe"
 msgstr "Prescribed"
+
+#: templates/noten/struktur.html:34
+#, python-format
+msgid "höchstens %(n)s"
+msgstr "at most %(n)s"
 
 #: templates/noten/struktur.html:34
 msgid "Name des Ordners"

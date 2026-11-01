@@ -24,7 +24,7 @@ from . import eingabe as E
 from . import notentabelle as T
 from . import zeugnisnoten as Z
 from .berechnung import Baum
-from .models import KAUFMAENNISCH, Bewertungsordner, Leistungsnachweis, Note, Unterricht
+from .models import KAUFMAENNISCH, Bewertungsordner, Leistungsnachweis, Note, Unterricht, grenze_text
 
 GROESSE_MAX = 5 * 1024 * 1024
 BEREICHE = ("ka", "somi")
@@ -554,6 +554,9 @@ def uebernehmen(u, tabelle, wahl, gewichte_uebernehmen=False, zeugnis_darf=True)
         ordner = ziel[info["bereich"]]
         ln = Leistungsnachweis.objects.filter(pk=info.get("ln")).first() if info.get("ln") else None
         if ln is None:
+            g = ordner.grenze()
+            if g is not None and g[1] >= g[2]:
+                raise ImportFehler(f"„{info['titel']}“: " + grenze_text(g))
             ln = Leistungsnachweis(ordner=ordner, titel=info["titel"], datum=standarddatum, gewicht=Decimal(1))
         kopf_gesperrt = bool(ln.pk and gesperrt and Note.objects.filter(leistungsnachweis=ln, schueler_id__in=gesperrt)
                              .exclude(stufe__isnull=True, sonderstatus="").exists())

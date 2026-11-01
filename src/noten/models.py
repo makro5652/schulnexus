@@ -294,6 +294,8 @@ class Bewertungsordner(models.Model):
     VORGABEN = [("", "—"), (KLAUSUR, _("Klausuren (Vorgabe der Schulleitung)")), (MITARBEIT, _("Sonstige Mitarbeit (Vorgabe der Schulleitung)"))]
     vorgegeben = models.CharField(_("Vorgegeben"), max_length=10, choices=VORGABEN, blank=True, default="", editable=False,
                                   help_text=_("Von einer Klausurregel der Schulleitung festgelegt: Name und Gewicht sind gesperrt."))
+    max_nachweise = models.PositiveSmallIntegerField(_("Höchstzahl Leistungsnachweise"), null=True, blank=True, editable=False,
+                                                     help_text=_("Vorgabe der Notenregel, gilt einschließlich der Unterordner."))
     history = HistoricalRecords(verbose_name=_("Änderungsprotokoll Bewertungsordner"))
 
     class Meta:
@@ -324,6 +326,33 @@ class Bewertungsordner(models.Model):
             o = o.eltern
         return liste
 
+    def grenze(self):
+        """
+        Höchstzahl der Leistungsnachweise, die für diesen Ordner gilt (eigene Vorgabe oder die eines übergeordneten
+        Ordners): (Ordner mit der Vorgabe, Anzahl darin samt Unterordnern, Höchstzahl) – oder None ohne Grenze.
+        """
+        o = self
+        for v in [self] + self.vorfahren():
+            if v.max_nachweise is not None:
+                o = v
+                break
+        else:
+            return None
+        return o, Leistungsnachweis.objects.filter(ordner_id__in=o.teilbaum_ids()).count(), o.max_nachweise
+
+    def teilbaum_ids(self):
+        """Dieser Ordner und alle Unterordner (IDs)."""
+        eltern_von = dict(Bewertungsordner.objects.filter(unterricht_id=self.unterricht_id).values_list("pk", "eltern_id"))
+        ids, neu = {self.pk}, {self.pk}
+        while neu:
+            neu = {pk for pk, e in eltern_von.items() if e in neu} - ids
+            ids |= neu
+        return ids
+
+    def voll(self):
+        g = self.grenze()
+        return g is not None and g[1] >= g[2]
+
     def _erzeugt_zyklus(self):
         if not (self.pk and self.eltern_id):
             return False
@@ -343,6 +372,12 @@ class Bewertungsordner(models.Model):
                 raise ValidationError({"eltern": _("Ein Ordner kann nicht in sich selbst oder einem seiner Unterordner liegen.")})
             if len(self.eltern.vorfahren()) + 2 > self.MAX_TIEFE:
                 raise ValidationError({"eltern": gettext("Höchstens %(n)s Ordnerebenen sind möglich.") % {"n": self.MAX_TIEFE}})
+
+
+def grenze_text(g):
+    o, _anzahl, hoechstens = g
+    return gettext("In „%(ordner)s“ sind höchstens %(n)s Leistungsnachweise je Halbjahr vorgesehen (Notenregel der Schulleitung).") % {
+        "ordner": o.name, "n": hoechstens}
 
 
 class Leistungsnachweis(models.Model):
@@ -382,6 +417,14 @@ class Leistungsnachweis(models.Model):
                     "von": a.beginn.strftime("%d.%m.%Y"), "bis": a.ende.strftime("%d.%m.%Y")}})
         if self.schluessel_id and not self.max_be:
             raise ValidationError(_("Bei Verwendung eines Notenschlüssels bitte die maximalen BE angeben."))
+        # Höchstzahl laut Notenregel (ab 0.4.17.0): beim Anlegen und beim Verschieben in einen anderen Ordner
+        g = self.ordner.grenze() if self.ordner_id else None
+        if g is not None:
+            bisher = Leistungsnachweis.objects.filter(pk=self.pk).values_list("ordner_id", flat=True).first() if self.pk else None
+            alt = Bewertungsordner.objects.get(pk=bisher).grenze() if bisher else None
+            schon_mitgezaehlt = alt is not None and alt[0].pk == g[0].pk
+            if not schon_mitgezaehlt and g[1] >= g[2]:
+                raise ValidationError({"ordner": grenze_text(g)})
         if self.schluessel_id and self.unterricht_id and self.schluessel.skala_id != self.unterricht.skala_id:
             raise ValidationError(_("Der Notenschlüssel passt nicht zur Notenskala des Unterrichts."))
 
@@ -498,7 +541,7 @@ class Zeugnisnote(models.Model):
                                    help_text=_("Freiwillig. Die Lehrkraft setzt die Zeugnisnote in eigener Verantwortung fest; "
                                                "Abweichungen vom rechnerischen Vorschlag werden nur markiert."))
     QUELLEN = [("", "—"), ("excel", _("aus der Excel-Notentabelle übernommen")), ("klasse", _("in der Klassenübersicht festgesetzt")),
-               ("auto", _("automatisch aus den Einzelnoten"))]
+               ("auto", _("automatisch aus den Einzelnoten")), ("kurs", _("in der Notentabelle festgesetzt"))]
     quelle = models.CharField(_("Herkunft"), max_length=10, choices=QUELLEN, blank=True, default="",
                               help_text=_("Wie die Zeugnisnote zuletzt gesetzt wurde; leer = in der Zeugnisnoten-Eingabe. "
                                           "„automatisch“ folgt den Einzelnoten, bis jemand die Note selbst festsetzt."))
@@ -609,6 +652,9 @@ class Klausurregel(models.Model):
                                          validators=[MinValueValidator(Decimal("1")), MaxValueValidator(Decimal("99"))])
     name_klausur = models.CharField(_("Name des Klausurordners"), max_length=60, default="Klausuren")
     name_mitarbeit = models.CharField(_("Name des Ordners für die übrigen Leistungen"), max_length=60, default="Sonstige Mitarbeit")
+    # ab 0.4.17.0: Höchstzahl der Leistungsnachweise je Halbjahr (leer = keine Grenze)
+    max_klausuren = models.PositiveSmallIntegerField(_("Höchstens Klausuren / Klassenarbeiten je Halbjahr"), null=True, blank=True, default=2)
+    max_mitarbeit = models.PositiveSmallIntegerField(_("Höchstens Noten sonstige Mitarbeit je Halbjahr"), null=True, blank=True, default=30)
     bemerkung = models.CharField(_("Bemerkung"), max_length=200, blank=True, help_text=_("z. B. Beschluss der Fachkonferenz vom …"))
     angelegt_von = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="+",
                                      verbose_name=_("Angelegt von"))
@@ -674,9 +720,9 @@ class Klausurregel(models.Model):
             klausur = Bewertungsordner(unterricht=unterricht, eltern=None, name=self.name_klausur)
         if mitarbeit is None:
             mitarbeit = Bewertungsordner(unterricht=unterricht, eltern=None, name=self.name_mitarbeit)
-        for o, art, anteil, rf in ((klausur, Bewertungsordner.KLAUSUR, self.anteil_klausur, 10),
-                                   (mitarbeit, Bewertungsordner.MITARBEIT, self.anteil_mitarbeit, 20)):
-            o.vorgegeben, o.gewicht = art, anteil
+        for o, art, anteil, rf, hoechstens in ((klausur, Bewertungsordner.KLAUSUR, self.anteil_klausur, 10, self.max_klausuren),
+                                               (mitarbeit, Bewertungsordner.MITARBEIT, self.anteil_mitarbeit, 20, self.max_mitarbeit)):
+            o.vorgegeben, o.gewicht, o.max_nachweise = art, anteil, hoechstens
             if not o.pk:
                 o.reihenfolge = rf
             o.save()
@@ -694,7 +740,7 @@ class Klausurregel(models.Model):
     @staticmethod
     def freigeben(unterricht):
         """Hebt die Vorgabe auf (z. B. wenn die Regel gelöscht wird); die Ordner bleiben frei bearbeitbar erhalten."""
-        Bewertungsordner.objects.filter(unterricht=unterricht).exclude(vorgegeben="").update(vorgegeben="")
+        Bewertungsordner.objects.filter(unterricht=unterricht).exclude(vorgegeben="").update(vorgegeben="", max_nachweise=None)
 
 
 class Notensperre(models.Model):
