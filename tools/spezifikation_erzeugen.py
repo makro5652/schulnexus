@@ -360,8 +360,8 @@ def betrieb():
 # ---------------------------------------------------------------- Fachliche Beschreibung (von Hand gepflegt)
 
 FACHLICH = {
-    "zweck": "Schulnexus ist eine Open-Source-Schulverwaltung für eine Deutsche Schule im Ausland (Deutsche Schule Nairobi, "
-             "Jahrgänge 1–12, Sek I nach der Richtlinie für Deutsche Schulen im Ausland, Sek II mit Punkten 0–15). Sie deckt "
+    "zweck": "Schulnexus ist eine Open-Source-Schulverwaltung für eine Schule (Jahrgänge 1–12,"
+             " Sek I nach der Richtlinie für Deutsche Schulen im Ausland, Sek II mit Punkten 0–15). Sie deckt "
              "Stammdaten, Klassen und Kurse, Noten, Zeugnisse und Konferenzen, Fehlzeiten, Förderung, Neuanmeldungen, "
              "Elternkommunikation, Termine, Personal, Schuljahreswechsel, Archiv, Sicherung und Rechte ab.",
     "zielgruppen": ["Lehrkräfte (eigener Unterricht, Klassenleitung)", "Stufenkoordination (Mittel- und Oberstufe)",

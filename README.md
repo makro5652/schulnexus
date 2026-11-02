@@ -1,6 +1,6 @@
 # Schulnexus (Version 0.4.9.2, Entwicklungsstand)
 
-**Schulnexus** ist eine Open-Source-Schulverwaltung für die DSN (bis 0.4.8.1 „Schulverwaltung“, in 0.4.9.0 kurz „edunex“): Stammdaten, Klassen und Lerngruppen,
+**Schulnexus** ist eine Open-Source-Schulverwaltung für Schulen (bis 0.4.8.1 „Schulverwaltung“, in 0.4.9.0 kurz „edunex“): Stammdaten, Klassen und Lerngruppen,
 Noten mit Gewichtung, Fehlzeiten, Nachmittagsprogramm, Anhänge zur Schülerakte,
 Förderpläne und Nachteilsausgleiche, Neuanmeldungen, Zeugnisse und Konferenzen, Schuljahreswechsel,
 Abgänge mit Abgangszeugnis, Archiv und Löschfristen, Schulkalender, Raumbuchung, Elternsprechtage und

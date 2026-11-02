@@ -212,10 +212,10 @@ if TESTLAUF and not DATEN_SCHLUESSEL:
     DATEN_SCHLUESSEL = "dGVzdHNjaGx1ZXNzZWwtbnVyLWZ1ZXItdGVzdHMtMzI"  # fester Testschlüssel (32 Byte)
 
 # ---------------------------------------------------------------- Office-Seite (ab 0.4.6.0)
-# Microsoft-365-Mandant (z. B. dsnairobi.onmicrosoft.com oder dsn.ac.ke); ergänzt Anmeldelinks um den Mandanten.
+# Microsoft-365-Mandant (z. B. meineschule.onmicrosoft.com oder meineschule.example); ergänzt Anmeldelinks um den Mandanten.
 OFFICE_MANDANT = os.environ.get("OFFICE_MANDANT", "").strip()
 
-SCHULNAME = os.environ.get("SCHULNAME", "Deutsche Schule Nairobi")
+SCHULNAME = os.environ.get("SCHULNAME", "Meine Schule")
 SCHULORT = os.environ.get("SCHULORT", "Nairobi")
 # Fehltage auf dem Zeugnis ausweisen (im KMK-Muster nicht vorgesehen; 1 = ja)
 ZEUGNIS_FEHLZEITEN = env_bool("ZEUGNIS_FEHLZEITEN", False)

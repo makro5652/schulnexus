@@ -4,7 +4,7 @@
  "schulnexus_version": "0.4.17.0",
  "hinweis": "Automatisch erzeugt mit tools/spezifikation_erzeugen.py. Enthält nur die Programmstruktur, keine Daten.",
  "projekt": {
-  "zweck": "Schulnexus ist eine Open-Source-Schulverwaltung für eine Deutsche Schule im Ausland (Deutsche Schule Nairobi, Jahrgänge 1–12, Sek I nach der Richtlinie für Deutsche Schulen im Ausland, Sek II mit Punkten 0–15). Sie deckt Stammdaten, Klassen und Kurse, Noten, Zeugnisse und Konferenzen, Fehlzeiten, Förderung, Neuanmeldungen, Elternkommunikation, Termine, Personal, Schuljahreswechsel, Archiv, Sicherung und Rechte ab.",
+  "zweck": "Schulnexus ist eine Open-Source-Schulverwaltung für eine Schule (Jahrgänge 1–12, Sek I nach der Richtlinie für Deutsche Schulen im Ausland, Sek II mit Punkten 0–15). Sie deckt Stammdaten, Klassen und Kurse, Noten, Zeugnisse und Konferenzen, Fehlzeiten, Förderung, Neuanmeldungen, Elternkommunikation, Termine, Personal, Schuljahreswechsel, Archiv, Sicherung und Rechte ab.",
   "zielgruppen": [
    "Lehrkräfte (eigener Unterricht, Klassenleitung)",
    "Stufenkoordination (Mittel- und Oberstufe)",
@@ -30685,13 +30685,13 @@
     "art": "os.environ.get",
     "standard": "\"\"",
     "zeile": "OFFICE_MANDANT = os.environ.get(\"OFFICE_MANDANT\", \"\").strip()",
-    "kommentar": "---------------------------------------------------------------- Office-Seite (ab 0.4.6.0) Microsoft-365-Mandant (z. B. dsnairobi.onmicrosoft.com oder dsn.ac.ke); ergänzt Anmeldelinks um den Mandanten."
+    "kommentar": "---------------------------------------------------------------- Office-Seite (ab 0.4.6.0) Microsoft-365-Mandant (z. B. meineschule.onmicrosoft.com oder meineschule.example); ergänzt Anmeldelinks um den Mandanten."
    },
    {
     "variable": "SCHULNAME",
     "art": "os.environ.get",
-    "standard": "\"Deutsche Schule Nairobi\"",
-    "zeile": "SCHULNAME = os.environ.get(\"SCHULNAME\", \"Deutsche Schule Nairobi\")",
+    "standard": "\"Meine Schule\"",
+    "zeile": "SCHULNAME = os.environ.get(\"SCHULNAME\", \"Meine Schule\")",
     "kommentar": null
    },
    {
@@ -31887,7 +31887,7 @@
    },
    {
     "variable": "OFFICE_MANDANT",
-    "kommentar": "Microsoft-365-Mandant: Name vor „.sharepoint.com“ (z. B. dsnairobi für https://dsnairobi.sharepoint.com). Nur nötig für Office-Kacheln mit dem Platzhalter {mandant}."
+    "kommentar": "Microsoft-365-Mandant: Name vor „.sharepoint.com“ (z. B. meineschule für https://meineschule.sharepoint.com). Nur nötig für Office-Kacheln mit dem Platzhalter {mandant}."
    },
    {
     "variable": "JAHRESNOTE_JAHRGAENGE",
