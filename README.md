@@ -155,6 +155,21 @@ Daten unter `/mnt/user/appdata/schulnexus-daten`, tägliche Datenbanksicherung.
 Einrichtung im Unraid-Terminal mit `sh unraid/einrichten.sh` – Schritt für Schritt in
 [ANLEITUNG-UNRAID.md](ANLEITUNG-UNRAID.md).
 
+## Schulname und Ort einstellen
+
+Der Schulname erscheint auf Zeugnissen, Förderplänen, Druckköpfen, in der Titelleiste und in E-Mails an Eltern.
+Der Ort steht auf dem Zeugnis unter dem Datum und auf Briefen.
+
+Beides steht in der Datei `.env` (bei Docker im Projektordner, bei Unraid in `unraid/.env`):
+
+```
+SCHULNAME=Name deiner Schule
+SCHULORT=Ort deiner Schule
+```
+
+Danach den Container neu starten, damit die Änderung wirkt. Ohne Neustart bleibt der alte Name stehen.
+Die `.env` gehört nicht ins Repository; die Vorlage `.env.example` enthält nur Platzhalter.
+
 ## Zeugnisse, Zeugniskommentare und Konferenzen
 
 Grundlage: Ordnung für den Abschluss der Sekundarstufe I an Deutschen Schulen im Ausland (Sek I-PO, KMK 16.03.2017;
