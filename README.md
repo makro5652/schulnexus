@@ -12,6 +12,12 @@ Sicherungen, Zwei-Faktor-Anmeldung, HTTPS-Betrieb. Läuft im Browser, betrieben 
 > verschlüsselte Festplatten (Unraid), Schlüssel sicher hinterlegen, Zwei-Faktor-Anmeldung für Leitung und IT
 > verpflichtend machen und die Freigabe durch den Datenschutz einholen (siehe „Sicherheit und Verschlüsselung“).
 
+## Standalone-Version für macOS (ohne Docker)
+
+Als eigenständige Mac-App mit eigenem Fenster, ohne Docker: Ordner [`mac/`](mac/README.md).
+Die App startet den Server lokal mit SQLite und benötigt nur Python 3.12 oder neuer.
+Bauen mit `mac/build-app.sh`, Anleitung und Hinweise in [`mac/README.md`](mac/README.md).
+
 ## Starten auf dem MacBook
 
 1. **Docker Desktop** installieren und starten: https://www.docker.com/products/docker-desktop/
