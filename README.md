@@ -829,6 +829,28 @@ SECRET_KEY=x DATABASE_URL=postgres://x:x@localhost/x python tools/spezifikation_
 
 Eine Datenbank ist dafür nicht nötig.
 
+## Noteneingabe mit Statistik, Filter, Tastenkürzeln und Entwurf (ab 0.5.0)
+
+Die Seite **Noten eintragen** (Schnelleingabe je Leistungsnachweis) ist komfortabler geworden. An Rechten, Berechnung
+und Speicherung ändert sich nichts.
+
+- **Statistik beim Tippen:** Neben der Tabelle stehen Durchschnitt, Verteilung der Noten als Balken sowie die Zahl der
+  Einträge „entschuldigt“, „unentschuldigt“, „befreit“, „nicht bewertbar“ und „ohne Eintrag“. Bei Bewertung über BE
+  zählt die Note, die sich aus dem Notenschlüssel ergibt. Die Statistik dient der Orientierung und wird nicht gespeichert.
+- **Filter:** „Name suchen …“ blendet die übrigen Zeilen aus (Umlaute und Akzente werden großzügig verglichen);
+  „nur ohne Note“ zeigt die noch fehlenden Einträge. Enter und die Pfeiltasten springen nur durch sichtbare Zeilen,
+  auch das Einfügen einer Excel-Spalte füllt nur sichtbare Zeilen. Ausgeblendete Zeilen werden trotzdem gespeichert.
+- **Tastenkürzel:** Strg+S (Mac: ⌘+S) speichert, Strg+Enter speichert und legt den nächsten Leistungsnachweis an,
+  Esc leert den Filter, F1 zeigt die Übersicht aller Kürzel.
+- **Entwurf:** Ungespeicherte Eingaben merkt sich der Browser im aktuellen Fenster (sessionStorage). Nach
+  versehentlichem Neuladen, Zurück-Klick oder abgelaufener Anmeldung bietet die Seite „Wiederherstellen“ oder
+  „Verwerfen“ an. Der Entwurf verlässt den Rechner nicht, gilt je Konto, Kurs und Leistungsnachweis, verschwindet
+  nach dem Speichern und spätestens beim Schließen des Fensters; Entwürfe anderer Konten im selben Fenster werden
+  entfernt.
+
+Technisch: `static/noten.js`, `templates/noten/eingabe.html`, `noten/ansichten.py` (`entwurf_schluessel`), Tests in
+`noten/tests_050.py`. Es kommen keine neuen Abhängigkeiten und keine Migrationen hinzu.
+
 ## Noten schnell eintragen (ab 0.4.17.0)
 
 - **Vorlage über die Notenregel** (Schulleitung › Notenregeln): je Jahrgangsbereich und Fächern zwei vorgegebene Ordner,

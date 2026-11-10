@@ -1,6 +1,17 @@
 /* Menüband: Registerkarten umschalten, einklappen (im Browser gemerkt), Tastaturbedienung. */
 (function () {
   "use strict";
+  // Noteneingabe (ab 0.5.0): Nach erfolgreichem Speichern nennt der Server den Entwurf, den der Browser verwerfen soll.
+  try {
+    var treffer = /(?:^|;\s*)ne_gespeichert=(ne\.[\w.]+)/.exec(document.cookie);
+    if (treffer) {
+      window.sessionStorage.removeItem(treffer[1]);
+      document.cookie = "ne_gespeichert=; Max-Age=0; path=/; SameSite=Lax";
+    }
+  } catch (e) { /* ohne Speicher */ }
+})();
+(function () {
+  "use strict";
   var mb = document.getElementById("menueband");
   if (!mb) return;
   var reiter = Array.prototype.slice.call(mb.querySelectorAll('[role="tab"]'));

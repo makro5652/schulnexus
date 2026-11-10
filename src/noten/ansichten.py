@@ -109,6 +109,11 @@ class NachweisForm(forms.ModelForm):
         super()._post_clean()
 
 
+def entwurf_schluessel(benutzer, u, ln):
+    """Schlüssel, unter dem der Browser ungespeicherte Eingaben merkt (nur Buchstaben, Ziffern, Punkte)."""
+    return f"ne.{benutzer.pk}.{u.pk}.{ln.pk if ln else 'neu'}"
+
+
 @login_required
 def noten_eintragen(request, pk, ln_pk=None):
     u = _unterricht(request, pk)
@@ -156,8 +161,13 @@ def noten_eintragen(request, pk, ln_pk=None):
                 messages.success(request, ngettext("„%(titel)s“ gespeichert, %(n)s Note geändert.",
                                                    "„%(titel)s“ gespeichert, %(n)s Noten geändert.", n) % {"titel": vorlaeufig.titel, "n": n})
                 if request.POST.get("weiter") == "neu":
-                    return redirect(reverse("noten_eintragen", args=[u.pk]) + f"?ordner={vorlaeufig.ordner_id}")
-                return redirect("notenuebersicht", pk=u.pk)
+                    antwort = redirect(reverse("noten_eintragen", args=[u.pk]) + f"?ordner={vorlaeufig.ordner_id}")
+                else:
+                    antwort = redirect("notenuebersicht", pk=u.pk)
+                # Der Browser verwirft daraufhin den lokal gemerkten Entwurf dieser Eingabe (ab 0.5.0)
+                antwort.set_cookie("ne_gespeichert", entwurf_schluessel(request.user, u, ln), max_age=300, samesite="Lax",
+                                   secure=request.is_secure())
+                return antwort
             messages.error(request, ngettext("%(n)s Eingabe ist nicht gültig – es wurde nichts gespeichert.",
                                              "%(n)s Eingaben sind nicht gültig – es wurde nichts gespeichert.", len(fehler)) % {"n": len(fehler)})
     else:
@@ -184,6 +194,8 @@ def noten_eintragen(request, pk, ln_pk=None):
         "u": u, "ln": ln, "form": form, "zeilen": zeilen, "ordner_optionen": ordner_optionen,
         "gewaehlt": str(form["ordner"].value() or ""),
         "erlaubt_liste": [s.bezeichnung for s in u.skala.stufen.all()],
+        "werte": {s.bezeichnung: float(s.wert) for s in u.skala.stufen.all()},
+        "entwurf": entwurf_schluessel(request.user, u, ln),
         "schluessel": schluessel,
         "texte": {
             "entschuldigt": gettext("entschuldigt"), "unentschuldigt": gettext("unentschuldigt"), "befreit": gettext("befreit"),
@@ -191,6 +203,10 @@ def noten_eintragen(request, pk, ln_pk=None):
             "be_ungueltig": gettext("BE ungültig"), "summe": gettext("In diesem Ordner bisher vergeben: {a} %, mit diesem Eintrag: {b} %"),
             "komma": "," if (get_language() or "de").startswith("de") else ".",
             "verlassen": gettext("Es gibt ungespeicherte Eingaben."),
+            "entwurf": gettext("Nicht gespeicherte Eingaben von {zeit} Uhr gefunden."),
+            "gemerkt": gettext("Entwurf gemerkt um {zeit} Uhr"),
+            "eingetragen": gettext("{a} von {b} eingetragen"),
+            "treffer": gettext("{a} von {b} angezeigt"),
         },
         "titel_vorschlaege": sorted({t for t in Leistungsnachweis.objects.filter(unterricht=u).values_list("titel", flat=True)}),
         "einzelgewichte": any(z["w"].get("gewicht") for z in zeilen),

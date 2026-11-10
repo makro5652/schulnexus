@@ -9,7 +9,11 @@
 <p class="unterzeile">{{ u.fach.lokal_name }} · {{ u.gruppe.name }} · {{ u.abschnitt }} · {% blocktranslate with skala=u.skala %}Skala „{{ skala }}“{% endblocktranslate %}</p>
 
 {% if gesperrt_anzahl %}<p class="ne-sperre">{% blocktranslate count n=gesperrt_anzahl %}Die Noten von {{ n }} Schüler:in sind gesperrt (Zeugnisfreigabe bzw. Konferenz).{% plural %}Die Noten von {{ n }} Schüler:innen sind gesperrt (Zeugnisfreigabe bzw. Konferenz).{% endblocktranslate %}{% if kopf_gesperrt %} {% translate "Gewicht, Ordner, Datum und Notenschlüssel dieses Leistungsnachweises bleiben deshalb unverändert." %}{% endif %}</p>{% endif %}
-<form method="post" id="ne-form" class="ne-form" novalidate>{% csrf_token %}
+<p class="ne-entwurf" id="ne-entwurf" hidden><span class="ne-entwurf-text"></span>
+  <button type="button" class="knopf klein" id="ne-entwurf-holen">{% translate "Wiederherstellen" %}</button>
+  <button type="button" class="knopf klein zweitrangig" id="ne-entwurf-weg">{% translate "Verwerfen" %}</button></p>
+<form method="post" id="ne-form" class="ne-form" novalidate data-entwurf="{{ entwurf }}">{% csrf_token %}
+  {{ werte|json_script:"ne-werte" }}
   {{ erlaubt_liste|json_script:"ne-erlaubt" }}
   {{ schluessel|json_script:"ne-schluessel" }}
   {{ texte|json_script:"ne-texte" }}
@@ -39,10 +43,17 @@
     </details>
   </section>
 
+  <div class="ne-zweispaltig">
   <section class="karte">
     <div class="karte-kopf">
       <h2>{% blocktranslate count n=zeilen|length %}{{ n }} Schüler:in{% plural %}{{ n }} Schüler:innen{% endblocktranslate %}</h2>
       <label class="haken"><input type="checkbox" id="ne-einzel"{% if einzelgewichte %} checked{% endif %}> {% translate "Einzelgewichte anzeigen" %}</label>
+    </div>
+    <div class="ne-werkzeug">
+      <input type="search" id="ne-filter" class="ne-filter" placeholder="{% translate 'Name suchen …' %}" aria-label="{% translate 'Schüler:innen nach Namen filtern' %}" autocomplete="off">
+      <label class="haken"><input type="checkbox" id="ne-nur-leer"> {% translate "nur ohne Note" %}</label>
+      <span class="ne-treffer hinweistext" id="ne-treffer" aria-live="polite"></span>
+      <button type="button" class="knopf klein zweitrangig ne-kuerzelknopf" id="ne-kuerzel-oeffnen" aria-haspopup="dialog">{% translate "Tastenkürzel" %} <kbd>F1</kbd></button>
     </div>
     <p class="hinweistext ne-hilfe">{% translate "Note eintippen, z. B. 2+ oder 3-. Kürzel: e = entschuldigt, u = unentschuldigt (u 6 = unentschuldigt mit Note), b = befreit, nb = nicht bewertbar. Enter oder ↓ springt zur nächsten Zeile. Eine Spalte aus Excel lässt sich in das erste Feld einfügen." %}</p>
     <div class="tabellenrahmen">
@@ -68,11 +79,45 @@
     </div>
   </section>
 
+  <aside class="karte ne-statistik" id="ne-statistik" aria-label="{% translate 'Statistik der Eingaben' %}">
+    <h2>{% translate "Statistik" %}</h2>
+    <p class="ne-schnitt"><span class="ne-schnitt-wert" id="ne-st-schnitt">–</span> <span class="hinweistext">{% translate "Durchschnitt" %}</span></p>
+    <p class="hinweistext" id="ne-st-anzahl" aria-live="polite"></p>
+    <div class="ne-balken" id="ne-st-balken" role="img" aria-label="{% translate 'Verteilung der Noten' %}"></div>
+    <dl class="ne-zaehler">
+      <div><dt>{% translate "entschuldigt" %}</dt><dd id="ne-st-e">0</dd></div>
+      <div><dt>{% translate "unentschuldigt" %}</dt><dd id="ne-st-u">0</dd></div>
+      <div><dt>{% translate "befreit" %}</dt><dd id="ne-st-b">0</dd></div>
+      <div><dt>{% translate "nicht bewertbar" %}</dt><dd id="ne-st-nb">0</dd></div>
+      <div><dt>{% translate "ohne Eintrag" %}</dt><dd id="ne-st-leer">0</dd></div>
+    </dl>
+    <p class="hinweistext">{% translate "Rechnet beim Tippen mit; dient nur zur Orientierung und wird nicht gespeichert." %}</p>
+  </aside>
+  </div>
+
   <div class="knopfreihe ne-knoepfe">
     <button type="submit" class="knopf ne-speichern">{% translate "Speichern" %}</button>
     <button type="submit" class="knopf zweitrangig" name="weiter" value="neu">{% translate "Speichern und nächsten anlegen" %}</button>
     <a class="knopf zweitrangig" href="{% url 'notenuebersicht' u.pk %}">{% translate "Abbrechen" %}</a>
+    <span class="ne-status hinweistext" id="ne-status" aria-live="polite"></span>
   </div>
 </form>
+<dialog class="ne-dialog" id="ne-kuerzel" aria-labelledby="ne-kuerzel-titel">
+  <h2 id="ne-kuerzel-titel">{% translate "Tastenkürzel der Noteneingabe" %}</h2>
+  <table class="ne-kuerzeltabelle">
+    <tr><th><kbd>Enter</kbd> / <kbd>↓</kbd></th><td>{% translate "nächste Zeile" %}</td></tr>
+    <tr><th><kbd>↑</kbd></th><td>{% translate "vorige Zeile" %}</td></tr>
+    <tr><th><kbd>{% translate "Strg" %}</kbd> + <kbd>S</kbd></th><td>{% translate "Speichern" %}</td></tr>
+    <tr><th><kbd>{% translate "Strg" %}</kbd> + <kbd>Enter</kbd></th><td>{% translate "Speichern und nächsten anlegen" %}</td></tr>
+    <tr><th><kbd>{% translate "Strg" %}</kbd> + <kbd>Z</kbd></th><td>{% translate "Eingabe im Feld rückgängig machen" %}</td></tr>
+    <tr><th><kbd>Esc</kbd></th><td>{% translate "Filter leeren" %}</td></tr>
+    <tr><th><kbd>F1</kbd></th><td>{% translate "diese Übersicht" %}</td></tr>
+    <tr><th><kbd>e</kbd> <kbd>u</kbd> <kbd>b</kbd> <kbd>nb</kbd></th><td>{% translate "entschuldigt, unentschuldigt, befreit, nicht bewertbar" %}</td></tr>
+    <tr><th><kbd>u 6</kbd></th><td>{% translate "unentschuldigt mit Note" %}</td></tr>
+    <tr><th><kbd>=2+</kbd></th><td>{% translate "Note direkt, auch bei Bewertung über BE" %}</td></tr>
+  </table>
+  <p class="hinweistext">{% translate "Auf dem Mac gilt ⌘ statt Strg. Ungespeicherte Eingaben merkt sich der Browser bis zum Schließen des Fensters." %}</p>
+  <form method="dialog"><button class="knopf">{% translate "Schließen" %}</button></form>
+</dialog>
 <script src="{% static 'noten.js' %}"></script>
 {% endblock %}

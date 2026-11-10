@@ -1212,3 +1212,41 @@ td.zn-abweichung small { color: #c06a1c; font-weight: 600; }
 .nk-gewicht input.geaendert, .nk-zn-zelle select.geaendert { border-color: var(--akzent); box-shadow: 0 0 0 2px var(--akzent-hell); }
 .nk-zn-zelle select { font: inherit; font-size: 0.85rem; padding: 0.15rem 0.3rem; border: 1px solid var(--linie); border-radius: 5px; background: var(--grund); color: var(--text); }
 th.nk-neu-spalte { background: var(--akzent-hell); }
+
+/* Noteneingabe ab 0.5.0: Filter, Statistik neben der Tabelle, Entwurf, Tastenkürzel */
+.ne-zweispaltig { display: grid; grid-template-columns: minmax(0, 1fr) 17rem; gap: 1rem; align-items: start; }
+.ne-zweispaltig > .karte { margin: 0; min-width: 0; }
+.ne-statistik { position: sticky; top: 0.8rem; }
+.ne-statistik h2 { margin: 0 0 0.4rem; font-size: 1rem; }
+.ne-schnitt { margin: 0; }
+.ne-schnitt-wert { font-size: 2rem; font-weight: 700; color: var(--akzent); font-variant-numeric: tabular-nums; }
+.ne-balken { display: grid; gap: 0.25rem; margin: 0.7rem 0; }
+.ne-balkenzeile { display: grid; grid-template-columns: 1.9rem minmax(0, 1fr) 1.6rem; gap: 0.4rem; align-items: center; font-size: 0.82rem; font-variant-numeric: tabular-nums; }
+.ne-balkenzeile b { text-align: right; }
+.ne-balkenzeile i { display: block; height: 0.7rem; border-radius: 4px; background: var(--akzent); min-width: 2px; }
+.ne-balkenzeile span:last-child { color: var(--leise); }
+.ne-zaehler { margin: 0.6rem 0; display: grid; gap: 0.15rem; font-size: 0.86rem; }
+.ne-zaehler div { display: flex; justify-content: space-between; gap: 0.6rem; border-bottom: 1px dotted var(--linie); padding: 0.1rem 0; }
+.ne-zaehler dt { color: var(--leise); }
+.ne-zaehler dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+.ne-werkzeug { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.9rem; margin: 0.6rem 0 0.2rem; }
+.ne-filter { font: inherit; padding: 0.35rem 0.6rem; border: 1px solid var(--linie); border-radius: 6px; background: var(--grund); color: var(--text); width: min(15rem, 100%); }
+.ne-treffer { margin: 0; }
+.ne-kuerzelknopf { margin-left: auto; }
+.ne-tabelle tr[hidden] { display: none; }
+.ne-entwurf { background: var(--hinweis-flaeche); color: var(--hinweis-text); border-radius: 6px; padding: 0.55rem 0.8rem; font-size: 0.9rem; display: flex; flex-wrap: wrap; gap: 0.5rem 0.8rem; align-items: center; }
+.ne-entwurf[hidden] { display: none; }
+.ne-status { margin: 0 0 0 0.4rem; }
+kbd { font: inherit; font-size: 0.82em; border: 1px solid var(--linie); border-bottom-width: 2px; border-radius: 4px; padding: 0 0.3rem; background: var(--grund); color: var(--text); white-space: nowrap; }
+.ne-dialog { border: 1px solid var(--linie); border-radius: 10px; background: var(--flaeche); color: var(--text); padding: 1.2rem 1.4rem; max-width: min(34rem, 92vw); }
+.ne-dialog::backdrop { background: rgba(0, 0, 0, 0.45); }
+.ne-dialog h2 { margin-top: 0; }
+.ne-kuerzeltabelle { border-collapse: collapse; width: 100%; margin-bottom: 0.8rem; }
+.ne-kuerzeltabelle th, .ne-kuerzeltabelle td { text-align: left; padding: 0.3rem 0.6rem 0.3rem 0; border-bottom: 1px solid var(--linie); font-weight: 400; vertical-align: top; }
+.ne-kuerzeltabelle th { white-space: nowrap; }
+@media (max-width: 900px) {
+  .ne-zweispaltig { grid-template-columns: minmax(0, 1fr); }
+  .ne-statistik { position: static; }
+  .ne-kuerzelknopf { display: none; }
+}
+@media print { .ne-werkzeug, .ne-statistik, .ne-entwurf, .ne-status { display: none; } }

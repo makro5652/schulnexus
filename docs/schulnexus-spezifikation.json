@@ -1,7 +1,7 @@
 {
  "format": "schulnexus-spezifikation",
  "formatversion": 1,
- "schulnexus_version": "0.4.17.0",
+ "schulnexus_version": "0.5.0",
  "hinweis": "Automatisch erzeugt mit tools/spezifikation_erzeugen.py. Enthält nur die Programmstruktur, keine Daten.",
  "projekt": {
   "zweck": "Schulnexus ist eine Open-Source-Schulverwaltung für eine Schule (Jahrgänge 1–12, Sek I nach der Richtlinie für Deutsche Schulen im Ausland, Sek II mit Punkten 0–15). Sie deckt Stammdaten, Klassen und Kurse, Noten, Zeugnisse und Konferenzen, Fehlzeiten, Förderung, Neuanmeldungen, Elternkommunikation, Termine, Personal, Schuljahreswechsel, Archiv, Sicherung und Rechte ab.",
@@ -9021,6 +9021,12 @@
        "doc": null
       },
       {
+       "name": "entwurf_schluessel",
+       "signatur": "(benutzer, u, ln)",
+       "dekoratoren": null,
+       "doc": "Schlüssel, unter dem der Browser ungespeicherte Eingaben merkt (nur Buchstaben, Ziffern, Punkte)."
+      },
+      {
        "name": "noten_eintragen",
        "signatur": "(request, pk, ln_pk=None)",
        "dekoratoren": [
@@ -10742,6 +10748,23 @@
         "test_somi_spalte_gewicht_und_note_ueber_die_tabelle",
         "test_zeugnisnote_in_der_tabelle_festsetzen_und_zuruecksetzen",
         "test_notenregeln_seite_zeigt_hoechstzahlen"
+       ]
+      }
+     ]
+    },
+    {
+     "datei": "src/noten/tests_050.py",
+     "doc": "Tests 0.5.0: Noteneingabe mit Statistik, Namensfilter, Tastenkürzeln und Entwurf im Browser.",
+     "klassen": [
+      {
+       "klasse": "KomfortTest",
+       "doc": null,
+       "faelle": [
+        "test_seite_bringt_statistik_filter_und_kuerzel",
+        "test_werte_der_skala_fuer_den_durchschnitt",
+        "test_entwurfsschluessel_je_konto_kurs_und_nachweis",
+        "test_speichern_nennt_dem_browser_den_erledigten_entwurf",
+        "test_fehlerhafte_eingabe_setzt_keinen_cookie"
        ]
       }
      ]
@@ -31211,7 +31234,7 @@
   },
   {
    "datei": "src/templates/noten/eingabe.html",
-   "zeilen": 79,
+   "zeilen": 124,
    "erbt_von": "portal/base.html",
    "einbindungen": [
     "noten/_kurswahl.html"
@@ -31657,13 +31680,13 @@
   },
   {
    "datei": "src/static/menueband.js",
-   "zeilen": 70,
+   "zeilen": 81,
    "beschreibung": "Menüband: Registerkarten umschalten, einklappen (im Browser gemerkt), Tastaturbedienung."
   },
   {
    "datei": "src/static/noten.js",
-   "zeilen": 149,
-   "beschreibung": "Schnelleingabe von Noten: sofortige Prüfung, Enter/Pfeiltasten, Einfügen einer Spalte, Gewichtsanzeige je Ordner."
+   "zeilen": 317,
+   "beschreibung": "Schnelleingabe von Noten: sofortige Prüfung, Enter/Pfeiltasten, Einfügen einer Spalte, Gewichtsanzeige je Ordner. Ab 0.5.0: Statistik beim Tippen, Namensfilter, Tastenkürzel (Strg+S, Strg+Enter, F1), Entwurf im Browser."
   },
   {
    "datei": "src/static/noten_matrix.js",
@@ -31697,7 +31720,7 @@
   },
   {
    "datei": "src/static/portal.css",
-   "zeilen": 1215,
+   "zeilen": 1253,
    "beschreibung": "Kennzeichnungen (Status, Hinweise)"
   },
   {

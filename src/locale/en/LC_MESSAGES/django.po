@@ -15374,3 +15374,87 @@ msgid ""
 msgstr ""
 "Poor in two non-core subjects requires at least satisfactory in two other "
 "subjects, at most one from art, music, PE."
+
+msgid "Name suchen …"
+msgstr "Search name …"
+
+msgid "Schüler:innen nach Namen filtern"
+msgstr "Filter students by name"
+
+msgid "nur ohne Note"
+msgstr "without grade only"
+
+msgid "Tastenkürzel"
+msgstr "Keyboard shortcuts"
+
+msgid "Statistik der Eingaben"
+msgstr "Statistics of the entries"
+
+msgid "Statistik"
+msgstr "Statistics"
+
+msgid "Durchschnitt"
+msgstr "Average"
+
+msgid "Verteilung der Noten"
+msgstr "Distribution of grades"
+
+msgid "ohne Eintrag"
+msgstr "no entry"
+
+msgid ""
+"Rechnet beim Tippen mit; dient nur zur Orientierung und wird nicht "
+"gespeichert."
+msgstr "Updates while you type; for orientation only and not saved."
+
+msgid "Tastenkürzel der Noteneingabe"
+msgstr "Keyboard shortcuts for grade entry"
+
+msgid "nächste Zeile"
+msgstr "next row"
+
+msgid "vorige Zeile"
+msgstr "previous row"
+
+msgid "Strg"
+msgstr "Ctrl"
+
+msgid "Eingabe im Feld rückgängig machen"
+msgstr "Undo the entry in the field"
+
+msgid "Filter leeren"
+msgstr "Clear filter"
+
+msgid "diese Übersicht"
+msgstr "this overview"
+
+msgid "entschuldigt, unentschuldigt, befreit, nicht bewertbar"
+msgstr "excused, unexcused, exempt, not assessable"
+
+msgid "unentschuldigt mit Note"
+msgstr "unexcused with grade"
+
+msgid "Note direkt, auch bei Bewertung über BE"
+msgstr "Grade directly, also when marking by points (BE)"
+
+msgid ""
+"Auf dem Mac gilt ⌘ statt Strg. Ungespeicherte Eingaben merkt sich der "
+"Browser bis zum Schließen des Fensters."
+msgstr ""
+"On a Mac use ⌘ instead of Ctrl. The browser remembers unsaved entries until "
+"the window is closed."
+
+msgid "Schließen"
+msgstr "Close"
+
+msgid "Nicht gespeicherte Eingaben von {zeit} Uhr gefunden."
+msgstr "Unsaved entries from {zeit} found."
+
+msgid "Entwurf gemerkt um {zeit} Uhr"
+msgstr "Draft remembered at {zeit}"
+
+msgid "{a} von {b} eingetragen"
+msgstr "{a} of {b} entered"
+
+msgid "{a} von {b} angezeigt"
+msgstr "{a} of {b} shown"
