@@ -308,7 +308,7 @@ unter **System › Rollen und Rechte** (für Verwaltungsleitung und Schulleitung
 | IT-Administration | Vollzugriff (Superuser): alle Daten, Benutzerkonten, Rollen und Einzelrechte, Sicherung, Wiederherstellung, PDF-Export |
 | Schüler:in, Eltern | vorbereitet für Stundenplan bzw. Elternportal; derzeit kein Zugang |
 
-**Einzelrechte (ab 0.4.3.0):** Unter **System › Benutzer und Rechte › Einzelrechte** (nur IT) lassen sich je Konto
+**Einzelrechte (ab 0.4.3.0):** Unter **System › Benutzer und Rechte › Konten und Rechte** (nur IT; bis 0.5.0 „Einzelrechte“) lassen sich je Konto
 Rollen setzen, das Konto sperren, ein vorläufiges Passwort erzeugen und einzelne Rechte zusätzlich **erteilen** oder trotz
 Rolle **entziehen** (je Bereich: ansehen, anlegen, ändern, löschen, dazu Sonderrechte). Die Vergabe der Rolle
 IT-Administration macht das Konto zum Administrator; man kann sie sich nicht selbst entziehen und das eigene Konto nicht
@@ -676,7 +676,8 @@ Portal und Verwaltungsoberfläche haben oben dasselbe **Menüband** (wie in Word
   - *Verwaltung* (Administration): Sekretariat (Schüler:in anlegen, Eltern und Kontakte, Klassen und Gruppen,
     Mitgliedschaften, Schullaufbahn, Archiv), Nachmittag (AG-Angebote, Wünsche, Zuteilungen), Finanzen
     (Rechnungsempfänger, Elternprofile, Dienstleister, Vertragsunterlagen).
-  - *System* (IT): Benutzerkonten, Rollen und Einzelrechte, eigene Datenfelder, Sicherung, PDF-Export, Protokoll.
+  - *System* (IT): Konten und Rechte (Rollen, Sammelaktionen, Einzelrechte), Benutzerkonten, eigene Datenfelder, Sicherung,
+    PDF-Export, Protokoll.
 - Jede Rolle sieht nur die Karten und Befehle, für die sie Rechte hat. Beim Öffnen einer Seite
   ist die passende Karte aktiv und der aktuelle Befehl hervorgehoben.
 - Mit dem Pfeil rechts neben den Registerkarten lässt sich das Band einklappen; der Browser
@@ -828,6 +829,55 @@ SECRET_KEY=x DATABASE_URL=postgres://x:x@localhost/x python tools/spezifikation_
 ```
 
 Eine Datenbank ist dafür nicht nötig.
+
+## Einfachere Bedienung, Rechteverwaltung und Klassenfilter (ab 0.6.0)
+
+Es wurde keine Funktion entfernt; Befehle wurden nur neu geordnet und ergänzt. Die Rechte der Rollen sind unverändert.
+
+**Befehlssuche und Favoriten**
+
+- **Strg+K** (Mac: ⌘+K) oder der Knopf **Befehle** in der Titelleiste öffnet eine Suche über alle Befehle des Menübands,
+  die das eigene Konto nutzen darf: tippen („Fehlzeit“, „Zeugnis“, „Rollen“), mit ↑/↓ wählen, Enter öffnet. Ohne
+  Eingabe stehen Favoriten, zuletzt verwendete und alle Befehle in der Liste. Ab zwei Zeichen lässt sich mit derselben
+  Eingabe auch eine Person suchen.
+- Der **Stern** neben einem Befehl merkt ihn als Favorit. Favoriten stehen als Leiste unter dem Menüband – auf jeder
+  Seite einen Klick entfernt. Favoriten und „zuletzt verwendet“ merkt sich der Browser, nicht der Server.
+
+**Menüband neu geordnet**
+
+- *Schüler:innen:* Meine Klassen · Stufenkoordination · Schülerakten · Klassen und Gruppen · Fehlzeiten · Eltern ·
+  Neuanmeldung (das Alltägliche steht vorn).
+- *Unterricht:* „Bewertung“ ist geteilt in **Noten** (Noten nach Klasse, Leistungsvorgaben) und **Listen**
+  (Leistungsnachweise, Neuer Leistungsnachweis, Bewertungsordner, Einzelnoten); „Zeugnis“ in **Zeugnis** (Zeugnisse,
+  Notenliste, Notensperre) und **Konferenz und Vorlagen** (Konferenzen, Textbausteine, Unterzeichnung).
+- *System:* **Konten und Rechte** ist der eine Einstieg für die IT (bisher „Einzelrechte“); Benutzerkonten, Rollen und
+  die Übersicht „Rollen und Rechte“ bleiben daneben erreichbar.
+
+**Rechteverwaltung (System › Konten und Rechte, nur IT)**
+
+- **Filter:** Suche (Name, Benutzername, E-Mail), Rolle, Status (aktiv/gesperrt) und Merkmal (mit Einzelrechten, ohne
+  Rolle, Vollzugriff, Zwei-Faktor eingerichtet/nicht eingerichtet/Pflicht offen, noch nie angemeldet).
+- **Sammelaktionen:** Konten ankreuzen – einzeln, mit Umschalt+Klick als Bereich oder mit „alle angezeigten Konten
+  auswählen“ – und für alle zugleich eine Rolle hinzufügen oder entziehen, Konten sperren oder entsperren, die
+  Zwei-Faktor-Anmeldung verpflichtend oder freiwillig machen. Andere Rollen der Konten bleiben erhalten. Es gelten
+  dieselben Schutzregeln wie beim einzelnen Konto (eigenes Konto nicht sperren, eigene IT-Rolle nicht entziehen, ein
+  Konto mit Vollzugriff muss bleiben); betroffene Konten werden übersprungen und genannt. Alles steht im Protokoll.
+- **Einzelrechte je Konto:** Suchfeld über alle Rechte („Fehlzeiten“), „nur Abweichungen von der Rolle“, alle Bereiche
+  auf- und zuklappen.
+- **Rollen und Rechte:** Die Zahl der Konten je Rolle führt direkt zur gefilterten Kontenliste.
+
+**Klassen statt der ganzen Schule auswählen**
+
+- Listen mit Einträgen zu Schüler:innen (Fehlzeiten, Kontakte und Sorgeberechtigte, Einwilligungen, Gesundheitsangaben,
+  AG-Wünsche und -Zuteilungen, Förderpläne, Nachteilsausgleiche, Verlaufsdokumentation, Einzelnoten, Zeugnisnoten)
+  haben die Filter **Klasse (aktuell)** und **Jahrgang (aktuell)**; die Schülerliste zusätzlich den Jahrgang. Nach
+  dem Filtern wählt das Ankreuzfeld im Tabellenkopf die ganze Klasse für eine Sammelaktion aus.
+- In allen **Auswahlfeldern für Schüler:innen** (z. B. Fehlzeit erfassen, Förderplan, AG-Zuteilung) und in der Suche
+  der Schülerliste zeigt der Klassenname die Klasse: „9a“ listet die 9a, „9a mei“ sucht darin weiter.
+
+Technisch: `static/befehle.js`, `static/rechte.js`, `stammdaten/filter.py`, `sicherung/konten.py` (`sammelaktion`),
+`sicherung/ansichten.py`, `portal/navigation.py`; Tests in `sicherung/tests_060.py`. Keine neuen Abhängigkeiten, keine
+Migrationen.
 
 ## Noteneingabe mit Statistik, Filter, Tastenkürzeln und Entwurf (ab 0.5.0)
 

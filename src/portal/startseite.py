@@ -346,7 +346,7 @@ def rollenuebersicht(request):
     from django.contrib.auth.models import Group
 
     from . import rollen as R
-    from .rechte import ist_systemverwaltung
+    from .rechte import ist_it, ist_systemverwaltung
 
     if not ist_systemverwaltung(request.user):
         raise PermissionDenied
@@ -355,8 +355,9 @@ def rollenuebersicht(request):
     for name in R.REIHENFOLGE:
         g = gruppen.get(name)
         zeilen.append({
-            "name": R.ANZEIGE[name], "beschreibung": R.BESCHREIBUNG[name], "gruppe": g, "anzahl": g.anzahl if g else 0,
+            "schluessel": name, "name": R.ANZEIGE[name], "beschreibung": R.BESCHREIBUNG[name], "gruppe": g, "anzahl": g.anzahl if g else 0,
             "werte": [(R.MATRIX[name].get(k, ""), R.WERTE[R.MATRIX[name].get(k, "")]) for k, _n in R.BEREICHE],
             "portal": name in R.PORTAL_ROLLEN,
         })
-    return render(request, "portal/rollen.html", {"zeilen": zeilen, "bereiche": [n for _k, n in R.BEREICHE]})
+    return render(request, "portal/rollen.html", {"zeilen": zeilen, "bereiche": [n for _k, n in R.BEREICHE],
+                                                  "darf_konten": ist_it(request.user)})

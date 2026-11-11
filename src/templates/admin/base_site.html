@@ -3,7 +3,7 @@
 {% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
 {% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static 'verwaltung.css' %}"><link rel="stylesheet" href="{% static 'menueband.css' %}">{% endblock %}
 {# Design: das <html>-Element der Verwaltung stammt aus Django – das Attribut setzt ein kleines Skript ohne Verzögerung #}
-{% block extrahead %}{{ block.super }}<script src="{% static 'design.js' %}" data-design="{{ DESIGN|default:'standard' }}"></script><script src="{% static 'menueband.js' %}" defer></script>{% endblock %}
+{% block extrahead %}{{ block.super }}<script src="{% static 'design.js' %}" data-design="{{ DESIGN|default:'standard' }}"></script><script src="{% static 'menueband.js' %}" defer></script><script src="{% static 'befehle.js' %}" defer></script>{% endblock %}
 {# Kopfbereich: dasselbe Menüband wie im Portal statt der Standard-Kopfzeile #}
 {% block header %}{% if MENUEBAND %}{% include "portal/_menueband.html" %}{% else %}{{ block.super }}{% endif %}{% endblock %}
 {% block branding %}

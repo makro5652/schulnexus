@@ -1,7 +1,7 @@
 {
  "format": "schulnexus-spezifikation",
  "formatversion": 1,
- "schulnexus_version": "0.5.0",
+ "schulnexus_version": "0.6.0",
  "hinweis": "Automatisch erzeugt mit tools/spezifikation_erzeugen.py. Enthält nur die Programmstruktur, keine Daten.",
  "projekt": {
   "zweck": "Schulnexus ist eine Open-Source-Schulverwaltung für eine Schule (Jahrgänge 1–12, Sek I nach der Richtlinie für Deutsche Schulen im Ausland, Sek II mit Punkten 0–15). Sie deckt Stammdaten, Klassen und Kurse, Noten, Zeugnisse und Konferenzen, Fehlzeiten, Förderung, Neuanmeldungen, Elternkommunikation, Termine, Personal, Schuljahreswechsel, Archiv, Sicherung und Rechte ab.",
@@ -846,6 +846,7 @@
       "list_filter": [
        "status",
        "StammklasseFilter",
+       "JahrgangsFilter",
        "BildungsgangFilter",
        "daz",
        "nachteilsausgleich"
@@ -2324,6 +2325,8 @@
        "rechnungsempfaenger"
       ],
       "list_filter": [
+       "KlassenFilter",
+       "JahrgangsFilter",
        "art",
        "sorgerecht",
        "notfallkontakt",
@@ -3228,6 +3231,8 @@
        "gueltig"
       ],
       "list_filter": [
+       "KlassenFilter",
+       "JahrgangsFilter",
        "zweck"
       ],
       "search_fields": [
@@ -4367,6 +4372,10 @@
        "medikamente",
        "schwimmen_erlaubt"
       ],
+      "list_filter": [
+       "KlassenFilter",
+       "JahrgangsFilter"
+      ],
       "search_fields": [
        "schueler__person__nachname"
       ],
@@ -4950,6 +4959,11 @@
        "doc": null,
        "methoden": [
         {
+         "name": "get_search_results",
+         "signatur": "(self, request, queryset, search_term)",
+         "doc": "Suche und Auswahlfelder (ab 0.6.0): „9a“ zeigt die Klasse 9a, „9a mei“ sucht darin weiter."
+        },
+        {
          "name": "has_change_permission",
          "signatur": "(self, request, obj=None)",
          "doc": "Archiv (abgegangen): nur lesend; Korrekturen nur durch Schulleitung und IT."
@@ -5408,6 +5422,43 @@
        "signatur": "(byte)",
        "dekoratoren": null,
        "doc": null
+      }
+     ]
+    },
+    {
+     "datei": "src/stammdaten/filter.py",
+     "doc": "Filter nach Klasse und Jahrgang für Listen der Verwaltungsoberfläche (ab 0.6.0).\n\nÜberall, wo Einträge zu Schüler:innen stehen (Fehlzeiten, AG-Wünsche, Förderpläne, Kontakte …), lässt sich die Liste\nauf eine Stammklasse oder einen Jahrgang des laufenden Schuljahres einschränken – statt in der Liste der ganzen Schule\nzu suchen. Mit dem Ankreuzfeld im Tabellenkopf wählt man danach die ganze Klasse für eine Sammelaktion aus.\n\n    list_filter = [klassenfilter(\"schueler\"), jahrgangsfilter(\"schueler\"), …]\n\n`pfad` ist der Weg vom Modell zum Schülerprofil (\"\" = das Modell ist selbst das Schülerprofil).",
+     "klassen": [],
+     "funktionen": [
+      {
+       "name": "_stammklassen",
+       "signatur": "()",
+       "dekoratoren": null,
+       "doc": null
+      },
+      {
+       "name": "_einschraenken",
+       "signatur": "(queryset, pfad, mitgliedschaften)",
+       "dekoratoren": null,
+       "doc": null
+      },
+      {
+       "name": "klassenfilter",
+       "signatur": "(pfad='schueler')",
+       "dekoratoren": null,
+       "doc": null
+      },
+      {
+       "name": "jahrgangsfilter",
+       "signatur": "(pfad='schueler')",
+       "dekoratoren": null,
+       "doc": null
+      },
+      {
+       "name": "suche_mit_klasse",
+       "signatur": "(queryset, suchbegriff, pfad='')",
+       "dekoratoren": null,
+       "doc": "Suchfelder für Schüler:innen (auch die Auswahlfelder mit Tippen): Ein Wort, das genau wie eine Stammklasse des\nlaufenden Schuljahres heißt („9a“), schränkt auf diese Klasse ein; die übrigen Wörter suchen wie gewohnt.\nGibt (queryset, restlicher Suchbegriff, eingeschränkt) zurück."
       }
      ]
     },
@@ -7589,6 +7640,8 @@
        "gewicht_individuell"
       ],
       "list_filter": [
+       "KlassenFilter",
+       "JahrgangsFilter",
        "leistungsnachweis__unterricht__abschnitt",
        "leistungsnachweis__unterricht__fach"
       ],
@@ -7807,6 +7860,8 @@
        "vermerk"
       ],
       "list_filter": [
+       "KlassenFilter",
+       "JahrgangsFilter",
        "unterricht__abschnitt",
        "unterricht__fach",
        "unterricht__gruppe"
@@ -11310,6 +11365,8 @@
        "fehlstunden_anzeige"
       ],
       "list_filter": [
+       "KlassenFilter",
+       "JahrgangsFilter",
        "status",
        "art",
        "quelle",
@@ -11825,6 +11882,8 @@
        "prioritaet"
       ],
       "list_filter": [
+       "KlassenFilter",
+       "JahrgangsFilter",
        "angebot__abschnitt",
        "prioritaet",
        "angebot"
@@ -11933,6 +11992,8 @@
        "erfuellter_wunsch"
       ],
       "list_filter": [
+       "KlassenFilter",
+       "JahrgangsFilter",
        "angebot__abschnitt",
        "angebot",
        "erfuellter_wunsch"
@@ -15411,6 +15472,8 @@
        "ansicht"
       ],
       "list_filter": [
+       "KlassenFilter",
+       "JahrgangsFilter",
        "status",
        "schuljahr",
        "schwerpunkte",
@@ -15767,6 +15830,8 @@
        "verfasst_von"
       ],
       "list_filter": [
+       "KlassenFilter",
+       "JahrgangsFilter",
        "art",
        "('datum', <class 'django.contrib.admin.filters.DateFieldListFilter'>)"
       ],
@@ -16013,6 +16078,8 @@
        "ansicht"
       ],
       "list_filter": [
+       "KlassenFilter",
+       "JahrgangsFilter",
        "AktivFilter",
        "status",
        "massnahmen",
@@ -20015,6 +20082,12 @@
        "doc": null
       },
       {
+       "name": "_konten_gefiltert",
+       "signatur": "(request)",
+       "dekoratoren": null,
+       "doc": "Konten nach Suche, Rolle, Status und Merkmal (ab 0.6.0) – dieselbe Auswahl für Liste und Sammelaktion."
+      },
+      {
        "name": "benutzerverwaltung",
        "signatur": "(request)",
        "dekoratoren": [
@@ -20214,6 +20287,12 @@
        "signatur": "(benutzer, durch)",
        "dekoratoren": null,
        "doc": null
+      },
+      {
+       "name": "sammelaktion",
+       "signatur": "(benutzer_liste, aktion, rolle, durch)",
+       "dekoratoren": null,
+       "doc": "Dieselbe Änderung für mehrere Konten. Es gelten die Schutzregeln von `konto_speichern` je Konto\n(eigene IT-Rolle, eigenes Konto, letztes Konto mit Vollzugriff). Rückgabe: (Anzahl geändert, Liste der Hinweise)."
       }
      ]
     },
@@ -20522,6 +20601,41 @@
        "doc": null,
        "faelle": [
         "test_seiten_auf_englisch"
+       ]
+      }
+     ]
+    },
+    {
+     "datei": "src/sicherung/tests_060.py",
+     "doc": "Tests 0.6.0: Kontenliste mit Filtern und Sammelaktionen, Klassenfilter und Klassensuche, Befehlssuche, Menüband.",
+     "klassen": [
+      {
+       "klasse": "KontenlisteTest",
+       "doc": null,
+       "faelle": [
+        "test_filter_nach_rolle_status_und_merkmal",
+        "test_sammelaktion_rolle_fuer_mehrere_konten",
+        "test_sammelaktion_behaelt_andere_rollen_und_schuetzt_das_eigene_konto",
+        "test_sammelaktion_nur_fuer_it_und_nur_mit_auswahl",
+        "test_einzelrechte_mit_suche",
+        "test_rollenuebersicht_fuehrt_zu_den_konten"
+       ]
+      },
+      {
+       "klasse": "KlassenfilterTest",
+       "doc": null,
+       "faelle": [
+        "test_suche_mit_klassenname",
+        "test_auswahlfeld_findet_ganze_klasse",
+        "test_listen_lassen_sich_nach_klasse_und_jahrgang_filtern"
+       ]
+      },
+      {
+       "klasse": "SteuerungTest",
+       "doc": null,
+       "faelle": [
+        "test_befehlssuche_und_favoritenleiste_auf_jeder_seite",
+        "test_menueband_behaelt_alle_befehle"
        ]
       }
      ]
@@ -31304,7 +31418,7 @@
   },
   {
    "datei": "src/templates/portal/_menueband.html",
-   "zeilen": 69,
+   "zeilen": 89,
    "erbt_von": null,
    "einbindungen": [
     "noten/_kurswahl.html",
@@ -31354,7 +31468,7 @@
   },
   {
    "datei": "src/templates/portal/base.html",
-   "zeilen": 21,
+   "zeilen": 22,
    "erbt_von": null,
    "einbindungen": [
     "portal/_menueband.html"
@@ -31395,7 +31509,7 @@
   },
   {
    "datei": "src/templates/portal/rollen.html",
-   "zeilen": 29,
+   "zeilen": 31,
    "erbt_von": "portal/base.html",
    "einbindungen": null
   },
@@ -31468,7 +31582,7 @@
   },
   {
    "datei": "src/templates/sicherung/benutzer.html",
-   "zeilen": 37,
+   "zeilen": 72,
    "erbt_von": "portal/base.html",
    "einbindungen": [
     "sicherung/_kopf.html"
@@ -31476,7 +31590,7 @@
   },
   {
    "datei": "src/templates/sicherung/benutzer_bearbeiten.html",
-   "zeilen": 101,
+   "zeilen": 110,
    "erbt_von": "portal/base.html",
    "einbindungen": [
     "sicherung/_kopf.html"
@@ -31674,6 +31788,11 @@
    "beschreibung": "Neuanmeldung: Adressfelder ein-/ausblenden, Vorlagen nach Jahrgang vorschlagen, Ablagefläche für Dateien, Sofortspeichern."
   },
   {
+   "datei": "src/static/befehle.js",
+   "zeilen": 174,
+   "beschreibung": "Befehlssuche und Favoriten (ab 0.6.0). Strg+K (Mac: ⌘+K) öffnet eine Suche über alle Befehle des Menübands, die das Konto nutzen darf – die Liste stammt aus dem Menüband der Seite, enthält also nie mehr als dieses. Mit ★ gemerkte Befehle stehen als Favoritenleiste unter dem Menüband. Favoriten und „zuletzt verwendet“ merkt sich der Browser (localStorage), nicht der Server."
+  },
+  {
    "datei": "src/static/design.js",
    "zeilen": 6,
    "beschreibung": "Setzt das gewählte Design auf <html>, bevor die Seite gezeichnet wird (Verwaltungsoberfläche)."
@@ -31692,6 +31811,11 @@
    "datei": "src/static/noten_matrix.js",
    "zeilen": 96,
    "beschreibung": "Bearbeitbare Notentabelle „Noten nach Klasse“ (ab 0.4.12.0): Enter/Pfeil ab → nächste Zeile, Pfeil auf → vorige Zeile; geänderte Zellen markieren; ungültige Eingaben kennzeichnen; Warnung beim Verlassen mit ungespeicherten Änderungen. Ab 0.4.17.0: Gewichte im Spaltenkopf und Zeugnisnoten zählen mit; nach „+ Spalte“ steht der Cursor in der neuen Spalte."
+  },
+  {
+   "datei": "src/static/rechte.js",
+   "zeilen": 80,
+   "beschreibung": "Benutzer und Rechte (ab 0.6.0): Konten gesammelt auswählen und ändern; Einzelrechte durchsuchen und filtern."
   },
   {
    "datei": "src/static/suchauswahl.js",
@@ -31715,12 +31839,12 @@
   },
   {
    "datei": "src/static/menueband.css",
-   "zeilen": 146,
+   "zeilen": 181,
    "beschreibung": "Menüband (Ribbon) – gemeinsam für Portal und Verwaltungsoberfläche. Alle Regeln sind auf .mb begrenzt."
   },
   {
    "datei": "src/static/portal.css",
-   "zeilen": 1253,
+   "zeilen": 1271,
    "beschreibung": "Kennzeichnungen (Status, Hinweise)"
   },
   {

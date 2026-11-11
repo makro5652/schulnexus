@@ -1250,3 +1250,21 @@ kbd { font: inherit; font-size: 0.82em; border: 1px solid var(--linie); border-b
   .ne-kuerzelknopf { display: none; }
 }
 @media print { .ne-werkzeug, .ne-statistik, .ne-entwurf, .ne-status { display: none; } }
+
+/* Benutzer und Rechte ab 0.6.0: Wege, Sammelaktion, Filter der Einzelrechte */
+.sy-wege { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 1rem; }
+.sy-wege a { padding: 0.3rem 0.8rem; border: 1px solid var(--linie); border-radius: 999px; text-decoration: none; font-size: 0.86rem; color: var(--text); background: var(--flaeche); }
+.sy-wege a.aktiv { background: var(--akzent); border-color: var(--akzent); color: var(--flaeche); font-weight: 600; }
+.sy-wege a:hover { border-color: var(--akzent); }
+.sy-sammelleiste { display: flex; flex-wrap: wrap; gap: 0.6rem 1rem; align-items: end; padding: 0.6rem 0.8rem; margin-bottom: 0.6rem; background: var(--akzent-hell); border-radius: 8px; position: sticky; top: 0; z-index: 4; }
+.sy-sammelleiste .haken { padding-bottom: 0.3rem; font-size: 0.9rem; }
+.sy-sammelwahl { display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.8rem; color: var(--leise); }
+.sy-sammelwahl[hidden] { display: none; }
+.sy-sammelwahl select, .an-filter select { font: inherit; padding: 0.35rem 0.5rem; border: 1px solid var(--linie); border-radius: 7px; background: var(--grund); color: var(--text); }
+.sy-anzahl { padding-bottom: 0.35rem; font-size: 0.86rem; }
+.sy-kreuz { width: 2rem; text-align: center; }
+.sy-konten tr.sy-gewaehlt td { background: var(--akzent-hell); }
+.sy-zurueck { margin: 0 0 0.3rem; font-size: 0.88rem; }
+.sy-rechtefilter { display: flex; flex-wrap: wrap; gap: 0.5rem 0.9rem; align-items: center; margin: 0.6rem 0; }
+.sy-rechtefilter input[type=search] { font: inherit; padding: 0.4rem 0.6rem; border: 1px solid var(--linie); border-radius: 7px; background: var(--grund); color: var(--text); width: min(22rem, 100%); }
+.sy-rechtetabelle tr[hidden], details.sy-app[hidden] { display: none; }

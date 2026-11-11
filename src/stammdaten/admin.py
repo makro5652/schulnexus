@@ -42,6 +42,7 @@ from .models import (
     VorherigeSchule,
     Zusatzfeld,
 )
+from .filter import jahrgangsfilter, klassenfilter, suche_mit_klasse
 from .zusatzfelder import ZusatzfelderAdminMixin, ZusatzfelderInlineMixin, zusatz_fieldsets
 
 admin.site.site_header = "Schulnexus"
@@ -266,7 +267,7 @@ class BildungsgangFilter(admin.SimpleListFilter):
 class SchuelerprofilAdmin(ZusatzfelderAdminMixin, SimpleHistoryAdmin):
     zusatz_zielgruppe = "schueler"
     list_display = ["person", "schuelernummer", "klasse", "bildungsgang", "status", "akte"]
-    list_filter = ["status", StammklasseFilter, BildungsgangFilter, "daz", "nachteilsausgleich"]
+    list_filter = ["status", StammklasseFilter, jahrgangsfilter(""), BildungsgangFilter, "daz", "nachteilsausgleich"]
     search_fields = ["person__nachname", "person__vorname", "schuelernummer"]
     autocomplete_fields = ["person"]
     fieldsets = [
@@ -276,6 +277,12 @@ class SchuelerprofilAdmin(ZusatzfelderAdminMixin, SimpleHistoryAdmin):
                                               "foerderbedarf", "religionsunterricht"]}),
         (_("Organisatorisches"), {"fields": ["lebt_bei", ("schulweg", "buslinie"), "abholhinweise", "bemerkungen"]}),
     ]
+
+    def get_search_results(self, request, queryset, search_term):
+        """Suche und Auswahlfelder (ab 0.6.0): „9a“ zeigt die Klasse 9a, „9a mei“ sucht darin weiter."""
+        queryset, rest, _klasse = suche_mit_klasse(queryset, search_term)
+        ergebnis, doppelt = super().get_search_results(request, queryset, rest)
+        return ergebnis, doppelt
 
     def has_change_permission(self, request, obj=None):
         """Archiv (abgegangen): nur lesend; Korrekturen nur durch Schulleitung und IT."""
@@ -506,7 +513,7 @@ class FachAdmin(admin.ModelAdmin):
 @admin.register(Beziehung)
 class BeziehungAdmin(SimpleHistoryAdmin):
     list_display = ["schueler", "person", "art", "sorgerecht", "notfallkontakt", "rechnungsempfaenger"]
-    list_filter = ["art", "sorgerecht", "notfallkontakt", "rechnungsempfaenger"]
+    list_filter = [klassenfilter("schueler"), jahrgangsfilter("schueler"), "art", "sorgerecht", "notfallkontakt", "rechnungsempfaenger"]
     search_fields = ["schueler__person__nachname", "person__nachname"]
     autocomplete_fields = ["schueler", "person"]
 
@@ -514,7 +521,7 @@ class BeziehungAdmin(SimpleHistoryAdmin):
 @admin.register(Einwilligung)
 class EinwilligungAdmin(SimpleHistoryAdmin):
     list_display = ["schueler", "zweck", "erteilt_am", "widerrufen_am", "gueltig"]
-    list_filter = ["zweck"]
+    list_filter = [klassenfilter("schueler"), jahrgangsfilter("schueler"), "zweck"]
     search_fields = ["schueler__person__nachname"]
     autocomplete_fields = ["schueler", "erteilt_durch"]
 
@@ -600,6 +607,7 @@ class ElternprofilAdmin(ZusatzfelderAdminMixin, SimpleHistoryAdmin):
 @admin.register(Gesundheitsangaben)
 class GesundheitsangabenAdmin(SimpleHistoryAdmin):
     list_display = ["schueler", "allergien", "medikamente", "schwimmen_erlaubt"]
+    list_filter = [klassenfilter("schueler"), jahrgangsfilter("schueler")]
     search_fields = ["schueler__person__nachname"]
     autocomplete_fields = ["schueler"]
 

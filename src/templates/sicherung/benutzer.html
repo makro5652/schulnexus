@@ -1,23 +1,57 @@
 {% extends "portal/base.html" %}
-{% load i18n %}
+{% load i18n static %}
 {% block title %}{% translate "Benutzer und Rechte" %}{% endblock %}
 {% block inhaltsklasse %}breit{% endblock %}
 {% block inhalt %}
 {% translate "Benutzer und Rechte" as titel %}{% include "sicherung/_kopf.html" %}
+<nav class="sy-wege" aria-label="{% translate 'Benutzer und Rechte' %}">
+  <a class="aktiv" aria-current="page" href="{% url 'benutzerverwaltung' %}">{% translate "Konten" %}</a>
+  <a href="{% url 'rollen' %}">{% translate "Was darf welche Rolle?" %}</a>
+  <a href="{% url 'admin:auth_user_add' %}">{% translate "Neues Konto anlegen" %}</a>
+  <a href="{% url 'systemprotokoll' %}?aktion=rechte">{% translate "Protokoll der Rechteänderungen" %}</a>
+</nav>
 <form method="get" class="filterzeile an-filter">
+  <label>{% translate "Suche" %} <input type="search" name="q" value="{{ q }}" placeholder="{% translate 'Name, Benutzername oder E-Mail' %}"></label>
   <label>{% translate "Rolle" %}
     <select name="rolle" onchange="this.form.submit()"><option value="">{% translate "alle" %}</option>
       {% for r, name in rollen %}<option value="{{ r }}"{% if rolle == r %} selected{% endif %}>{{ name }}</option>{% endfor %}</select></label>
-  <label>{% translate "Suche" %} <input type="search" name="q" value="{{ q }}" placeholder="{% translate 'Name oder Benutzername' %}"></label>
+  <label>{% translate "Status" %}
+    <select name="status" onchange="this.form.submit()"><option value="">{% translate "alle" %}</option>
+      {% for k, name in statuswerte %}<option value="{{ k }}"{% if status == k %} selected{% endif %}>{{ name }}</option>{% endfor %}</select></label>
+  <label>{% translate "Merkmal" %}
+    <select name="merkmal" onchange="this.form.submit()"><option value="">{% translate "alle" %}</option>
+      {% for k, name in merkmale %}<option value="{{ k }}"{% if merkmal == k %} selected{% endif %}>{{ name }}</option>{% endfor %}</select></label>
   <button type="submit" class="knopf zweitrangig klein">{% translate "Anzeigen" %}</button>
+  {% if gefiltert %}<a class="klein" href="{% url 'benutzerverwaltung' %}">{% translate "Filter zurücksetzen" %}</a>{% endif %}
 </form>
+
+<form method="post" id="sy-sammel" data-frage="{% translate 'Die gewählte Aktion auf alle angekreuzten Konten anwenden?' %}">{% csrf_token %}
+<div class="sy-sammelleiste">
+  <label class="haken"><input type="checkbox" id="sy-alle"> {% blocktranslate count n=zeilen|length %}{{ n }} angezeigtes Konto auswählen{% plural %}alle {{ n }} angezeigten Konten auswählen{% endblocktranslate %}</label>
+  <span class="sy-anzahl leise" id="sy-anzahl" data-text="{% translate '{n} ausgewählt' %}" aria-live="polite"></span>
+  <label class="sy-sammelwahl">{% translate "Aktion für die Auswahl" %}
+    <select name="aktion" id="sy-aktion">
+      <option value="">{% translate "– bitte wählen –" %}</option>
+      <option value="rolle_plus" data-rolle="1">{% translate "Rolle hinzufügen" %}</option>
+      <option value="rolle_minus" data-rolle="1">{% translate "Rolle entziehen" %}</option>
+      <option value="sperren">{% translate "Konten sperren" %}</option>
+      <option value="entsperren">{% translate "Konten entsperren" %}</option>
+      <option value="zweifaktor_an">{% translate "Zwei-Faktor-Anmeldung verpflichtend machen" %}</option>
+      <option value="zweifaktor_aus">{% translate "Zwei-Faktor-Anmeldung freiwillig machen" %}</option>
+    </select></label>
+  <label class="sy-sammelwahl" id="sy-rollenwahl" hidden>{% translate "Rolle" %}
+    <select name="sammelrolle">{% for r, name in rollen %}<option value="{{ r }}"{% if rolle == r %} selected{% endif %}>{{ name }}</option>{% endfor %}</select></label>
+  <button type="submit" class="knopf klein" id="sy-anwenden" disabled>{% translate "Anwenden" %}</button>
+</div>
+{% if gesamt > zeilen|length %}<p class="hinweistext">{% blocktranslate with n=zeilen|length g=gesamt %}Angezeigt werden die ersten {{ n }} von {{ g }} Konten. Bitte mit Suche oder Filter eingrenzen.{% endblocktranslate %}</p>{% endif %}
 <div class="tabellenrahmen">
-<table class="liste">
-  <thead><tr><th>{% translate "Benutzername" %}</th><th>{% translate "Name" %}</th><th>{% translate "Rollen" %}</th>
+<table class="liste sy-konten">
+  <thead><tr><th class="sy-kreuz"><span class="unsichtbar">{% translate "Auswahl" %}</span></th><th>{% translate "Benutzername" %}</th><th>{% translate "Name" %}</th><th>{% translate "Rollen" %}</th>
     <th>{% translate "Einzelrechte" %}</th><th>{% translate "2FA" %}</th><th>{% translate "Letzte Anmeldung" %}</th><th>{% translate "Status" %}</th></tr></thead>
   <tbody>
   {% for z in zeilen %}
     <tr>
+      <td class="sy-kreuz"><input type="checkbox" name="konten" value="{{ z.u.pk }}" class="sy-konto" aria-label="{{ z.u.username }}"></td>
       <td><a href="{% url 'benutzer_bearbeiten' z.u.pk %}"><strong>{{ z.u.username }}</strong></a></td>
       <td>{{ z.u.person.anzeigename|default:"–" }}</td>
       <td>{% for r in z.rollen %}<span class="etikett">{{ r }}</span>{% empty %}<span class="leise">–</span>{% endfor %}
@@ -27,10 +61,11 @@
       <td class="nowrap"><small>{{ z.u.last_login|date:"SHORT_DATETIME_FORMAT"|default:"–" }}</small></td>
       <td>{% if z.u.is_active %}{% translate "aktiv" %}{% else %}<span class="auffaellig">{% translate "gesperrt" %}</span>{% endif %}</td>
     </tr>
-  {% empty %}<tr><td colspan="7" class="leer">{% translate "Keine Konten gefunden." %}</td></tr>{% endfor %}
+  {% empty %}<tr><td colspan="8" class="leer">{% translate "Keine Konten gefunden." %}</td></tr>{% endfor %}
   </tbody>
 </table>
 </div>
-<p class="hinweistext">{% translate "Neue Konten legen Sie in der Verwaltungsoberfläche unter Benutzerkonten an; Rollen und Einzelrechte vergeben Sie hier." %}
-  <a href="{% url 'admin:auth_user_add' %}">{% translate "Neues Konto anlegen" %}</a></p>
+</form>
+<p class="hinweistext">{% translate "So geht es am schnellsten: mit Rolle, Status oder Merkmal filtern, im Kopf alle angezeigten Konten ankreuzen und die Aktion anwenden – zum Beispiel allen Lehrkräften eine weitere Rolle geben. Ein Klick auf den Benutzernamen öffnet Rollen, Passwort, Zwei-Faktor-Anmeldung und Einzelrechte des Kontos. Alle Änderungen stehen im Protokoll." %}</p>
+<script src="{% static 'rechte.js' %}"></script>
 {% endblock %}

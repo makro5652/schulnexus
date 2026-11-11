@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.translation import gettext, gettext_lazy as _
 from simple_history.admin import SimpleHistoryAdmin
+from stammdaten.filter import jahrgangsfilter, klassenfilter
 
 from portal.suchauswahl import SuchauswahlAdminMixin
 
@@ -184,7 +185,7 @@ class SchuelerVorauswahlMixin:
 @admin.register(Foerderplan)
 class FoerderplanAdmin(SuchauswahlAdminMixin, SchuelerVorauswahlMixin, FoerderRechteMixin, SimpleHistoryAdmin):
     list_display = ["schueler", "klasse", "titel", "status", "gueltig_von", "evaluation_am", "eltern", "ansicht"]
-    list_filter = ["status", "schuljahr", "schwerpunkte", ElternbestaetigungFilter]
+    list_filter = [klassenfilter("schueler"), jahrgangsfilter("schueler"), "status", "schuljahr", "schwerpunkte", ElternbestaetigungFilter]
     search_fields = ["schueler__person__nachname", "schueler__person__vorname", "titel"]
     autocomplete_fields = ["schueler", "verantwortlich", "vorgaenger"]
     readonly_fields = ["erstellt_von", "erstellt_am", "geaendert_am"]
@@ -291,7 +292,7 @@ class AktivFilter(admin.SimpleListFilter):
 class NachteilsausgleichAdmin(SuchauswahlAdminMixin, SchuelerVorauswahlMixin, FoerderRechteMixin, SimpleHistoryAdmin):
     sehen_pruefung = staticmethod(darf_nachteilsausgleich_sehen)
     list_display = ["schueler", "klasse", "massnahmen_kurz", "faecher_kurz", "status", "gueltig_von", "gueltig_bis", "eltern", "ansicht"]
-    list_filter = [AktivFilter, "status", "massnahmen", "schwerpunkte", ElternbestaetigungFilter]
+    list_filter = [klassenfilter("schueler"), jahrgangsfilter("schueler"), AktivFilter, "status", "massnahmen", "schwerpunkte", ElternbestaetigungFilter]
     search_fields = ["schueler__person__nachname", "schueler__person__vorname"]
     autocomplete_fields = ["schueler", "foerderplan"]
     readonly_fields = ["erstellt_von", "erstellt_am", "geaendert_am"]
@@ -355,7 +356,7 @@ class NachteilsausgleichAdmin(SuchauswahlAdminMixin, SchuelerVorauswahlMixin, Fo
 @admin.register(Foerdereintrag)
 class FoerdereintragAdmin(FoerderRechteMixin, SimpleHistoryAdmin):
     list_display = ["datum", "schueler", "art", "kurztext", "plan", "verfasst_von"]
-    list_filter = ["art", ("datum", admin.DateFieldListFilter)]
+    list_filter = [klassenfilter("schueler"), jahrgangsfilter("schueler"), "art", ("datum", admin.DateFieldListFilter)]
     search_fields = ["schueler__person__nachname", "text"]
     autocomplete_fields = ["schueler", "plan"]
     readonly_fields = ["verfasst_von", "erstellt_am"]

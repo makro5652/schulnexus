@@ -130,17 +130,10 @@ def menueband(request):
         "schueler", _("Schüler:innen"),
         meine_klassen,
         stufen,
-        neuanmeldung,
         Gruppe(_("Schülerakten"))
         .add(_("Alle Schüler:innen"), _url("admin:stammdaten_schuelerprofil_changelist", query="?status__exact=aktiv"), "personen", gross=True,
              bedingung=alle_sehen and p("stammdaten.view_schuelerprofil"))
         .add(_("Anhänge"), _url("admin:stammdaten_dokument_changelist"), "klammer", bedingung=p("stammdaten.view_dokument")),
-        Gruppe(_("Eltern"))
-        .add(_("Elternnachrichten"), _url("elternkontakt"), "brief", gross=True, bedingung=p("elternkontakt.view_gespraech"),
-             hinweis=_("Nachrichten an Eltern, Antworten und Bestätigungen"))
-        .add(_("Neue Nachricht"), _url("elternnachricht_neu"), "plus", bedingung=p("elternkontakt.add_gespraech"))
-        .add(_("Benachrichtigungsregeln"), _url("elternkontakt_regeln"), "glocke", bedingung=darf_regeln(user),
-             hinweis=_("Automatische Benachrichtigung bei Fehlzeiten und Verspätungen")),
         Gruppe(_("Klassen und Gruppen"))
         .add(_("Klassen und Gruppen"), _url("zuordnung"), "person_plus", gross=True, bedingung=darf_zuordnen(user),
              hinweis=_("Klassen anlegen, Schüler:innen zuordnen und abmelden, Fächer und Lehrkräfte festlegen")),
@@ -149,6 +142,13 @@ def menueband(request):
         .add(_("Offene Entschuldigungen"), _url("admin:fehlzeiten_fehlzeit_changelist", query="?status__exact=offen"), "warnung",
              bedingung=p("fehlzeiten.view_fehlzeit"))
         .add(_("Fehlzeit erfassen"), _url("admin:fehlzeiten_fehlzeit_add"), "plus", bedingung=p("fehlzeiten.add_fehlzeit")),
+        Gruppe(_("Eltern"))
+        .add(_("Elternnachrichten"), _url("elternkontakt"), "brief", gross=True, bedingung=p("elternkontakt.view_gespraech"),
+             hinweis=_("Nachrichten an Eltern, Antworten und Bestätigungen"))
+        .add(_("Neue Nachricht"), _url("elternnachricht_neu"), "plus", bedingung=p("elternkontakt.add_gespraech"))
+        .add(_("Benachrichtigungsregeln"), _url("elternkontakt_regeln"), "glocke", bedingung=darf_regeln(user),
+             hinweis=_("Automatische Benachrichtigung bei Fehlzeiten und Verspätungen")),
+        neuanmeldung,
     )
 
     # ------------------------------------------------------------ Unterricht
@@ -164,11 +164,12 @@ def menueband(request):
     unterricht = _karte(
         "unterricht", pgettext("Menüband", "Unterricht"),
         mein_unterricht,
-        Gruppe(_("Bewertung"))
+        Gruppe(_("Noten"))
         .add(_("Noten nach Klasse"), _url("noten_klassen"), "tafel", gross=True, bedingung=p("noten.view_note"),
              hinweis=_("Klasse und Kurs wählen, Noten in der Tabelle eintragen, Excel-Tabelle laden"))
         .add(_("Leistungsvorgaben"), _url("leistungsvorgaben"), "haken", gross=True, bedingung=p("noten.view_leistungsvorgabe"),
-             hinweis=_("Pflichtnoten mit Frist"))
+             hinweis=_("Pflichtnoten mit Frist")),
+        Gruppe(_("Listen"))
         .add(_("Leistungsnachweise"), _url("admin:noten_leistungsnachweis_changelist"), "stift",
              bedingung=p("noten.view_leistungsnachweis"))
         .add(_("Neuer Leistungsnachweis"), _url("admin:noten_leistungsnachweis_add"), "plus", bedingung=p("noten.add_leistungsnachweis"))
@@ -179,11 +180,12 @@ def menueband(request):
              hinweis=_("Zeugnisnoten, Kommentare, Zeugnisse und Konferenzen"))
         .add(_("Notenliste"), _url("notenliste"), "liste", bedingung=p("zeugnisse.view_zeugnis"),
              hinweis=_("Alle Zeugnisnoten einer Klasse wie in der Konferenz – auch vergangene Halbjahre"))
-        .add(_("Konferenzen"), _url("admin:zeugnisse_konferenz_changelist"), "gruppen",
-             bedingung=admin and p("zeugnisse.change_konferenz"))
         .add(_("Notensperre"), _url("notensperre"), "schild",
              bedingung=noten_rechte.darf_noten_sperren(user, None) or noten_rechte.ist_koordination(user),
-             hinweis=_("Noten einer Klasse nach Zeugnisfreigabe bzw. Konferenz sperren oder wieder freigeben; Notenschluss-Termine"))
+             hinweis=_("Noten einer Klasse nach Zeugnisfreigabe bzw. Konferenz sperren oder wieder freigeben; Notenschluss-Termine")),
+        Gruppe(_("Konferenz und Vorlagen"))
+        .add(_("Konferenzen"), _url("admin:zeugnisse_konferenz_changelist"), "gruppen",
+             bedingung=admin and p("zeugnisse.change_konferenz"))
         .add(_("Textbausteine"), _url("admin:zeugnisse_textbaustein_changelist"), "notiz",
              bedingung=admin and p("zeugnisse.change_textbaustein"), hinweis=_("Textbausteine für Zeugniskommentare"))
         .add(_("Unterzeichnung"), _url("admin:zeugnisse_unterzeichner_changelist"), "stift",
@@ -310,12 +312,14 @@ def menueband(request):
     system_karte = _karte(
         "system", _("System"),
         Gruppe(_("Benutzer und Rechte"))
-        .add(_("Benutzerkonten"), _url("admin:auth_user_changelist"), "schluessel", gross=True, bedingung=p("auth.view_user"))
-        .add(_("Rollen"), _url("admin:auth_group_changelist"), "schild", bedingung=p("auth.view_group"))
+        .add(_("Konten und Rechte"), _url("benutzerverwaltung"), "person_plus", gross=True, bedingung=ist_it(user),
+             hinweis=_("Konten filtern, Rollen für mehrere Konten auf einmal vergeben, Einzelrechte je Konto"))
+        .add(_("Benutzerkonten"), _url("admin:auth_user_changelist"), "schluessel", gross=not ist_it(user), bedingung=p("auth.view_user"),
+             hinweis=_("Konten anlegen und Stammdaten der Konten bearbeiten"))
         .add(_("Rollen und Rechte"), _url("rollen"), "liste", bedingung=ist_systemverwaltung(user),
              hinweis=_("Übersicht: welche Rolle was darf"))
-        .add(_("Einzelrechte"), _url("benutzerverwaltung"), "person_plus", bedingung=ist_it(user),
-             hinweis=_("Rollen und Einzelrechte je Konto erteilen oder entziehen")),
+        .add(_("Rollen"), _url("admin:auth_group_changelist"), "schild", bedingung=p("auth.view_group"),
+             hinweis=_("Rechte einer Rolle anpassen")),
         Gruppe(_("Datenfelder"))
         .add(_("Eigene Felder"), _url("admin:stammdaten_zusatzfeld_changelist"), "regler", gross=True,
              bedingung=p("stammdaten.change_zusatzfeld"), hinweis=_("Zusatzfelder für Schüler:innen, Personal und Eltern")),

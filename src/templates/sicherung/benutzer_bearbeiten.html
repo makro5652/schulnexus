@@ -1,9 +1,10 @@
 {% extends "portal/base.html" %}
-{% load i18n %}
+{% load i18n static %}
 {% block title %}{{ u.username }} · {% translate "Benutzer und Rechte" %}{% endblock %}
 {% block inhaltsklasse %}breit{% endblock %}
 {% block inhalt %}
 {% translate "Benutzer und Rechte" as titel %}{% include "sicherung/_kopf.html" %}
+<p class="sy-zurueck"><a href="{% url 'benutzerverwaltung' %}">‹ {% translate "Alle Konten" %}</a></p>
 <h2 class="sy-ueberschrift">{{ u.username }}{% if u.person %} <span class="leise">· {{ u.person.anzeigename }}</span>{% endif %}
   {% if vollzugriff %}<span class="etikett warnend">{% translate "Vollzugriff" %}</span>{% endif %}
   {% if not u.is_active %}<span class="etikett warnend">{% translate "gesperrt" %}</span>{% endif %}</h2>
@@ -64,7 +65,14 @@
 <section class="karte sy-rechte">
   <h3>{% translate "Einzelrechte" %}</h3>
   <p class="hinweistext">{% translate "„ja (Rolle)“ bzw. „nein“ ist der Stand aus den Rollen. Mit „+ erteilen“ erhält das Konto ein Recht zusätzlich, mit „− entziehen“ verliert es ein Recht trotz seiner Rolle. Sichtbarkeitsregeln nach Klasse und Stufe (z. B. Klassenleitung) bleiben davon unberührt." %}</p>
-  <form method="post">{% csrf_token %}<input type="hidden" name="aktion" value="rechte">
+  <div class="sy-rechtefilter" id="sy-rechtefilter">
+    <input type="search" id="sy-rechtesuche" placeholder="{% translate 'Recht oder Bereich suchen, z. B. Fehlzeiten' %}" aria-label="{% translate 'Rechte durchsuchen' %}" autocomplete="off">
+    <label class="haken"><input type="checkbox" id="sy-nur-abweichungen"> {% translate "nur Abweichungen von der Rolle" %}</label>
+    <button type="button" class="knopf klein zweitrangig" id="sy-alle-auf">{% translate "Alle aufklappen" %}</button>
+    <button type="button" class="knopf klein zweitrangig" id="sy-alle-zu">{% translate "Alle zuklappen" %}</button>
+    <span class="leise" id="sy-rechtetreffer" data-text="{% translate '{n} Rechte angezeigt' %}" aria-live="polite"></span>
+  </div>
+  <form method="post" id="sy-rechteform">{% csrf_token %}<input type="hidden" name="aktion" value="rechte">
     {% for app in tabelle %}
     <details class="sy-app"{% if app.geaendert %} open{% endif %}>
       <summary><strong>{{ app.name }}</strong>{% if app.geaendert %} <span class="etikett">{% blocktranslate count n=app.geaendert %}{{ n }} Änderung{% plural %}{{ n }} Änderungen{% endblocktranslate %}</span>{% endif %}</summary>
@@ -97,4 +105,5 @@
     <button type="submit" class="knopf">{% translate "Einzelrechte speichern" %}</button>
   </form>
 </section>
+<script src="{% static 'rechte.js' %}"></script>
 {% endblock %}

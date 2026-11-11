@@ -6,6 +6,8 @@
 <p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › {% translate "Rollen und Rechte" %}</p>
 <h1>{% translate "Rollen und Rechte" %}</h1>
 <p class="hinweistext">{% translate "Standardrechte der Rollen. Eine Person kann mehrere Rollen haben; es gilt die Summe der Rechte. „Eigene“ bedeutet: eigener Unterricht bzw. eigene Klasse als Klassenleitung; „Stufe“: alle Klassen der koordinierten Jahrgänge. Rollen werden unter System › Benutzerkonten zugewiesen; einzelne Rechte lassen sich unter Rollen anpassen." %}</p>
+{% if darf_konten %}<p><a class="knopf klein zweitrangig" href="{% url 'benutzerverwaltung' %}">{% translate "Konten und Rollen verwalten" %}</a>
+  <span class="hinweistext">{% translate "Die Zahl in der Spalte „Konten“ zeigt die Konten der Rolle – dort lassen sich Rollen auch für mehrere Konten auf einmal vergeben." %}</span></p>{% endif %}
 
 <div class="tabellenrahmen" style="margin-top:1rem">
 <table class="liste rollenmatrix">
@@ -19,7 +21,7 @@
     <tr>
       <th scope="row"><strong>{{ z.name }}</strong>{% if not z.portal %} <span class="etikett">{% translate "noch kein Portalzugang" %}</span>{% endif %}<small class="notiz">{{ z.beschreibung }}</small></th>
       {% for wert, text in z.werte %}<td class="recht recht-{{ wert|default:'nein' }}">{{ text }}</td>{% endfor %}
-      <td class="zahl">{% if z.gruppe and user.is_staff %}<a href="{% url 'admin:auth_user_changelist' %}?groups__id__exact={{ z.gruppe.pk }}">{{ z.anzahl }}</a>{% else %}{{ z.anzahl }}{% endif %}</td>
+      <td class="zahl">{% if z.gruppe and darf_konten %}<a href="{% url 'benutzerverwaltung' %}?rolle={{ z.schluessel|urlencode }}" title="{% translate 'Konten mit dieser Rolle anzeigen und bearbeiten' %}">{{ z.anzahl }}</a>{% elif z.gruppe and user.is_staff %}<a href="{% url 'admin:auth_user_changelist' %}?groups__id__exact={{ z.gruppe.pk }}">{{ z.anzahl }}</a>{% else %}{{ z.anzahl }}{% endif %}</td>
     </tr>
   {% endfor %}
   </tbody>

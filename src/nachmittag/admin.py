@@ -1,6 +1,7 @@
 from django.contrib import admin, messages
 from django.utils.translation import gettext, gettext_lazy as _
 from simple_history.admin import SimpleHistoryAdmin
+from stammdaten.filter import jahrgangsfilter, klassenfilter
 
 from .models import AGAngebot, AGWahl, AGZuteilung
 from .zuteilung import lose_zuteilen
@@ -52,7 +53,7 @@ class AGAngebotAdmin(SimpleHistoryAdmin):
 @admin.register(AGWahl)
 class AGWahlAdmin(admin.ModelAdmin):
     list_display = ["schueler", "angebot", "prioritaet"]
-    list_filter = ["angebot__abschnitt", "prioritaet", "angebot"]
+    list_filter = [klassenfilter("schueler"), jahrgangsfilter("schueler"), "angebot__abschnitt", "prioritaet", "angebot"]
     search_fields = ["schueler__person__nachname", "angebot__titel"]
     autocomplete_fields = ["schueler", "angebot"]
 
@@ -60,6 +61,6 @@ class AGWahlAdmin(admin.ModelAdmin):
 @admin.register(AGZuteilung)
 class AGZuteilungAdmin(admin.ModelAdmin):
     list_display = ["schueler", "angebot", "erfuellter_wunsch"]
-    list_filter = ["angebot__abschnitt", "angebot", "erfuellter_wunsch"]
+    list_filter = [klassenfilter("schueler"), jahrgangsfilter("schueler"), "angebot__abschnitt", "angebot", "erfuellter_wunsch"]
     search_fields = ["schueler__person__nachname"]
     autocomplete_fields = ["schueler", "angebot"]

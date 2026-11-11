@@ -13,6 +13,7 @@ from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone, translation
 from django.utils.translation import gettext, gettext_lazy as _, ngettext, pgettext_lazy
 
@@ -304,25 +305,77 @@ def pdf_loeschen(request, pk):
 
 # ---------------------------------------------------------------- Benutzer und Rechte (IT)
 
-@nur_it
-def benutzerverwaltung(request):
+KONTO_STATUS = [("aktiv", _("aktiv")), ("gesperrt", _("gesperrt"))]
+KONTO_MERKMALE = [("einzelrechte", _("mit Einzelrechten")), ("ohne_rolle", _("ohne Rolle")), ("vollzugriff", _("Vollzugriff")),
+                  ("zf_an", _("Zwei-Faktor eingerichtet")), ("zf_aus", _("Zwei-Faktor nicht eingerichtet")),
+                  ("zf_offen", _("Zwei-Faktor Pflicht, noch offen")), ("nie", _("noch nie angemeldet"))]
+
+
+def _konten_gefiltert(request):
+    """Konten nach Suche, Rolle, Status und Merkmal (ab 0.6.0) – dieselbe Auswahl für Liste und Sammelaktion."""
     User = get_user_model()
     q = (request.GET.get("q") or "").strip()
     rolle = request.GET.get("rolle") or ""
-    qs = User.objects.prefetch_related("groups").select_related("person", "einstellung", "zweifaktor").order_by("-is_active", "username")
-    if q:
-        qs = qs.filter(Q(username__icontains=q) | Q(person__nachname__icontains=q) | Q(person__vorname__icontains=q))
-    if rolle:
+    status = request.GET.get("status") or ""
+    merkmal = request.GET.get("merkmal") or ""
+    qs = User.objects.all()
+    for teil in q.split():
+        qs = qs.filter(Q(username__icontains=teil) | Q(person__nachname__icontains=teil) | Q(person__vorname__icontains=teil)
+                       | Q(email__icontains=teil))
+    if rolle in R.REIHENFOLGE:
         qs = qs.filter(groups__name=rolle)
+    if status == "aktiv":
+        qs = qs.filter(is_active=True)
+    elif status == "gesperrt":
+        qs = qs.filter(is_active=False)
+    if merkmal == "einzelrechte":
+        qs = qs.filter(Q(user_permissions__isnull=False) | Q(einstellung__entzogene_rechte__isnull=False))
+    elif merkmal == "ohne_rolle":
+        qs = qs.exclude(groups__name__in=R.REIHENFOLGE)
+    elif merkmal == "vollzugriff":
+        qs = qs.filter(is_superuser=True)
+    elif merkmal == "zf_an":
+        qs = qs.filter(zweifaktor__aktiv=True)
+    elif merkmal == "zf_aus":
+        qs = qs.exclude(zweifaktor__aktiv=True)
+    elif merkmal == "zf_offen":
+        qs = qs.filter(zweifaktor__pflicht=True).exclude(zweifaktor__aktiv=True)
+    elif merkmal == "nie":
+        qs = qs.filter(last_login__isnull=True)
+    return qs.distinct(), {"q": q, "rolle": rolle, "status": status, "merkmal": merkmal}
+
+
+@nur_it
+def benutzerverwaltung(request):
+    qs, filter_ = _konten_gefiltert(request)
+    if request.method == "POST":
+        ids = [int(x) for x in request.POST.getlist("konten") if x.isdigit()]
+        gewaehlt = list(qs.filter(pk__in=ids)) if ids else []
+        if not gewaehlt:
+            messages.error(request, gettext("Bitte zuerst Konten ankreuzen."))
+        else:
+            try:
+                n, hinweise = konten.sammelaktion(gewaehlt, request.POST.get("aktion") or "", request.POST.get("sammelrolle") or "",
+                                                  request.user)
+                messages.success(request, ngettext("%(n)d Konto geändert.", "%(n)d Konten geändert.", n) % {"n": n})
+                for h in hinweise:
+                    messages.warning(request, h)
+            except konten.KontoFehler as f:
+                messages.error(request, str(f))
+        abfrage = request.GET.urlencode()
+        return redirect(reverse("benutzerverwaltung") + (f"?{abfrage}" if abfrage else ""))
+    gesamt = qs.count()
     zeilen = []
-    for u in qs[:500]:
+    for u in (qs.prefetch_related("groups", "user_permissions", "einstellung__entzogene_rechte")
+              .select_related("person", "einstellung", "zweifaktor").order_by("-is_active", "username")[:500]):
         namen = {g.name for g in u.groups.all()}
         zeilen.append({"u": u, "rollen": [R.ANZEIGE.get(n, n) for n in R.REIHENFOLGE if n in namen] + sorted(n for n in namen if n not in R.ANZEIGE),
-                       "plus": u.user_permissions.count(),
-                       "minus": u.einstellung.entzogene_rechte.count() if hasattr(u, "einstellung") else 0})
+                       "plus": len(u.user_permissions.all()),
+                       "minus": len(u.einstellung.entzogene_rechte.all()) if hasattr(u, "einstellung") else 0})
     return render(request, "sicherung/benutzer.html", {
-        "reiter": _reiter(request, "benutzer"), "zeilen": zeilen, "q": q, "rolle": rolle,
-        "rollen": [(r, R.ANZEIGE[r]) for r in R.REIHENFOLGE],
+        "reiter": _reiter(request, "benutzer"), "zeilen": zeilen, "gesamt": gesamt, **filter_,
+        "rollen": [(r, R.ANZEIGE[r]) for r in R.REIHENFOLGE], "statuswerte": KONTO_STATUS, "merkmale": KONTO_MERKMALE,
+        "gefiltert": any(filter_.values()),
     })
 
 

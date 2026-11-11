@@ -134,3 +134,51 @@ def passwort_zuruecksetzen(benutzer, durch):
     benutzer.save(update_fields=["password"])
     Protokoll.schreiben(durch, "passwort", benutzer.username)
     return pw
+
+
+# ---------------------------------------------------------------- Sammelaktionen (ab 0.6.0)
+
+SAMMELAKTIONEN = ("rolle_plus", "rolle_minus", "sperren", "entsperren", "zweifaktor_an", "zweifaktor_aus")
+
+
+def sammelaktion(benutzer_liste, aktion, rolle, durch):
+    """
+    Dieselbe Änderung für mehrere Konten. Es gelten die Schutzregeln von `konto_speichern` je Konto
+    (eigene IT-Rolle, eigenes Konto, letztes Konto mit Vollzugriff). Rückgabe: (Anzahl geändert, Liste der Hinweise).
+    """
+    if aktion not in SAMMELAKTIONEN:
+        raise KontoFehler(_("Bitte eine Aktion wählen."))
+    if aktion in ("rolle_plus", "rolle_minus") and rolle not in R.REIHENFOLGE:
+        raise KontoFehler(_("Bitte eine Rolle wählen."))
+    geaendert, hinweise = 0, []
+    for b in benutzer_liste:
+        try:
+            if aktion in ("zweifaktor_an", "zweifaktor_aus"):
+                from portal import zweifaktor as Z
+
+                z, pflicht = Z.eintrag(b), aktion == "zweifaktor_an"
+                if z.pflicht != pflicht:
+                    z.pflicht = pflicht
+                    z.save(update_fields=["pflicht"])
+                    Protokoll.schreiben(durch, "zweifaktor", _("%(u)s: Zwei-Faktor-Anmeldung %(w)s") % {
+                        "u": b.username, "w": _("verpflichtend") if pflicht else _("freiwillig")})
+                    geaendert += 1
+                continue
+            rollen = set(b.groups.values_list("name", flat=True)) & set(R.REIHENFOLGE)
+            aktiv = b.is_active
+            neu = set(rollen)
+            if aktion == "rolle_plus":
+                neu.add(rolle)
+            elif aktion == "rolle_minus":
+                neu.discard(rolle)
+            elif aktion == "sperren":
+                aktiv = False
+            elif aktion == "entsperren":
+                aktiv = True
+            if neu == rollen and aktiv == b.is_active:
+                continue
+            konto_speichern(b, neu, aktiv, durch)
+            geaendert += 1
+        except KontoFehler as f:
+            hinweise.append(f"{b.username}: {f}")
+    return geaendert, hinweise

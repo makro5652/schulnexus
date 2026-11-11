@@ -5,6 +5,7 @@ from django.utils.html import format_html
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from simple_history.admin import SimpleHistoryAdmin
+from stammdaten.filter import jahrgangsfilter, klassenfilter
 
 from portal.suchauswahl import SuchauswahlAdminMixin
 
@@ -315,7 +316,7 @@ class LeistungsnachweisAdmin(EigeneDatenMixin, SimpleHistoryAdmin):
 class NoteAdmin(EigeneDatenMixin, SimpleHistoryAdmin):
     unterricht_pfad = "leistungsnachweis__unterricht"
     list_display = ["schueler", "leistungsnachweis", "erreichte_be", "stufe", "sonderstatus", "gewicht_individuell"]
-    list_filter = ["leistungsnachweis__unterricht__abschnitt", "leistungsnachweis__unterricht__fach"]
+    list_filter = [klassenfilter("schueler"), jahrgangsfilter("schueler"), "leistungsnachweis__unterricht__abschnitt", "leistungsnachweis__unterricht__fach"]
     search_fields = ["schueler__person__nachname", "leistungsnachweis__titel"]
     autocomplete_fields = ["schueler", "leistungsnachweis"]
 
@@ -337,7 +338,7 @@ class NoteAdmin(EigeneDatenMixin, SimpleHistoryAdmin):
 @admin.register(Zeugnisnote)
 class ZeugnisnoteAdmin(EigeneDatenMixin, SimpleHistoryAdmin):
     list_display = ["schueler", "unterricht", "vorschlag", "stufe", "vermerk"]
-    list_filter = ["unterricht__abschnitt", "unterricht__fach", "unterricht__gruppe"]
+    list_filter = [klassenfilter("schueler"), jahrgangsfilter("schueler"), "unterricht__abschnitt", "unterricht__fach", "unterricht__gruppe"]
     search_fields = ["schueler__person__nachname"]
     autocomplete_fields = ["schueler", "unterricht"]
 

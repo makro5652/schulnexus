@@ -15458,3 +15458,211 @@ msgstr "{a} of {b} entered"
 
 msgid "{a} von {b} angezeigt"
 msgstr "{a} of {b} shown"
+
+msgid "Aktion für die Auswahl"
+msgstr "Action for the selection"
+
+msgid "Alle Befehle"
+msgstr "All commands"
+
+msgid "Alle Konten"
+msgstr "All accounts"
+
+msgid "Alle aufklappen"
+msgstr "Expand all"
+
+msgid "Alle zuklappen"
+msgstr "Collapse all"
+
+msgid "Als Favorit merken"
+msgstr "Add to favourites"
+
+msgid "Anwenden"
+msgstr "Apply"
+
+msgid "Auswahl"
+msgstr "Selection"
+
+msgid ""
+"Angezeigt werden die ersten %(n)s von %(g)s Konten. Bitte mit Suche oder "
+"Filter eingrenzen."
+msgstr ""
+"Showing the first %(n)s of %(g)s accounts. Please narrow down with search or"
+" filters."
+
+msgid "Befehl suchen"
+msgstr "Search commands"
+
+msgid "Befehl suchen: alle Funktionen, die Sie nutzen dürfen"
+msgstr "Search commands: all functions you are allowed to use"
+
+msgid "Befehle"
+msgstr "Commands"
+
+msgid "Bitte eine Aktion wählen."
+msgstr "Please choose an action."
+
+msgid "Bitte eine Rolle wählen."
+msgstr "Please choose a role."
+
+msgid "Bitte zuerst Konten ankreuzen."
+msgstr "Please tick accounts first."
+
+msgid ""
+"Die Zahl in der Spalte „Konten“ zeigt die Konten der Rolle – dort lassen "
+"sich Rollen auch für mehrere Konten auf einmal vergeben."
+msgstr ""
+"The number in the “Accounts” column shows the accounts with that role – "
+"roles can be assigned to several accounts at once there."
+
+msgid "Die gewählte Aktion auf alle angekreuzten Konten anwenden?"
+msgstr "Apply the chosen action to all ticked accounts?"
+
+msgid "Favorit entfernen"
+msgstr "Remove favourite"
+
+msgid "Favoriten"
+msgstr "Favourites"
+
+msgid "Filter zurücksetzen"
+msgstr "Reset filters"
+
+msgid "Jahrgang (aktuell)"
+msgstr "Year group (current)"
+
+msgid "Kein Befehl gefunden."
+msgstr "No command found."
+
+msgid "Klasse (aktuell)"
+msgstr "Class (current)"
+
+msgid "Konferenz und Vorlagen"
+msgstr "Conference and templates"
+
+msgid "Konten anlegen und Stammdaten der Konten bearbeiten"
+msgstr "Create accounts and edit account details"
+
+msgid "Konten entsperren"
+msgstr "Unlock accounts"
+
+msgid ""
+"Konten filtern, Rollen für mehrere Konten auf einmal vergeben, Einzelrechte "
+"je Konto"
+msgstr ""
+"Filter accounts, assign roles to several accounts at once, individual "
+"permissions per account"
+
+msgid "Konten mit dieser Rolle anzeigen und bearbeiten"
+msgstr "Show and edit accounts with this role"
+
+msgid "Konten sperren"
+msgstr "Lock accounts"
+
+msgid "Konten und Rechte"
+msgstr "Accounts and permissions"
+
+msgid "Konten und Rollen verwalten"
+msgstr "Manage accounts and roles"
+
+msgid "Listen"
+msgstr "Lists"
+
+msgid "Merkmal"
+msgstr "Attribute"
+
+msgid "Name, Benutzername oder E-Mail"
+msgstr "Name, username or e-mail"
+
+msgid "Person suchen: „{q}“"
+msgstr "Search person: “{q}”"
+
+msgid "Protokoll der Rechteänderungen"
+msgstr "Log of permission changes"
+
+msgid "Recht oder Bereich suchen, z. B. Fehlzeiten"
+msgstr "Search permission or area, e.g. absences"
+
+msgid "Rechte durchsuchen"
+msgstr "Search permissions"
+
+msgid "Rechte einer Rolle anpassen"
+msgstr "Adjust the permissions of a role"
+
+msgid "Rolle entziehen"
+msgstr "Remove role"
+
+msgid "Rolle hinzufügen"
+msgstr "Add role"
+
+msgid ""
+"So geht es am schnellsten: mit Rolle, Status oder Merkmal filtern, im Kopf "
+"alle angezeigten Konten ankreuzen und die Aktion anwenden – zum Beispiel "
+"allen Lehrkräften eine weitere Rolle geben. Ein Klick auf den Benutzernamen "
+"öffnet Rollen, Passwort, Zwei-Faktor-Anmeldung und Einzelrechte des Kontos. "
+"Alle Änderungen stehen im Protokoll."
+msgstr ""
+"The quickest way: filter by role, status or attribute, tick all shown "
+"accounts in the header and apply the action – for example give all teachers "
+"an additional role. Clicking the username opens roles, password, two-factor "
+"sign-in and individual permissions of the account. All changes are logged."
+
+msgid "Was darf welche Rolle?"
+msgstr "What may each role do?"
+
+msgid "Was möchten Sie tun? z. B. Fehlzeit, Zeugnis, 9a …"
+msgstr "What would you like to do? e.g. absence, report, 9a …"
+
+msgid "Zwei-Faktor Pflicht, noch offen"
+msgstr "Two-factor mandatory, not yet set up"
+
+msgid "Zwei-Faktor eingerichtet"
+msgstr "Two-factor set up"
+
+msgid "Zwei-Faktor nicht eingerichtet"
+msgstr "Two-factor not set up"
+
+msgid "Zwei-Faktor-Anmeldung freiwillig machen"
+msgstr "Make two-factor sign-in optional"
+
+msgid "Zwei-Faktor-Anmeldung verpflichtend machen"
+msgstr "Make two-factor sign-in mandatory"
+
+msgid "merkt einen Befehl als Favorit"
+msgstr "adds a command to favourites"
+
+msgid "mit Einzelrechten"
+msgstr "with individual permissions"
+
+msgid "noch nie angemeldet"
+msgstr "never signed in"
+
+msgid "nur Abweichungen von der Rolle"
+msgstr "only deviations from the role"
+
+msgid "ohne Rolle"
+msgstr "without role"
+
+msgid "schließen"
+msgstr "close"
+
+msgid "wählen"
+msgstr "select"
+
+msgid "{n} Rechte angezeigt"
+msgstr "{n} permissions shown"
+
+msgid "{n} ausgewählt"
+msgstr "{n} selected"
+
+msgid "– bitte wählen –"
+msgstr "– please choose –"
+
+msgid "%(n)d Konto geändert."
+msgid_plural "%(n)d Konten geändert."
+msgstr[0] "%(n)d account changed."
+msgstr[1] "%(n)d accounts changed."
+
+msgid "%(n)s angezeigtes Konto auswählen"
+msgid_plural "alle %(n)s angezeigten Konten auswählen"
+msgstr[0] "Select %(n)s shown account"
+msgstr[1] "Select all %(n)s shown accounts"

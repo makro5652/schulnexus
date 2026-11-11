@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.utils import formats
 from django.utils.translation import gettext, gettext_lazy as _
 from simple_history.admin import SimpleHistoryAdmin
+from stammdaten.filter import jahrgangsfilter, klassenfilter
 
 from .models import Fehlzeit, Stunde
 
@@ -15,7 +16,7 @@ class StundeAdmin(admin.ModelAdmin):
 @admin.register(Fehlzeit)
 class FehlzeitAdmin(SimpleHistoryAdmin):
     list_display = ["schueler", "art", "zeitraum", "status", "quelle", "fehlstunden_anzeige"]
-    list_filter = ["status", "art", "quelle", "datum_von"]
+    list_filter = [klassenfilter("schueler"), jahrgangsfilter("schueler"), "status", "art", "quelle", "datum_von"]
     search_fields = ["schueler__person__nachname", "schueler__person__vorname", "grund"]
     autocomplete_fields = ["schueler"]
     date_hierarchy = "datum_von"
