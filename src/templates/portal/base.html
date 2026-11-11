@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="{% static 'menueband.css' %}">
   <script src="{% static 'menueband.js' %}" defer></script>
   <script src="{% static 'befehle.js' %}" defer></script>
+  <script src="{% static 'hilfe.js' %}" defer></script>
   {% block kopf %}{% endblock %}
 </head>
 <body>
@@ -16,6 +17,6 @@
     {% if messages %}<ul class="meldungen">{% for m in messages %}<li class="{{ m.tags }}">{{ m }}</li>{% endfor %}</ul>{% endif %}
     {% block inhalt %}{% endblock %}
   </main>
-  <footer class="fuss">Schulnexus · {% blocktranslate %}Open-Source-Schulverwaltung · Version {{ VERSION }} (Entwicklungsstand){% endblocktranslate %}</footer>
+  <footer class="fuss">Schulnexus · {% blocktranslate %}Open-Source-Schulverwaltung · Version {{ VERSION }} (Entwicklungsstand){% endblocktranslate %} · <span class="fuss-datum">{% translate "Stand" context "Versionsdatum" %} <time datetime="{{ VERSION_DATUM|date:'Y-m-d' }}">{{ VERSION_DATUM|date:"SHORT_DATE_FORMAT" }}</time></span></footer>
 </body>
 </html>

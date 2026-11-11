@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.utils.functional import SimpleLazyObject
 
-from config.version import VERSION
+from config.version import VERSION, VERSION_DATUM
 from stammdaten.models import Schuljahr
 
 from .models import DESIGNS, design_gruppen
@@ -35,6 +35,7 @@ def schulinfo(request):
         "SCHULNAME": settings.SCHULNAME,
         "AKTUELLES_SCHULJAHR": Schuljahr.aktuelles(),
         "VERSION": VERSION,
+        "VERSION_DATUM": VERSION_DATUM,
         "SPRACHEN": settings.LANGUAGES,
         "DOKUMENT_MAX_MB": settings.DOKUMENT_MAX_MB,
         "DESIGN": aktuelles_design(request),

@@ -1,0 +1,9 @@
+{% load i18n %}
+{% for art, name, themen in gruppen %}
+<section class="hp-gruppe" data-art="{{ art }}">
+  <h3>{{ name }}</h3>
+  <ul class="hp-liste">
+    {% for x in themen %}<li data-slug="{{ x.slug }}"><a href="{% url 'hilfe_thema' x.slug %}" data-hilfe="{{ x.slug }}"><strong>{{ x.titel }}</strong>{% if x.kurz %}<small>{{ x.kurz }}</small>{% endif %}</a></li>{% endfor %}
+  </ul>
+</section>
+{% endfor %}

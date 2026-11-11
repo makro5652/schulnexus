@@ -15699,3 +15699,70 @@ msgstr "Light"
 
 msgid "Dunkel"
 msgstr "Dark"
+
+msgid "Alle Themen"
+msgstr "All topics"
+
+msgid "Anleitungen"
+msgstr "Guides"
+
+msgid "Anleitungen und Erklärungen zu allen Menüs"
+msgstr "Guides and explanations for all menus"
+
+msgid "Die Hilfe ließ sich nicht laden."
+msgstr "The help could not be loaded."
+
+msgid "Diese Seite"
+msgstr "This page"
+
+msgid "Ganze Seite"
+msgstr "Full page"
+
+msgid "Grundlagen"
+msgstr "Basics"
+
+msgid ""
+"Hier ist jedes Menü erklärt, dazu Schritt-für-Schritt-Anleitungen für "
+"typische Aufgaben. Auf jeder Seite öffnet der Knopf „Hilfe“ am rechten Rand "
+"die passende Erklärung, ohne die Seite zu verlassen."
+msgstr ""
+"Every menu is explained here, together with step-by-step guides for common "
+"tasks. On every page the “Help” button on the right edge opens the matching "
+"explanation without leaving the page."
+
+msgid "Hilfe"
+msgstr "Help"
+
+msgid "Hilfe durchsuchen"
+msgstr "Search help"
+
+msgid "Hilfe durchsuchen, z. B. Zeugnis, Schuljahr …"
+msgstr "Search help, e.g. report, school year …"
+
+msgid "Hilfe schließen"
+msgstr "Close help"
+
+msgid "Hilfe und Anleitungen"
+msgstr "Help and guides"
+
+msgid "Hilfe zu dieser Seite"
+msgstr "Help for this page"
+
+msgid "In ganzer Seite öffnen"
+msgstr "Open as full page"
+
+msgid "Inhalt"
+msgstr "Contents"
+
+msgid "Kein Hilfethema gefunden."
+msgstr "No help topic found."
+
+msgid "Menüs erklärt"
+msgstr "Menus explained"
+
+msgid "The help texts are currently available in German only."
+msgstr "The help texts are currently available in German only."
+
+msgctxt "Versionsdatum"
+msgid "Stand"
+msgstr "as of"

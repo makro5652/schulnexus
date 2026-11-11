@@ -1,0 +1,7 @@
+{% load i18n %}<article class="hp-artikel" data-slug="{{ t.slug }}" data-titel="{{ t.titel }}">
+  <p class="hp-art">{{ t.art_name }}</p>
+  <h2>{{ t.titel }}</h2>
+  {% if t.kurz %}<p class="hp-kurz">{{ t.kurz }}</p>{% endif %}
+  {% if t.abschnitte|length > 2 %}<nav class="hp-toc" aria-label="{% translate 'Inhalt' %}"><p>{% translate "Inhalt" %}</p><ol>{% for anker, titel in t.abschnitte %}<li><a href="#{{ anker }}">{{ titel }}</a></li>{% endfor %}</ol></nav>{% endif %}
+  <div class="hp-text">{{ inhalt }}</div>
+</article>

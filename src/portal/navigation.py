@@ -67,7 +67,8 @@ def menueband(request):
         "start", _("Start"),
         Gruppe(_("Übersicht"))
         .add(_("Startseite"), _url("start"), "haus", gross=True)
-        .add(_("Person suchen"), _url("suche"), "lupe", gross=True),
+        .add(_("Person suchen"), _url("suche"), "lupe", gross=True)
+        .add(_("Hilfe"), _url("hilfe"), "frage", gross=True, hinweis=_("Anleitungen und Erklärungen zu allen Menüs")),
         Gruppe(_("Microsoft 365"))
         .add(_("Office"), _url("office"), "brief", gross=True, hinweis=_("Outlook, Teams, Word, Excel und weitere Anwendungen")),
         Gruppe(_("Persönlich"))
@@ -339,10 +340,12 @@ def menueband(request):
     rollen = [str(R.ANZEIGE[n]) for n in R.REIHENFOLGE if n in namen] + sorted(n for n in namen if n not in R.ANZEIGE)
     if user.is_superuser:
         rollen.insert(0, _("Vollzugriff"))
-    return {"karten": karten, "aktiv": aktiv, "rollen": rollen}
+    from .hilfe import thema_fuer
+
+    return {"karten": karten, "aktiv": aktiv, "rollen": rollen, "hilfe": thema_fuer(request.path, aktiv)}
 
 
-PFAD_REGELN = [("/termine/", "termine"), ("/laufbahn/archiv/", "schulleitung"), ("/laufbahn/archiv/", "verwaltung"), ("/laufbahn/schueler/", "schueler"),
+PFAD_REGELN = [("/hilfe/", "start"), ("/termine/", "termine"), ("/laufbahn/archiv/", "schulleitung"), ("/laufbahn/archiv/", "verwaltung"), ("/laufbahn/schueler/", "schueler"),
                ("/klassen/", "schueler"), ("/schueler/", "schueler"), ("/stufe/", "schueler"), ("/zuordnung/", "schueler"),
                ("/aufnahme/", "schueler"), ("/elternkontakt/", "schueler"),
                ("/noten/", "unterricht"), ("/zeugnisse/", "unterricht"),

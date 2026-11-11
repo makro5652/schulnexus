@@ -841,6 +841,27 @@ SECRET_KEY=x DATABASE_URL=postgres://x:x@localhost/x python tools/spezifikation_
 
 Eine Datenbank ist dafür nicht nötig.
 
+## Hilfe und Dokumentation in der Anwendung (ab 0.7.0)
+
+- **Hilfe-Knopf auf jeder Seite:** Am rechten Rand steht überall der Knopf **Hilfe** (Portal und Verwaltungsoberfläche).
+  Er öffnet von rechts eine Einblendung mit der Erklärung **zur gerade geöffneten Seite** – zum Beispiel auf
+  „Schuljahre“ die Anleitung zum Schuljahreswechsel, in der Fehlzeitenliste die Anleitung zu Fehlzeiten, sonst das
+  Menü der aktiven Registerkarte. „Alle Themen“ zeigt die Übersicht, das Suchfeld durchsucht den gesamten Hilfetext;
+  Verweise zwischen Themen öffnen in der Einblendung, „Ganze Seite“ öffnet das Thema unter `/hilfe/`. Esc schließt.
+- **Inhalt (29 Themen):** *Grundlagen* (Bedienung, Rollen), *Menüs erklärt* – jede Registerkarte mit jeder Gruppe und
+  jedem Befehl – und *Anleitungen* für typische Aufgaben: Schuljahreswechsel einleiten, Neuaufnahme, Klassen bilden und
+  Unterricht festlegen, Noten eintragen, Excel-Notentabelle, Zeugnisse, Zeugniskonferenz, Notensperre, Fehlzeiten,
+  Elternnachrichten, Förderung, Abgang/Archiv/Löschfristen, Konten und Rollen, Sicherung, Sprechtag, Zwei-Faktor,
+  Leistungsvorgaben und Notenregeln, Schülerakte.
+- **Hilfe** steht auch im Menüband (Start › Übersicht) und in der Befehlssuche (Strg+K).
+- **Version und Datum** stehen unten auf jeder Seite („Version 0.7.0 · Stand 11.11.2026“); das Datum steht in
+  `src/config/version.py` (`VERSION_DATUM`) und wird mit jeder Version angepasst.
+- **Texte pflegen:** Die Hilfetexte liegen als einfache Textdateien in `src/portal/hilfetexte/*.md` (Kopf mit Titel,
+  Art, Kurzbeschreibung, Seiten, Stichworten; Auszeichnung siehe `src/portal/hilfe.py`). HTML in den Dateien wird nie
+  ausgeführt. Ein Test prüft, dass jede Karte des Menübands ein Hilfethema hat, das alle Gruppen und Befehle nennt, und
+  dass alle Verweise zwischen Themen gültig sind – wer einen Befehl hinzufügt, muss ihn also auch erklären.
+- Die Hilfetexte sind derzeit nur auf Deutsch; in der englischen Oberfläche weist die Einblendung darauf hin.
+
 ## Mehr Designs und stabiler Importtest (0.6.1)
 
 - **Acht weitere Designs** (Schulnexus Hell und Dunkel, Ozean, Sepia, Hoher Kontrast, Nord, Catppuccin Frappé und

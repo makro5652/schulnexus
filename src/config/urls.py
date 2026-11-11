@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
 
-from portal import anhaenge, klassenunterricht, sicherheit, startseite, stundentafel, views, zuordnung
+from portal import anhaenge, hilfe, klassenunterricht, sicherheit, startseite, stundentafel, views, zuordnung
 
 urlpatterns = [
     path("", views.start, name="start"),
@@ -42,6 +42,9 @@ urlpatterns = [
     path("notizen/<int:pk>/", startseite.notiz_aendern, name="notiz_aendern"),
     path("notizen/<int:pk>/aktion/", startseite.notiz_aktion, name="notiz_aktion"),
     path("notizen/erledigte-loeschen/", startseite.erledigte_loeschen, name="notizen_erledigte_loeschen"),
+    path("hilfe/", hilfe.index, name="hilfe"),
+    path("hilfe/suche.json", hilfe.suchindex, name="hilfe_suche"),
+    path("hilfe/<slug:slug>/", hilfe.thema, name="hilfe_thema"),
     path("gesundheit/", views.gesundheit, name="gesundheit"),
     path("sprache/", views.sprache_wechseln, name="sprache_wechseln"),
     path("design/", views.design_wechseln, name="design_wechseln"),

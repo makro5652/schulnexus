@@ -1,7 +1,7 @@
 {
  "format": "schulnexus-spezifikation",
  "formatversion": 1,
- "schulnexus_version": "0.6.1",
+ "schulnexus_version": "0.7.0",
  "hinweis": "Automatisch erzeugt mit tools/spezifikation_erzeugen.py. Enthält nur die Programmstruktur, keine Daten.",
  "projekt": {
   "zweck": "Schulnexus ist eine Open-Source-Schulverwaltung für eine Schule (Jahrgänge 1–12, Sek I nach der Richtlinie für Deutsche Schulen im Ausland, Sek II mit Punkten 0–15). Sie deckt Stammdaten, Klassen und Kurse, Noten, Zeugnisse und Konferenzen, Fehlzeiten, Förderung, Neuanmeldungen, Elternkommunikation, Termine, Personal, Schuljahreswechsel, Archiv, Sicherung und Rechte ab.",
@@ -13197,6 +13197,106 @@
      ]
     },
     {
+     "datei": "src/portal/hilfe.py",
+     "doc": "Hilfe und Dokumentation (ab 0.7.0).\n\nDie Hilfetexte liegen als einfache Textdateien in `portal/hilfetexte/*.md` – ohne Programmierkenntnisse änderbar.\nJede Datei beginnt mit einem Kopf zwischen zwei Zeilen `---`:\n\n    ---\n    titel: Schuljahreswechsel einleiten\n    art: anleitung                 grundlagen | menue | anleitung\n    kurz: Ein Satz für Listen und Suche\n    karte: schulleitung            nur bei art=menue: Schlüssel der Registerkarte im Menüband\n    pfade: /laufbahn/, /laufbahn/wechsel/*      Seiten, auf denen dieses Thema zuerst erscheint (* = beliebig, =/ = genau)\n    stichworte: Versetzung, neues Schuljahr\n    reihenfolge: 10\n    ---\n\nDanach folgt der Text in einer kleinen Auszeichnung:\n\n    ## Überschrift              ### Unterüberschrift\n    - Aufzählung                1. nummerierte Schritte\n    > Hinweis                   | Tabelle | mit | Spalten |\n    **fett**   `Eingabe`   [[Strg]]+[[K]] (Taste)\n    [Text](/pfad/)              Verweis innerhalb von Schulnexus (nur Pfade, die mit / beginnen)\n    [Text](hilfe:slug)          Verweis auf ein anderes Hilfethema (öffnet in der Hilfe-Einblendung)\n\nAlles wird zuerst maskiert; HTML in den Dateien wird also nie ausgeführt.",
+     "klassen": [
+      {
+       "name": "Thema",
+       "basen": [],
+       "doc": null,
+       "methoden": [
+        {
+         "name": "art_name",
+         "signatur": "(self)",
+         "doc": null
+        }
+       ]
+      }
+     ],
+     "funktionen": [
+      {
+       "name": "_verweis",
+       "signatur": "(m)",
+       "dekoratoren": null,
+       "doc": null
+      },
+      {
+       "name": "_zeile",
+       "signatur": "(text)",
+       "dekoratoren": null,
+       "doc": "Inline-Auszeichnung; der Text ist bereits maskiert."
+      },
+      {
+       "name": "_anker",
+       "signatur": "(titel, vergeben)",
+       "dekoratoren": null,
+       "doc": null
+      },
+      {
+       "name": "umwandeln",
+       "signatur": "(quelle)",
+       "dekoratoren": null,
+       "doc": "Wandelt den Text eines Hilfethemas in HTML. Gibt (html, abschnitte) zurück."
+      },
+      {
+       "name": "_lesen",
+       "signatur": "(pfad)",
+       "dekoratoren": null,
+       "doc": null
+      },
+      {
+       "name": "alle",
+       "signatur": "()",
+       "dekoratoren": [
+        "lru_cache(maxsize=1)"
+       ],
+       "doc": "Alle Themen als {slug: Thema}, sortiert nach Art, Reihenfolge, Titel. Wird einmal je Prozess gelesen."
+      },
+      {
+       "name": "gruppiert",
+       "signatur": "()",
+       "dekoratoren": null,
+       "doc": null
+      },
+      {
+       "name": "thema_fuer",
+       "signatur": "(pfad, karte='')",
+       "dekoratoren": null,
+       "doc": "Passendes Thema für eine Seite: das Thema mit dem genauesten passenden Pfad, sonst das Menü der aktiven Karte."
+      },
+      {
+       "name": "_teil",
+       "signatur": "(request)",
+       "dekoratoren": null,
+       "doc": null
+      },
+      {
+       "name": "index",
+       "signatur": "(request)",
+       "dekoratoren": [
+        "login_required"
+       ],
+       "doc": null
+      },
+      {
+       "name": "thema",
+       "signatur": "(request, slug)",
+       "dekoratoren": [
+        "login_required"
+       ],
+       "doc": null
+      },
+      {
+       "name": "suchindex",
+       "signatur": "(request)",
+       "dekoratoren": [
+        "login_required"
+       ],
+       "doc": "Alle Themen mit Klartext für die Suche in der Hilfe-Einblendung (einmal geladen, im Browser durchsucht)."
+      }
+     ]
+    },
+    {
      "datei": "src/portal/klassenunterricht.py",
      "doc": "Fächer und Lehrkräfte einer Klasse oder Lerngruppe (ab 0.4.14.0) – Teil der Seite „Klassen und Gruppen“.\n\nJe Fach und Halbjahr wird eine Lehrkraft gewählt; daraus entsteht der Unterricht (noten.Unterricht).\nEin Unterricht mit Leistungsnachweisen oder Zeugnisnoten wird nie gelöscht – dort lässt sich nur die\nLehrkraft wechseln. Übernommen werden nur Zellen, die auf der Seite geändert wurden; was inzwischen von\nanderer Seite geändert wurde, bleibt unangetastet.",
      "klassen": [],
@@ -14736,6 +14836,34 @@
         "test_erste_anmeldung_uebernimmt_gewaehltes_design",
         "test_druckansichten_tragen_design",
         "test_css_enthaelt_alle_designs"
+       ]
+      }
+     ]
+    },
+    {
+     "datei": "src/portal/tests_hilfe.py",
+     "doc": "Tests 0.7.0: Hilfe und Dokumentation (Hilfetexte, Einblendung, passende Hilfe je Seite) und Versionshinweis unten.",
+     "klassen": [
+      {
+       "klasse": "HilfetexteTest",
+       "doc": null,
+       "faelle": [
+        "test_alle_themen_vollstaendig",
+        "test_verweise_zeigen_auf_vorhandene_themen",
+        "test_umwandeln_ist_sicher",
+        "test_passendes_thema_je_seite"
+       ]
+      },
+      {
+       "klasse": "HilfeSeitenTest",
+       "doc": null,
+       "faelle": [
+        "test_nur_angemeldet",
+        "test_seiten_und_teile",
+        "test_knopf_und_einblendung_auf_jeder_seite",
+        "test_jedes_menue_ist_erklaert",
+        "test_hilfe_als_befehl_im_menueband",
+        "test_version_und_datum_unten"
        ]
       }
      ]
@@ -28281,7 +28409,7 @@
   },
   {
    "datei": "src/config/version.py",
-   "doc": "Zentrale Versionsnummer. Kleine Änderungen erhöhen die letzte Stelle (z. B. 0.4.1.1 -> 0.4.1.2).",
+   "doc": "Zentrale Versionsnummer und Datum der Version. Kleine Änderungen erhöhen die letzte Stelle (z. B. 0.4.1.1 -> 0.4.1.2).\nBei jeder neuen Version auch VERSION_DATUM anpassen – es steht unten auf jeder Seite.",
    "klassen": [],
    "funktionen": []
   },
@@ -28957,6 +29085,24 @@
    "route": "/notizen/erledigte-loeschen/",
    "name": "notizen_erledigte_loeschen",
    "view": "portal.startseite.erledigte_loeschen",
+   "doc": null
+  },
+  {
+   "route": "/hilfe/",
+   "name": "hilfe",
+   "view": "portal.hilfe.index",
+   "doc": null
+  },
+  {
+   "route": "/hilfe/suche.json",
+   "name": "hilfe_suche",
+   "view": "portal.hilfe.suchindex",
+   "doc": "Alle Themen mit Klartext für die Suche in der Hilfe-Einblendung (einmal geladen, im Browser durchsucht)."
+  },
+  {
+   "route": "/hilfe/<slug:slug>/",
+   "name": "hilfe_thema",
+   "view": "portal.hilfe.thema",
    "doc": null
   },
   {
@@ -31322,6 +31468,43 @@
    ]
   },
   {
+   "datei": "src/templates/hilfe/_liste.html",
+   "zeilen": 10,
+   "erbt_von": null,
+   "einbindungen": null
+  },
+  {
+   "datei": "src/templates/hilfe/index.html",
+   "zeilen": 10,
+   "erbt_von": "portal/base.html",
+   "einbindungen": [
+    "hilfe/_liste.html"
+   ]
+  },
+  {
+   "datei": "src/templates/hilfe/index_teil.html",
+   "zeilen": 2,
+   "erbt_von": null,
+   "einbindungen": [
+    "hilfe/_liste.html"
+   ]
+  },
+  {
+   "datei": "src/templates/hilfe/thema.html",
+   "zeilen": 12,
+   "erbt_von": "portal/base.html",
+   "einbindungen": [
+    "hilfe/_liste.html",
+    "hilfe/thema_teil.html"
+   ]
+  },
+  {
+   "datei": "src/templates/hilfe/thema_teil.html",
+   "zeilen": 8,
+   "erbt_von": null,
+   "einbindungen": null
+  },
+  {
    "datei": "src/templates/laufbahn/_kopf.html",
    "zeilen": 9,
    "erbt_von": null,
@@ -31460,7 +31643,7 @@
   },
   {
    "datei": "src/templates/portal/_menueband.html",
-   "zeilen": 89,
+   "zeilen": 108,
    "erbt_von": null,
    "einbindungen": [
     "noten/_kurswahl.html",
@@ -31497,7 +31680,7 @@
   },
   {
    "datei": "src/templates/portal/_symbole.html",
-   "zeilen": 43,
+   "zeilen": 44,
    "erbt_von": null,
    "einbindungen": null
   },
@@ -31510,7 +31693,7 @@
   },
   {
    "datei": "src/templates/portal/base.html",
-   "zeilen": 22,
+   "zeilen": 23,
    "erbt_von": null,
    "einbindungen": [
     "portal/_menueband.html"
@@ -31840,6 +32023,11 @@
    "beschreibung": "Setzt das gewählte Design auf <html>, bevor die Seite gezeichnet wird (Verwaltungsoberfläche)."
   },
   {
+   "datei": "src/static/hilfe.js",
+   "zeilen": 181,
+   "beschreibung": "Hilfe-Einblendung (ab 0.7.0): Knopf am rechten Rand jeder Seite, Einblendung von rechts. „Diese Seite“ zeigt das zur Seite passende Thema (vom Server bestimmt), „Alle Themen“ die Übersicht. Verweise mit data-hilfe öffnen ein Thema in der Einblendung; die Suche lädt einmal einen Index und filtert im Browser."
+  },
+  {
    "datei": "src/static/menueband.js",
    "zeilen": 81,
    "beschreibung": "Menüband: Registerkarten umschalten, einklappen (im Browser gemerkt), Tastaturbedienung."
@@ -31881,7 +32069,7 @@
   },
   {
    "datei": "src/static/menueband.css",
-   "zeilen": 233,
+   "zeilen": 301,
    "beschreibung": "Menüband (Ribbon) – gemeinsam für Portal und Verwaltungsoberfläche. Alle Regeln sind auf .mb begrenzt."
   },
   {
