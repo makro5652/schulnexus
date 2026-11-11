@@ -89,7 +89,7 @@ class KonferenzAnwesenheitTest(Grundlage):
         self.assertContains(r, "data-suchauswahl")
         self.assertNotContains(r, "SelectFilter2.js")
         self.assertNotContains(r, 'class="selectfilter')
-        self.assertNotContains(r, "Strg")  # kein Hinweis „Strg gedrückt halten …“
+        self.assertNotContains(r, "gedrückt")  # kein Hinweis „Strg gedrückt halten …“ (ab 0.6.0 steht „Strg+K“ im Menüband)
         formset = r.context["inline_admin_formsets"][0].formset
         auswahl = set(formset.empty_form.fields["schueler"].queryset.values_list("pk", flat=True))
         klasse = {s.pk for s in klassen_mitglieder(self.k.klasse, self.k.abschnitt)}
