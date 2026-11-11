@@ -30,7 +30,7 @@ class NameOhneAnmeldungTest(TestCase):
         self.assertEqual((admin.site.site_header, admin.site.site_title), ("Schulnexus", "Schulnexus"))
 
     def test_version(self):
-        self.assertEqual(VERSION, "0.6.0")
+        self.assertEqual(VERSION, "0.6.1")
 
 
 class NameAngemeldetTest(Grundlage):

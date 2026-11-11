@@ -773,16 +773,23 @@ umschalten – im Portal ebenso wie in der Verwaltungsoberfläche.
 liegen in `src/locale/en/LC_MESSAGES/django.po`; Pflege mit `tools/sprachdateien.py`
 (Ablauf in der Datei beschrieben). Ein Test schlägt fehl, sobald ein Text ohne Übersetzung ist.
 
-## Design: Standard, Catppuccin Latte, Catppuccin Mocha
+## Design: elf Farbschemata
 
-Oben rechts neben der Sprachauswahl (Paletten-Symbol, „Design“) stehen drei Farbschemata zur Wahl –
-im Portal, in der Verwaltungsoberfläche und auf der Anmeldeseite:
+Oben rechts neben der Sprachauswahl (Paletten-Symbol, „Design“) stehen elf Farbschemata zur Wahl –
+im Portal, in der Verwaltungsoberfläche und auf der Anmeldeseite. Das Menü ist gegliedert in
+„Automatisch“, „Hell“ und „Dunkel“ (ab 0.6.1; bis dahin Standard, Latte und Mocha):
 
 | Design | Beschreibung |
 |---|---|
-| **Standard** | das bisherige Grün-Schema; hell oder dunkel je nach Einstellung des Betriebssystems |
-| **Catppuccin Latte** | helle Palette von [Catppuccin](https://catppuccin.com) (Akzent Mauve), immer hell |
-| **Catppuccin Mocha** | dunkle Palette von Catppuccin, immer dunkel |
+| **Standard** | das Grün-Schema; hell oder dunkel je nach Einstellung des Betriebssystems |
+| **Schulnexus Hell** | das Grün-Schema, immer hell |
+| **Ozean** | hell, blauer Akzent |
+| **Sepia** | hell, warme Papierfarben – angenehm bei langem Lesen |
+| **Catppuccin Latte** | helle Palette von [Catppuccin](https://catppuccin.com) (Akzent Mauve) |
+| **Hoher Kontrast** | Schwarz auf Weiß, kräftige Linien, deutlicher Fokusrahmen |
+| **Schulnexus Dunkel** | das Grün-Schema, immer dunkel |
+| **Nord** | dunkel, kühle Blautöne ([Nord](https://www.nordtheme.com)) |
+| **Catppuccin Frappé**, **Macchiato**, **Mocha** | dunkle Paletten von Catppuccin, von mild bis sehr dunkel |
 
 - Die Wahl wird wie die Sprache **im Benutzerkonto gespeichert** und gilt auf jedem Gerät;
   vor der Anmeldung merkt sich der Browser sie per Cookie.
@@ -792,6 +799,10 @@ im Portal, in der Verwaltungsoberfläche und auf der Anmeldeseite:
   `portal.css`, `menueband.css` und `verwaltung.css` (Abschnitte „Designs“). Schriftfarben auf
   getönten Flächen sind gegenüber der Palette leicht abgedunkelt, damit der Kontrast reicht.
   Catppuccin steht unter MIT-Lizenz.
+- Die acht Designs ab 0.6.1 stehen als Paletten in `tools/designs_erzeugen.py`; das Skript schreibt die
+  CSS-Abschnitte in die vier Dateien und prüft jede Farbpaarung auf Kontrast (WCAG AA, 4,5 : 1). Neues Design:
+  Palette dort eintragen, in `portal/models.py` (`DESIGNS`, `DESIGN_GRUPPEN`) ergänzen, Skript ausführen.
+  `python tools/designs_erzeugen.py pruefen` läuft in der automatischen Prüfung mit. Nord steht unter MIT-Lizenz.
 
 ## Automatische Prüfungen auf GitHub (ab 0.4.9.3)
 
@@ -829,6 +840,14 @@ SECRET_KEY=x DATABASE_URL=postgres://x:x@localhost/x python tools/spezifikation_
 ```
 
 Eine Datenbank ist dafür nicht nötig.
+
+## Mehr Designs und stabiler Importtest (0.6.1)
+
+- **Acht weitere Designs** (Schulnexus Hell und Dunkel, Ozean, Sepia, Hoher Kontrast, Nord, Catppuccin Frappé und
+  Macchiato) – siehe „Design: elf Farbschemata“. Die Migration `portal/0010` ändert nur die Auswahlliste.
+- **Excel-Notentabelle:** Der Import arbeitete richtig; der Test „erneutes Hochladen ändert nichts“ wählte seinen
+  Kurs aber ohne feste Reihenfolge und erwischte im Gesamtlauf einen Demo-Kurs ohne Noten (dort meldet der Import zu
+  Recht „stehen keine Noten“). Der Test nimmt jetzt eindeutig den ersten Kurs mit Noten.
 
 ## Einfachere Bedienung, Rechteverwaltung und Klassenfilter (ab 0.6.0)
 

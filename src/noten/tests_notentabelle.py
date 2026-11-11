@@ -22,8 +22,11 @@ class NotentabelleTest(Grundlage):
         super().setUp()
         p = personal_von(User.objects.get(username="lehrkraft"))
         kandidaten = Unterricht.objects.filter(lehrkraft=p, skala__hoeher_ist_besser=False).select_related(
-            "gruppe", "abschnitt", "fach", "skala").order_by("abschnitt__nummer")
-        self.u = next(u for u in kandidaten if not gesperrte_schueler(u, list(u.schueler().values_list("pk", flat=True))))
+            "gruppe", "abschnitt", "fach", "skala").order_by("abschnitt__nummer", "pk")
+        # Eindeutige Wahl: der erste nicht gesperrte Kurs, der schon Noten hat. Ohne feste Reihenfolge erwischte die
+        # Datenbank manchmal einen Kurs ohne Noten – dort meldet der Import zu Recht „stehen keine Noten“.
+        self.u = next(u for u in kandidaten if Note.objects.filter(leistungsnachweis__unterricht=u).exists()
+                      and not gesperrte_schueler(u, list(u.schueler().values_list("pk", flat=True))))
         self.schueler = list(self.u.schueler())
         self.anmelden("lehrkraft")
 

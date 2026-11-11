@@ -91,3 +91,36 @@ table { border-collapse: collapse; width: 100%; }
 @media screen and (max-width: 820px) {
   .blatt { width: auto; min-height: 0; margin: 0.6rem 0.4rem; padding: 1rem; overflow-x: auto; }
 }
+
+/* >>> Weitere Designs – erzeugt von tools/designs_erzeugen.py, nicht von Hand ändern */
+@media screen {
+  html[data-design="hell"] body { background: #f6f5f1; }
+  html[data-design="hell"] .werkzeug { background: #1f5f5b; color: #ffffff; }
+  html[data-design="hell"] .werkzeug button { color: #1f5f5b; }
+  html[data-design="dunkel"] body { background: #15191c; }
+  html[data-design="dunkel"] .werkzeug { background: #163f3c; color: #ffffff; }
+  html[data-design="dunkel"] .werkzeug a { color: #6fbfb6; }
+  html[data-design="dunkel"] .werkzeug button { background: #6fbfb6; color: #10201e; }
+  html[data-design="frappe"] body { background: #292c3c; }
+  html[data-design="frappe"] .werkzeug { background: #232634; color: #c6d0f5; }
+  html[data-design="frappe"] .werkzeug a { color: #ca9ee6; }
+  html[data-design="frappe"] .werkzeug button { background: #ca9ee6; color: #232634; }
+  html[data-design="macchiato"] body { background: #1e2030; }
+  html[data-design="macchiato"] .werkzeug { background: #181926; color: #cad3f5; }
+  html[data-design="macchiato"] .werkzeug a { color: #c6a0f6; }
+  html[data-design="macchiato"] .werkzeug button { background: #c6a0f6; color: #181926; }
+  html[data-design="nord"] body { background: #272c36; }
+  html[data-design="nord"] .werkzeug { background: #1f242d; color: #eceff4; }
+  html[data-design="nord"] .werkzeug a { color: #88c0d0; }
+  html[data-design="nord"] .werkzeug button { background: #88c0d0; color: #1f242d; }
+  html[data-design="ozean"] body { background: #f1f5f9; }
+  html[data-design="ozean"] .werkzeug { background: #1e3a8a; color: #ffffff; }
+  html[data-design="ozean"] .werkzeug button { color: #1e3a8a; }
+  html[data-design="sepia"] body { background: #f1e9d8; }
+  html[data-design="sepia"] .werkzeug { background: #5c3a17; color: #fbf6ea; }
+  html[data-design="sepia"] .werkzeug button { color: #5c3a17; }
+  html[data-design="kontrast"] body { background: #ffffff; }
+  html[data-design="kontrast"] .werkzeug { background: #000000; color: #ffffff; }
+  html[data-design="kontrast"] .werkzeug button { color: #000000; }
+}
+/* <<< Weitere Designs */

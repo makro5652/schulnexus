@@ -4,7 +4,7 @@ from django.utils.functional import SimpleLazyObject
 from config.version import VERSION
 from stammdaten.models import Schuljahr
 
-from .models import DESIGNS
+from .models import DESIGNS, design_gruppen
 
 
 def darf_portal_nutzen(user):
@@ -39,6 +39,7 @@ def schulinfo(request):
         "DOKUMENT_MAX_MB": settings.DOKUMENT_MAX_MB,
         "DESIGN": aktuelles_design(request),
         "DESIGNS": DESIGNS,
+        "DESIGN_GRUPPEN": design_gruppen(),
     }
     user = getattr(request, "user", None)
     if user is not None and darf_portal_nutzen(user):

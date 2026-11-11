@@ -21,8 +21,48 @@ class DesignwahlTest(TestCase):
     def waehlen(self, design, ziel="/"):
         return self.client.post(reverse("design_wechseln"), {"design": design, "next": ziel})
 
-    def test_drei_designs(self):
-        self.assertEqual([c for c, _ in DESIGNS], ["standard", "latte", "mocha"])
+    def test_designs_und_gruppen(self):
+        from .models import DESIGN_GRUPPEN, design_gruppen
+
+        codes = [c for c, _ in DESIGNS]
+        self.assertEqual(codes[0], "standard")
+        self.assertTrue({"standard", "latte", "mocha", "hell", "dunkel", "ozean", "sepia", "kontrast", "nord", "frappe", "macchiato"}
+                        <= set(codes))
+        self.assertEqual(len(codes), len(set(codes)))
+        self.assertTrue(all(len(c) <= 12 for c in codes))            # Länge des Datenbankfeldes
+        gruppiert = [c for _t, liste in DESIGN_GRUPPEN for c in liste]
+        self.assertEqual(sorted(gruppiert), sorted(codes))           # jedes Design steht genau einmal im Menü
+        self.assertEqual([len(l) for _t, l in design_gruppen()], [1, 5, 5])
+
+    def test_menue_zeigt_alle_designs_in_gruppen(self):
+        r = self.client.get(reverse("login"))
+        for code, name in DESIGNS:
+            self.assertContains(r, f'name="design" value="{code}"')
+            self.assertContains(r, f"design-muster-{code}")
+        self.assertContains(r, 'class="designmenue-gruppe"', count=3)
+
+    def test_jedes_design_laesst_sich_waehlen(self):
+        self.client.login(username="chef", password=PW)
+        for code, _name in DESIGNS:
+            self.waehlen(code)
+            self.assertEqual(User.objects.get(username="chef").einstellung.design, code)
+            for url in (reverse("start"), reverse("admin:index")):
+                self.assertContains(self.client.get(url), f'data-design="{code}"')
+
+    def test_erzeugte_designs_aktuell_und_kontrastreich(self):
+        import importlib.util
+
+        pfad = Path(settings.BASE_DIR).parent / "tools" / "designs_erzeugen.py"
+        if not pfad.exists():                                         # im Container liegt nur src/
+            self.skipTest("tools/designs_erzeugen.py nicht vorhanden")
+        spec = importlib.util.spec_from_file_location("designs_erzeugen", pfad)
+        modul = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(modul)
+        self.assertEqual(modul.kontrast_maengel(), [])
+        self.assertEqual(set(modul.PALETTEN), {c for c, _ in DESIGNS} - {"standard", "latte", "mocha"})
+        for datei, erzeuger in modul.DATEIEN.items():
+            text = (STATIC / datei).read_text(encoding="utf-8")
+            self.assertEqual(modul.neuer_inhalt(text, erzeuger()), text, f"{datei} veraltet – tools/designs_erzeugen.py ausführen")
 
     def test_standard_ohne_wahl(self):
         r = self.client.get(reverse("login"))
@@ -86,8 +126,9 @@ class DesignwahlTest(TestCase):
     def test_css_enthaelt_alle_designs(self):
         for datei in ("portal.css", "menueband.css", "verwaltung.css"):
             css = (STATIC / datei).read_text()
-            for code in ("latte", "mocha"):
-                self.assertIn(f'[data-design="{code}"]', css, datei)
+            for code, _name in DESIGNS:
+                if code != "standard":
+                    self.assertIn(f'[data-design="{code}"]', css, datei)
         portal = (STATIC / "portal.css").read_text()
         # Catppuccin-Grundfarben: Latte base/text/mauve, Mocha base/text/mauve
         for farbe in ("#eff1f5", "#4c4f69", "#8839ef", "#1e1e2e", "#cdd6f4", "#cba6f7"):

@@ -3,14 +3,34 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
-# Farbschemata der Oberfläche. „standard“ folgt der Hell-/Dunkel-Einstellung des Betriebssystems,
-# die beiden anderen sind feste Paletten von Catppuccin (https://catppuccin.com, MIT-Lizenz).
+# Farbschemata der Oberfläche. „standard“ folgt der Hell-/Dunkel-Einstellung des Betriebssystems, alle anderen sind fest.
+# Latte, Frappé, Macchiato und Mocha sind Paletten von Catppuccin (https://catppuccin.com, MIT-Lizenz), Nord stammt von
+# https://www.nordtheme.com (MIT-Lizenz). Die Farben der Designs ab 0.6.1 erzeugt tools/designs_erzeugen.py.
 DESIGN_COOKIE = "design"
 DESIGNS = [
     ("standard", _("Standard (hell/dunkel nach System)")),
+    ("hell", _("Schulnexus Hell")),
+    ("ozean", _("Ozean (hell, blau)")),
+    ("sepia", _("Sepia (hell, warm)")),
     ("latte", _("Catppuccin Latte (hell)")),
+    ("kontrast", _("Hoher Kontrast (hell)")),
+    ("dunkel", _("Schulnexus Dunkel")),
+    ("nord", _("Nord (dunkel)")),
+    ("frappe", _("Catppuccin Frappé (dunkel)")),
+    ("macchiato", _("Catppuccin Macchiato (dunkel)")),
     ("mocha", _("Catppuccin Mocha (dunkel)")),
 ]
+# Gliederung des Design-Menüs (ab 0.6.1)
+DESIGN_GRUPPEN = [
+    (_("Automatisch"), ["standard"]),
+    (_("Hell"), ["hell", "ozean", "sepia", "latte", "kontrast"]),
+    (_("Dunkel"), ["dunkel", "nord", "frappe", "macchiato", "mocha"]),
+]
+
+
+def design_gruppen():
+    namen = dict(DESIGNS)
+    return [(titel, [(code, namen[code]) for code in codes]) for titel, codes in DESIGN_GRUPPEN]
 
 
 class Benutzereinstellung(models.Model):

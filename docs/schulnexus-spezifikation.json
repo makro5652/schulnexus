@@ -1,7 +1,7 @@
 {
  "format": "schulnexus-spezifikation",
  "formatversion": 1,
- "schulnexus_version": "0.6.0",
+ "schulnexus_version": "0.6.1",
  "hinweis": "Automatisch erzeugt mit tools/spezifikation_erzeugen.py. Enthält nur die Programmstruktur, keine Daten.",
  "projekt": {
   "zweck": "Schulnexus ist eine Open-Source-Schulverwaltung für eine Schule (Jahrgänge 1–12, Sek I nach der Richtlinie für Deutsche Schulen im Ausland, Sek II mit Punkten 0–15). Sie deckt Stammdaten, Klassen und Kurse, Noten, Zeugnisse und Konferenzen, Fehlzeiten, Förderung, Neuanmeldungen, Elternkommunikation, Termine, Personal, Schuljahreswechsel, Archiv, Sicherung und Rechte ab.",
@@ -12282,8 +12282,40 @@
          "Standard (hell/dunkel nach System)"
         ],
         [
+         "hell",
+         "Schulnexus Hell"
+        ],
+        [
+         "ozean",
+         "Ozean (hell, blau)"
+        ],
+        [
+         "sepia",
+         "Sepia (hell, warm)"
+        ],
+        [
          "latte",
          "Catppuccin Latte (hell)"
+        ],
+        [
+         "kontrast",
+         "Hoher Kontrast (hell)"
+        ],
+        [
+         "dunkel",
+         "Schulnexus Dunkel"
+        ],
+        [
+         "nord",
+         "Nord (dunkel)"
+        ],
+        [
+         "frappe",
+         "Catppuccin Frappé (dunkel)"
+        ],
+        [
+         "macchiato",
+         "Catppuccin Macchiato (dunkel)"
         ],
         [
          "mocha",
@@ -13632,7 +13664,14 @@
        ]
       }
      ],
-     "funktionen": []
+     "funktionen": [
+      {
+       "name": "design_gruppen",
+       "signatur": "()",
+       "dekoratoren": null,
+       "doc": null
+      }
+     ]
     },
     {
      "datei": "src/portal/navigation.py",
@@ -14683,7 +14722,10 @@
        "klasse": "DesignwahlTest",
        "doc": null,
        "faelle": [
-        "test_drei_designs",
+        "test_designs_und_gruppen",
+        "test_menue_zeigt_alle_designs_in_gruppen",
+        "test_jedes_design_laesst_sich_waehlen",
+        "test_erzeugte_designs_aktuell_und_kontrastreich",
         "test_standard_ohne_wahl",
         "test_menue_neben_sprachauswahl",
         "test_wahl_ohne_anmeldung_per_cookie",
@@ -31406,7 +31448,7 @@
   },
   {
    "datei": "src/templates/portal/_designmenue.html",
-   "zeilen": 17,
+   "zeilen": 20,
    "erbt_von": null,
    "einbindungen": null
   },
@@ -31839,12 +31881,12 @@
   },
   {
    "datei": "src/static/menueband.css",
-   "zeilen": 181,
+   "zeilen": 233,
    "beschreibung": "Menüband (Ribbon) – gemeinsam für Portal und Verwaltungsoberfläche. Alle Regeln sind auf .mb begrenzt."
   },
   {
    "datei": "src/static/portal.css",
-   "zeilen": 1271,
+   "zeilen": 1344,
    "beschreibung": "Kennzeichnungen (Status, Hinweise)"
   },
   {
@@ -31854,12 +31896,12 @@
   },
   {
    "datei": "src/static/verwaltung.css",
-   "zeilen": 71,
+   "zeilen": 186,
    "beschreibung": "Sprachmenü in der Verwaltungsoberfläche"
   },
   {
    "datei": "src/static/zeugnis.css",
-   "zeilen": 94,
+   "zeilen": 127,
    "beschreibung": "Druckansicht der Zeugnisse nach dem Muster der Sek I-PO (Anlage 11), Format DIN A4"
   }
  ],
@@ -31873,7 +31915,7 @@
   "vps_traefik_yml": "# Schulnexus auf einem VPS hinter einem vorhandenen Traefik (HTTPS über Let's Encrypt)\n#\n# Wird zusätzlich zur docker-compose.yml im Hauptordner geladen:\n#   docker compose -f docker-compose.yml -f vps/traefik.yml up -d --build\n#\n# Benötigte Werte in der .env (Hauptordner), Beispiele:\n#   DOMAIN=schule.example.org\n#   TRAEFIK_NETZWERK=traefik          (Docker-Netzwerk, in dem Traefik hängt)\n#   TRAEFIK_ENTRYPOINT=websecure      (Entrypoint für https)\n#   TRAEFIK_RESOLVER=letsencrypt      (Name des Zertifikats-Resolvers)\n#   PORT=127.0.0.1:8000               (nur lokal veröffentlichen; von außen nur über Traefik)\n#   ALLOWED_HOSTS=schule.example.org,localhost,127.0.0.1\n#   CSRF_TRUSTED_ORIGINS=https://schule.example.org\n#   HTTPS=1 und HINTER_PROXY=1\n# Schritt für Schritt: README.md, Abschnitt „Betrieb auf einem VPS mit Traefik“.\n\nservices:\n  web:\n    networks: [default, proxy]\n    labels:\n      - traefik.enable=true\n      - traefik.docker.network=${TRAEFIK_NETZWERK:?Bitte TRAEFIK_NETZWERK in .env setzen}\n      - traefik.http.routers.schulnexus.rule=Host(`${DOMAIN:?Bitte DOMAIN in .env setzen}`)\n      - traefik.http.routers.schulnexus.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}\n      - traefik.http.routers.schulnexus.tls=true\n      - traefik.http.routers.schulnexus.tls.certresolver=${TRAEFIK_RESOLVER:-letsencrypt}\n      - traefik.http.services.schulnexus.loadbalancer.server.port=8000\n\nnetworks:\n  proxy:\n    external: true\n    name: ${TRAEFIK_NETZWERK:?Bitte TRAEFIK_NETZWERK in .env setzen}\n",
   "vps_caddy_yml": "# Schulnexus auf einem VPS OHNE vorhandenen Traefik: mitgelieferter Caddy-Proxy holt das HTTPS-Zertifikat selbst.\n#\n# Wird zusätzlich zur docker-compose.yml im Hauptordner geladen:\n#   docker compose -f docker-compose.yml -f vps/caddy.yml up -d --build\n#\n# Benötigte Werte in der .env (Hauptordner), Beispiele:\n#   DOMAIN=schule.example.org\n#   PORT=127.0.0.1:8000               (Anwendung nur lokal; von außen nur über Caddy auf 80/443)\n#   ALLOWED_HOSTS=schule.example.org,localhost,127.0.0.1\n#   CSRF_TRUSTED_ORIGINS=https://schule.example.org\n#   HTTPS=1 und HINTER_PROXY=1\n# Voraussetzung: Die Ports 80 und 443 des Servers sind frei (kein anderer Webserver, kein Traefik).\n# Schritt für Schritt: README.md, Abschnitt „Betrieb auf einem VPS ohne Traefik (Caddy)“.\n\nservices:\n  caddy:\n    image: caddy:2-alpine\n    restart: unless-stopped\n    depends_on:\n      - web\n    environment:\n      DOMAIN: ${DOMAIN:?Bitte DOMAIN in .env setzen}\n    ports:\n      - \"80:80\"\n      - \"443:443\"\n    volumes:\n      - ./vps/Caddyfile:/etc/caddy/Caddyfile:ro\n      - caddy_daten:/data\n      - caddy_konfig:/config\n\nvolumes:\n  caddy_daten:\n  caddy_konfig:\n",
   "vps_caddyfile": "# Caddy: automatisches HTTPS (Let's Encrypt) für die in DOMAIN eingetragene Adresse.\n# Caddy setzt X-Forwarded-Proto/-For selbst; fremde Werte aus dem Internet werden verworfen.\n{$DOMAIN} {\n\tencode zstd gzip\n\trequest_body {\n\t\tmax_size 600MB\n\t}\n\treverse_proxy web:8000\n}\n",
-  "ci_github_actions": "# Automatische Prüfungen für Schulnexus (ab 0.4.9.3)\n# Läuft bei jedem Push auf main, bei Pull Requests, wöchentlich und auf Knopfdruck.\n# Es werden ausschließlich erfundene Demodaten verwendet; keine Geheimnisse des Betriebs nötig.\nname: Prüfung\n\non:\n  push:\n    branches: [main]\n  pull_request:\n  schedule:\n    - cron: \"17 3 * * 1\"\n  workflow_dispatch:\n\npermissions:\n  contents: read\n\nconcurrency:\n  group: pruefung-${{ github.ref }}\n  cancel-in-progress: true\n\njobs:\n  qualitaet:\n    name: Code-Qualität (ruff, Django-Prüfung, Übersetzungen, Shell)\n    runs-on: ubuntu-24.04\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with:\n          python-version: \"3.12\"\n          cache: pip\n      - run: pip install -r requirements.txt ruff\n      - name: ruff (Syntax- und Namensfehler)\n        run: ruff check src tools\n      - name: Django-Systemprüfung und fehlende Migrationen\n        working-directory: src\n        env:\n          SECRET_KEY: nur-fuer-die-pruefung\n          DATABASE_URL: postgres://schule:schule@localhost:5432/schulnexus\n        run: |\n          python manage.py check\n          python manage.py makemigrations --check --dry-run\n      - name: Übersetzungen vollständig\n        run: python tools/sprachdateien.py pruefen\n      - name: Shell-Skripte (shellcheck)\n        run: |\n          shellcheck -S warning -e SC1111 start.sh unraid/einrichten.sh vps/einrichten.sh vps/einrichten-caddy.sh docker/*.sh\n\n  tests:\n    name: Tests (PostgreSQL 16)\n    runs-on: ubuntu-24.04\n    timeout-minutes: 30\n    services:\n      postgres:\n        image: postgres:16\n        env:\n          POSTGRES_USER: schule\n          POSTGRES_PASSWORD: schule\n          POSTGRES_DB: schulnexus\n        ports: [\"5432:5432\"]\n        options: >-\n          --health-cmd \"pg_isready -U schule\"\n          --health-interval 5s --health-timeout 5s --health-retries 10\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with:\n          python-version: \"3.12\"\n          cache: pip\n      - run: pip install -r requirements.txt\n      - name: Testsuite\n        working-directory: src\n        env:\n          SECRET_KEY: nur-fuer-die-pruefung\n          DATABASE_URL: postgres://schule:schule@localhost:5432/schulnexus\n        run: |\n          export DATEN_SCHLUESSEL=\"$(python -c 'import base64,os;print(base64.urlsafe_b64encode(os.urandom(32)).decode().rstrip(\"=\"))')\"\n          python manage.py test --parallel 4 --noinput\n\n  sicherheit:\n    name: Sicherheit (Abhängigkeiten, bandit)\n    runs-on: ubuntu-24.04\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with:\n          python-version: \"3.12\"\n          cache: pip\n      - run: pip install pip-audit bandit\n      - name: Bekannte Schwachstellen in Abhängigkeiten\n        run: pip-audit -r requirements.txt\n      - name: Statische Sicherheitsanalyse (nur mittlere und hohe Schwere)\n        run: bandit -r src -x \"src/*/tests*.py,src/*/migrations\" --severity-level medium -q\n\n  oberflaeche:\n    name: Oberfläche im Container (Telefon 390 px und Desktop)\n    runs-on: ubuntu-24.04\n    timeout-minutes: 30\n    needs: [qualitaet]\n    steps:\n      - uses: actions/checkout@v4\n      - name: Konfiguration mit Wegwerf-Geheimnissen erzeugen\n        run: |\n          zufall() { LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c \"$1\"; }\n          schluessel() { head -c 32 /dev/urandom | base64 | tr '+/' '-_' | tr -d '=\\n'; }\n          sed -e \"s|^SECRET_KEY=.*|SECRET_KEY=$(zufall 50)|\" \\\n              -e \"s|^DB_PASSWORT=.*|DB_PASSWORT=$(zufall 24)|\" \\\n              -e \"s|^ADMIN_PASSWORT=.*|ADMIN_PASSWORT=$(zufall 16)|\" \\\n              -e \"s|^DEMO_PASSWORT=.*|DEMO_PASSWORT=Schule-Demo-2026|\" \\\n              -e \"s|^DATEN_SCHLUESSEL=.*|DATEN_SCHLUESSEL=$(schluessel)|\" \\\n              .env.example > .env\n      - name: Container bauen und starten\n        run: docker compose up --build -d\n      - name: Auf Bereitschaft warten\n        run: |\n          for i in $(seq 1 90); do\n            if curl -fsS -o /dev/null http://localhost:8000/anmelden/; then echo \"bereit nach $((i*2)) s\"; exit 0; fi\n            sleep 2\n          done\n          docker compose logs --tail=200\n          exit 1\n      - uses: actions/setup-python@v5\n        with:\n          python-version: \"3.12\"\n      - name: Playwright installieren\n        run: |\n          pip install playwright\n          playwright install --with-deps chromium\n      - name: Oberfläche prüfen\n        run: python tools/oberflaeche_pruefen.py http://localhost:8000 bildschirmfotos-ci\n      - name: Bildschirmfotos und Befunde sichern\n        if: always()\n        uses: actions/upload-artifact@v4\n        with:\n          name: bildschirmfotos\n          path: bildschirmfotos-ci\n          retention-days: 14\n      - name: Container-Protokoll bei Fehler\n        if: failure()\n        run: docker compose logs --tail=300\n",
+  "ci_github_actions": "# Automatische Prüfungen für Schulnexus (ab 0.4.9.3)\n# Läuft bei jedem Push auf main, bei Pull Requests, wöchentlich und auf Knopfdruck.\n# Es werden ausschließlich erfundene Demodaten verwendet; keine Geheimnisse des Betriebs nötig.\nname: Prüfung\n\non:\n  push:\n    branches: [main]\n  pull_request:\n  schedule:\n    - cron: \"17 3 * * 1\"\n  workflow_dispatch:\n\npermissions:\n  contents: read\n\nconcurrency:\n  group: pruefung-${{ github.ref }}\n  cancel-in-progress: true\n\njobs:\n  qualitaet:\n    name: Code-Qualität (ruff, Django-Prüfung, Übersetzungen, Shell)\n    runs-on: ubuntu-24.04\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with:\n          python-version: \"3.12\"\n          cache: pip\n      - run: pip install -r requirements.txt ruff\n      - name: ruff (Syntax- und Namensfehler)\n        run: ruff check src tools\n      - name: Django-Systemprüfung und fehlende Migrationen\n        working-directory: src\n        env:\n          SECRET_KEY: nur-fuer-die-pruefung\n          DATABASE_URL: postgres://schule:schule@localhost:5432/schulnexus\n        run: |\n          python manage.py check\n          python manage.py makemigrations --check --dry-run\n      - name: Übersetzungen vollständig\n        run: python tools/sprachdateien.py pruefen\n      - name: Designs aktuell und kontrastreich\n        run: python tools/designs_erzeugen.py pruefen\n      - name: Shell-Skripte (shellcheck)\n        run: |\n          shellcheck -S warning -e SC1111 start.sh unraid/einrichten.sh vps/einrichten.sh vps/einrichten-caddy.sh docker/*.sh\n\n  tests:\n    name: Tests (PostgreSQL 16)\n    runs-on: ubuntu-24.04\n    timeout-minutes: 30\n    services:\n      postgres:\n        image: postgres:16\n        env:\n          POSTGRES_USER: schule\n          POSTGRES_PASSWORD: schule\n          POSTGRES_DB: schulnexus\n        ports: [\"5432:5432\"]\n        options: >-\n          --health-cmd \"pg_isready -U schule\"\n          --health-interval 5s --health-timeout 5s --health-retries 10\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with:\n          python-version: \"3.12\"\n          cache: pip\n      - run: pip install -r requirements.txt\n      - name: Testsuite\n        working-directory: src\n        env:\n          SECRET_KEY: nur-fuer-die-pruefung\n          DATABASE_URL: postgres://schule:schule@localhost:5432/schulnexus\n        run: |\n          export DATEN_SCHLUESSEL=\"$(python -c 'import base64,os;print(base64.urlsafe_b64encode(os.urandom(32)).decode().rstrip(\"=\"))')\"\n          python manage.py test --parallel 4 --noinput\n\n  sicherheit:\n    name: Sicherheit (Abhängigkeiten, bandit)\n    runs-on: ubuntu-24.04\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with:\n          python-version: \"3.12\"\n          cache: pip\n      - run: pip install pip-audit bandit\n      - name: Bekannte Schwachstellen in Abhängigkeiten\n        run: pip-audit -r requirements.txt\n      - name: Statische Sicherheitsanalyse (nur mittlere und hohe Schwere)\n        run: bandit -r src -x \"src/*/tests*.py,src/*/migrations\" --severity-level medium -q\n\n  oberflaeche:\n    name: Oberfläche im Container (Telefon 390 px und Desktop)\n    runs-on: ubuntu-24.04\n    timeout-minutes: 30\n    needs: [qualitaet]\n    steps:\n      - uses: actions/checkout@v4\n      - name: Konfiguration mit Wegwerf-Geheimnissen erzeugen\n        run: |\n          zufall() { LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c \"$1\"; }\n          schluessel() { head -c 32 /dev/urandom | base64 | tr '+/' '-_' | tr -d '=\\n'; }\n          sed -e \"s|^SECRET_KEY=.*|SECRET_KEY=$(zufall 50)|\" \\\n              -e \"s|^DB_PASSWORT=.*|DB_PASSWORT=$(zufall 24)|\" \\\n              -e \"s|^ADMIN_PASSWORT=.*|ADMIN_PASSWORT=$(zufall 16)|\" \\\n              -e \"s|^DEMO_PASSWORT=.*|DEMO_PASSWORT=Schule-Demo-2026|\" \\\n              -e \"s|^DATEN_SCHLUESSEL=.*|DATEN_SCHLUESSEL=$(schluessel)|\" \\\n              .env.example > .env\n      - name: Container bauen und starten\n        run: docker compose up --build -d\n      - name: Auf Bereitschaft warten\n        run: |\n          for i in $(seq 1 90); do\n            if curl -fsS -o /dev/null http://localhost:8000/anmelden/; then echo \"bereit nach $((i*2)) s\"; exit 0; fi\n            sleep 2\n          done\n          docker compose logs --tail=200\n          exit 1\n      - uses: actions/setup-python@v5\n        with:\n          python-version: \"3.12\"\n      - name: Playwright installieren\n        run: |\n          pip install playwright\n          playwright install --with-deps chromium\n      - name: Oberfläche prüfen\n        run: python tools/oberflaeche_pruefen.py http://localhost:8000 bildschirmfotos-ci\n      - name: Bildschirmfotos und Befunde sichern\n        if: always()\n        uses: actions/upload-artifact@v4\n        with:\n          name: bildschirmfotos\n          path: bildschirmfotos-ci\n          retention-days: 14\n      - name: Container-Protokoll bei Fehler\n        if: failure()\n        run: docker compose logs --tail=300\n",
   "ruff_toml": "# Statische Prüfung (ab 0.4.9.3), läuft automatisch auf GitHub: ruff check src\ntarget-version = \"py312\"\nline-length = 130\nextend-exclude = [\"src/*/migrations\"]\n\n[lint]\n# F: Pyflakes (undefinierte Namen, unbenutzte Importe/Variablen), E9: Syntaxfehler, PLE: weitere sichere Fehler\nselect = [\"F\", \"E9\", \"PLE\"]\n",
   "env_beispiel_variablen": [
    {

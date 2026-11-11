@@ -1268,3 +1268,76 @@ kbd { font: inherit; font-size: 0.82em; border: 1px solid var(--linie); border-b
 .sy-rechtefilter { display: flex; flex-wrap: wrap; gap: 0.5rem 0.9rem; align-items: center; margin: 0.6rem 0; }
 .sy-rechtefilter input[type=search] { font: inherit; padding: 0.4rem 0.6rem; border: 1px solid var(--linie); border-radius: 7px; background: var(--grund); color: var(--text); width: min(22rem, 100%); }
 .sy-rechtetabelle tr[hidden], details.sy-app[hidden] { display: none; }
+
+/* >>> Weitere Designs – erzeugt von tools/designs_erzeugen.py, nicht von Hand ändern */
+:root[data-design="hell"] {
+  color-scheme: light;
+  --grund: #f6f5f1; --flaeche: #ffffff; --text: #1d2327; --leise: #5b6670; --linie: #dfe3e6;
+  --akzent: #1f5f5b; --akzent-hell: #e3efed; --warnung: #a04520; --gefahr-flaeche: #fbeae5;
+  --info-flaeche: #e4ecf7; --info-text: #2b4f80; --hinweis-flaeche: #fbf0d9; --hinweis-text: #855a0c; --notiz-text: #4a3608;
+  --lila-flaeche: #ece6f6; --lila-text: #563f8c; --ok: #2f7a4f;
+  --papier-gelb: #fbf3d3; --papier-gruen: #e1efe9; --papier-blau: #e3ebf5; --papier-rosa: #f6e4e4; --papier-grau: #ecebe7;
+}
+:root[data-design="dunkel"] {
+  color-scheme: dark;
+  --grund: #15191c; --flaeche: #1e2428; --text: #e8eaec; --leise: #9aa5ae; --linie: #313a40;
+  --akzent: #6fbfb6; --akzent-hell: #20332f; --warnung: #f0a07a; --gefahr-flaeche: #3a2620;
+  --info-flaeche: #22324a; --info-text: #a9c6ef; --hinweis-flaeche: #3a3020; --hinweis-text: #f0cd85; --notiz-text: #f0e0bd;
+  --lila-flaeche: #2f2945; --lila-text: #c9bdf2; --ok: #7fd1a1;
+  --papier-gelb: #3a3522; --papier-gruen: #233530; --papier-blau: #232f3d; --papier-rosa: #3b2829; --papier-grau: #2c2f31;
+}
+:root[data-design="dunkel"] .nv-stand.in_arbeit { background: #3a3020; color: #f0cd85; }
+:root[data-design="frappe"] {
+  color-scheme: dark;
+  --grund: #292c3c; --flaeche: #303446; --text: #c6d0f5; --leise: #a5adce; --linie: #414559;
+  --akzent: #ca9ee6; --akzent-hell: #443f5c; --warnung: #ea999c; --gefahr-flaeche: #43343f;
+  --info-flaeche: #343b58; --info-text: #8caaee; --hinweis-flaeche: #4a4650; --hinweis-text: #e5c890; --notiz-text: #e5c890;
+  --lila-flaeche: #443f5c; --lila-text: #ca9ee6; --ok: #a6d189;
+  --papier-gelb: #454250; --papier-gruen: #3a4649; --papier-blau: #384060; --papier-rosa: #463f58; --papier-grau: #3a3d50;
+}
+:root[data-design="frappe"] .nv-stand.in_arbeit { background: #4a4650; color: #e5c890; }
+:root[data-design="macchiato"] {
+  color-scheme: dark;
+  --grund: #1e2030; --flaeche: #24273a; --text: #cad3f5; --leise: #a5adcb; --linie: #363a4f;
+  --akzent: #c6a0f6; --akzent-hell: #3b3555; --warnung: #ed8796; --gefahr-flaeche: #453246;
+  --info-flaeche: #2f3858; --info-text: #8aadf4; --hinweis-flaeche: #423e47; --hinweis-text: #eed49f; --notiz-text: #eed49f;
+  --lila-flaeche: #3b3555; --lila-text: #c6a0f6; --ok: #a6da95;
+  --papier-gelb: #3c3944; --papier-gruen: #2f3b40; --papier-blau: #2d3554; --papier-rosa: #3c354f; --papier-grau: #2f3245;
+}
+:root[data-design="macchiato"] .nv-stand.in_arbeit { background: #423e47; color: #eed49f; }
+:root[data-design="nord"] {
+  color-scheme: dark;
+  --grund: #272c36; --flaeche: #2e3440; --text: #eceff4; --leise: #b4bccb; --linie: #434c5e;
+  --akzent: #88c0d0; --akzent-hell: #37475a; --warnung: #f0a3aa; --gefahr-flaeche: #4a3540;
+  --info-flaeche: #36465c; --info-text: #a3c1e0; --hinweis-flaeche: #4a4538; --hinweis-text: #ebcb8b; --notiz-text: #ebcb8b;
+  --lila-flaeche: #473f54; --lila-text: #d0b3cb; --ok: #a3be8c;
+  --papier-gelb: #474436; --papier-gruen: #3a463f; --papier-blau: #36465c; --papier-rosa: #4a3b46; --papier-grau: #3b4252;
+}
+:root[data-design="nord"] .nv-stand.in_arbeit { background: #4a4538; color: #ebcb8b; }
+:root[data-design="ozean"] {
+  color-scheme: light;
+  --grund: #f1f5f9; --flaeche: #ffffff; --text: #0f172a; --leise: #51607a; --linie: #d8e0ea;
+  --akzent: #1d4ed8; --akzent-hell: #e0e9fd; --warnung: #b42318; --gefahr-flaeche: #fdecea;
+  --info-flaeche: #e0f0fb; --info-text: #0b5a8a; --hinweis-flaeche: #fdf3d7; --hinweis-text: #854d0e; --notiz-text: #4a3608;
+  --lila-flaeche: #ede9fe; --lila-text: #5b21b6; --ok: #15803d;
+  --papier-gelb: #fdf3d7; --papier-gruen: #dcf3e4; --papier-blau: #e0e9fd; --papier-rosa: #fbe4e6; --papier-grau: #e8edf3;
+}
+:root[data-design="sepia"] {
+  color-scheme: light;
+  --grund: #f1e9d8; --flaeche: #fbf6ea; --text: #3b2f20; --leise: #6b5a45; --linie: #ddd0b8;
+  --akzent: #8a4b14; --akzent-hell: #f1e1c8; --warnung: #a8321c; --gefahr-flaeche: #f6ded4;
+  --info-flaeche: #e0e6e2; --info-text: #2f4f63; --hinweis-flaeche: #f3e3b8; --hinweis-text: #7a5200; --notiz-text: #4a3608;
+  --lila-flaeche: #eadff0; --lila-text: #5f3d7a; --ok: #4d6b1f;
+  --papier-gelb: #f3e6bd; --papier-gruen: #dfe6cf; --papier-blau: #dde3e3; --papier-rosa: #efd9d0; --papier-grau: #e6dcc8;
+}
+:root[data-design="kontrast"] {
+  color-scheme: light;
+  --grund: #ffffff; --flaeche: #ffffff; --text: #000000; --leise: #2b2b2b; --linie: #5a5a5a;
+  --akzent: #0033a0; --akzent-hell: #dfe8ff; --warnung: #a30000; --gefahr-flaeche: #ffe3e0;
+  --info-flaeche: #dfe8ff; --info-text: #002a80; --hinweis-flaeche: #fff1b8; --hinweis-text: #5c3d00; --notiz-text: #2b1d00;
+  --lila-flaeche: #ecdcff; --lila-text: #3d0a80; --ok: #005a1c;
+  --papier-gelb: #fff1b8; --papier-gruen: #d9f2df; --papier-blau: #dfe8ff; --papier-rosa: #ffe3e0; --papier-grau: #ededed;
+}
+:root[data-design="kontrast"] a { text-decoration-thickness: 2px; }
+:root[data-design="kontrast"] :focus-visible { outline: 3px solid #0033a0; outline-offset: 2px; }
+/* <<< Weitere Designs */

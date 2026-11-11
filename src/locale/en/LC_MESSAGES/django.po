@@ -15666,3 +15666,36 @@ msgid "%(n)s angezeigtes Konto auswählen"
 msgid_plural "alle %(n)s angezeigten Konten auswählen"
 msgstr[0] "Select %(n)s shown account"
 msgstr[1] "Select all %(n)s shown accounts"
+
+msgid "Schulnexus Hell"
+msgstr "Schulnexus Light"
+
+msgid "Ozean (hell, blau)"
+msgstr "Ocean (light, blue)"
+
+msgid "Sepia (hell, warm)"
+msgstr "Sepia (light, warm)"
+
+msgid "Hoher Kontrast (hell)"
+msgstr "High contrast (light)"
+
+msgid "Schulnexus Dunkel"
+msgstr "Schulnexus Dark"
+
+msgid "Nord (dunkel)"
+msgstr "Nord (dark)"
+
+msgid "Catppuccin Frappé (dunkel)"
+msgstr "Catppuccin Frappé (dark)"
+
+msgid "Catppuccin Macchiato (dunkel)"
+msgstr "Catppuccin Macchiato (dark)"
+
+msgid "Automatisch"
+msgstr "Automatic"
+
+msgid "Hell"
+msgstr "Light"
+
+msgid "Dunkel"
+msgstr "Dark"
