@@ -394,3 +394,6 @@ html[data-design="skizze"] .suchfeld { background: #fff; border: 2px solid var(-
   html[data-design="skizze"] .ne-felder, html[data-design="skizze"] .ne-neuer-ordner .ne-felder { grid-template-columns: minmax(0, 1fr); }
   html[data-design="skizze"] .raster { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* Dichte Konferenz-/Zeugnisseiten: Begründungsfelder bleiben einzeilig (per Ziehen vergrößerbar) */
+html[data-design="skizze"] textarea.zg-begruendung, html[data-design="skizze"] .zg-anmerken textarea { min-height: 2.4rem; height: 2.4rem; }
