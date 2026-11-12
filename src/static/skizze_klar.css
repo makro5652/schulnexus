@@ -1,0 +1,38 @@
+/* Design „Skizzenbuch klar (modern)“ (ab 0.8.1): dieselbe Anordnung wie das Skizzenbuch (skizze.css, skizze_start.css,
+   skizze_seiten.css), aber mit höchstens vier Farben: Tinte, Akzent, Fläche und Karte. Alle Bereichs- und Warnfarben
+   sind Töne davon. Die Regeln der Anordnung gelten für beide Designs; hier stehen nur die Farbvariablen.
+   Schriften bleiben wie im Skizzenbuch. */
+:root[data-design="klar"] {
+  color-scheme: light;
+  /* Die vier Farben */
+  --klar-tinte: #1E293B; --klar-akzent: #2563EB; --klar-flaeche: #EEF2F7; --klar-karte: #FFFFFF;
+  /* Grund, Schrift, Akzent */
+  --sk-papier: var(--klar-flaeche); --sk-raster: var(--klar-flaeche); --sk-tinte: var(--klar-tinte); --sk-leise: var(--klar-tinte);
+  --sk-blau-tinte: var(--klar-akzent); --sk-rot: var(--klar-akzent);
+  /* Bereichs- und Kachelfarben: alle gleich, damit keine weitere Farbe entsteht. Pale Fläche, kräftiger Ton = Akzent */
+  --sk-gelb: var(--klar-flaeche); --sk-gelb-kraeftig: var(--klar-akzent);
+  --sk-rosa: var(--klar-flaeche); --sk-rosa-kraeftig: var(--klar-akzent);
+  --sk-gruen: var(--klar-flaeche); --sk-gruen-kraeftig: var(--klar-akzent);
+  --sk-lila: var(--klar-flaeche); --sk-lila-kraeftig: var(--klar-akzent);
+  --sk-blau: var(--klar-flaeche); --sk-blau-kraeftig: var(--klar-akzent);
+  --sk-orange: var(--klar-flaeche); --sk-orange-kraeftig: var(--klar-akzent);
+  --sk-tuerkis: var(--klar-flaeche); --sk-tuerkis-kraeftig: var(--klar-akzent);
+  /* Flächen und Linien */
+  --sk-karte: var(--klar-karte); --sk-papier-hell: var(--klar-karte); --sk-zebra: var(--klar-flaeche); --sk-zebra2: var(--klar-karte);
+  --sk-warm: var(--klar-karte); --sk-rot-fl: var(--klar-flaeche); --sk-blau-hell: var(--klar-flaeche); --sk-papier-grau: var(--klar-flaeche);
+  --sk-linie: var(--klar-flaeche); --sk-strich: var(--klar-flaeche); --sk-hover: var(--klar-flaeche);
+  /* Zeichen als Grafik in Tinte und Akzent */
+  --sk-pfeil: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%231E293B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --sk-haken: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3.2 3.2L13 4.8' fill='none' stroke='%231E293B' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --sk-welle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='8' viewBox='0 0 24 8'%3E%3Cpath d='M0 4Q6 0 12 4T24 4' fill='none' stroke='%232563EB' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E");
+  /* Bestehende Variablen (Fachseiten, Verwaltung, Menüband, Befehlssuche) */
+  --grund: var(--klar-flaeche); --flaeche: var(--klar-karte); --text: var(--klar-tinte); --leise: var(--klar-tinte); --linie: var(--klar-flaeche);
+  --akzent: var(--klar-akzent); --akzent-hell: var(--klar-flaeche); --warnung: var(--klar-akzent); --gefahr-flaeche: var(--klar-flaeche);
+  --info-flaeche: var(--klar-flaeche); --info-text: var(--klar-akzent); --hinweis-flaeche: var(--klar-flaeche); --hinweis-text: var(--klar-tinte);
+  --notiz-text: var(--klar-tinte); --lila-flaeche: var(--klar-flaeche); --lila-text: var(--klar-akzent); --ok: var(--klar-akzent);
+  --papier-grau: var(--klar-flaeche);
+  --mb-flaeche: var(--klar-karte); --mb-hover: var(--klar-flaeche); --mb-schatten: rgba(30, 41, 59, .10);
+  --hairline-color: var(--klar-flaeche); --darkened-bg: var(--klar-flaeche); --selected-row: var(--klar-flaeche); --selected-bg: var(--klar-flaeche);
+  --link-hover-color: var(--klar-tinte); --close-button-bg: var(--klar-tinte); --delete-button-hover-bg: var(--klar-tinte);
+  --mb-titel: var(--klar-flaeche);
+}

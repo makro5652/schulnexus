@@ -1,7 +1,7 @@
 {
  "format": "schulnexus-spezifikation",
  "formatversion": 1,
- "schulnexus_version": "0.8.0",
+ "schulnexus_version": "0.8.1",
  "hinweis": "Automatisch erzeugt mit tools/spezifikation_erzeugen.py. Enthält nur die Programmstruktur, keine Daten.",
  "projekt": {
   "zweck": "Schulnexus ist eine Open-Source-Schulverwaltung für eine Schule (Jahrgänge 1–12, Sek I nach der Richtlinie für Deutsche Schulen im Ausland, Sek II mit Punkten 0–15). Sie deckt Stammdaten, Klassen und Kurse, Noten, Zeugnisse und Konferenzen, Fehlzeiten, Förderung, Neuanmeldungen, Elternkommunikation, Termine, Personal, Schuljahreswechsel, Archiv, Sicherung und Rechte ab.",
@@ -12419,6 +12419,10 @@
         [
          "skizze",
          "Skizzenbuch (hell, ohne Menüband)"
+        ],
+        [
+         "klar",
+         "Skizzenbuch klar (modern)"
         ]
        ],
        "standard": "standard"
@@ -29091,7 +29095,7 @@
    "route": "/system/sicherung/<int:pk>/herunterladen/",
    "name": "sicherung_herunterladen",
    "view": "sicherung.ansichten.sicherung_herunterladen",
-   "doc": "Herunterladen: mit Passwort verschlüsselt (POST mit Passwort, empfohlen) oder als unverschlüsselte ZIP-Datei. Die Ablage auf dem Server bleibt mit dem Serverschlüssel verschlüsselt."
+   "doc": "Herunterladen: mit Passwort verschlüsselt (POST mit Passwort, empfohlen) oder als unverschlüsselte ZIP-Datei.     Die Ablage auf dem Server bleibt mit dem Serverschlüssel verschlüsselt."
   },
   {
    "route": "/system/sicherung/<int:pk>/loeschen/",
@@ -32335,18 +32339,23 @@
   },
   {
    "datei": "src/static/skizze.css",
-   "zeilen": 69,
+   "zeilen": 556,
    "beschreibung": "Oberfläche „Skizzenbuch“ (ab 0.8.0) – Grundlagen: Schriften, Farbvariablen, Bereichsfarben. Vorgabe: docs/skizzenbuch-design.md. Alle Regeln gelten nur unter data-design=\"skizze\"; die übrigen Designs und das Menüband bleiben unberührt. Kopf, Bauteile: weiter unten bzw. skizze_start.css (Start, Bereichsseite) und skizze_seiten.css (Fachseiten). Schriften liegen lokal in schrift/ (Lizenztexte dort: "
   },
   {
+   "datei": "src/static/skizze_klar.css",
+   "zeilen": 34,
+   "beschreibung": "Design „Skizzenbuch klar (modern)“ (ab 0.8.1): dieselbe Anordnung wie das Skizzenbuch (skizze.css, skizze_start.css, skizze_seiten.css), aber schlichte, moderne Farben. Die Regeln der Anordnung gelten für beide Designs; hier werden nur die Farbvariablen überschrieben. Diese Datei wird nach den drei Skizzen-Dateien geladen. Schriften bleiben wie im Skizzenbuch."
+  },
+  {
    "datei": "src/static/skizze_seiten.css",
-   "zeilen": 2,
+   "zeilen": 451,
    "beschreibung": "Oberfläche „Skizzenbuch“ (ab 0.8.0) – Fachseiten (Tabellen, Formulare, Knöpfe) und Verwaltungsoberfläche. Vorgabe: docs/skizzenbuch-design.md"
   },
   {
    "datei": "src/static/skizze_start.css",
-   "zeilen": 2,
-   "beschreibung": "Oberfläche „Skizzenbuch“ (ab 0.8.0) – Startseite (Bereichskacheln, Kalenderblatt, Kennzahlen) und Bereichsseite. Vorgabe: docs/skizzenbuch-design.md"
+   "zeilen": 235,
+   "beschreibung": "Skizzenbuch – Startseite und Bereichsseite (ab 0.8.0). Wird nach skizze.css geladen. Vorgabe: docs/skizzenbuch-design.md. Alle Regeln unter html:is([data-design=\"skizze\"],[data-design=\"klar\"])."
   },
   {
    "datei": "src/static/suchauswahl.css",

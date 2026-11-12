@@ -841,6 +841,12 @@ SECRET_KEY=x DATABASE_URL=postgres://x:x@localhost/x python tools/spezifikation_
 
 Eine Datenbank ist dafür nicht nötig.
 
+## Design „Skizzenbuch klar (modern)“ (ab 0.8.1)
+
+Dieselbe Anordnung wie das Skizzenbuch, aber mit schlichten, modernen Farben: helles Grau-Weiß, Schiefer als Schrift,
+blaue Akzente und blasse Pastellflächen. Wahl unter **Design › Skizzenbuch › Skizzenbuch klar (modern)**. Die Farben
+stehen in `static/skizze_klar.css`; die Anordnung teilt es mit dem Skizzenbuch (Details in `docs/skizzenbuch-design.md`).
+
 ## Oberfläche „Skizzenbuch“ ohne Menüband (ab 0.8.0)
 
 Neben dem Menüband gibt es eine zweite, vollständig eigene Oberfläche im Stil eines handgezeichneten Lernplakats:

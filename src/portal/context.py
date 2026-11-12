@@ -40,7 +40,7 @@ def schulinfo(request):
         "SPRACHEN": settings.LANGUAGES,
         "DOKUMENT_MAX_MB": settings.DOKUMENT_MAX_MB,
         "DESIGN": design,
-        "SKIZZE": design == "skizze",
+        "SKIZZE": design in ("skizze", "klar"),
         "DESIGNS": DESIGNS,
         "DESIGN_GRUPPEN": design_gruppen(),
     }

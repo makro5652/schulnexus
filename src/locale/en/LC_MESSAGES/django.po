@@ -15938,3 +15938,6 @@ msgstr "Commands in this area"
 #: templates/portal/_skizze_bereiche.html
 msgid "Was möchten Sie tun?"
 msgstr "What would you like to do?"
+
+msgid "Skizzenbuch klar (modern)"
+msgstr "Sketchbook clear (modern)"

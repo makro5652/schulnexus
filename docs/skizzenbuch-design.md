@@ -131,3 +131,14 @@ Text auf Farbe ist immer `--sk-tinte` (Kontrast ≥ 4,5 : 1).
 
 Alle Regeln stehen unter `html[data-design="skizze"]`; die übrigen elf Designs und das Menüband bleiben unberührt.
 Die Befehlssuche liest ihre Befehle weiterhin aus einem (im Skizzenbuch unsichtbaren) Befehlsverzeichnis im Kopf.
+
+## Variante „klar“ (ab 0.8.1)
+
+Das Design `klar` („Skizzenbuch klar (modern)“) hat dieselbe Anordnung wie das Skizzenbuch, aber schlichte, moderne
+Farben: helles Grau-Weiß als Grund, Schiefer als Schrift, blaue Akzente und blasse Pastellflächen mit kräftigen Tönen.
+
+Technisch: Die Regeln der Anordnung in `skizze.css`, `skizze_start.css` und `skizze_seiten.css` gelten unter
+`:is([data-design="skizze"],[data-design="klar"])`. Alle festen Flächenfarben stehen dort als Variablen
+(`--sk-karte`, `--sk-papier-hell`, `--sk-zebra`, `--sk-hover`, `--sk-linie` …); die Werte für das Skizzenbuch sind unverändert.
+`static/skizze_klar.css` überschreibt nur die Farbvariablen und wird ausschließlich für `klar` geladen.
+Schriften bleiben in beiden Designs gleich. Der Schalter `SKIZZE` in `portal/context.py` gilt für beide.

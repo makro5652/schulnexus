@@ -11,6 +11,8 @@ Das **Skizzenbuch** ist eine zweite Oberfläche neben dem Menüband: hell, wie e
 
 1. Öffnen Sie oben rechts das Menü **Design**.
 2. Wählen Sie in der Gruppe **Skizzenbuch** den Eintrag **Skizzenbuch (hell, ohne Menüband)**.
+   Mit **Skizzenbuch klar (modern)** erhalten Sie dieselbe Anordnung in schlichten, modernen Farben: helle Flächen,
+   dunkle Schrift und klare Akzente statt des Papierlooks.
 
 Die Seite lädt neu und zeigt die neue Oberfläche. Auch die Verwaltungsoberfläche übernimmt das Aussehen.
 
