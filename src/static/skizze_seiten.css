@@ -397,3 +397,13 @@ html[data-design="skizze"] .suchfeld { background: #fff; border: 2px solid var(-
 
 /* Dichte Konferenz-/Zeugnisseiten: Begründungsfelder bleiben einzeilig (per Ziehen vergrößerbar) */
 html[data-design="skizze"] textarea.zg-begruendung, html[data-design="skizze"] .zg-anmerken textarea { min-height: 2.4rem; height: 2.4rem; }
+
+/* Änderungsliste: der Container trägt in Django auch die Klasse „module“ – er bekommt keinen eigenen Kasten, nur Ergebnisliste und Filter */
+html[data-design="skizze"] body:not(.sk) #changelist.module { background: transparent; border: 0; box-shadow: none; border-radius: 0; overflow: visible; margin-bottom: 0; }
+html[data-design="skizze"] body:not(.sk) #changelist .changelist-form-container { min-width: 0; }
+html[data-design="skizze"] body:not(.sk) #changelist #changelist-form .results { overflow-x: auto; }
+html[data-design="skizze"] body:not(.sk) #changelist .actions select { max-width: 14rem; }
+html[data-design="skizze"] body:not(.sk) #changelist #changelist-search #searchbar { width: min(22rem, 70vw); height: auto; }
+html[data-design="skizze"] body:not(.sk) #changelist-search label { display: inline-flex; align-items: center; }
+html[data-design="skizze"] body:not(.sk) #changelist .changelist-form-container { padding: 0 8px 8px 0; box-sizing: border-box; }
+html[data-design="skizze"] body:not(.sk) #changelist .results { box-sizing: border-box; max-width: 100%; }
