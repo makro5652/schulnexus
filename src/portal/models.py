@@ -19,10 +19,12 @@ DESIGNS = [
     ("frappe", _("Catppuccin Frappé (dunkel)")),
     ("macchiato", _("Catppuccin Macchiato (dunkel)")),
     ("mocha", _("Catppuccin Mocha (dunkel)")),
+    ("skizze", _("Skizzenbuch (hell, ohne Menüband)")),
 ]
-# Gliederung des Design-Menüs (ab 0.6.1)
+# Gliederung des Design-Menüs (ab 0.6.1). „skizze“ (ab 0.8.0) ist eine eigene Oberfläche ohne Menüband.
 DESIGN_GRUPPEN = [
     (_("Automatisch"), ["standard"]),
+    (_("Skizzenbuch"), ["skizze"]),
     (_("Hell"), ["hell", "ozean", "sepia", "latte", "kontrast"]),
     (_("Dunkel"), ["dunkel", "nord", "frappe", "macchiato", "mocha"]),
 ]

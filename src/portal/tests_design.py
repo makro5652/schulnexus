@@ -32,14 +32,14 @@ class DesignwahlTest(TestCase):
         self.assertTrue(all(len(c) <= 12 for c in codes))            # Länge des Datenbankfeldes
         gruppiert = [c for _t, liste in DESIGN_GRUPPEN for c in liste]
         self.assertEqual(sorted(gruppiert), sorted(codes))           # jedes Design steht genau einmal im Menü
-        self.assertEqual([len(l) for _t, l in design_gruppen()], [1, 5, 5])
+        self.assertEqual([len(l) for _t, l in design_gruppen()], [1, 1, 5, 5])
 
     def test_menue_zeigt_alle_designs_in_gruppen(self):
         r = self.client.get(reverse("login"))
         for code, name in DESIGNS:
             self.assertContains(r, f'name="design" value="{code}"')
             self.assertContains(r, f"design-muster-{code}")
-        self.assertContains(r, 'class="designmenue-gruppe"', count=3)
+        self.assertContains(r, 'class="designmenue-gruppe"', count=4)
 
     def test_jedes_design_laesst_sich_waehlen(self):
         self.client.login(username="chef", password=PW)
@@ -59,7 +59,7 @@ class DesignwahlTest(TestCase):
         modul = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(modul)
         self.assertEqual(modul.kontrast_maengel(), [])
-        self.assertEqual(set(modul.PALETTEN), {c for c, _ in DESIGNS} - {"standard", "latte", "mocha"})
+        self.assertEqual(set(modul.PALETTEN), {c for c, _ in DESIGNS} - {"standard", "latte", "mocha", "skizze"})
         for datei, erzeuger in modul.DATEIEN.items():
             text = (STATIC / datei).read_text(encoding="utf-8")
             self.assertEqual(modul.neuer_inhalt(text, erzeuger()), text, f"{datei} veraltet – tools/designs_erzeugen.py ausführen")
@@ -127,7 +127,7 @@ class DesignwahlTest(TestCase):
         for datei in ("portal.css", "menueband.css", "verwaltung.css"):
             css = (STATIC / datei).read_text()
             for code, _name in DESIGNS:
-                if code != "standard":
+                if code not in ("standard", "skizze"):         # das Skizzenbuch hat eigene Dateien (skizze*.css)
                     self.assertIn(f'[data-design="{code}"]', css, datei)
         portal = (STATIC / "portal.css").read_text()
         # Catppuccin-Grundfarben: Latte base/text/mauve, Mocha base/text/mauve

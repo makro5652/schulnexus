@@ -31,6 +31,7 @@ def aktuelles_design(request):
 
 
 def schulinfo(request):
+    design = aktuelles_design(request)
     daten = {
         "SCHULNAME": settings.SCHULNAME,
         "AKTUELLES_SCHULJAHR": Schuljahr.aktuelles(),
@@ -38,13 +39,14 @@ def schulinfo(request):
         "VERSION_DATUM": VERSION_DATUM,
         "SPRACHEN": settings.LANGUAGES,
         "DOKUMENT_MAX_MB": settings.DOKUMENT_MAX_MB,
-        "DESIGN": aktuelles_design(request),
+        "DESIGN": design,
+        "SKIZZE": design == "skizze",
         "DESIGNS": DESIGNS,
         "DESIGN_GRUPPEN": design_gruppen(),
     }
     user = getattr(request, "user", None)
     if user is not None and darf_portal_nutzen(user):
-        from .navigation import menueband
+        from .navigation import menueband_fuer
 
-        daten["MENUEBAND"] = SimpleLazyObject(lambda: menueband(request))
+        daten["MENUEBAND"] = SimpleLazyObject(lambda: menueband_fuer(request))
     return daten

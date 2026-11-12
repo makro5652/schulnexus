@@ -1,0 +1,15 @@
+{% load i18n %}{# Bereichskacheln der Startseite im Skizzenbuch (ab 0.8.0) #}
+<section class="sk-kacheln" aria-labelledby="sk-frage">
+  <h2 class="sk-frage" id="sk-frage">{% translate "Was möchten Sie tun?" %}</h2>
+  {% for k in MENUEBAND.karten %}{% if k.schluessel != "start" %}
+  <article class="sk-kachel sk-farbe-{{ k.farbe }}">
+    <h3><a href="{{ k.url }}">{{ k.titel }}</a></h3>
+    {% if k.wichtig %}
+    <ul>
+      {% for b in k.wichtig %}<li><a href="{{ b.url }}" title="{{ b.hinweis }}"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-{{ b.symbol }}"/></svg><span>{{ b.titel }}</span></a></li>{% endfor %}
+    </ul>
+    {% endif %}
+    <a class="sk-kachel-alle" href="{{ k.url }}">{% translate "Alle anzeigen" %}</a>
+  </article>
+  {% endif %}{% endfor %}
+</section>

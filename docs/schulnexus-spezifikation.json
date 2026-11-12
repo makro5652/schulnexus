@@ -1,7 +1,7 @@
 {
  "format": "schulnexus-spezifikation",
  "formatversion": 1,
- "schulnexus_version": "0.7.1",
+ "schulnexus_version": "0.8.0",
  "hinweis": "Automatisch erzeugt mit tools/spezifikation_erzeugen.py. Enthält nur die Programmstruktur, keine Daten.",
  "projekt": {
   "zweck": "Schulnexus ist eine Open-Source-Schulverwaltung für eine Schule (Jahrgänge 1–12, Sek I nach der Richtlinie für Deutsche Schulen im Ausland, Sek II mit Punkten 0–15). Sie deckt Stammdaten, Klassen und Kurse, Noten, Zeugnisse und Konferenzen, Fehlzeiten, Förderung, Neuanmeldungen, Elternkommunikation, Termine, Personal, Schuljahreswechsel, Archiv, Sicherung und Rechte ab.",
@@ -12415,6 +12415,10 @@
         [
          "mocha",
          "Catppuccin Mocha (dunkel)"
+        ],
+        [
+         "skizze",
+         "Skizzenbuch (hell, ohne Menüband)"
         ]
        ],
        "standard": "standard"
@@ -13920,10 +13924,28 @@
        "doc": null
       },
       {
+       "name": "menueband_fuer",
+       "signatur": "(request)",
+       "dekoratoren": null,
+       "doc": "Menüband einmal je Anfrage berechnen (Kontextprozessor und Ansichten teilen sich das Ergebnis)."
+      },
+      {
+       "name": "_wichtige_befehle",
+       "signatur": "(karte, anzahl=4)",
+       "dekoratoren": null,
+       "doc": "Bis zu vier Befehle für die Kachel der Startseite: erst große, dann kleine, ohne doppelte Adressen."
+      },
+      {
+       "name": "_weg",
+       "signatur": "(pfad, karten, aktiv)",
+       "dekoratoren": null,
+       "doc": "Wegleiste des Skizzenbuchs: aktive Karte und Gruppe des aktiven Befehls; None auf der Startseite oder ohne Bezug."
+      },
+      {
        "name": "_aktive_karte",
        "signatur": "(pfad, karten)",
        "dekoratoren": null,
-       "doc": "Karte des am besten passenden Befehls; sonst nach Pfadregeln; sonst Start."
+       "doc": "Karte des am besten passenden Befehls; sonst nach Pfadregeln; sonst Start. Bereichsseiten gehören zu ihrer Karte."
       },
       {
        "name": "_aktiven_befehl_markieren",
@@ -14520,6 +14542,14 @@
         "login_required"
        ],
        "doc": null
+      },
+      {
+       "name": "bereich",
+       "signatur": "(request, schluessel)",
+       "dekoratoren": [
+        "login_required"
+       ],
+       "doc": "Bereichsseite des Skizzenbuchs: alle Befehle einer Menüband-Karte, nach Gruppen geordnet (ab 0.8.0)."
       },
       {
        "name": "notenuebersicht",
@@ -15175,6 +15205,35 @@
         "test_mandant_platzhalter",
         "test_englische_titel",
         "test_kachel_pruefung"
+       ]
+      }
+     ]
+    },
+    {
+     "datei": "src/portal/tests_skizze.py",
+     "doc": "Tests 0.8.0: Oberfläche „Skizzenbuch“ – Design, Kopfzeile, Bereichsleiste, Kacheln, Bereichsseite, Befehlsverzeichnis, Schriften.",
+     "klassen": [
+      {
+       "klasse": "SkizzeTest",
+       "doc": null,
+       "faelle": [
+        "test_design_waehlbar_und_im_menue",
+        "test_startseite_im_skizzenbuch",
+        "test_anderes_design_unveraendert",
+        "test_anmeldeseite_nur_marke_sprache_design",
+        "test_bereichsleiste_und_marke",
+        "test_kacheln",
+        "test_farbe_je_karte_ueberall_gleich",
+        "test_bereichsseite",
+        "test_bereichsseite_start_leitet_um",
+        "test_bereichsseite_nur_angemeldet",
+        "test_bereichsseite_auch_mit_menueband",
+        "test_wegleiste_zeigt_gruppe_des_aktiven_befehls",
+        "test_befehlsverzeichnis_wie_menueband",
+        "test_verzeichnis_hat_struktur_fuer_befehle_js",
+        "test_verwaltungsoberflaeche_laedt_skizze_css",
+        "test_hilfethema_vorhanden",
+        "test_schriften_und_css_vorhanden"
        ]
       }
      ]
@@ -28555,6 +28614,12 @@
    "doc": "Kacheln zu Microsoft 365. Die Anwendungen öffnen in einem neuen Tab (Einbetten verbietet Microsoft)."
   },
   {
+   "route": "/bereich/<slug:schluessel>/",
+   "name": "bereich",
+   "view": "portal.views.bereich",
+   "doc": "Bereichsseite des Skizzenbuchs: alle Befehle einer Menüband-Karte, nach Gruppen geordnet (ab 0.8.0)."
+  },
+  {
    "route": "/abmelden/",
    "name": "logout",
    "view": "django.contrib.auth.views.LogoutView",
@@ -29026,7 +29091,7 @@
    "route": "/system/sicherung/<int:pk>/herunterladen/",
    "name": "sicherung_herunterladen",
    "view": "sicherung.ansichten.sicherung_herunterladen",
-   "doc": "Herunterladen: mit Passwort verschlüsselt (POST mit Passwort, empfohlen) oder als unverschlüsselte ZIP-Datei.     Die Ablage auf dem Server bleibt mit dem Serverschlüssel verschlüsselt."
+   "doc": "Herunterladen: mit Passwort verschlüsselt (POST mit Passwort, empfohlen) oder als unverschlüsselte ZIP-Datei. Die Ablage auf dem Server bleibt mit dem Serverschlüssel verschlüsselt."
   },
   {
    "route": "/system/sicherung/<int:pk>/loeschen/",
@@ -31770,6 +31835,13 @@
    "einbindungen": null
   },
   {
+   "datei": "src/templates/portal/_befehlssuche.html",
+   "zeilen": 13,
+   "erbt_von": null,
+   "einbindungen": null,
+   "beschreibung": "Befehlssuche Strg+K (befehle.js), gemeinsam für Menüband und Skizzenbuch; nur für Konten mit MENUEBAND"
+  },
+  {
    "datei": "src/templates/portal/_designmenue.html",
    "zeilen": 20,
    "erbt_von": null,
@@ -31782,12 +31854,21 @@
    "einbindungen": null
   },
   {
+   "datei": "src/templates/portal/_hilfeleiste.html",
+   "zeilen": 21,
+   "erbt_von": null,
+   "einbindungen": null,
+   "beschreibung": "Hilfe-Knopf und Einblendung (hilfe.js), gemeinsam für Menüband und Skizzenbuch; nur für Konten mit MENUEBAND"
+  },
+  {
    "datei": "src/templates/portal/_menueband.html",
-   "zeilen": 108,
+   "zeilen": 80,
    "erbt_von": null,
    "einbindungen": [
     "noten/_kurswahl.html",
+    "portal/_befehlssuche.html",
     "portal/_designmenue.html",
+    "portal/_hilfeleiste.html",
     "portal/_sprachmenue.html",
     "portal/_symbole.html"
    ]
@@ -31805,6 +31886,26 @@
    "einbindungen": [
     "portal/_notiz_form.html"
    ]
+  },
+  {
+   "datei": "src/templates/portal/_skizze_bereiche.html",
+   "zeilen": 16,
+   "erbt_von": null,
+   "einbindungen": null,
+   "beschreibung": "Bereichskacheln der Startseite im Skizzenbuch (ab 0.8.0)"
+  },
+  {
+   "datei": "src/templates/portal/_skizze_kopf.html",
+   "zeilen": 76,
+   "erbt_von": null,
+   "einbindungen": [
+    "portal/_befehlssuche.html",
+    "portal/_designmenue.html",
+    "portal/_hilfeleiste.html",
+    "portal/_sprachmenue.html",
+    "portal/_symbole.html"
+   ],
+   "beschreibung": "Kopfzeile der Oberfläche „Skizzenbuch“ (ab 0.8.0). Hat id=\"menueband\", weil befehle.js und menueband.js dort ihre Elemente suchen."
   },
   {
    "datei": "src/templates/portal/_sprachmenue.html",
@@ -31833,10 +31934,19 @@
   },
   {
    "datei": "src/templates/portal/base.html",
-   "zeilen": 23,
+   "zeilen": 26,
    "erbt_von": null,
    "einbindungen": [
-    "portal/_menueband.html"
+    "portal/_menueband.html",
+    "portal/_skizze_kopf.html"
+   ]
+  },
+  {
+   "datei": "src/templates/portal/bereich.html",
+   "zeilen": 21,
+   "erbt_von": "portal/base.html",
+   "einbindungen": [
+    "noten/_kurswahl.html"
    ]
   },
   {
@@ -31896,7 +32006,7 @@
   },
   {
    "datei": "src/templates/portal/start.html",
-   "zeilen": 91,
+   "zeilen": 93,
    "erbt_von": "portal/base.html",
    "einbindungen": [
     "aufnahme/_start.html",
@@ -31907,6 +32017,7 @@
     "noten/_start.html",
     "portal/_geburtstage.html",
     "portal/_notizen.html",
+    "portal/_skizze_bereiche.html",
     "portal/_start_hr.html",
     "termine/_start.html",
     "zeugnisse/_start.html"
@@ -32214,13 +32325,28 @@
   },
   {
    "datei": "src/static/menueband.css",
-   "zeilen": 301,
+   "zeilen": 303,
    "beschreibung": "Menüband (Ribbon) – gemeinsam für Portal und Verwaltungsoberfläche. Alle Regeln sind auf .mb begrenzt."
   },
   {
    "datei": "src/static/portal.css",
    "zeilen": 1415,
    "beschreibung": "Kennzeichnungen (Status, Hinweise)"
+  },
+  {
+   "datei": "src/static/skizze.css",
+   "zeilen": 69,
+   "beschreibung": "Oberfläche „Skizzenbuch“ (ab 0.8.0) – Grundlagen: Schriften, Farbvariablen, Bereichsfarben. Vorgabe: docs/skizzenbuch-design.md. Alle Regeln gelten nur unter data-design=\"skizze\"; die übrigen Designs und das Menüband bleiben unberührt. Kopf, Bauteile: weiter unten bzw. skizze_start.css (Start, Bereichsseite) und skizze_seiten.css (Fachseiten). Schriften liegen lokal in schrift/ (Lizenztexte dort: "
+  },
+  {
+   "datei": "src/static/skizze_seiten.css",
+   "zeilen": 2,
+   "beschreibung": "Oberfläche „Skizzenbuch“ (ab 0.8.0) – Fachseiten (Tabellen, Formulare, Knöpfe) und Verwaltungsoberfläche. Vorgabe: docs/skizzenbuch-design.md"
+  },
+  {
+   "datei": "src/static/skizze_start.css",
+   "zeilen": 2,
+   "beschreibung": "Oberfläche „Skizzenbuch“ (ab 0.8.0) – Startseite (Bereichskacheln, Kalenderblatt, Kennzahlen) und Bereichsseite. Vorgabe: docs/skizzenbuch-design.md"
   },
   {
    "datei": "src/static/suchauswahl.css",

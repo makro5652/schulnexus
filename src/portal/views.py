@@ -5,8 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db import connection
 from django.db.models import Count, Q
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, render
+from django.http import Http404, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.translation import gettext
 
@@ -112,6 +112,22 @@ def start(request):
          "schnellzugriff": schnellzugriff(request.user, sj), "kurswahl": kurswahl_auswahl(request), "geburtstage": geburtstage(request.user, jetzt.date()),
          "notizen": notizen_fuer(request.user, jetzt.date())},
     )
+
+
+@login_required
+def bereich(request, schluessel):
+    """Bereichsseite des Skizzenbuchs: alle Befehle einer Menüband-Karte, nach Gruppen geordnet (ab 0.8.0)."""
+    from .navigation import menueband_fuer
+    from .context import darf_portal_nutzen
+
+    if schluessel == "start":
+        return redirect("start")
+    if not darf_portal_nutzen(request.user):
+        raise Http404
+    karte = next((k for k in menueband_fuer(request)["karten"] if k["schluessel"] == schluessel), None)
+    if karte is None:
+        raise Http404
+    return render(request, "portal/bereich.html", {"karte": karte})
 
 
 @login_required

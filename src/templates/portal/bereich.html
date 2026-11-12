@@ -1,0 +1,20 @@
+{% extends "portal/base.html" %}
+{% load i18n %}
+{% block title %}{{ karte.titel }}{% endblock %}
+{% block inhalt %}
+<header class="sk-bereichskopf sk-farbe-{{ karte.farbe }}">
+  <h1>{{ karte.titel }}</h1>
+</header>
+{% for g in karte.gruppen %}
+<section class="sk-gruppe" aria-labelledby="sk-gruppe-{{ forloop.counter }}">
+  <h2 id="sk-gruppe-{{ forloop.counter }}">{{ g.titel }}</h2>
+  {% if g.auswahl %}{% include "noten/_kurswahl.html" with kw=g.auswahl stil="start" %}{% endif %}
+  {% if g.befehle %}
+  <ul class="sk-befehlskarten">
+    {% for b in g.grosse %}<li><a class="sk-befehlskarte gross" href="{{ b.url }}"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-{{ b.symbol }}"/></svg><strong>{{ b.titel }}</strong>{% if b.hinweis != b.titel %}<span>{{ b.hinweis }}</span>{% endif %}</a></li>{% endfor %}
+    {% for b in g.kleine %}<li><a class="sk-befehlskarte" href="{{ b.url }}"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-{{ b.symbol }}"/></svg><strong>{{ b.titel }}</strong>{% if b.hinweis != b.titel %}<span>{{ b.hinweis }}</span>{% endif %}</a></li>{% endfor %}
+  </ul>
+  {% endif %}
+</section>
+{% endfor %}
+{% endblock %}

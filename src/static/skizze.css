@@ -1,0 +1,552 @@
+/* Oberfläche „Skizzenbuch“ (ab 0.8.0) – Grundlagen: Schriften, Farbvariablen, Bereichsfarben.
+   Vorgabe: docs/skizzenbuch-design.md. Alle Regeln gelten nur unter data-design="skizze"; die übrigen Designs und das Menüband
+   bleiben unberührt. Kopf, Bauteile: weiter unten bzw. skizze_start.css (Start, Bereichsseite) und skizze_seiten.css (Fachseiten).
+   Schriften liegen lokal in schrift/ (Lizenztexte dort: OFL 1.1 bzw. Apache 2.0), es werden keine fremden Server angefragt. */
+@font-face { font-family: "Caveat"; font-style: normal; font-weight: 600; font-display: swap;
+  src: url("schrift/caveat-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Caveat"; font-style: normal; font-weight: 600; font-display: swap;
+  src: url("schrift/caveat-latin-ext-600-normal.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: "Caveat"; font-style: normal; font-weight: 700; font-display: swap;
+  src: url("schrift/caveat-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Caveat"; font-style: normal; font-weight: 700; font-display: swap;
+  src: url("schrift/caveat-latin-ext-700-normal.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: "Patrick Hand"; font-style: normal; font-weight: 400; font-display: swap;
+  src: url("schrift/patrick-hand-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-002F, U+003A-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+/* Ziffern nie in Patrick Hand: dessen 9 liest sich wie q oder 1 („9a“). Ziffern kommen aus einer nüchternen Systemschrift. */
+@font-face { font-family: "Patrick Hand"; font-style: normal; font-weight: 400;
+  src: local("Helvetica Neue"), local("Segoe UI"), local("Roboto"), local("Arial"), local("Liberation Sans"), local("DejaVu Sans"); unicode-range: U+0030-0039; }
+@font-face { font-family: "Patrick Hand"; font-style: normal; font-weight: 400; font-display: swap;
+  src: url("schrift/patrick-hand-latin-ext-400-normal.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: "Permanent Marker"; font-style: normal; font-weight: 400; font-display: swap;
+  src: url("schrift/permanent-marker-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+:root[data-design="skizze"] {
+  color-scheme: light;
+  /* Farben laut Vorgabe */
+  --sk-papier: #FFF8E7; --sk-raster: #E8DCC0; --sk-tinte: #2B2B33; --sk-leise: #666A78; --sk-blau-tinte: #1A5FA8; --sk-rot: #C2273D;
+  --sk-gelb: #FFE08A;   --sk-gelb-kraeftig: #F2B100;
+  --sk-rosa: #FFB8CB;   --sk-rosa-kraeftig: #E0527A;
+  --sk-gruen: #BDEFC6;  --sk-gruen-kraeftig: #2E9E63;
+  --sk-lila: #DCC8FF;   --sk-lila-kraeftig: #7B4FD6;
+  --sk-blau: #AEDBFF;   --sk-blau-kraeftig: #1F6FC4;
+  --sk-orange: #FFCF96; --sk-orange-kraeftig: #E0801A;
+  --sk-tuerkis: #ACEBE0; --sk-tuerkis-kraeftig: #159A8A;
+  /* Schriften mit Ersatz, falls die Dateien nicht laden */
+  --sk-marker: "Permanent Marker", "Marker Felt", "Comic Sans MS", cursive;
+  --sk-schrift: "Caveat", "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive;
+  --sk-hand: "Patrick Hand", "Segoe Print", "Comic Sans MS", cursive;
+  /* Bestehende Variablen (portal.css) passend belegt, damit alle Fachseiten ohne Einzelanpassung stimmig sind */
+  --grund: var(--sk-papier); --flaeche: #ffffff; --text: var(--sk-tinte); --leise: var(--sk-leise); --linie: #cdbf9d;
+  --akzent: var(--sk-blau-tinte); --akzent-hell: #dff0ff; --warnung: var(--sk-rot); --gefahr-flaeche: #ffe1e8;
+  --info-flaeche: #dff0ff; --info-text: #123f73; --hinweis-flaeche: #fff0c2; --hinweis-text: #6b4a00; --notiz-text: #4a3608;
+  --lila-flaeche: #ece0ff; --lila-text: #4a2a99; --ok: #1f7a4a;
+  --radius: 14px;
+  --papier-gelb: var(--sk-gelb); --papier-gruen: var(--sk-gruen); --papier-blau: var(--sk-blau); --papier-rosa: var(--sk-rosa); --papier-grau: #ece6d4;
+  /* Menüband-Variablen: die Befehlssuche (.bs) und die Hilfe (.hp) lesen sie */
+  --mb-titel: var(--sk-blau); --mb-titel-text: var(--sk-tinte); --mb-flaeche: #ffffff; --mb-text: var(--sk-tinte); --mb-leise: var(--sk-leise);
+  --mb-linie: var(--sk-tinte); --mb-akzent: var(--sk-blau-tinte); --mb-akzent-hell: var(--sk-gelb); --mb-hover: #fff3cc;
+  --mb-schatten: rgba(43, 43, 51, .2);
+  /* Verwaltungsoberfläche (Django-Admin) */
+  --primary: var(--sk-blau); --secondary: var(--sk-blau); --accent: var(--sk-gelb); --primary-fg: var(--sk-tinte);
+  --body-fg: var(--sk-tinte); --body-bg: var(--sk-papier); --body-quiet-color: var(--sk-leise); --body-medium-color: var(--sk-tinte); --body-loud-color: var(--sk-tinte);
+  --header-color: var(--sk-tinte); --header-branding-color: var(--sk-tinte); --header-bg: var(--sk-papier); --header-link-color: var(--sk-blau-tinte);
+  --breadcrumbs-fg: var(--sk-tinte); --breadcrumbs-link-fg: var(--sk-blau-tinte); --breadcrumbs-bg: var(--sk-blau);
+  --link-fg: var(--sk-blau-tinte); --link-hover-color: #0f3d70; --link-selected-fg: var(--sk-blau-tinte);
+  --hairline-color: #cdbf9d; --border-color: var(--sk-tinte);
+  --error-fg: var(--sk-rot); --message-success-bg: var(--sk-gruen); --message-warning-bg: var(--sk-gelb); --message-error-bg: var(--sk-rosa);
+  --darkened-bg: #fff3cc; --selected-bg: var(--sk-gelb); --selected-row: #fff3cc;
+  --button-fg: var(--sk-tinte); --button-bg: var(--sk-gelb); --button-hover-bg: var(--sk-gelb-kraeftig);
+  --default-button-bg: var(--sk-gelb); --default-button-hover-bg: var(--sk-gelb-kraeftig);
+  --close-button-bg: #666A78; --close-button-hover-bg: var(--sk-tinte); --delete-button-bg: var(--sk-rot); --delete-button-hover-bg: #9d1b2e;
+  --object-tools-fg: var(--sk-tinte); --object-tools-bg: var(--sk-blau); --object-tools-hover-bg: var(--sk-gelb);
+}
+
+/* Bereichsfarben, reihum (Nummer kommt aus portal/navigation.py: Start 1, Termine 2, …) */
+html[data-design="skizze"] .sk-farbe-1 { --sk-f: var(--sk-gelb);    --sk-f-kraeftig: var(--sk-gelb-kraeftig); }
+html[data-design="skizze"] .sk-farbe-2 { --sk-f: var(--sk-rosa);    --sk-f-kraeftig: var(--sk-rosa-kraeftig); }
+html[data-design="skizze"] .sk-farbe-3 { --sk-f: var(--sk-gruen);   --sk-f-kraeftig: var(--sk-gruen-kraeftig); }
+html[data-design="skizze"] .sk-farbe-4 { --sk-f: var(--sk-lila);    --sk-f-kraeftig: var(--sk-lila-kraeftig); }
+html[data-design="skizze"] .sk-farbe-5 { --sk-f: var(--sk-blau);    --sk-f-kraeftig: var(--sk-blau-kraeftig); }
+html[data-design="skizze"] .sk-farbe-6 { --sk-f: var(--sk-orange);  --sk-f-kraeftig: var(--sk-orange-kraeftig); }
+html[data-design="skizze"] .sk-farbe-7 { --sk-f: var(--sk-tuerkis); --sk-f-kraeftig: var(--sk-tuerkis-kraeftig); }
+
+/* =====================================================================================================
+   Ergänzende Variablen (Punktraster, harte Schatten, Pfeil- und Haken-Zeichen)
+   ===================================================================================================== */
+:root[data-design="skizze"] {
+  --sk-punkte: radial-gradient(circle, var(--sk-raster) 1.5px, transparent 1.9px);
+  --sk-kante: 2px solid var(--sk-tinte);
+  --sk-strich: #d9cba8;                       /* gestrichelte Linien, Trennlinien */
+  --sk-hover: #fff3cc;                        /* Hover-Grund (blasses Gelb) */
+  --sk-pfeil: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%232B2B33' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --sk-haken: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3.2 3.2L13 4.8' fill='none' stroke='%232B2B33' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --sk-welle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='8' viewBox='0 0 24 8'%3E%3Cpath d='M0 4Q6 0 12 4T24 4' fill='none' stroke='%23F2B100' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+/* =====================================================================================================
+   1. Seite: Papier mit Punktraster, Grundschrift, Überschriften, Links, Auswahl, Fokus
+   ===================================================================================================== */
+html[data-design="skizze"] { background: var(--sk-punkte) 0 0 / 22px 22px, var(--sk-papier); scroll-padding-top: 11rem; }
+html[data-design="skizze"] body { background: transparent; color: var(--sk-tinte); line-height: 1.5; min-height: 100vh; overflow-wrap: break-word; }
+html[data-design="skizze"] ::selection { background: var(--sk-gelb); color: var(--sk-tinte); }
+
+/* Links: ruhig unterstrichen, beim Überfahren wie mit dem Textmarker angestrichen (nur Links ohne eigene Klasse) */
+:where(html[data-design="skizze"]) a:where(:not([class])) { text-decoration: underline; text-decoration-thickness: 2px; text-decoration-color: var(--sk-blau); text-underline-offset: 3px; border-radius: 3px; }
+:where(html[data-design="skizze"]) a:where(:not([class])):hover { background: var(--sk-gelb); text-decoration-color: var(--sk-tinte); }
+:where(html[data-design="skizze"]) .link { color: var(--sk-blau-tinte); text-decoration: underline; text-decoration-thickness: 2px; text-decoration-color: var(--sk-blau); text-underline-offset: 3px; }
+
+/* Überschriften: h1 Marker in Großbuchstaben, h2/h3 Patrick Hand, Unterzeile Caveat in Tintenblau */
+html[data-design="skizze"] h1 {
+  font-family: var(--sk-marker); font-weight: 400; font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.1rem); line-height: 1.2; letter-spacing: .03em;
+  text-transform: uppercase; color: var(--sk-tinte); margin: .2rem 0 .5rem; text-wrap: balance;
+}
+html[data-design="skizze"] h2 { font-family: var(--sk-hand); font-weight: 400; font-size: 1.4rem; line-height: 1.25; color: var(--sk-tinte); margin: 0 0 .8rem; text-wrap: balance; }
+html[data-design="skizze"] h3, html[data-design="skizze"] .karte h3 { font-family: var(--sk-hand); font-weight: 400; font-size: 1.15rem; line-height: 1.3; color: var(--sk-tinte); margin: 1.1rem 0 .4rem; }
+html[data-design="skizze"] .unterzeile { font-family: var(--sk-schrift); font-weight: 600; font-size: 1.4rem; line-height: 1.2; color: var(--sk-blau-tinte); margin: 0 0 1rem; }
+html[data-design="skizze"] .brotkrumen { font-family: var(--sk-schrift); font-weight: 600; font-size: 1.15rem; color: var(--sk-leise); margin: 0; }
+html[data-design="skizze"] .brotkrumen a { color: var(--sk-blau-tinte); }
+
+html[data-design="skizze"] .inhalt { padding: 1.6rem 1.25rem 3rem; min-width: 0; }
+html[data-design="skizze"] .fuss {
+  font-family: var(--sk-schrift); font-weight: 600; font-size: 1.15rem; color: var(--sk-leise); padding: 1.6rem 1rem 2rem;
+  max-width: 1200px; margin: 0 auto; border-top: 2px dashed var(--sk-strich);
+}
+
+/* Meldungen als Haftzettel (Farbe nach Art der Meldung) */
+html[data-design="skizze"] .meldungen { list-style: none; padding: 0; margin: 0 0 1.2rem; display: grid; gap: .7rem; }
+html[data-design="skizze"] .meldungen li {
+  background: var(--sk-gelb); color: var(--sk-tinte); border: var(--sk-kante); border-radius: 14px; box-shadow: 3px 4px 0 var(--sk-tinte);
+  padding: .6rem 1rem; font-weight: 600; margin: 0;
+}
+html[data-design="skizze"] .meldungen li.success { background: var(--sk-gruen); }
+html[data-design="skizze"] .meldungen li.error { background: var(--sk-rosa); }
+html[data-design="skizze"] .meldungen li.info, html[data-design="skizze"] .meldungen li.debug { background: var(--sk-blau); }
+html[data-design="skizze"] .meldungen li.warning { background: var(--sk-orange); }
+
+/* Fokus: dunkle Kontur mit Abstand, überall sichtbar (die Eingabefelder bekommen zusätzlich den gelben Ring) */
+html[data-design="skizze"] :focus-visible:focus-visible { outline: 3px solid var(--sk-tinte); outline-offset: 2px; }
+
+/* =====================================================================================================
+   2. Kopf: Marke, Suche, Befehle, Menüs, Bereichsleiste, Wegleiste, Favoriten
+   ===================================================================================================== */
+html[data-design="skizze"] .sk-kopf {
+  position: sticky; top: 0; z-index: 50; background: var(--sk-punkte) 0 0 / 22px 22px, var(--sk-papier);
+  border-bottom: var(--sk-kante); color: var(--sk-tinte);
+}
+html[data-design="skizze"] .sk-kopf svg { width: 1.2rem; height: 1.2rem; flex: none; }
+html[data-design="skizze"] .sk-kopfzeile { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem 1rem; padding: .55rem 1.25rem .35rem; }
+
+/* Marke: SCHUL (lila) NE (rosa) XUS (grün) in Marker-Schrift, gelbe Wellenlinie darunter */
+html[data-design="skizze"] .sk-marke { display: flex; flex-direction: column; min-width: 0; flex: none; text-decoration: none; color: var(--sk-tinte); border-radius: 8px; }
+html[data-design="skizze"] .sk-wort {
+  display: inline-block; align-self: flex-start; font-family: var(--sk-marker); font-size: 1.6rem; line-height: 1.1; letter-spacing: .03em; text-transform: uppercase;
+  padding-bottom: .5rem; background: var(--sk-welle) repeat-x left bottom / 24px 8px;
+}
+html[data-design="skizze"] .sk-m1 { color: var(--sk-lila-kraeftig); }
+html[data-design="skizze"] .sk-m2 { color: var(--sk-rosa-kraeftig); }
+html[data-design="skizze"] .sk-m3 { color: var(--sk-gruen-kraeftig); }
+html[data-design="skizze"] .sk-marke-unter {
+  font-family: var(--sk-schrift); font-weight: 600; font-size: 1.15rem; line-height: 1.05; color: var(--sk-blau-tinte);
+  max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* Personensuche */
+html[data-design="skizze"] .sk-suche {
+  flex: 1 1 15rem; max-width: 30rem; display: flex; align-items: center; gap: .5rem; padding: .25rem .9rem; margin: 0;
+  background: #fff; border: var(--sk-kante); border-radius: 999px; box-shadow: 3px 4px 0 var(--sk-blau-kraeftig);
+}
+html[data-design="skizze"] .sk-suche svg { color: var(--sk-leise); }
+html[data-design="skizze"] .sk-suche input[type=search] { flex: 1; min-width: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; padding: .3rem 0; font: inherit; color: var(--sk-tinte); }
+html[data-design="skizze"] .sk-suche input[type=search]:focus, html[data-design="skizze"] .sk-suche input[type=search]:focus-visible { outline: 0; box-shadow: none; }
+html[data-design="skizze"] .sk-suche:focus-within { outline: 3px solid var(--sk-tinte); outline-offset: 2px; background: #fffdf3; }
+
+/* Befehlsknopf (Strg+K) */
+html[data-design="skizze"] .sk-kopf button.sk-befehlsknopf {
+  flex: none; display: inline-flex; align-items: center; gap: .45rem; background: var(--sk-gelb); color: var(--sk-tinte); border: var(--sk-kante); border-radius: 999px;
+  box-shadow: 2px 3px 0 var(--sk-tinte); font-family: var(--sk-hand); font-size: 1.1rem; font-weight: 400; line-height: 1.2; padding: .25rem .85rem; cursor: pointer;
+  transition: transform .08s, box-shadow .08s;
+}
+html[data-design="skizze"] .sk-kopf button.sk-befehlsknopf:hover { background: var(--sk-gelb-kraeftig); }
+html[data-design="skizze"] .sk-kopf button.sk-befehlsknopf:active { transform: translate(2px, 3px); box-shadow: 0 0 0 var(--sk-tinte); }
+html[data-design="skizze"] kbd {
+  font: inherit; font-size: .78em; background: #fff; color: var(--sk-tinte); border: 1.5px solid var(--sk-tinte); border-bottom-width: 3px; border-radius: 6px; padding: 0 .35rem; white-space: nowrap;
+}
+
+/* Rechte Seite: Sprache, Design, Hilfe, Konto */
+html[data-design="skizze"] .sk-rechts { display: flex; align-items: center; gap: .6rem; margin-left: auto; flex: none; }
+html[data-design="skizze"] .sk-rechts details > summary {
+  list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: .4rem; background: #fff; color: var(--sk-tinte); border: var(--sk-kante);
+  border-radius: 999px; box-shadow: 2px 3px 0 var(--sk-tinte); font-family: var(--sk-hand); font-size: 1.05rem; line-height: 1.2; padding: .25rem .75rem; transition: transform .08s, box-shadow .08s;
+}
+html[data-design="skizze"] .sk-rechts details > summary::-webkit-details-marker { display: none; }
+html[data-design="skizze"] .sk-rechts details > summary:hover { background: var(--sk-hover); }
+html[data-design="skizze"] .sk-rechts details[open] > summary { background: var(--sk-gelb); transform: translate(2px, 3px); box-shadow: 0 0 0 var(--sk-tinte); }
+
+/* Aufklappmenüs: weiße Karte, Kontur, harter Schatten, über dem Inhalt */
+html[data-design="skizze"] .sk-rechts .sprachmenue form,
+html[data-design="skizze"] .sk-rechts .mb-konto-menue {
+  position: absolute; right: 0; left: auto; z-index: 60; margin-top: .55rem; background: #fff; color: var(--sk-tinte); border: var(--sk-kante);
+  border-radius: 14px; box-shadow: 4px 5px 0 var(--sk-tinte); padding: .4rem; min-width: 10rem;
+}
+html[data-design="skizze"] .sk-rechts .mb-konto-menue { top: 100%; margin-top: .55rem; min-width: 15rem; }
+html[data-design="skizze"] .sk-rechts .designmenue form { min-width: 19rem; max-height: min(32rem, 75vh); overflow-y: auto; }
+html[data-design="skizze"] .sk-rechts .sprachmenue button,
+html[data-design="skizze"] .sk-rechts .mb-konto-menue a,
+html[data-design="skizze"] .sk-rechts .mb-konto-menue button {
+  display: flex; align-items: center; gap: .6rem; width: 100%; text-align: left; background: transparent; color: var(--sk-tinte); border: 2px solid transparent; border-radius: 10px;
+  box-shadow: none; font-family: var(--sk-hand); font-size: 1.1rem; font-weight: 400; line-height: 1.3; padding: .4rem .7rem; text-decoration: none; cursor: pointer; white-space: nowrap;
+}
+html[data-design="skizze"] .sk-rechts .sprachmenue button:hover,
+html[data-design="skizze"] .sk-rechts .mb-konto-menue a:hover,
+html[data-design="skizze"] .sk-rechts .mb-konto-menue button:hover { background: var(--sk-hover); border-color: var(--sk-tinte); }
+html[data-design="skizze"] .sk-rechts .sprachmenue button[aria-current="true"] { background: var(--sk-gelb); border-color: var(--sk-tinte); }
+html[data-design="skizze"] .sk-rechts .mb-konto-menue svg { color: var(--sk-blau-tinte); }
+html[data-design="skizze"] .sk-rechts .mb-konto-menue form { margin: 0; }
+html[data-design="skizze"] .sk-rechts .designmenue-gruppe { margin: .5rem .7rem .15rem; font-family: var(--sk-schrift); font-weight: 700; font-size: 1.2rem; line-height: 1.1; color: var(--sk-blau-tinte); text-transform: none; letter-spacing: 0; opacity: 1; }
+html[data-design="skizze"] .sk-rechts .designmenue-gruppe:first-of-type { margin-top: .15rem; }
+html[data-design="skizze"] .sk-rechts .design-muster { box-shadow: 0 0 0 1.5px var(--sk-tinte); }
+html[data-design="skizze"] .sk-konto > summary { padding: .15rem .8rem .15rem .2rem; }
+html[data-design="skizze"] .sk-konto .mb-initialen {
+  display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%; background: var(--sk-rosa); color: var(--sk-tinte); border: var(--sk-kante);
+  font-family: var(--sk-hand); font-size: 1rem; letter-spacing: .02em;
+}
+html[data-design="skizze"] .sk-konto .mb-name { font-family: var(--sk-hand); font-size: 1.05rem; }
+html[data-design="skizze"] .sk-konto .mb-konto-kopf { margin: 0 0 .3rem; padding: .35rem .7rem .55rem; border-bottom: 2px dashed var(--sk-strich); }
+html[data-design="skizze"] .sk-konto .mb-konto-kopf strong { display: block; font-family: var(--sk-hand); font-weight: 400; font-size: 1.15rem; }
+html[data-design="skizze"] .sk-konto .mb-konto-kopf small { display: block; color: var(--sk-leise); font-size: .85rem; }
+
+/* Bereichsleiste: Caveat-Namen, darunter Klammerlinie in der Bereichsfarbe (├──┤), aktiv = Pastellfüllung */
+html[data-design="skizze"] .sk-bereiche { display: flex; flex-wrap: nowrap; align-items: flex-end; gap: .15rem .5rem; padding: 0 1.25rem; overflow-x: auto; scrollbar-width: none; }
+html[data-design="skizze"] .sk-bereiche::-webkit-scrollbar { display: none; }
+html[data-design="skizze"] .sk-bereich {
+  position: relative; flex: none; padding: .2rem .8rem 1rem; font-family: var(--sk-schrift); font-weight: 700; font-size: 1.4rem; line-height: 1.1;
+  color: var(--sk-tinte); text-decoration: none; white-space: nowrap; border-radius: 12px 12px 0 0; border: 2px solid transparent; border-bottom: 0;
+}
+html[data-design="skizze"] .sk-bereich::after {
+  content: ""; position: absolute; left: .45rem; right: .45rem; bottom: .3rem; height: .7rem;
+  background:
+    linear-gradient(var(--sk-f-kraeftig), var(--sk-f-kraeftig)) 0 50% / 100% 3px no-repeat,
+    linear-gradient(var(--sk-f-kraeftig), var(--sk-f-kraeftig)) 0 0 / 3px 100% no-repeat,
+    linear-gradient(var(--sk-f-kraeftig), var(--sk-f-kraeftig)) 100% 0 / 3px 100% no-repeat;
+}
+html[data-design="skizze"] .sk-bereich:hover { background: rgba(255, 255, 255, .75); border-color: var(--sk-tinte); }
+html[data-design="skizze"] .sk-bereich.aktiv, html[data-design="skizze"] .sk-bereich[aria-current] { background: var(--sk-f); border-color: var(--sk-tinte); }
+
+/* Wegleiste: hellblaues Band mit Bereichsname und Geschwister-Befehlen als Kästchen */
+html[data-design="skizze"] .sk-weg {
+  display: flex; align-items: center; flex-wrap: nowrap; gap: .45rem; margin: .1rem 1.25rem .6rem; padding: .35rem .9rem; background: var(--sk-blau);
+  border-radius: 22px; overflow-x: auto; scrollbar-width: none;
+}
+html[data-design="skizze"] .sk-weg::-webkit-scrollbar { display: none; }
+html[data-design="skizze"] .sk-weg-bereich { flex: none; font-family: var(--sk-schrift); font-weight: 700; font-size: 1.35rem; line-height: 1.1; color: var(--sk-tinte); text-decoration: none; white-space: nowrap; border-radius: 6px; }
+html[data-design="skizze"] .sk-weg-bereich::after { content: "›"; margin: 0 .2rem 0 .45rem; font-family: var(--sk-hand); }
+html[data-design="skizze"] .sk-weg-befehl {
+  flex: none; background: #fff; color: var(--sk-tinte); border: var(--sk-kante); border-radius: 10px; padding: .05rem .7rem; font-family: var(--sk-hand); font-size: 1rem; line-height: 1.5;
+  text-decoration: none; white-space: nowrap;
+}
+html[data-design="skizze"] .sk-weg-befehl:hover { background: var(--sk-hover); }
+html[data-design="skizze"] .sk-weg-befehl.aktiv { background: var(--sk-gelb); box-shadow: 2px 3px 0 var(--sk-tinte); }
+
+/* Favoriten (befehle.js erzeugt die Links mit Symbol): Pillen mit Stern */
+html[data-design="skizze"] .sk-favoriten { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem .5rem; padding: .1rem 1.25rem .6rem; }
+html[data-design="skizze"] .sk-favoriten[hidden] { display: none; }
+html[data-design="skizze"] .sk-favoriten-titel { font-family: var(--sk-schrift); font-weight: 700; font-size: 1.25rem; line-height: 1; color: var(--sk-blau-tinte); margin-right: .2rem; }
+html[data-design="skizze"] .sk-favoriten a {
+  display: inline-flex; align-items: center; gap: .35rem; background: #fff; color: var(--sk-tinte); border: var(--sk-kante); border-radius: 999px; padding: .02rem .75rem .02rem .55rem;
+  font-family: var(--sk-hand); font-size: 1rem; line-height: 1.5; text-decoration: none;
+}
+html[data-design="skizze"] .sk-favoriten a::before { content: "★"; color: var(--sk-gelb-kraeftig); font-size: .95rem; }
+html[data-design="skizze"] .sk-favoriten a svg { width: 1rem; height: 1rem; color: var(--sk-blau-tinte); }
+html[data-design="skizze"] .sk-favoriten a:hover { background: var(--sk-gelb); }
+html.hp-offen[data-design="skizze"] .sk-favoriten { padding-right: min(32rem, 100vw); }
+
+/* =====================================================================================================
+   3. Befehlssuche (Strg+K) und Hilfe-Seitenleiste
+   ===================================================================================================== */
+html[data-design="skizze"] .bs {
+  width: min(40rem, 94vw); max-height: 80vh; padding: 0; margin: 0 auto; top: 8vh; overflow: hidden; background: #fff; color: var(--sk-tinte);
+  border: var(--sk-kante); border-radius: 18px; box-shadow: 6px 7px 0 var(--sk-tinte);
+}
+html[data-design="skizze"] .bs[open] { display: flex; flex-direction: column; }
+html[data-design="skizze"] .bs::backdrop { background: rgba(43, 43, 51, .5); }
+html[data-design="skizze"] .bs-kopf { display: flex; align-items: center; gap: .6rem; padding: .8rem 1rem; background: var(--sk-blau); border-bottom: var(--sk-kante); }
+html[data-design="skizze"] .bs-kopf svg { width: 1.4rem; height: 1.4rem; flex: none; color: var(--sk-tinte); }
+html[data-design="skizze"] .bs-kopf input { flex: 1; min-width: 0; font-size: 1.1rem; }
+html[data-design="skizze"] .bs-liste { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: .4rem .6rem .6rem; }
+html[data-design="skizze"] .bs-titel { margin: .7rem .5rem .2rem; font-family: var(--sk-schrift); font-weight: 700; font-size: 1.25rem; line-height: 1.1; color: var(--sk-blau-tinte); text-transform: none; letter-spacing: 0; }
+html[data-design="skizze"] .bs-zeile { display: flex; align-items: center; border: 2px solid transparent; border-radius: 12px; }
+html[data-design="skizze"] .bs-zeile:hover { background: var(--sk-hover); }
+html[data-design="skizze"] .bs-zeile.aktiv { background: var(--sk-gelb); border-color: var(--sk-tinte); }
+html[data-design="skizze"] .bs-zeile a { flex: 1; min-width: 0; display: flex; align-items: center; gap: .75rem; padding: .4rem .6rem; color: var(--sk-tinte); text-decoration: none; background: none; }
+html[data-design="skizze"] .bs-zeile a svg { width: 1.3rem; height: 1.3rem; flex: none; color: var(--sk-blau-tinte); }
+html[data-design="skizze"] .bs-zeile a span { display: grid; min-width: 0; }
+html[data-design="skizze"] .bs-zeile strong { font-family: var(--sk-hand); font-weight: 400; font-size: 1.15rem; line-height: 1.25; }
+html[data-design="skizze"] .bs-zeile small { color: var(--sk-leise); font-size: .82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+html[data-design="skizze"] .bs-zeile.aktiv small { color: #3d4050; }
+html[data-design="skizze"] .bs .bs-stern {
+  flex: none; background: transparent; border: 0; box-shadow: none; color: var(--sk-leise); font-family: inherit; font-size: 1.35rem; line-height: 1; padding: .3rem .7rem; border-radius: 8px; cursor: pointer; transform: none;
+}
+html[data-design="skizze"] .bs .bs-stern.an { color: #a86f00; }
+html[data-design="skizze"] .bs .bs-stern:hover { background: #fff; color: #a86f00; box-shadow: none; transform: none; }
+html[data-design="skizze"] .bs-fuss { margin: 0; padding: .45rem 1rem; border-top: 2px dashed var(--sk-strich); font-family: var(--sk-schrift); font-weight: 600; font-size: 1.15rem; line-height: 1.5; color: var(--sk-leise); }
+
+/* Hilfe: Knopf am rechten Rand, Seitenleiste fährt von rechts ein; die Variablen brauchen die Inhaltsregeln aus menueband.css */
+html[data-design="skizze"] .hp { --hp-linie: var(--sk-strich); --hp-leise: var(--sk-leise); --hp-akzent: var(--sk-blau-tinte); --hp-akzent-hell: #dff0ff; --hp-grund: #fff8e7; }
+html[data-design="skizze"] .sk-rechts .hp-knopf {
+  position: fixed; right: 0; top: 50%; transform: translateY(-50%); z-index: 45; display: flex; flex-direction: column; align-items: center; gap: .3rem;
+  padding: .75rem .4rem; background: var(--sk-gelb); color: var(--sk-tinte); border: var(--sk-kante); border-right: 0; border-radius: 14px 0 0 14px; box-shadow: -3px 3px 0 var(--sk-tinte);
+  font-family: var(--sk-hand); font-size: 1.05rem; font-weight: 400; line-height: 1.2; cursor: pointer; transition: padding .1s;
+}
+html[data-design="skizze"] .sk-rechts .hp-knopf span { writing-mode: vertical-rl; transform: rotate(180deg); }
+html[data-design="skizze"] .sk-rechts .hp-knopf svg { width: 1.3rem; height: 1.3rem; }
+html[data-design="skizze"] .sk-rechts .hp-knopf:hover { background: var(--sk-gelb-kraeftig); padding-right: .65rem; }
+html[data-design="skizze"] .sk-rechts .hp-knopf[aria-expanded="true"] { display: none; }
+html[data-design="skizze"] .hp {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 70; width: min(32rem, 100vw); display: flex; flex-direction: column; background: #fff; color: var(--sk-tinte);
+  border-left: var(--sk-kante); transform: translateX(100%); transition: transform .2s ease;
+}
+html[data-design="skizze"] .hp.hp-sichtbar { transform: none; box-shadow: -6px 0 0 var(--sk-blau-kraeftig); }
+html[data-design="skizze"] .hp[hidden] { display: none; }
+html[data-design="skizze"] .hp-kopf { display: flex; align-items: center; gap: .6rem; padding: .7rem .9rem; background: var(--sk-blau); color: var(--sk-tinte); border-bottom: var(--sk-kante); }
+html[data-design="skizze"] .hp-kopf h2 { margin: 0; flex: 1; display: flex; align-items: center; gap: .45rem; font-size: 1.4rem; color: var(--sk-tinte); }
+html[data-design="skizze"] .hp-kopf h2 svg { width: 1.4rem; height: 1.4rem; }
+html[data-design="skizze"] .hp .hp-gross { font-family: var(--sk-hand); font-size: 1rem; color: var(--sk-tinte); text-decoration: underline; text-underline-offset: 3px; opacity: 1; }
+html[data-design="skizze"] .hp .hp-zu {
+  display: grid; place-items: center; width: 2.1rem; height: 2.1rem; padding: 0; background: #fff; color: var(--sk-tinte); border: var(--sk-kante); border-radius: 50%;
+  box-shadow: 2px 3px 0 var(--sk-tinte); font-family: var(--sk-hand); font-size: 1.5rem; line-height: 1; cursor: pointer;
+}
+html[data-design="skizze"] .hp .hp-zu:hover { background: var(--sk-gelb); }
+html[data-design="skizze"] .hp-reiter { display: flex; flex-wrap: wrap; gap: .4rem; padding: .7rem .9rem .2rem; }
+html[data-design="skizze"] .hp .hp-reiter button {
+  background: #fff; color: var(--sk-tinte); border: var(--sk-kante); border-radius: 999px; box-shadow: none; font-family: var(--sk-hand); font-size: 1.05rem; font-weight: 400; line-height: 1.3; padding: .15rem .9rem; cursor: pointer;
+}
+html[data-design="skizze"] .hp .hp-reiter button:hover { background: var(--sk-hover); }
+html[data-design="skizze"] .hp .hp-reiter button[aria-pressed="true"] { background: var(--sk-gelb); box-shadow: 2px 3px 0 var(--sk-tinte); }
+html[data-design="skizze"] .hp-suche { padding: .6rem .9rem .7rem; border-bottom: 2px dashed var(--sk-strich); }
+html[data-design="skizze"] .hp-suche input { width: 100%; }
+html[data-design="skizze"] .hp-inhalt { flex: 1; overflow-y: auto; padding: .4rem 1.1rem 1.5rem; outline: none; }
+html[data-design="skizze"] .hp-sprache, html[data-design="skizze"] .hp-fehler, html[data-design="skizze"] .hp-keine { font-size: .9rem; color: var(--sk-leise); padding: .5rem 1.1rem; margin: 0; }
+html[data-design="skizze"] .hp-sprache { border-top: 2px dashed var(--sk-strich); }
+/* Hilfetexte (Einblendung und ganze Hilfeseite) */
+html[data-design="skizze"] .hp-art { font-family: var(--sk-schrift); font-weight: 700; font-size: 1.15rem; text-transform: none; letter-spacing: 0; color: var(--sk-blau-tinte); }
+html[data-design="skizze"] .hp-artikel h2 { font-size: 1.6rem; margin: .15rem 0 .3rem; }
+html[data-design="skizze"] .hp-kurz { font-family: var(--sk-schrift); font-weight: 600; font-size: 1.3rem; color: var(--sk-blau-tinte); }
+html[data-design="skizze"] .hp-toc { background: #fff8e7; border: var(--sk-kante); border-radius: 14px; padding: .6rem .9rem; }
+html[data-design="skizze"] .hp-toc p { font-family: var(--sk-hand); font-weight: 400; font-size: 1.1rem; }
+html[data-design="skizze"] .hp-text { color: var(--sk-tinte); }
+html[data-design="skizze"] .hp-text h3 { font-size: 1.25rem; border-top: 2px dashed var(--sk-strich); }
+html[data-design="skizze"] .hp-text h4 { font-family: var(--sk-hand); font-weight: 400; font-size: 1.1rem; }
+html[data-design="skizze"] .hp-text code { background: var(--sk-hover); border: 1.5px solid var(--sk-strich); }
+html[data-design="skizze"] .hp-hinweis { background: var(--sk-gelb); border: var(--sk-kante); border-left-width: 6px; border-radius: 12px; color: var(--sk-tinte); }
+html[data-design="skizze"] .hp-gruppe h3 { font-family: var(--sk-schrift); font-weight: 700; font-size: 1.25rem; text-transform: none; letter-spacing: 0; color: var(--sk-blau-tinte); }
+html[data-design="skizze"] .hp-liste a { border: 2px solid transparent; border-radius: 12px; color: var(--sk-tinte); text-decoration: none; background: none; }
+html[data-design="skizze"] .hp-liste a:hover { background: var(--sk-hover); border-color: var(--sk-tinte); }
+html[data-design="skizze"] .hp-liste strong { font-family: var(--sk-hand); font-weight: 400; font-size: 1.1rem; }
+html[data-design="skizze"] .hp-tabelle { border: var(--sk-kante); border-radius: 12px; }
+
+/* =====================================================================================================
+   4. Allgemeine Bauteile (Namen aus portal.css)
+   ===================================================================================================== */
+
+/* Karten: weiß, Kontur, harter Versatzschatten in wechselnden kräftigen Farben */
+html[data-design="skizze"] .karte {
+  background: #fff; color: var(--sk-tinte); border: var(--sk-kante); border-radius: 14px; box-shadow: 5px 6px 0 var(--sk-gelb-kraeftig); padding: 1.2rem 1.4rem;
+}
+html[data-design="skizze"] .karte:nth-of-type(4n+2) { box-shadow: 5px 6px 0 var(--sk-rosa-kraeftig); }
+html[data-design="skizze"] .karte:nth-of-type(4n+3) { box-shadow: 5px 6px 0 var(--sk-gruen-kraeftig); }
+html[data-design="skizze"] .karte:nth-of-type(4n+4) { box-shadow: 5px 6px 0 var(--sk-lila-kraeftig); }
+html[data-design="skizze"] .karte.vertraulich { border-color: var(--sk-rot); box-shadow: 5px 6px 0 var(--sk-rosa-kraeftig); }
+html[data-design="skizze"] .karte-kopf { align-items: center; padding-bottom: .5rem; margin-bottom: .8rem; border-bottom: 2px dashed var(--sk-strich); }
+html[data-design="skizze"] .karte-kopf h2, html[data-design="skizze"] .karte > h2:first-child { margin-bottom: 0; }
+html[data-design="skizze"] .karte > h2:first-child { padding-bottom: .1rem; }
+html[data-design="skizze"] .aktionen a { font-size: .95rem; }
+
+/* Knöpfe: Hauptknopf gelb, zweitrangig weiß, gefährlich rosa; beim Drücken rückt der Knopf in den Schatten */
+html[data-design="skizze"] .knopf.knopf {
+  display: inline-flex; align-items: center; justify-content: center; gap: .4rem; background: var(--sk-gelb); color: var(--sk-tinte); border: var(--sk-kante); border-radius: 12px;
+  box-shadow: 3px 4px 0 var(--sk-tinte); padding: .45rem 1.1rem; font-family: var(--sk-hand); font-size: 1.1rem; font-weight: 400; line-height: 1.3; text-decoration: none; cursor: pointer;
+  transition: transform .08s, box-shadow .08s, background-color .08s;
+}
+html[data-design="skizze"] .knopf.knopf:hover { background: var(--sk-gelb-kraeftig); transform: translate(-1px, -1px); box-shadow: 4px 5px 0 var(--sk-tinte); }
+html[data-design="skizze"] .knopf.knopf:active { transform: translate(3px, 4px); box-shadow: 0 0 0 var(--sk-tinte); }
+html[data-design="skizze"] .knopf.knopf.zweitrangig { background: #fff; }
+html[data-design="skizze"] .knopf.knopf.zweitrangig:hover { background: var(--sk-hover); }
+html[data-design="skizze"] .knopf.knopf.gefahr { background: var(--sk-rosa); color: var(--sk-tinte); }
+html[data-design="skizze"] .knopf.knopf.gefahr:hover { background: var(--sk-rosa-kraeftig); }
+html[data-design="skizze"] .knopf.knopf.klein { padding: .2rem .8rem; font-size: 1rem; box-shadow: 2px 3px 0 var(--sk-tinte); }
+html[data-design="skizze"] .knopf.knopf.klein:hover { box-shadow: 3px 4px 0 var(--sk-tinte); }
+html[data-design="skizze"] .knopf.knopf.klein:active { box-shadow: 0 0 0 var(--sk-tinte); }
+html[data-design="skizze"] .knopf.knopf:disabled, html[data-design="skizze"] .knopf.knopf[aria-disabled="true"] { background: var(--papier-grau); color: var(--sk-leise); border-color: var(--sk-leise); box-shadow: none; transform: none; cursor: default; opacity: 1; }
+html[data-design="skizze"] .knopfreihe { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem .8rem; }
+/* Auffangregel für Knöpfe ohne Klasse (schwach, damit jede Seitenregel Vorrang hat) */
+:where(html[data-design="skizze"]) button:where(:not([class])) { background: #fff; color: var(--sk-tinte); border: var(--sk-kante); border-radius: 12px; font-family: var(--sk-hand); font-size: 1.05rem; padding: .3rem .9rem; cursor: pointer; }
+
+/* Eingabefelder: weiß, 2 px Kontur, Fokus = 3 px gelber Ring (plus dunkle Kontur) */
+html[data-design="skizze"] input[type=text], html[data-design="skizze"] input[type=search], html[data-design="skizze"] input[type=email], html[data-design="skizze"] input[type=password],
+html[data-design="skizze"] input[type=number], html[data-design="skizze"] input[type=date], html[data-design="skizze"] input[type=time], html[data-design="skizze"] input[type=datetime-local],
+html[data-design="skizze"] input[type=tel], html[data-design="skizze"] input[type=url], html[data-design="skizze"] input[type=month], html[data-design="skizze"] input:not([type]),
+html[data-design="skizze"] select, html[data-design="skizze"] textarea {
+  font: inherit; color: var(--sk-tinte); background-color: #fff; border: var(--sk-kante); border-radius: 12px; padding: .45rem .7rem; max-width: 100%;
+}
+html[data-design="skizze"] textarea { min-height: 5rem; resize: vertical; line-height: 1.45; }
+html[data-design="skizze"] select { appearance: none; background-image: var(--sk-pfeil); background-repeat: no-repeat; background-position: right .7rem center; background-size: .7rem; padding-right: 2.1rem; cursor: pointer; }
+html[data-design="skizze"] input[type=text]:focus, html[data-design="skizze"] input[type=search]:focus, html[data-design="skizze"] input[type=email]:focus, html[data-design="skizze"] input[type=password]:focus,
+html[data-design="skizze"] input[type=number]:focus, html[data-design="skizze"] input[type=date]:focus, html[data-design="skizze"] input[type=time]:focus, html[data-design="skizze"] input[type=datetime-local]:focus,
+html[data-design="skizze"] input[type=tel]:focus, html[data-design="skizze"] input[type=url]:focus, html[data-design="skizze"] input:not([type]):focus,
+html[data-design="skizze"] select:focus, html[data-design="skizze"] textarea:focus {
+  outline: 2px solid var(--sk-tinte); outline-offset: 3px; box-shadow: 0 0 0 3px var(--sk-gelb-kraeftig);
+}
+html[data-design="skizze"] input::placeholder, html[data-design="skizze"] textarea::placeholder { color: var(--sk-leise); opacity: 1; }
+html[data-design="skizze"] input:disabled, html[data-design="skizze"] select:disabled, html[data-design="skizze"] textarea:disabled, html[data-design="skizze"] input[readonly] { background-color: var(--papier-grau); color: var(--sk-leise); border-color: var(--sk-leise); opacity: 1; }
+html[data-design="skizze"] input[type=file] { font: inherit; max-width: 100%; color: var(--sk-tinte); }
+html[data-design="skizze"] input[type=file]::file-selector-button {
+  font-family: var(--sk-hand); font-size: 1rem; color: var(--sk-tinte); background: #fff; border: var(--sk-kante); border-radius: 10px; box-shadow: 2px 3px 0 var(--sk-tinte); padding: .2rem .8rem; margin-right: .7rem; cursor: pointer;
+}
+html[data-design="skizze"] input[type=file]::file-selector-button:hover { background: var(--sk-gelb); }
+/* Kästchen und Auswahlkreise selbst gezeichnet */
+html[data-design="skizze"] input[type=checkbox], html[data-design="skizze"] input[type=radio] {
+  appearance: none; flex: none; width: 1.3rem; height: 1.3rem; margin: 0 .1rem 0 0; vertical-align: -.25rem; background: #fff center / 85% no-repeat; border: var(--sk-kante); border-radius: 6px; cursor: pointer;
+}
+html[data-design="skizze"] input[type=radio] { border-radius: 50%; }
+html[data-design="skizze"] input[type=checkbox]:checked { background-color: var(--sk-gelb); background-image: var(--sk-haken); }
+html[data-design="skizze"] input[type=radio]:checked { background-color: var(--sk-gelb); background-image: radial-gradient(circle, var(--sk-tinte) 0 38%, transparent 42%); }
+html[data-design="skizze"] input[type=checkbox]:disabled, html[data-design="skizze"] input[type=radio]:disabled { background-color: var(--papier-grau); border-color: var(--sk-leise); cursor: default; }
+html[data-design="skizze"] .sy-feld, html[data-design="skizze"] .an-feld, html[data-design="skizze"] .formular label { color: var(--sk-tinte); font-size: .9rem; }
+html[data-design="skizze"] .haken { display: inline-flex; align-items: center; gap: .5rem; cursor: pointer; color: var(--sk-tinte); }
+html[data-design="skizze"] .filterzeile label, html[data-design="skizze"] .inline-form label, html[data-design="skizze"] .zo-sj label { color: var(--sk-tinte); }
+
+/* Kennzeichen (Status): Pillen mit Kontur und Pastellfüllung, Text immer in Tinte */
+html[data-design="skizze"] .etikett, html[data-design="skizze"] .an-status, html[data-design="skizze"] .zg-status, html[data-design="skizze"] .tm-status,
+html[data-design="skizze"] .sy-art, html[data-design="skizze"] .sy-status, html[data-design="skizze"] .zf-status, html[data-design="skizze"] .ampel, html[data-design="skizze"] .nta-marke {
+  display: inline-block; background: var(--sk-blau); color: var(--sk-tinte); border: var(--sk-kante); border-radius: 999px; padding: 0 .7rem; font-family: var(--sk-hand);
+  font-size: 1rem; font-weight: 400; line-height: 1.45; white-space: nowrap; vertical-align: middle; cursor: default;
+}
+html[data-design="skizze"] .etikett.warnend { background: var(--sk-rosa); }
+html[data-design="skizze"] .etikett.meins { background: var(--sk-gelb); }
+html[data-design="skizze"] .an-status, html[data-design="skizze"] .zg-status, html[data-design="skizze"] .tm-status, html[data-design="skizze"] .sy-art, html[data-design="skizze"] .sy-status { background: var(--papier-grau); }
+html[data-design="skizze"] .an-status.gross, html[data-design="skizze"] .zg-status.gross, html[data-design="skizze"] .tm-status.gross { font-size: 1.05rem; padding: 0 .9rem; }
+html[data-design="skizze"] .an-status-eingegangen, html[data-design="skizze"] .zg-status-durchgefuehrt, html[data-design="skizze"] .tm-status-geschlossen, html[data-design="skizze"] .sy-art-hochgeladen,
+html[data-design="skizze"] .sy-status-laeuft, html[data-design="skizze"] .sy-status-wartet { background: var(--sk-blau); }
+html[data-design="skizze"] .an-status-pruefung, html[data-design="skizze"] .zg-status-entwurf, html[data-design="skizze"] .zg-status-geplant, html[data-design="skizze"] .tm-status-entwurf,
+html[data-design="skizze"] .sy-art-vor_wiederherstellung { background: var(--sk-gelb); }
+html[data-design="skizze"] .an-status-warteliste, html[data-design="skizze"] .tm-status-verfuegbarkeit, html[data-design="skizze"] .sy-art-automatisch, html[data-design="skizze"] .nta-marke { background: var(--sk-lila); }
+html[data-design="skizze"] .an-status-zugesagt, html[data-design="skizze"] .zg-status-freigegeben, html[data-design="skizze"] .zg-status-abgeschlossen, html[data-design="skizze"] .tm-status-buchung,
+html[data-design="skizze"] .sy-status-fertig, html[data-design="skizze"] .zf-status.an, html[data-design="skizze"] .ampel.ok { background: var(--sk-gruen); }
+html[data-design="skizze"] .an-status-abgelehnt, html[data-design="skizze"] .an-status-zurueckgezogen, html[data-design="skizze"] .sy-status-fehler { background: var(--sk-rosa); }
+html[data-design="skizze"] .an-status-uebernommen { background: var(--sk-tuerkis); }
+html[data-design="skizze"] .zf-status.aus { background: var(--papier-grau); }
+html[data-design="skizze"] .ampel.fehlt, html[data-design="skizze"] .ampel.offen, html[data-design="skizze"] .ampel.veraltet { background: var(--sk-orange); }
+html[data-design="skizze"] .einzelgewicht { background: var(--sk-lila); color: var(--sk-tinte); border: 1.5px solid var(--sk-tinte); border-radius: 999px; font-size: .75rem; }
+html[data-design="skizze"] .marke-status, html[data-design="skizze"] .auffaellig, html[data-design="skizze"] .status-abgang { color: var(--sk-rot); }
+html[data-design="skizze"] .warnung { background: var(--sk-rot); color: #fff; }
+
+/* Tabellen: weiße Karte, hellblaue Kopfzeile in Patrick Hand, gestrichelte Zeilenlinien, Zellen in Systemschrift */
+html[data-design="skizze"] .tabellenrahmen { background: #fff; border: var(--sk-kante); border-radius: 14px; box-shadow: 4px 5px 0 var(--sk-tinte); overflow-x: auto; }
+html[data-design="skizze"] th, html[data-design="skizze"] td { border-bottom: 2px dashed var(--sk-strich); color: var(--sk-tinte); }
+html[data-design="skizze"] thead th {
+  background: var(--sk-blau); color: var(--sk-tinte); border-bottom: var(--sk-kante); font-family: var(--sk-hand); font-size: 1.05rem; font-weight: 400; line-height: 1.3; padding-top: .55rem; padding-bottom: .55rem;
+}
+html[data-design="skizze"] tbody th { font-family: inherit; font-weight: 600; }
+html[data-design="skizze"] tbody tr:last-child th, html[data-design="skizze"] tbody tr:last-child td { border-bottom: 0; }
+html[data-design="skizze"] tbody tr:hover { background: var(--sk-hover); }
+html[data-design="skizze"] table.liste { border-collapse: separate; border-spacing: 0; background: #fff; border: var(--sk-kante); border-radius: 14px; box-shadow: 4px 5px 0 var(--sk-tinte); }
+html[data-design="skizze"] table.liste thead tr:first-child th:first-child { border-top-left-radius: 12px; }
+html[data-design="skizze"] table.liste thead tr:first-child th:last-child { border-top-right-radius: 12px; }
+html[data-design="skizze"] .karte table.liste, html[data-design="skizze"] .tabellenrahmen table.liste, html[data-design="skizze"] .rollbar table.liste { border: 0; border-radius: 0; box-shadow: none; border-collapse: collapse; background: transparent; }
+html[data-design="skizze"] .rollbar, html[data-design="skizze"] .tabellenrahmen { scrollbar-width: thin; scrollbar-color: var(--sk-tinte) transparent; }
+html[data-design="skizze"] .noten .kat { background: var(--sk-hover); color: var(--sk-tinte); }
+html[data-design="skizze"] .noten .vorschlag { background: #dff0ff; }
+html[data-design="skizze"] .noten tr.gefaehrdet td, html[data-design="skizze"] .noten tr.gefaehrdet th { background: #ffe1e8; }
+
+/* Kachel-Liste, Hinweise, Leerzustand, Fehler */
+html[data-design="skizze"] .kacheln a { background: #fff; color: var(--sk-tinte); border: var(--sk-kante); border-radius: 14px; box-shadow: 3px 4px 0 var(--sk-tinte); padding: .7rem 1rem; text-decoration: none; transition: transform .08s, box-shadow .08s; }
+html[data-design="skizze"] .kacheln a:hover { background: var(--sk-gelb); transform: translate(-1px, -1px); box-shadow: 4px 5px 0 var(--sk-tinte); }
+html[data-design="skizze"] .kacheln span { color: var(--sk-tinte); }
+html[data-design="skizze"] .hinweistext { color: var(--sk-leise); font-size: .9rem; border-left: 4px solid var(--sk-gelb-kraeftig); padding-left: .7rem; }
+html[data-design="skizze"] .leer { color: var(--sk-leise); }
+html[data-design="skizze"] p.leer { padding: .8rem 1rem; border: 2px dashed var(--sk-strich); border-radius: 14px; background: rgba(255, 255, 255, .6); text-align: center; }
+html[data-design="skizze"] .fehler { color: var(--sk-rot); font-weight: 600; }
+html[data-design="skizze"] p.fehler, html[data-design="skizze"] div.fehler {
+  background: var(--sk-rosa); color: var(--sk-tinte); border: var(--sk-kante); border-radius: 12px; box-shadow: 3px 4px 0 var(--sk-tinte); padding: .5rem .9rem;
+}
+html[data-design="skizze"] .sy-warnung, html[data-design="skizze"] .sy-bestaetigung { border: var(--sk-kante); border-radius: 14px; }
+html[data-design="skizze"] .anmeldung label { color: var(--sk-tinte); }
+html[data-design="skizze"] .anmeldung input { width: 100%; margin-top: .3rem; }
+
+/* Reiter: Knöpfe-Leiste mit Kontur, aktiver Reiter gelb */
+html[data-design="skizze"] .an-tabs, html[data-design="skizze"] .zo-reiter { display: flex; flex-wrap: wrap; gap: .4rem .5rem; margin: 0 0 1rem; padding-bottom: .1rem; border-bottom: 0; }
+html[data-design="skizze"] .an-tabs a, html[data-design="skizze"] .zo-reiter a {
+  display: inline-flex; align-items: center; gap: .3rem; background: #fff; color: var(--sk-tinte); border: var(--sk-kante); border-radius: 999px; padding: .1rem .9rem; margin: 0;
+  font-family: var(--sk-hand); font-size: 1.1rem; font-weight: 400; line-height: 1.45; text-decoration: none;
+}
+html[data-design="skizze"] .an-tabs a:hover, html[data-design="skizze"] .zo-reiter a:hover { background: var(--sk-hover); color: var(--sk-tinte); }
+html[data-design="skizze"] .an-tabs a.aktiv, html[data-design="skizze"] .zo-reiter a.aktiv { background: var(--sk-gelb); color: var(--sk-tinte); box-shadow: 2px 3px 0 var(--sk-tinte); }
+html[data-design="skizze"] .an-tabs a span { background: var(--sk-blau); color: var(--sk-tinte); border: 1.5px solid var(--sk-tinte); font-size: .9rem; line-height: 1.3; margin-left: 0; }
+html[data-design="skizze"] .an-tabs a.aktiv span { background: #fff; color: var(--sk-tinte); }
+html[data-design="skizze"] .nk-chip, html[data-design="skizze"] .zo-chip { background: #fff; color: var(--sk-tinte); border: var(--sk-kante); font-family: var(--sk-hand); font-weight: 400; font-size: 1rem; }
+html[data-design="skizze"] .nk-chip:hover, html[data-design="skizze"] .zo-chip:hover { background: var(--sk-hover); color: var(--sk-tinte); }
+html[data-design="skizze"] .nk-chip.aktiv, html[data-design="skizze"] .zo-chip[aria-pressed=true] { background: var(--sk-gelb); color: var(--sk-tinte); border-color: var(--sk-tinte); box-shadow: 2px 3px 0 var(--sk-tinte); }
+
+/* Aufklappbereiche */
+:where(html[data-design="skizze"]) details > summary { cursor: pointer; font-family: var(--sk-hand); font-size: 1.1rem; }
+html[data-design="skizze"] details > summary::marker { color: var(--sk-tinte); }
+html[data-design="skizze"] .hochladen, html[data-design="skizze"] .zo-neu { border-top: 2px dashed var(--sk-strich); }
+html[data-design="skizze"] .hochladen summary, html[data-design="skizze"] .zo-neu > summary { color: var(--sk-blau-tinte); font-weight: 400; }
+
+/* Textmarker-Hervorhebung (wie die Markierungen im Merke-Kasten des Vorbilds) */
+html[data-design="skizze"] [class*="sk-marker-"] { color: var(--sk-tinte); padding: 0 .2em; border-radius: .25em; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+html[data-design="skizze"] .sk-marker-gelb  { background: linear-gradient(180deg, transparent 8%, var(--sk-gelb) 8% 94%, transparent 94%); }
+html[data-design="skizze"] .sk-marker-rosa  { background: linear-gradient(180deg, transparent 8%, var(--sk-rosa) 8% 94%, transparent 94%); }
+html[data-design="skizze"] .sk-marker-gruen { background: linear-gradient(180deg, transparent 8%, var(--sk-gruen) 8% 94%, transparent 94%); }
+html[data-design="skizze"] .sk-marker-blau  { background: linear-gradient(180deg, transparent 8%, var(--sk-blau) 8% 94%, transparent 94%); }
+html[data-design="skizze"] .sk-marker-lila  { background: linear-gradient(180deg, transparent 8%, var(--sk-lila) 8% 94%, transparent 94%); }
+
+/* =====================================================================================================
+   5. Telefon, reduzierte Bewegung, Druck
+   ===================================================================================================== */
+@media (max-height: 640px) { html[data-design="skizze"] .sk-kopf { position: static; } }
+@media (max-width: 720px) {
+  html[data-design="skizze"] { scroll-padding-top: 1rem; }
+  html[data-design="skizze"] .sk-kopf { position: static; }   /* der mehrzeilige Kopf würde sonst zu viel vom Bildschirm bedecken */
+  html[data-design="skizze"] .sk-kopfzeile { gap: .5rem .6rem; padding: .5rem 16px .4rem; }
+  html[data-design="skizze"] .sk-marke { order: 1; flex: 1 1 9rem; min-width: 0; }
+  html[data-design="skizze"] .sk-wort { font-size: 1.45rem; }
+  html[data-design="skizze"] .sk-rechts { order: 2; gap: .4rem; }
+  html[data-design="skizze"] .sk-suche { order: 3; flex: 1 1 12rem; min-width: 0; max-width: none; }
+  html[data-design="skizze"] .sk-kopf button.sk-befehlsknopf { order: 4; padding: .3rem .6rem; }
+  html[data-design="skizze"] .sk-befehlsknopf span, html[data-design="skizze"] .sk-befehlsknopf kbd, html[data-design="skizze"] .sk-konto .mb-name,
+  html[data-design="skizze"] .designmenue-text { display: none; }
+  html[data-design="skizze"] .sk-konto > summary { padding-right: .2rem; }
+  html[data-design="skizze"] .sk-bereiche { padding: 0 16px; }
+  html[data-design="skizze"] .sk-weg { margin: .1rem 16px .6rem; }
+  html[data-design="skizze"] .sk-favoriten { padding: .1rem 16px .6rem; }
+  /* Aufklappmenüs über die volle Breite, damit sie nicht aus dem Bild ragen */
+  html[data-design="skizze"] .sk-rechts .sprachmenue form { position: fixed; left: .75rem; right: .75rem; min-width: 0; }
+  html[data-design="skizze"] .sk-rechts .designmenue form { min-width: 0; }
+  html[data-design="skizze"] .sk-rechts .mb-konto-menue { right: 0; min-width: min(15rem, calc(100vw - 1.5rem)); }
+  html[data-design="skizze"] .bs { width: 96vw; top: 4vh; max-height: 88vh; }
+  html[data-design="skizze"] .bs-fuss { display: none; }
+  html[data-design="skizze"] .inhalt { padding: 1rem 16px 2.5rem; }
+  html[data-design="skizze"] .karte { padding: 1rem; }
+  html[data-design="skizze"] .fuss { padding-left: 16px; padding-right: 16px; }
+  html[data-design="skizze"] .unterzeile { font-size: 1.25rem; }
+  html[data-design="skizze"] .knopfreihe .knopf { flex: 1 1 auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-design="skizze"] *, html[data-design="skizze"] *::before, html[data-design="skizze"] *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+  html[data-design="skizze"] .knopf.knopf:hover, html[data-design="skizze"] .kacheln a:hover { transform: none; }
+}
+@media print {
+  /* Kopf, Papiergrund und Schatten weg; Zeugnis- und Listenausdrucke bleiben wie im Standard-Design */
+  html[data-design="skizze"] { background: #fff; }
+  html[data-design="skizze"] .sk-kopf, html[data-design="skizze"] .sk-favoriten, html[data-design="skizze"] .hp, html[data-design="skizze"] .hp-knopf, html[data-design="skizze"] .bs { display: none !important; }
+  html[data-design="skizze"] body { background: #fff; color: #000; }
+  html[data-design="skizze"] .karte { border: 0; border-radius: 0; box-shadow: none; padding: 0; background: #fff; }
+  html[data-design="skizze"] .tabellenrahmen, html[data-design="skizze"] table.liste { box-shadow: none; border: 1px solid #999; border-radius: 0; }
+  html[data-design="skizze"] h1, html[data-design="skizze"] h2, html[data-design="skizze"] h3, html[data-design="skizze"] .karte h3 { font-family: inherit; text-transform: none; letter-spacing: 0; color: #000; }
+  html[data-design="skizze"] .unterzeile, html[data-design="skizze"] .brotkrumen { font-family: inherit; color: #444; }
+  html[data-design="skizze"] thead th { background: #fff; font-family: inherit; border-bottom: 1px solid #999; }
+  html[data-design="skizze"] th, html[data-design="skizze"] td { border-bottom: 1px solid #ccc; }
+  html[data-design="skizze"] .knopf.knopf, html[data-design="skizze"] .etikett { box-shadow: none; }
+  html[data-design="skizze"] .etikett, html[data-design="skizze"] .an-status, html[data-design="skizze"] .zg-status { border-width: 1px; font-family: inherit; font-size: .8rem; }
+}

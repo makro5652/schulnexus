@@ -1,0 +1,450 @@
+/* Oberfläche „Skizzenbuch“ (ab 0.8.0) – Fachseiten (Tabellen, Formulare, Knöpfe) und Verwaltungsoberfläche. Vorgabe: docs/skizzenbuch-design.md */
+
+/* ===================================================================================================
+   1. Verwaltungsoberfläche (Django-Admin, /verwaltung/) – Kopf kommt aus skizze.css
+   =================================================================================================== */
+html[data-design="skizze"] body:not(.sk) {
+  background-color: var(--sk-papier); background-image: radial-gradient(circle, var(--sk-raster) 1.3px, transparent 1.6px); background-size: 22px 22px;
+  color: var(--sk-tinte);
+}
+html[data-design="skizze"] body:not(.sk) #container { background: transparent; }
+html[data-design="skizze"] body:not(.sk) #content { padding: 1rem 1.4rem 2rem; }
+html[data-design="skizze"] body:not(.sk) #content-main, html[data-design="skizze"] body:not(.sk) #content-related { min-width: 0; }
+html[data-design="skizze"] body:not(.sk) #content h1, html[data-design="skizze"] body:not(.sk) .colMS h1 {
+  font-family: var(--sk-marker); font-weight: 400; font-size: 1.7rem; letter-spacing: .03em; text-transform: uppercase; color: var(--sk-tinte);
+  margin: .3rem 0 1rem; line-height: 1.25;
+}
+html[data-design="skizze"] body:not(.sk) #content h2, html[data-design="skizze"] body:not(.sk) #content-related h2 {
+  font-family: var(--sk-hand); font-weight: 400; font-size: 1.15rem; color: var(--sk-tinte); margin: 0 0 .6rem;
+}
+html[data-design="skizze"] body:not(.sk) #content h3 { font-family: var(--sk-hand); font-weight: 400; font-size: 1.05rem; color: var(--sk-tinte); }
+html[data-design="skizze"] body:not(.sk) .breadcrumbs {
+  background: var(--sk-blau); color: var(--sk-tinte); border-bottom: 2px solid var(--sk-tinte); padding: .5rem 1.4rem; font-family: var(--sk-hand); font-size: 1rem;
+}
+html[data-design="skizze"] body:not(.sk) .breadcrumbs a { color: var(--sk-blau-tinte); font-weight: 400; text-decoration: underline; text-underline-offset: 2px; }
+html[data-design="skizze"] body:not(.sk) .breadcrumbs a:hover { color: #0f3d70; }
+
+/* Module (Kästen auf der Admin-Startseite und in Formularen): Pastellband mit Kontur */
+html[data-design="skizze"] body:not(.sk) .module {
+  background: #fff; border: 2px solid var(--sk-tinte); border-radius: 14px; box-shadow: 4px 5px 0 var(--sk-gelb-kraeftig); overflow: hidden; margin-bottom: 1.4rem;
+}
+html[data-design="skizze"] body:not(.sk) #content-main > .module:nth-of-type(3n+2), html[data-design="skizze"] body:not(.sk) .app-list .module:nth-of-type(3n+2) { box-shadow: 4px 5px 0 var(--sk-rosa-kraeftig); }
+html[data-design="skizze"] body:not(.sk) #content-main > .module:nth-of-type(3n+3), html[data-design="skizze"] body:not(.sk) .app-list .module:nth-of-type(3n+3) { box-shadow: 4px 5px 0 var(--sk-gruen-kraeftig); }
+html[data-design="skizze"] body:not(.sk) .module caption, html[data-design="skizze"] body:not(.sk) .module h2, html[data-design="skizze"] body:not(.sk) .module h3 {
+  background: var(--sk-blau); color: var(--sk-tinte); border-bottom: 2px solid var(--sk-tinte); font-family: var(--sk-hand); font-weight: 400;
+  font-size: 1.1rem; text-transform: none; letter-spacing: .01em; padding: .5rem .9rem; margin: 0;
+}
+html[data-design="skizze"] body:not(.sk) .module caption a, html[data-design="skizze"] body:not(.sk) .module caption a:link, html[data-design="skizze"] body:not(.sk) .module caption a:visited { color: var(--sk-tinte); }
+html[data-design="skizze"] body:not(.sk) .module table { border-collapse: collapse; width: 100%; }
+html[data-design="skizze"] body:not(.sk) .module td, html[data-design="skizze"] body:not(.sk) .module th { border-bottom: 1px dashed #cdbf9d; }
+html[data-design="skizze"] body:not(.sk) .module tr:last-child td, html[data-design="skizze"] body:not(.sk) .module tr:last-child th { border-bottom: 0; }
+html[data-design="skizze"] body:not(.sk) .module tr:nth-child(even) { background: #fff8e0; }
+html[data-design="skizze"] body:not(.sk) .module tr:hover { background: #fff3cc; }
+html[data-design="skizze"] body:not(.sk) .module th a, html[data-design="skizze"] body:not(.sk) .module td a { color: var(--sk-blau-tinte); }
+html[data-design="skizze"] body:not(.sk) .module th[scope=row] { font-weight: 600; }
+html[data-design="skizze"] body:not(.sk) .addlink, html[data-design="skizze"] body:not(.sk) .changelink { color: var(--sk-blau-tinte); }
+html[data-design="skizze"] body:not(.sk) .addlink { background-image: none; padding-left: 0; }
+html[data-design="skizze"] body:not(.sk) .addlink::before { content: "+ "; font-weight: 700; }
+html[data-design="skizze"] body:not(.sk) .changelink { background-image: none; padding-left: 0; }
+html[data-design="skizze"] body:not(.sk) .changelink::before { content: "✎ "; }
+html[data-design="skizze"] body:not(.sk) #recent-actions-module { box-shadow: 4px 5px 0 var(--sk-orange-kraeftig); }
+html[data-design="skizze"] body:not(.sk) #content-related .module h2 { background: var(--sk-gelb); }
+
+/* Formulare */
+html[data-design="skizze"] body:not(.sk) fieldset.module, html[data-design="skizze"] body:not(.sk) .inline-group .module { box-shadow: 4px 5px 0 var(--sk-gelb-kraeftig); }
+html[data-design="skizze"] body:not(.sk) fieldset.module > h2 { background: var(--sk-blau); }
+html[data-design="skizze"] body:not(.sk) .inline-group .tabular, html[data-design="skizze"] body:not(.sk) .inline-group { background: transparent; border: 0; }
+html[data-design="skizze"] body:not(.sk) .form-row { border-bottom: 1px dashed #cdbf9d; padding: .6rem .9rem; }
+html[data-design="skizze"] body:not(.sk) .form-row:last-child { border-bottom: 0; }
+html[data-design="skizze"] body:not(.sk) label, html[data-design="skizze"] body:not(.sk) .aligned label { font-family: var(--sk-hand); font-size: 1rem; color: var(--sk-tinte); }
+html[data-design="skizze"] body:not(.sk) .required label, html[data-design="skizze"] body:not(.sk) label.required { font-weight: 400; text-decoration: underline; text-decoration-color: var(--sk-rosa-kraeftig); text-underline-offset: 3px; }
+html[data-design="skizze"] body:not(.sk) .help, html[data-design="skizze"] body:not(.sk) form .aligned p.help, html[data-design="skizze"] body:not(.sk) form .aligned div.help { color: var(--sk-leise); font-size: .85rem; }
+html[data-design="skizze"] body:not(.sk) input[type=text], html[data-design="skizze"] body:not(.sk) input[type=password], html[data-design="skizze"] body:not(.sk) input[type=email], html[data-design="skizze"] body:not(.sk) input[type=url],
+html[data-design="skizze"] body:not(.sk) input[type=number], html[data-design="skizze"] body:not(.sk) input[type=tel], html[data-design="skizze"] body:not(.sk) input[type=date], html[data-design="skizze"] body:not(.sk) input[type=time],
+html[data-design="skizze"] body:not(.sk) input[type=search], html[data-design="skizze"] body:not(.sk) textarea, html[data-design="skizze"] body:not(.sk) select, html[data-design="skizze"] body:not(.sk) .vTextField {
+  background: #fff; color: var(--sk-tinte); border: 2px solid var(--sk-tinte); border-radius: 10px; padding: .35rem .55rem; font-family: inherit; max-width: 100%; box-sizing: border-box;
+}
+html[data-design="skizze"] body:not(.sk) select[multiple] { padding: .3rem; }
+html[data-design="skizze"] body:not(.sk) input[type=text]:focus, html[data-design="skizze"] body:not(.sk) input[type=password]:focus, html[data-design="skizze"] body:not(.sk) input[type=email]:focus,
+html[data-design="skizze"] body:not(.sk) input[type=number]:focus, html[data-design="skizze"] body:not(.sk) input[type=date]:focus, html[data-design="skizze"] body:not(.sk) input[type=time]:focus,
+html[data-design="skizze"] body:not(.sk) input[type=search]:focus, html[data-design="skizze"] body:not(.sk) textarea:focus, html[data-design="skizze"] body:not(.sk) select:focus {
+  outline: 0; border-color: var(--sk-tinte); box-shadow: 0 0 0 3px var(--sk-gelb-kraeftig);
+}
+html[data-design="skizze"] body:not(.sk) input[type=checkbox], html[data-design="skizze"] body:not(.sk) input[type=radio] { accent-color: var(--sk-blau-kraeftig); }
+html[data-design="skizze"] body:not(.sk) .errornote, html[data-design="skizze"] body:not(.sk) ul.errorlist li {
+  background: var(--sk-rosa); color: var(--sk-tinte); border: 2px solid var(--sk-tinte); border-radius: 10px; font-weight: 600; box-shadow: none;
+}
+html[data-design="skizze"] body:not(.sk) .errors input, html[data-design="skizze"] body:not(.sk) .errors select, html[data-design="skizze"] body:not(.sk) .errors textarea, html[data-design="skizze"] body:not(.sk) .form-row.errors { border-color: var(--sk-rot); }
+html[data-design="skizze"] body:not(.sk) .form-row.errors { background: #fff0f3; }
+html[data-design="skizze"] body:not(.sk) .errors input, html[data-design="skizze"] body:not(.sk) .errors select, html[data-design="skizze"] body:not(.sk) .errors textarea { box-shadow: 0 0 0 2px var(--sk-rosa); }
+
+/* Meldungen */
+html[data-design="skizze"] body:not(.sk) ul.messagelist { padding: 0; margin: 0 0 1rem; }
+html[data-design="skizze"] body:not(.sk) ul.messagelist li {
+  background: var(--sk-gelb); color: var(--sk-tinte); border: 2px solid var(--sk-tinte); border-radius: 12px; box-shadow: 3px 4px 0 var(--sk-tinte);
+  margin: 0 1.4rem .7rem; padding: .6rem .9rem; font-family: var(--sk-hand); font-size: 1.05rem; background-image: none;
+}
+html[data-design="skizze"] body:not(.sk) ul.messagelist li.success { background: var(--sk-gruen); }
+html[data-design="skizze"] body:not(.sk) ul.messagelist li.warning { background: var(--sk-orange); }
+html[data-design="skizze"] body:not(.sk) ul.messagelist li.error { background: var(--sk-rosa); }
+
+/* Knöpfe */
+html[data-design="skizze"] body:not(.sk) #content .button, html[data-design="skizze"] body:not(.sk) #content input[type=submit], html[data-design="skizze"] body:not(.sk) #content input[type=button], html[data-design="skizze"] body:not(.sk) .submit-row input,
+html[data-design="skizze"] body:not(.sk) #content a.button, html[data-design="skizze"] body:not(.sk) #content button {
+  background: #fff; color: var(--sk-tinte); border: 2px solid var(--sk-tinte); border-radius: 12px; box-shadow: 2px 3px 0 var(--sk-tinte);
+  font-family: var(--sk-hand); font-size: 1rem; font-weight: 400; padding: .4rem .9rem; cursor: pointer; text-transform: none; letter-spacing: 0; transition: transform .08s, box-shadow .08s;
+}
+html[data-design="skizze"] body:not(.sk) .button.default, html[data-design="skizze"] body:not(.sk) input[type=submit].default, html[data-design="skizze"] body:not(.sk) .submit-row input.default { background: var(--sk-gelb); box-shadow: 3px 4px 0 var(--sk-tinte); }
+html[data-design="skizze"] body:not(.sk) .button:hover, html[data-design="skizze"] body:not(.sk) input[type=submit]:hover, html[data-design="skizze"] body:not(.sk) input[type=button]:hover,
+html[data-design="skizze"] body:not(.sk) .button.default:hover, html[data-design="skizze"] body:not(.sk) input[type=submit].default:hover { background: var(--sk-gelb-kraeftig); color: var(--sk-tinte); }
+html[data-design="skizze"] body:not(.sk) .button:active, html[data-design="skizze"] body:not(.sk) input[type=submit]:active, html[data-design="skizze"] body:not(.sk) .object-tools a:active { transform: translate(2px, 3px); box-shadow: 0 0 0 var(--sk-tinte); }
+html[data-design="skizze"] body:not(.sk) #content .button:focus-visible, html[data-design="skizze"] body:not(.sk) #content input[type=submit]:focus-visible, html[data-design="skizze"] body:not(.sk) #content a:focus-visible,
+html[data-design="skizze"] body:not(.sk) #content button:focus-visible { outline: 3px solid var(--sk-gelb-kraeftig); outline-offset: 2px; }
+html[data-design="skizze"] body:not(.sk) .submit-row {
+  background: #fff; border: 2px solid var(--sk-tinte); border-radius: 14px; box-shadow: 4px 5px 0 var(--sk-tinte); padding: .8rem 1rem; display: flex; flex-wrap: wrap; gap: .6rem; align-items: center;
+}
+html[data-design="skizze"] body:not(.sk) .submit-row input { margin: 0; float: none; }
+html[data-design="skizze"] body:not(.sk) .submit-row p { margin: 0; }
+html[data-design="skizze"] body:not(.sk) .submit-row .deletelink-box { margin-left: auto; float: none; }
+html[data-design="skizze"] body:not(.sk) a.deletelink, html[data-design="skizze"] body:not(.sk) .submit-row a.deletelink, html[data-design="skizze"] body:not(.sk) .submit-row a.closelink {
+  display: inline-block; background: var(--sk-rosa); color: var(--sk-tinte); border: 2px solid var(--sk-tinte); border-radius: 12px; box-shadow: 2px 3px 0 var(--sk-tinte);
+  font-family: var(--sk-hand); font-size: 1rem; padding: .4rem .9rem; height: auto; text-decoration: none;
+}
+html[data-design="skizze"] body:not(.sk) .submit-row a.closelink { background: #fff; }
+html[data-design="skizze"] body:not(.sk) a.deletelink:hover { background: var(--sk-rosa-kraeftig); color: var(--sk-tinte); }
+html[data-design="skizze"] body:not(.sk) input[name=_delete], html[data-design="skizze"] body:not(.sk) .delete-confirmation form input[type=submit] { background: var(--sk-rosa); }
+html[data-design="skizze"] body:not(.sk) .object-tools { margin-top: .2rem; }
+html[data-design="skizze"] body:not(.sk) .object-tools a:link, html[data-design="skizze"] body:not(.sk) .object-tools a:visited {
+  background: var(--sk-blau); color: var(--sk-tinte); border: 2px solid var(--sk-tinte); border-radius: 12px; box-shadow: 2px 3px 0 var(--sk-tinte);
+  font-family: var(--sk-hand); font-size: 1rem; text-transform: none; letter-spacing: 0; padding: .3rem .9rem; height: auto;
+}
+html[data-design="skizze"] body:not(.sk) .object-tools a:hover, html[data-design="skizze"] body:not(.sk) .object-tools a:focus { background: var(--sk-gelb); color: var(--sk-tinte); }
+html[data-design="skizze"] body:not(.sk) .object-tools li { height: auto; }
+html[data-design="skizze"] body:not(.sk) .object-tools a.viewsitelink, html[data-design="skizze"] body:not(.sk) .object-tools a.addlink { background-image: none; }
+
+/* Änderungslisten */
+html[data-design="skizze"] body:not(.sk) #changelist .results, html[data-design="skizze"] body:not(.sk) .results { background: #fff; border: 2px solid var(--sk-tinte); border-radius: 14px; box-shadow: 4px 5px 0 var(--sk-gelb-kraeftig); overflow-x: auto; }
+html[data-design="skizze"] body:not(.sk) #result_list { border: 0; width: 100%; }
+html[data-design="skizze"] body:not(.sk) #result_list thead th, html[data-design="skizze"] body:not(.sk) table thead th {
+  background: var(--sk-blau); color: var(--sk-tinte); border-bottom: 2px solid var(--sk-tinte); font-family: var(--sk-hand); font-weight: 400; font-size: 1rem; text-transform: none; letter-spacing: 0;
+}
+html[data-design="skizze"] body:not(.sk) thead th a, html[data-design="skizze"] body:not(.sk) thead th.sortable a, html[data-design="skizze"] body:not(.sk) thead th .text a { color: var(--sk-tinte); }
+html[data-design="skizze"] body:not(.sk) thead th.sorted { background: var(--sk-gelb); }
+html[data-design="skizze"] body:not(.sk) thead th.sorted .sortoptions a { filter: none; }
+html[data-design="skizze"] body:not(.sk) #result_list tbody tr { background: #fff; }
+html[data-design="skizze"] body:not(.sk) #result_list tbody tr:nth-child(even) { background: #fffaf0; }
+html[data-design="skizze"] body:not(.sk) #result_list tbody tr:hover { background: #fff3cc; }
+html[data-design="skizze"] body:not(.sk) #result_list tbody tr.selected, html[data-design="skizze"] body:not(.sk) #result_list tr.selected td { background: var(--sk-gelb); }
+html[data-design="skizze"] body:not(.sk) #result_list td, html[data-design="skizze"] body:not(.sk) #result_list th { border-bottom: 1px dashed #cdbf9d; }
+html[data-design="skizze"] body:not(.sk) #changelist .actions { background: var(--sk-gelb); border: 2px solid var(--sk-tinte); border-radius: 12px; margin-bottom: .8rem; padding: .5rem .8rem; }
+html[data-design="skizze"] body:not(.sk) #changelist .actions .button { box-shadow: 2px 3px 0 var(--sk-tinte); }
+html[data-design="skizze"] body:not(.sk) #changelist .paginator { background: transparent; border: 0; font-family: var(--sk-hand); color: var(--sk-tinte); }
+html[data-design="skizze"] body:not(.sk) .paginator a:link, html[data-design="skizze"] body:not(.sk) .paginator a:visited { background: #fff; color: var(--sk-tinte); border: 2px solid var(--sk-tinte); border-radius: 8px; padding: .1rem .5rem; }
+html[data-design="skizze"] body:not(.sk) .paginator .this-page { background: var(--sk-gelb); border: 2px solid var(--sk-tinte); border-radius: 8px; color: var(--sk-tinte); padding: .1rem .5rem; font-weight: 400; }
+html[data-design="skizze"] body:not(.sk) #changelist-search input[type=text] { min-width: 14rem; }
+html[data-design="skizze"] body:not(.sk) #toolbar { background: #fff; border: 2px solid var(--sk-tinte); border-radius: 12px; padding: .6rem .8rem; margin-bottom: .8rem; }
+html[data-design="skizze"] body:not(.sk) #changelist-filter {
+  background: #fff; border: 2px solid var(--sk-tinte); border-radius: 14px; box-shadow: 4px 5px 0 var(--sk-rosa-kraeftig); overflow: hidden;
+}
+html[data-design="skizze"] body:not(.sk) #changelist-filter h2 { background: var(--sk-blau); border-bottom: 2px solid var(--sk-tinte); color: var(--sk-tinte); font-family: var(--sk-hand); font-size: 1.1rem; text-transform: none; letter-spacing: 0; padding: .5rem .9rem; margin: 0; }
+html[data-design="skizze"] body:not(.sk) #changelist-filter h3 { font-family: var(--sk-hand); font-size: 1rem; color: var(--sk-tinte); margin: .8rem .9rem .2rem; }
+html[data-design="skizze"] body:not(.sk) #changelist-filter ul { padding: 0 .9rem .5rem; margin: 0; }
+html[data-design="skizze"] body:not(.sk) #changelist-filter li { list-style: none; }
+html[data-design="skizze"] body:not(.sk) #changelist-filter a { color: var(--sk-blau-tinte); display: block; padding: .15rem .4rem; border-radius: 8px; }
+html[data-design="skizze"] body:not(.sk) #changelist-filter li.selected { background: transparent; border-left: 0; }
+html[data-design="skizze"] body:not(.sk) #changelist-filter li.selected a { background: var(--sk-gelb); color: var(--sk-tinte); font-weight: 700; }
+html[data-design="skizze"] body:not(.sk) #changelist-filter a:hover { background: #fff3cc; color: var(--sk-tinte); }
+html[data-design="skizze"] body:not(.sk) #changelist-filter-extra-actions { border: 0; background: transparent; }
+html[data-design="skizze"] body:not(.sk) #nav-filter { width: calc(100% - 1.4rem); margin: .6rem .7rem; }
+html[data-design="skizze"] body:not(.sk) .selector .selector-available h2, html[data-design="skizze"] body:not(.sk) .selector .selector-chosen h2 { background: var(--sk-blau); color: var(--sk-tinte); font-family: var(--sk-hand); border-bottom: 2px solid var(--sk-tinte); }
+html[data-design="skizze"] body:not(.sk) .selector-chosen h2 { background: var(--sk-gruen); }
+html[data-design="skizze"] body:not(.sk) .selector .selector-filter { border-color: var(--sk-tinte); background: #fff; }
+
+/* Datumswähler und Kalender-Fenster */
+html[data-design="skizze"] body:not(.sk) .calendarbox, html[data-design="skizze"] body:not(.sk) .clockbox { background: #fff; border: 2px solid var(--sk-tinte); border-radius: 12px; box-shadow: 4px 5px 0 var(--sk-tinte); overflow: hidden; }
+html[data-design="skizze"] body:not(.sk) .calendar caption, html[data-design="skizze"] body:not(.sk) .calendarbox .calendar-cancel a, html[data-design="skizze"] body:not(.sk) .clockbox h2 { background: var(--sk-blau); color: var(--sk-tinte); font-family: var(--sk-hand); }
+html[data-design="skizze"] body:not(.sk) .calendar td.selected a { background: var(--sk-gelb); color: var(--sk-tinte); }
+html[data-design="skizze"] body:not(.sk) .calendar td a:hover, html[data-design="skizze"] body:not(.sk) .timelist a:hover { background: var(--sk-gelb-kraeftig); color: var(--sk-tinte); }
+html[data-design="skizze"] body:not(.sk) .datetimeshortcuts a { color: var(--sk-blau-tinte); }
+html[data-design="skizze"] body:not(.sk) .calendarnav a, html[data-design="skizze"] body:not(.sk) .calendar-shortcuts a { color: var(--sk-blau-tinte); }
+
+/* Anmeldung, Löschen-Bestätigung, Verlauf */
+html[data-design="skizze"] body:not(.sk) #footer { background: transparent; }
+html[data-design="skizze"] body:not(.sk) .delete-confirmation #content > form > div { margin-top: 1rem; }
+html[data-design="skizze"] body:not(.sk) .delete-confirmation ul { background: #fff; border: 2px solid var(--sk-tinte); border-radius: 12px; padding: .7rem 1.6rem; }
+html[data-design="skizze"] body:not(.sk) #content .colM, html[data-design="skizze"] body:not(.sk) #content .colMS { min-width: 0; }
+html[data-design="skizze"] body:not(.sk) .verwaltung-fuss { color: var(--sk-leise); font-family: var(--sk-hand); }
+/* Tabellen in der Verwaltung rollen im Rahmen statt die Seite zu verbreitern */
+html[data-design="skizze"] body:not(.sk) #content-main form, html[data-design="skizze"] body:not(.sk) .inline-group .tabular { overflow-x: auto; }
+@media (max-width: 767px) {
+  html[data-design="skizze"] body:not(.sk) #content { padding: .8rem 16px 2rem; }
+  html[data-design="skizze"] body:not(.sk) .breadcrumbs { padding: .5rem 16px; }
+  html[data-design="skizze"] body:not(.sk) ul.messagelist li { margin-left: 16px; margin-right: 16px; }
+  html[data-design="skizze"] body:not(.sk) #content h1 { font-size: 1.4rem; }
+  html[data-design="skizze"] body:not(.sk) #changelist-filter { margin-top: 1rem; }
+  html[data-design="skizze"] body:not(.sk) .submit-row .deletelink-box { margin-left: 0; }
+}
+
+/* ===================================================================================================
+   2. Druck: weißes Blatt, keine Schatten, kein Kopf (Portal und Verwaltungsoberfläche)
+   =================================================================================================== */
+@media print {
+  html[data-design="skizze"], html[data-design="skizze"] body, html[data-design="skizze"] body.sk, html[data-design="skizze"] body:not(.sk) {
+    background: #fff !important; background-image: none !important; color: #000;
+  }
+  html[data-design="skizze"] .sk-kopf, html[data-design="skizze"] .sk-bereiche, html[data-design="skizze"] .sk-weg, html[data-design="skizze"] .sk-favoriten,
+  html[data-design="skizze"] .bs, html[data-design="skizze"] .hp, html[data-design="skizze"] #header, html[data-design="skizze"] .breadcrumbs,
+  html[data-design="skizze"] .verwaltung-fuss, html[data-design="skizze"] .object-tools, html[data-design="skizze"] #changelist-filter,
+  html[data-design="skizze"] .submit-row, html[data-design="skizze"] #toolbar, html[data-design="skizze"] #changelist .actions, html[data-design="skizze"] .paginator,
+  html[data-design="skizze"] ul.messagelist { display: none !important; }
+  html[data-design="skizze"] *, html[data-design="skizze"] *::before, html[data-design="skizze"] *::after { box-shadow: none !important; text-shadow: none !important; transition: none !important; }
+  html[data-design="skizze"] .karte, html[data-design="skizze"] .module, html[data-design="skizze"] .results { background: #fff !important; border-radius: 0; }
+  html[data-design="skizze"] body:not(.sk) .module caption, html[data-design="skizze"] body:not(.sk) .module h2, html[data-design="skizze"] body:not(.sk) #result_list thead th { background: #eee !important; border-bottom: 1px solid #000; }
+  html[data-design="skizze"] .noten .links, html[data-design="skizze"] .nk-matrix th.links, html[data-design="skizze"] .nk-klasse th.links { position: static; }
+  html[data-design="skizze"] .ne-knoepfe, html[data-design="skizze"] .nk-speichern, html[data-design="skizze"] .lb-speichern, html[data-design="skizze"] .fz-knoepfe { position: static; }
+  html[data-design="skizze"] body:not(.sk) #content h1 { font-size: 16pt; }
+  html[data-design="skizze"] body:not(.sk) .results { overflow: visible; border: 1px solid #000; }
+}
+
+/* ===================================================================================================
+   3. Fachseiten des Portals – nur, was die allgemeinen Bauteile (skizze.css) nicht schon leisten.
+      Leitsatz: dichte Arbeitstabellen bleiben dicht und in Systemschrift; Dekor nur an Überschriften, Rahmen, Kennzeichen.
+   =================================================================================================== */
+
+/* --- Suchauswahl (suchauswahl.css): in Portal und Verwaltung eindeutige Farben, damit der Treffer-Hover lesbar bleibt */
+html[data-design="skizze"] .suchauswahl {
+  --sa-flaeche: #fff; --sa-text: var(--sk-tinte); --sa-leise: var(--sk-leise); --sa-linie: var(--sk-tinte); --sa-akzent: var(--sk-blau-tinte); --sa-akzent-hell: #fff3cc;
+}
+html[data-design="skizze"] .suchauswahl .sa-feld { border: 2px solid var(--sk-tinte); border-radius: 10px; background: #fff; }
+html[data-design="skizze"] .suchauswahl .sa-feld:focus-within { border-color: var(--sk-tinte); box-shadow: 0 0 0 3px var(--sk-gelb-kraeftig); }
+html[data-design="skizze"] .suchauswahl .sa-marke { background: var(--sk-blau); color: var(--sk-tinte); border: 1.5px solid var(--sk-tinte); font-family: var(--sk-hand); font-size: 1rem; }
+html[data-design="skizze"] .suchauswahl .sa-vorschlaege, html[data-design="skizze"] .suchauswahl .sa-dialog {
+  background: #fff; color: var(--sk-tinte); border: 2px solid var(--sk-tinte); border-radius: 12px; box-shadow: 4px 5px 0 var(--sk-tinte);
+}
+html[data-design="skizze"] .suchauswahl .sa-dialog::backdrop { background: rgba(43, 43, 51, .45); }
+html[data-design="skizze"] .suchauswahl .sa-knopf { background: #fff; color: var(--sk-tinte); border: 2px solid var(--sk-tinte); border-radius: 10px; font-family: var(--sk-hand); font-size: 1rem; }
+html[data-design="skizze"] .suchauswahl .sa-knopf:hover { background: var(--sk-gelb); border-color: var(--sk-tinte); }
+html[data-design="skizze"] .suchauswahl .sa-knopf.sa-haupt { background: var(--sk-gelb); color: var(--sk-tinte); border-color: var(--sk-tinte); box-shadow: 2px 3px 0 var(--sk-tinte); }
+html[data-design="skizze"] .suchauswahl .sa-treffer.aktiv, html[data-design="skizze"] .suchauswahl .sa-treffer:hover { background: var(--sk-gelb); color: var(--sk-tinte); }
+html[data-design="skizze"] .suchauswahl .sa-treffer.sa-vorschlag.aktiv::after { color: var(--sk-tinte); }
+html[data-design="skizze"] .suchauswahl .sa-gruppe-titel { font-family: var(--sk-hand); font-size: 1rem; text-transform: none; letter-spacing: 0; color: var(--sk-tinte); }
+html[data-design="skizze"] .suchauswahl label.sa-option:hover { background: #fff3cc; }
+
+/* --- Anmeldeseite: freundliche Karte, mittig, Hauptknopf über die volle Breite */
+html[data-design="skizze"] .anmeldung {
+  max-width: 26rem; margin: 2.5rem auto; padding: 1.6rem 1.7rem 1.8rem; background: #fff; border: 2px solid var(--sk-tinte); border-radius: 18px; box-shadow: 6px 7px 0 var(--sk-gelb-kraeftig);
+}
+html[data-design="skizze"] .anmeldung h1 { text-align: center; margin: 0 0 1.1rem; }
+html[data-design="skizze"] .anmeldung label { font-family: var(--sk-hand); font-size: 1.05rem; font-weight: 400; margin-bottom: 1rem; }
+html[data-design="skizze"] .anmeldung input { margin-top: .3rem; font-size: 1rem; }
+html[data-design="skizze"] .anmeldung .knopf, html[data-design="skizze"] .anmeldung button[type=submit] { width: 100%; justify-content: center; margin-top: .4rem; }
+html[data-design="skizze"] .anmeldung .fehler { background: var(--sk-rosa); border: 2px solid var(--sk-tinte); border-radius: 10px; color: var(--sk-tinte); padding: .5rem .8rem; margin: 0 0 1rem; font-weight: 600; }
+html[data-design="skizze"] .anmeldung p:not(.fehler) { color: var(--sk-leise); }
+
+/* --- Kennzeichen (Status-Pillen der Fachseiten): Kontur, Pastellfüllung, Tinte als Schriftfarbe */
+html[data-design="skizze"] :is(.an-status, .zg-status, .tm-status, .sy-status, .sy-art, .ek-art, .nv-stand, .nta-marke, .zg-kern, .recht-ja, .kurschips a, .einzelgewicht) {
+  border: 1.5px solid var(--sk-tinte); color: var(--sk-tinte); font-family: var(--sk-hand); font-weight: 400; font-size: .95rem; line-height: 1.35;
+}
+html[data-design="skizze"] :is(.an-status, .zg-status, .tm-status, .sy-status, .sy-art, .ek-art, .nv-stand) { background: #fff; padding-block: .02rem; }
+html[data-design="skizze"] :is(.an-status-eingegangen, .zg-status-durchgefuehrt, .tm-status-geschlossen, .sy-status-laeuft, .sy-status-wartet, .sy-art-hochgeladen) { background: var(--sk-blau); }
+html[data-design="skizze"] :is(.an-status-pruefung, .zg-status-entwurf, .zg-status-geplant, .tm-status-entwurf, .sy-art-vor_wiederherstellung, .ek-art-fehlzeiten, .nv-stand.in_arbeit) { background: var(--sk-gelb); }
+html[data-design="skizze"] :is(.an-status-warteliste, .tm-status-verfuegbarkeit, .sy-art-automatisch, .ek-art-zeugnis, .nta-marke) { background: var(--sk-lila); }
+html[data-design="skizze"] :is(.an-status-zugesagt, .zg-status-freigegeben, .zg-status-abgeschlossen, .tm-status-buchung, .sy-status-fertig, .nv-stand.erfuellt, .recht-ja) { background: var(--sk-gruen); }
+html[data-design="skizze"] :is(.an-status-abgelehnt, .an-status-zurueckgezogen, .sy-status-fehler, .nv-stand.ueberfaellig) { background: var(--sk-rosa); }
+html[data-design="skizze"] :is(.zg-kern, .kurschips a, .einzelgewicht) { background: var(--sk-blau); border-radius: 6px; }
+html[data-design="skizze"] .nv-stand { padding: .02rem .65rem; }
+html[data-design="skizze"] .zg-punkt { border: 1.5px solid var(--sk-tinte); }
+html[data-design="skizze"] .zg-punkt.ok { background: var(--sk-gruen-kraeftig); }
+html[data-design="skizze"] .zg-punkt.veraltet { background: var(--sk-rosa-kraeftig); }
+html[data-design="skizze"] .zg-punkt.offen { background: #fff; }
+
+/* --- Schülerakte */
+html[data-design="skizze"] .akte-kopf { align-items: center; gap: .6rem 1.2rem; }
+html[data-design="skizze"] .raster { gap: 1.4rem; }
+html[data-design="skizze"] .raster > .karte { min-width: 0; }
+html[data-design="skizze"] .karte.vertraulich { border-color: var(--sk-rot); box-shadow: 5px 6px 0 var(--sk-rosa-kraeftig); background: #fff; }
+html[data-design="skizze"] .karte.vertraulich > h2 .etikett, html[data-design="skizze"] .karte.vertraulich h2 .etikett { background: var(--sk-rosa); }
+html[data-design="skizze"] .etikett.warnend { background: var(--sk-rosa); color: var(--sk-tinte); }
+html[data-design="skizze"] tr.auffaellig td, html[data-design="skizze"] tr.auffaellig th { color: var(--sk-rot); font-weight: 600; background: #fff0f3; }
+html[data-design="skizze"] .auffaellig { color: var(--sk-rot); }
+
+/* --- Noten: Eingabe */
+html[data-design="skizze"] .ne-tabelle { background: #fff; }
+html[data-design="skizze"] .ne-tabelle th, html[data-design="skizze"] .ne-tabelle td { border-bottom: 1px dashed #cdbf9d; font-family: inherit; }
+html[data-design="skizze"] .ne-tabelle thead th { color: var(--sk-tinte); background: var(--sk-blau); border-bottom: 2px solid var(--sk-tinte); font-family: var(--sk-hand); font-size: 1rem; font-weight: 400; }
+html[data-design="skizze"] .ne-tabelle input { background: #fff; border: 2px solid var(--sk-tinte); border-radius: 8px; color: var(--sk-tinte); font-family: inherit; }
+html[data-design="skizze"] .ne-tabelle input:focus, html[data-design="skizze"] .ne-note:focus { outline: 0; box-shadow: 0 0 0 3px var(--sk-gelb-kraeftig); }
+html[data-design="skizze"] .ne-note { font-weight: 700; font-variant-numeric: tabular-nums; }
+html[data-design="skizze"] .ne-falsch .ne-note { border-color: var(--sk-rot); background: var(--sk-rosa); }
+html[data-design="skizze"] .ne-falsch .ne-deutung { color: var(--sk-rot); }
+html[data-design="skizze"] .ne-nr, html[data-design="skizze"] .ne-deutung, html[data-design="skizze"] .ne-einheit { color: var(--sk-leise); }
+html[data-design="skizze"] .ne-gesperrt input { opacity: .6; background: #f0ead8; }
+html[data-design="skizze"] .ne-sperre { background: var(--sk-rosa); color: var(--sk-tinte); border: 2px solid var(--sk-tinte); border-radius: 12px; box-shadow: 3px 4px 0 var(--sk-tinte); font-weight: 600; padding: .6rem .9rem; }
+html[data-design="skizze"] .ne-vorlaeufig { background: var(--sk-gelb); color: var(--sk-tinte); border: 2px solid var(--sk-tinte); border-left-width: 6px; border-radius: 10px; }
+html[data-design="skizze"] .ne-wurzel th, html[data-design="skizze"] .ne-wurzel td { background: var(--sk-blau); }
+html[data-design="skizze"] .ne-be summary, html[data-design="skizze"] .ne-hilfe summary { font-family: var(--sk-hand); font-size: 1.05rem; font-weight: 400; }
+html[data-design="skizze"] .ne-jahresnote { border: 2px solid var(--sk-tinte); border-radius: 14px; background: #fff; }
+html[data-design="skizze"] .ne-jahresnote legend { font-family: var(--sk-hand); font-size: 1.05rem; font-weight: 400; }
+html[data-design="skizze"] .ne-statistik { background: #fff; border-color: var(--sk-tinte); box-shadow: 5px 6px 0 var(--sk-gruen-kraeftig); }
+html[data-design="skizze"] .ne-statistik h2, html[data-design="skizze"] .ne-statistik h3 { font-family: var(--sk-hand); font-weight: 400; }
+/* Fußleisten, die beim Rollen unten kleben: deckend (kein durchscheinendes Punktraster) und mit Tintenlinie */
+html[data-design="skizze"] :is(.ne-knoepfe, .lb-speichern) { background: var(--sk-papier); border-top: 2px solid var(--sk-tinte); }
+html[data-design="skizze"] :is(.nk-speichern, .fz-knoepfe) { background: #fff; border-top: 2px solid var(--sk-tinte); }
+html[data-design="skizze"] .sy-sammelleiste { background: var(--sk-gelb); border: 2px solid var(--sk-tinte); border-radius: 12px; }
+
+/* --- Notenübersicht (Matrix), Kurswahl-Spalten, Zeugnis-Notenlisten: dicht, deckende Sticky-Spalten */
+html[data-design="skizze"] .noten { border-collapse: separate; border-spacing: 0; }
+html[data-design="skizze"] .noten th, html[data-design="skizze"] .noten td { border-bottom: 1px dashed #cdbf9d; }
+html[data-design="skizze"] .noten thead th { background: var(--sk-blau); color: var(--sk-tinte); border-bottom: 2px solid var(--sk-tinte); font-family: var(--sk-hand); font-weight: 400; font-size: 1rem; }
+html[data-design="skizze"] .noten thead th small, html[data-design="skizze"] .noten small { font-family: system-ui, sans-serif; color: var(--sk-leise); }
+html[data-design="skizze"] .noten thead th small { color: #3d4252; }
+html[data-design="skizze"] .noten .kat { background: #f4ecd5; color: var(--sk-tinte); }
+html[data-design="skizze"] .noten .ordnerkopf { color: var(--sk-tinte); border-bottom: 2px solid var(--sk-tinte); background: var(--sk-gelb); font-size: .95rem; }
+html[data-design="skizze"] .noten .links { background: #fff; z-index: 1; border-right: 2px solid var(--sk-tinte); font-weight: 600; }
+html[data-design="skizze"] .noten thead .links { background: var(--sk-blau); z-index: 2; }
+html[data-design="skizze"] .noten tbody tr:nth-child(even) th.links { background: #fffaf0; }
+html[data-design="skizze"] .noten .vorschlag { background: #dff0ff; }
+html[data-design="skizze"] .noten thead th.vorschlag { background: var(--sk-blau); }
+html[data-design="skizze"] .noten tr.gefaehrdet td, html[data-design="skizze"] .noten tr.gefaehrdet th { background: #ffd9e2; }
+html[data-design="skizze"] .noten tr.gefaehrdet th.links { border-left: 6px solid var(--sk-rot); color: var(--sk-tinte); }
+html[data-design="skizze"] .noten tr.gefaehrdet th.links::after { content: " \26A0"; color: var(--sk-rot); }
+html[data-design="skizze"] .warnung { background: var(--sk-rot); color: #fff; border: 1.5px solid var(--sk-tinte); }
+html[data-design="skizze"] :is(.nk-matrix, .nk-klasse) th.links { background: #fff; z-index: 1; border-right: 2px solid var(--sk-tinte); }
+html[data-design="skizze"] :is(.nk-matrix, .nk-klasse) thead th { background: var(--sk-blau); color: var(--sk-tinte); border-bottom: 2px solid var(--sk-tinte); }
+html[data-design="skizze"] :is(.nk-matrix, .nk-klasse) thead th.links { background: var(--sk-blau); z-index: 2; }
+html[data-design="skizze"] .nk-gefaehrdet { background: #ffd9e2 !important; color: var(--sk-tinte); font-weight: 700; box-shadow: inset 0 -3px 0 var(--sk-rosa-kraeftig); }
+html[data-design="skizze"] .zg-noten thead th, html[data-design="skizze"] .zg-ger thead th { background: var(--sk-blau); color: var(--sk-tinte); }
+html[data-design="skizze"] .zg-noten tbody.fehlerhaft { background: #ffe1e8; }
+html[data-design="skizze"] .zg-n5 { background: var(--sk-gelb); color: var(--sk-tinte); }
+html[data-design="skizze"] .zg-n6 { background: var(--sk-rosa); color: var(--sk-rot); }
+html[data-design="skizze"] .zg-beschlusszeile td { background: #fff8e0; border-bottom: 2px solid var(--sk-tinte); }
+html[data-design="skizze"] :is(.zg-noten, .zg-ger table, .nk-matrix) input, html[data-design="skizze"] :is(.zg-begruendung, .zg-wahl, .sy-wahl, .zo-filterzeile select) {
+  background: #fff; border: 2px solid var(--sk-tinte); border-radius: 8px; color: var(--sk-tinte);
+}
+html[data-design="skizze"] .zg-wahl.vorschlag { border-style: dashed; color: var(--sk-leise); }
+html[data-design="skizze"] .zg-kommentartext { background: #fff8e0; border-left: 4px solid var(--sk-gelb-kraeftig); }
+html[data-design="skizze"] .zg-anmerkungen li { background: var(--sk-gelb); color: var(--sk-tinte); border: 1.5px solid var(--sk-tinte); }
+html[data-design="skizze"] .zg-anmerkungen li.erledigt { background: #f4ecd5; color: var(--sk-leise); }
+html[data-design="skizze"] .zg-versetzung { background: var(--sk-blau); border: 2px solid var(--sk-tinte); border-radius: 12px; color: var(--sk-tinte); }
+html[data-design="skizze"] .zg-versetzung.warnend { background: var(--sk-rosa); }
+
+/* --- Termine, Kalender, Raumplan */
+html[data-design="skizze"] .tm-monat { border: 2px solid var(--sk-tinte); border-radius: 14px; box-shadow: 5px 6px 0 var(--sk-rosa-kraeftig); background: #fff; }
+html[data-design="skizze"] .tm-kopfzeile div { background: var(--sk-blau); color: var(--sk-tinte); font-family: var(--sk-hand); font-size: 1rem; font-weight: 400; border-bottom: 2px solid var(--sk-tinte); }
+html[data-design="skizze"] .tm-tag { border-right-color: #cdbf9d; border-bottom-color: #cdbf9d; background: #fff; }
+html[data-design="skizze"] .tm-tag.fremd { background: #f4ecd5; }
+html[data-design="skizze"] .tm-tag.heute { background: #fff3cc; }
+html[data-design="skizze"] .tm-tag.heute .tm-nr, html[data-design="skizze"] .tm-tag.heute > :first-child { color: var(--sk-tinte); }
+html[data-design="skizze"] [class*="tm-art-"] { color: var(--sk-tinte); }
+html[data-design="skizze"] .tm-art-veranstaltung, html[data-design="skizze"] .tm-art-eltern, html[data-design="skizze"] .tm-art-sprechtag { background: var(--sk-blau); }
+html[data-design="skizze"] .tm-art-ferien { background: var(--sk-tuerkis); }
+html[data-design="skizze"] .tm-art-feiertag { background: var(--sk-rosa); }
+html[data-design="skizze"] .tm-art-konferenz { background: var(--sk-lila); }
+html[data-design="skizze"] .tm-art-pruefung, html[data-design="skizze"] .tm-art-frist { background: var(--sk-gelb); }
+html[data-design="skizze"] .tm-art-fahrt { background: var(--sk-gruen); }
+html[data-design="skizze"] .tm-punkt[class*="tm-art-"] { border: 1.5px solid var(--sk-tinte); }
+html[data-design="skizze"] .tm-aufgabe { background: #f4ecd5; }
+html[data-design="skizze"] .tm-aufgabe.offen { background: var(--sk-gelb); color: var(--sk-tinte); }
+html[data-design="skizze"] .tm-bahn { border: 2px solid var(--sk-tinte); background: #fff; }
+html[data-design="skizze"] .tm-buchung { border: 1.5px solid var(--sk-tinte); color: var(--sk-tinte); }
+html[data-design="skizze"] .tm-buchung.termin { background: var(--sk-lila); }
+html[data-design="skizze"] .tm-buchung.sprechtag { background: var(--sk-blau); }
+html[data-design="skizze"] .tm-z-gebucht td { background: var(--sk-gruen); }
+html[data-design="skizze"] .tm-z-gesperrt td { background: #f4ecd5; }
+html[data-design="skizze"] .tm-ablauf li.hier .tm-schritt { background: var(--sk-gelb); border-color: var(--sk-tinte); }
+
+/* --- Reiter (Aufnahme, Kalender, …) */
+html[data-design="skizze"] .an-tabs { border-bottom: 2px solid var(--sk-tinte); gap: .4rem; }
+html[data-design="skizze"] .an-tabs a { font-family: var(--sk-hand); font-size: 1.05rem; font-weight: 400; color: var(--sk-tinte); border: 2px solid transparent; border-bottom: 0; margin-bottom: -2px; border-radius: 12px 12px 0 0; }
+html[data-design="skizze"] .an-tabs a:hover { background: #fff3cc; color: var(--sk-tinte); }
+html[data-design="skizze"] .an-tabs a.aktiv { background: var(--sk-gelb); border-color: var(--sk-tinte); color: var(--sk-tinte); border-bottom: 2px solid var(--sk-gelb); }
+html[data-design="skizze"] .an-tabs a span { background: #fff; border: 1.5px solid var(--sk-tinte); color: var(--sk-tinte); }
+html[data-design="skizze"] .an-balken { background: #fff; border: 1.5px solid var(--sk-tinte); }
+html[data-design="skizze"] .an-balken span { background: var(--sk-gruen-kraeftig); }
+html[data-design="skizze"] .an-banner.ok { background: var(--sk-gruen); border-color: var(--sk-tinte); }
+html[data-design="skizze"] .an-banner.warnend { background: var(--sk-rosa); border-color: var(--sk-tinte); }
+html[data-design="skizze"] .an-vorlage:has(input:checked), html[data-design="skizze"] .an-ablage:hover, html[data-design="skizze"] .an-ablage.ablegen { background: var(--sk-gelb); border-color: var(--sk-tinte); }
+html[data-design="skizze"] .an-kaestchen[aria-checked=true] { background: var(--sk-gruen-kraeftig); border-color: var(--sk-tinte); }
+
+/* --- Förderung, Elternkontakt, Hinweise */
+html[data-design="skizze"] .ek-von-eltern { background: var(--sk-blau); border-color: var(--sk-tinte); }
+html[data-design="skizze"] .ek-von-system { background: #f4ecd5; }
+html[data-design="skizze"] .ek-meldung { background: var(--sk-gruen); color: var(--sk-tinte); border: 2px solid var(--sk-tinte); }
+html[data-design="skizze"] .ek-vorschau, html[data-design="skizze"] .sy-warnung, html[data-design="skizze"] .lb-faellig { background: var(--sk-gelb); color: var(--sk-tinte); border: 2px solid var(--sk-tinte); }
+html[data-design="skizze"] .sy-blockiert, html[data-design="skizze"] .sy-fehler, html[data-design="skizze"] .lb-hindernis { background: var(--sk-rosa); color: var(--sk-tinte); }
+html[data-design="skizze"] .lb-archivhinweis { background: var(--sk-lila); color: var(--sk-tinte); border: 2px solid var(--sk-tinte); }
+html[data-design="skizze"] .lb-kette li.hier { background: var(--sk-gelb); border-color: var(--sk-tinte); }
+html[data-design="skizze"] .lb-kette li::before { border: 1.5px solid var(--sk-tinte); background: #fff; }
+html[data-design="skizze"] .lb-punkt { border: 1.5px solid var(--sk-tinte); background: var(--sk-blau-kraeftig); }
+html[data-design="skizze"] .lb-st-abgang .lb-punkt { background: var(--sk-orange-kraeftig); }
+html[data-design="skizze"] .lb-st-archiv .lb-punkt { background: var(--sk-lila-kraeftig); }
+html[data-design="skizze"] .nv-vorgabe h2, html[data-design="skizze"] .nv-unterricht h2 { font-family: var(--sk-hand); font-weight: 400; font-size: 1.2rem; }
+html[data-design="skizze"] .nv-faecher { border: 2px solid var(--sk-tinte); border-radius: 12px; background: #fff; }
+html[data-design="skizze"] .nv-faecher legend { font-family: var(--sk-hand); font-weight: 400; font-size: 1.05rem; }
+html[data-design="skizze"] .kw-start { background: #fff; border: 2px solid var(--sk-tinte); border-radius: 14px; box-shadow: 4px 5px 0 var(--sk-gruen-kraeftig); }
+html[data-design="skizze"] .zo-poolzeile.gewaehlt, html[data-design="skizze"] .zo-mitglieder.ablegen { background: var(--sk-gelb); }
+html[data-design="skizze"] .zo-gruppen li a:hover { background: #fff3cc; }
+html[data-design="skizze"] .gb-tag.heute { background: var(--sk-gelb); }
+html[data-design="skizze"] .suchfeld { background: #fff; border: 2px solid var(--sk-tinte); border-radius: 12px; }
+
+/* --- Tabellen in Fachseiten rollen im Rahmen statt die Seite zu verbreitern */
+@media (max-width: 767px) {
+  html[data-design="skizze"] .anmeldung { margin: 1.2rem 0; padding: 1.2rem; }
+  html[data-design="skizze"] .noten .links { position: sticky; }
+  html[data-design="skizze"] .ne-felder, html[data-design="skizze"] .ne-neuer-ordner .ne-felder { grid-template-columns: minmax(0, 1fr); }
+  html[data-design="skizze"] .raster { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Dichte Konferenz-/Zeugnisseiten: Begründungsfelder bleiben einzeilig (per Ziehen vergrößerbar) */
+html[data-design="skizze"] textarea.zg-begruendung, html[data-design="skizze"] .zg-anmerken textarea { min-height: 2.4rem; height: 2.4rem; }
+
+/* Änderungsliste: der Container trägt in Django auch die Klasse „module“ – er bekommt keinen eigenen Kasten, nur Ergebnisliste und Filter */
+html[data-design="skizze"] body:not(.sk) #changelist.module { background: transparent; border: 0; box-shadow: none; border-radius: 0; overflow: visible; margin-bottom: 0; }
+html[data-design="skizze"] body:not(.sk) #changelist .changelist-form-container { min-width: 0; }
+html[data-design="skizze"] body:not(.sk) #changelist #changelist-form .results { overflow-x: auto; }
+html[data-design="skizze"] body:not(.sk) #changelist .actions select { max-width: 14rem; }
+html[data-design="skizze"] body:not(.sk) #changelist #changelist-search #searchbar { width: min(22rem, 70vw); height: auto; }
+html[data-design="skizze"] body:not(.sk) #changelist-search label { display: inline-flex; align-items: center; }
+html[data-design="skizze"] body:not(.sk) #changelist .changelist-form-container { padding: 0 8px 8px 0; box-sizing: border-box; }
+html[data-design="skizze"] body:not(.sk) #changelist .results { box-sizing: border-box; max-width: 100%; }
+html[data-design="skizze"] body:not(.sk) #content .submit-row input.default, html[data-design="skizze"] body:not(.sk) #content input[type=submit].default, html[data-design="skizze"] body:not(.sk) #content .button.default { background: var(--sk-gelb); box-shadow: 3px 4px 0 var(--sk-tinte); }
+html[data-design="skizze"] body:not(.sk) #content .submit-row input.default:hover, html[data-design="skizze"] body:not(.sk) #content input[type=submit].default:hover { background: var(--sk-gelb-kraeftig); }
+html[data-design="skizze"] body:not(.sk) #content .submit-row a.deletelink { background: var(--sk-rosa); }
+
+/* Dichte Eingabefelder in Arbeitstabellen und Leisten: kompakter als die allgemeinen Felder (höhere Spezifität über das Elternelement) */
+html[data-design="skizze"] :is(.zo-rolle, .zo-filterzeile, .zo-stichtag, .zg-ger table, .zg-noten, .nk-matrix, .nk-klasse, .inline-form, .lb-plan, .lb-posten, .lb-fristen, .lb-aufschub, .zg-anmerken, .ek-vermerk, #lehrkraefte, .notizform-zeile) :is(input[type=text], input[type=number], input[type=date], input[type=time], input:not([type]), select, textarea) {
+  padding-block: .2rem; padding-left: .45rem; font-size: .88rem; border-radius: 8px; min-height: 0;
+}
+html[data-design="skizze"] .zo-rolle input[type=text] { width: 8.5rem; font-size: .85rem; border-width: 1.5px; border-style: dashed; border-color: #cdbf9d; background: transparent; }
+html[data-design="skizze"] .zo-rolle input[type=text]:hover, html[data-design="skizze"] .zo-rolle input[type=text]:focus { border-style: solid; border-color: var(--sk-tinte); background: #fff; }
+html[data-design="skizze"] :is(.nk-matrix, .nk-klasse, .zg-noten) input[type=text], html[data-design="skizze"] :is(.nk-matrix, .nk-klasse) input[type=number] { text-align: center; }
+html[data-design="skizze"] .sa-eingabe, html[data-design="skizze"] .sa-dialog-suche { font-size: .95rem; }
+
+/* Raster mit „1fr“ ohne Minimum: Felder mit Kontur und Polster würden am Telefon die Seite verbreitern */
+@media (max-width: 860px) {
+  html[data-design="skizze"] :is(.sy-raster, .sy-zeitraum, .lb-zwei, .formzeile) { grid-template-columns: minmax(0, 1fr); }
+  html[data-design="skizze"] :is(.sy-raster, .sy-zeitraum, .lb-zwei, .formzeile) > * { min-width: 0; }
+  html[data-design="skizze"] :is(.sy-feld, .zg-kommentarform, .lb-filter, .nv-filter) :is(input, select, textarea) { max-width: 100%; min-width: 0; box-sizing: border-box; }
+}
+html[data-design="skizze"] .sy-formular { grid-template-columns: minmax(0, 1fr); }
+html[data-design="skizze"] .sy-formular > * { min-width: 0; }
+@media (max-width: 767px) {
+  html[data-design="skizze"] .noten .links { max-width: 8.5rem; white-space: normal; }
+}
+
+@media print {
+  /* Tabellen im Druck: keine Pastellflächen, nur Linien; gefährdete Zeilen bleiben als helles Grau erkennbar */
+  html[data-design="skizze"] table, html[data-design="skizze"] table th, html[data-design="skizze"] table td, html[data-design="skizze"] table tr { background: #fff !important; color: #000; }
+  html[data-design="skizze"] table thead th { background: #eee !important; border-bottom: 1px solid #000 !important; font-family: inherit !important; }
+  html[data-design="skizze"] .noten tr.gefaehrdet td, html[data-design="skizze"] .noten tr.gefaehrdet th, html[data-design="skizze"] .nk-gefaehrdet { background: #ddd !important; }
+  html[data-design="skizze"] .noten .links, html[data-design="skizze"] :is(.nk-matrix, .nk-klasse) th.links { border-right: 1px solid #000; }
+  html[data-design="skizze"] .knopf { border-width: 1px; }
+}
+@media print { html[data-design="skizze"] body:not(.sk) #content h1, html[data-design="skizze"] body:not(.sk) #content h2 { font-family: inherit; text-transform: none; letter-spacing: 0; } }
+html[data-design="skizze"] body:not(.sk) #changelist-search > div { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+html[data-design="skizze"] body:not(.sk) #changelist #changelist-search #searchbar { flex: 1 1 8rem; min-width: 0; }
+html[data-design="skizze"] body:not(.sk) #changelist .actions { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .7rem; }
+
+/* Verwaltungsoberfläche: Die Feldregeln oben dürfen das Suchfeld im Kopf nicht ein zweites Mal umranden. */
+html[data-design="skizze"] body:not(.sk) .sk-kopf .sk-suche input[type=search],
+html[data-design="skizze"] body:not(.sk) .sk-kopf .sk-suche input[type=search]:focus { border: 0; border-radius: 0; background: transparent; box-shadow: none; outline: 0; padding: .3rem 0; margin: 0; }

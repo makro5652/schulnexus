@@ -63,7 +63,7 @@ class SprachwahlTest(TestCase):
         self.assertContains(r, f"Version {VERSION}")
 
     def test_versionsnummer(self):
-        self.assertTrue(VERSION.startswith("0.7"))
+        self.assertTrue(VERSION.startswith("0.8"))
 
     def test_sprachmenue_vorhanden(self):
         r = self.client.get(reverse("login"))

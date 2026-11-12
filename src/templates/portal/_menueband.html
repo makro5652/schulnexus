@@ -69,39 +69,11 @@
   {% endfor %}
   {% endif %}
   {% if MENUEBAND %}
-  <button type="button" class="hp-knopf" id="hp-knopf" aria-controls="hp" aria-expanded="false" title="{% translate 'Hilfe zu dieser Seite' %}">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-frage"/></svg><span>{% translate "Hilfe" %}</span>
-  </button>
-  <aside class="hp" id="hp" hidden aria-labelledby="hp-titel" data-thema="{{ MENUEBAND.hilfe }}"
-         data-basis="{% url 'hilfe' %}" data-suche="{% url 'hilfe_suche' %}" data-t-fehler="{% translate 'Die Hilfe ließ sich nicht laden.' %}"
-         data-t-keine="{% translate 'Kein Hilfethema gefunden.' %}">
-    <div class="hp-kopf">
-      <h2 id="hp-titel"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-frage"/></svg>{% translate "Hilfe" %}</h2>
-      <a class="hp-gross" id="hp-gross" href="{% url 'hilfe' %}" title="{% translate 'In ganzer Seite öffnen' %}">{% translate "Ganze Seite" %}</a>
-      <button type="button" class="hp-zu" id="hp-zu" aria-label="{% translate 'Hilfe schließen' %}">×</button>
-    </div>
-    <nav class="hp-reiter" aria-label="{% translate 'Hilfe' %}">
-      <button type="button" data-ziel="seite" aria-pressed="true">{% translate "Diese Seite" %}</button>
-      <button type="button" data-ziel="alle" aria-pressed="false">{% translate "Alle Themen" %}</button>
-    </nav>
-    <div class="hp-suche"><input type="search" id="hp-suche" placeholder="{% translate 'Hilfe durchsuchen, z. B. Zeugnis, Schuljahr …' %}" aria-label="{% translate 'Hilfe durchsuchen' %}" autocomplete="off"></div>
-    <div class="hp-inhalt" id="hp-inhalt" tabindex="-1" aria-live="polite"></div>
-    {% get_current_language as hp_sprache %}{% if hp_sprache != "de" %}<p class="hp-sprache">{% translate "The help texts are currently available in German only." %}</p>{% endif %}
-  </aside>
+  {% include "portal/_hilfeleiste.html" %}
   <nav class="mb-schnell" id="mb-schnell" aria-label="{% translate 'Favoriten' %}" hidden><span class="mb-schnell-titel">{% translate "Favoriten" %}</span></nav>
   {% endif %}
 {% if MENUEBAND %}
-<dialog class="bs" id="bs" aria-label="{% translate 'Befehl suchen' %}"
-        data-t-person="{% translate 'Person suchen: „{q}“' %}" data-t-zuletzt="{% translate 'Zuletzt verwendet' %}" data-t-favoriten="{% translate 'Favoriten' %}"
-        data-t-alle="{% translate 'Alle Befehle' %}" data-t-merken="{% translate 'Als Favorit merken' %}" data-t-entfernen="{% translate 'Favorit entfernen' %}"
-        data-t-keine="{% translate 'Kein Befehl gefunden.' %}" data-suche="{% url 'suche' %}">
-  <div class="bs-kopf">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-lupe"/></svg>
-    <input type="search" id="bs-eingabe" placeholder="{% translate 'Was möchten Sie tun? z. B. Fehlzeit, Zeugnis, 9a …' %}" aria-label="{% translate 'Befehl suchen' %}" autocomplete="off" spellcheck="false">
-  </div>
-  <div class="bs-liste" id="bs-liste" role="listbox" aria-label="{% translate 'Befehle' %}"></div>
-  <p class="bs-fuss"><kbd>↑</kbd> <kbd>↓</kbd> {% translate "wählen" %} · <kbd>Enter</kbd> {% translate "öffnen" %} · <kbd>★</kbd> {% translate "merkt einen Befehl als Favorit" %} · <kbd>Esc</kbd> {% translate "schließen" %}</p>
-</dialog>
+{% include "portal/_befehlssuche.html" %}
 {% endif %}
 </header>
 

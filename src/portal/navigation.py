@@ -336,6 +336,10 @@ def menueband(request):
     )
 
     karten = [k for k in (start, termine_karte, schueler, unterricht, foerderung, schulleitung_karte, verwaltung_karte, personal_karte, system_karte) if k]
+    for k in karten:                      # Skizzenbuch (ab 0.8.0): feste Farbe, Adresse und wichtigste Befehle je Karte
+        k["farbe"] = FARBEN.get(k["schluessel"], 1)
+        k["url"] = _url("start") if k["schluessel"] == "start" else _url("bereich", k["schluessel"])
+        k["wichtig"] = _wichtige_befehle(k)
     aktiv = _aktive_karte(request.path, karten)
     _aktiven_befehl_markieren(request.get_full_path(), karten)
     from . import rollen as R
@@ -346,7 +350,44 @@ def menueband(request):
         rollen.insert(0, _("Vollzugriff"))
     from .hilfe import thema_fuer
 
-    return {"karten": karten, "aktiv": aktiv, "rollen": rollen, "hilfe": thema_fuer(request.path, aktiv)}
+    return {"karten": karten, "aktiv": aktiv, "rollen": rollen, "hilfe": thema_fuer(request.path, aktiv),
+            "weg": _weg(request.path, karten, aktiv)}
+
+
+def menueband_fuer(request):
+    """Menüband einmal je Anfrage berechnen (Kontextprozessor und Ansichten teilen sich das Ergebnis)."""
+    if not hasattr(request, "_menueband"):
+        request._menueband = menueband(request)
+    return request._menueband
+
+
+# Skizzenbuch: Bereichsfarbe 1…7 nach fester Reihenfolge der Karten (für alle Konten gleich)
+KARTEN_REIHENFOLGE = ["start", "termine", "schueler", "unterricht", "foerderung", "schulleitung", "verwaltung", "personal", "system"]
+FARBEN = {schluessel: i % 7 + 1 for i, schluessel in enumerate(KARTEN_REIHENFOLGE)}
+
+
+def _wichtige_befehle(karte, anzahl=4):
+    """Bis zu vier Befehle für die Kachel der Startseite: erst große, dann kleine, ohne doppelte Adressen."""
+    alle = [b for g in karte["gruppen"] for b in g.grosse] + [b for g in karte["gruppen"] for b in g.kleine]
+    gesehen, aus = set(), []
+    for b in alle:
+        if b["url"] not in gesehen:
+            gesehen.add(b["url"])
+            aus.append(b)
+    return aus[:anzahl]
+
+
+def _weg(pfad, karten, aktiv):
+    """Wegleiste des Skizzenbuchs: aktive Karte und Gruppe des aktiven Befehls; None auf der Startseite oder ohne Bezug."""
+    if pfad == "/":
+        return None
+    karte = next((k for k in karten if k["schluessel"] == aktiv), None)
+    gruppe = next((g for k in karten for g in k["gruppen"] if any(b["aktiv"] for b in g.befehle)), None)
+    if gruppe is None and (karte is None or aktiv == "start"):
+        return None
+    if gruppe is not None:
+        karte = next(k for k in karten if gruppe in k["gruppen"])
+    return {"karte": karte, "gruppe": gruppe}
 
 
 PFAD_REGELN = [("/hilfe/", "start"), ("/termine/", "termine"), ("/laufbahn/archiv/", "schulleitung"), ("/laufbahn/archiv/", "verwaltung"), ("/laufbahn/schueler/", "schueler"),
@@ -358,7 +399,11 @@ PFAD_REGELN = [("/hilfe/", "start"), ("/termine/", "termine"), ("/laufbahn/archi
 
 
 def _aktive_karte(pfad, karten):
-    """Karte des am besten passenden Befehls; sonst nach Pfadregeln; sonst Start."""
+    """Karte des am besten passenden Befehls; sonst nach Pfadregeln; sonst Start. Bereichsseiten gehören zu ihrer Karte."""
+    if pfad.startswith("/bereich/"):
+        schluessel = pfad[len("/bereich/"):].strip("/")
+        if any(k["schluessel"] == schluessel for k in karten):
+            return schluessel
     beste, laenge = None, 0
     for k in karten:
         for g in k["gruppen"]:
