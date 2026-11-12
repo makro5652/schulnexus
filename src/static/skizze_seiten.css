@@ -197,7 +197,7 @@ html[data-design="skizze"] body:not(.sk) #content-main form, html[data-design="s
   html[data-design="skizze"] .verwaltung-fuss, html[data-design="skizze"] .object-tools, html[data-design="skizze"] #changelist-filter,
   html[data-design="skizze"] .submit-row, html[data-design="skizze"] #toolbar, html[data-design="skizze"] #changelist .actions, html[data-design="skizze"] .paginator,
   html[data-design="skizze"] ul.messagelist { display: none !important; }
-  html[data-design="skizze"] *, html[data-design="skizze"] *::before, html[data-design="skizze"] *::after { box-shadow: none !important; text-shadow: none !important; }
+  html[data-design="skizze"] *, html[data-design="skizze"] *::before, html[data-design="skizze"] *::after { box-shadow: none !important; text-shadow: none !important; transition: none !important; }
   html[data-design="skizze"] .karte, html[data-design="skizze"] .module, html[data-design="skizze"] .results { background: #fff !important; border-radius: 0; }
   html[data-design="skizze"] body:not(.sk) .module caption, html[data-design="skizze"] body:not(.sk) .module h2, html[data-design="skizze"] body:not(.sk) #result_list thead th { background: #eee !important; border-bottom: 1px solid #000; }
   html[data-design="skizze"] .noten .links, html[data-design="skizze"] .nk-matrix th.links, html[data-design="skizze"] .nk-klasse th.links { position: static; }
@@ -407,3 +407,44 @@ html[data-design="skizze"] body:not(.sk) #changelist #changelist-search #searchb
 html[data-design="skizze"] body:not(.sk) #changelist-search label { display: inline-flex; align-items: center; }
 html[data-design="skizze"] body:not(.sk) #changelist .changelist-form-container { padding: 0 8px 8px 0; box-sizing: border-box; }
 html[data-design="skizze"] body:not(.sk) #changelist .results { box-sizing: border-box; max-width: 100%; }
+html[data-design="skizze"] body:not(.sk) #content .submit-row input.default, html[data-design="skizze"] body:not(.sk) #content input[type=submit].default, html[data-design="skizze"] body:not(.sk) #content .button.default { background: var(--sk-gelb); box-shadow: 3px 4px 0 var(--sk-tinte); }
+html[data-design="skizze"] body:not(.sk) #content .submit-row input.default:hover, html[data-design="skizze"] body:not(.sk) #content input[type=submit].default:hover { background: var(--sk-gelb-kraeftig); }
+html[data-design="skizze"] body:not(.sk) #content .submit-row a.deletelink { background: var(--sk-rosa); }
+
+/* Dichte Eingabefelder in Arbeitstabellen und Leisten: kompakter als die allgemeinen Felder (höhere Spezifität über das Elternelement) */
+html[data-design="skizze"] :is(.zo-rolle, .zo-filterzeile, .zo-stichtag, .zg-ger table, .zg-noten, .nk-matrix, .nk-klasse, .inline-form, .lb-plan, .lb-posten, .lb-fristen, .lb-aufschub, .zg-anmerken, .ek-vermerk, #lehrkraefte, .notizform-zeile) :is(input[type=text], input[type=number], input[type=date], input[type=time], input:not([type]), select, textarea) {
+  padding-block: .2rem; padding-left: .45rem; font-size: .88rem; border-radius: 8px; min-height: 0;
+}
+html[data-design="skizze"] .zo-rolle input[type=text] { width: 8.5rem; font-size: .85rem; border-width: 1.5px; border-style: dashed; border-color: #cdbf9d; background: transparent; }
+html[data-design="skizze"] .zo-rolle input[type=text]:hover, html[data-design="skizze"] .zo-rolle input[type=text]:focus { border-style: solid; border-color: var(--sk-tinte); background: #fff; }
+html[data-design="skizze"] :is(.nk-matrix, .nk-klasse, .zg-noten) input[type=text], html[data-design="skizze"] :is(.nk-matrix, .nk-klasse) input[type=number] { text-align: center; }
+html[data-design="skizze"] .sa-eingabe, html[data-design="skizze"] .sa-dialog-suche { font-size: .95rem; }
+
+/* Raster mit „1fr“ ohne Minimum: Felder mit Kontur und Polster würden am Telefon die Seite verbreitern */
+@media (max-width: 860px) {
+  html[data-design="skizze"] :is(.sy-raster, .sy-zeitraum, .lb-zwei, .formzeile) { grid-template-columns: minmax(0, 1fr); }
+  html[data-design="skizze"] :is(.sy-raster, .sy-zeitraum, .lb-zwei, .formzeile) > * { min-width: 0; }
+  html[data-design="skizze"] :is(.sy-feld, .zg-kommentarform, .lb-filter, .nv-filter) :is(input, select, textarea) { max-width: 100%; min-width: 0; box-sizing: border-box; }
+}
+html[data-design="skizze"] .sy-formular { grid-template-columns: minmax(0, 1fr); }
+html[data-design="skizze"] .sy-formular > * { min-width: 0; }
+@media (max-width: 767px) {
+  html[data-design="skizze"] .noten .links { max-width: 8.5rem; white-space: normal; }
+}
+
+@media print {
+  /* Tabellen im Druck: keine Pastellflächen, nur Linien; gefährdete Zeilen bleiben als helles Grau erkennbar */
+  html[data-design="skizze"] table, html[data-design="skizze"] table th, html[data-design="skizze"] table td, html[data-design="skizze"] table tr { background: #fff !important; color: #000; }
+  html[data-design="skizze"] table thead th { background: #eee !important; border-bottom: 1px solid #000 !important; font-family: inherit !important; }
+  html[data-design="skizze"] .noten tr.gefaehrdet td, html[data-design="skizze"] .noten tr.gefaehrdet th, html[data-design="skizze"] .nk-gefaehrdet { background: #ddd !important; }
+  html[data-design="skizze"] .noten .links, html[data-design="skizze"] :is(.nk-matrix, .nk-klasse) th.links { border-right: 1px solid #000; }
+  html[data-design="skizze"] .knopf { border-width: 1px; }
+}
+@media print { html[data-design="skizze"] body:not(.sk) #content h1, html[data-design="skizze"] body:not(.sk) #content h2 { font-family: inherit; text-transform: none; letter-spacing: 0; } }
+html[data-design="skizze"] body:not(.sk) #changelist-search > div { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+html[data-design="skizze"] body:not(.sk) #changelist #changelist-search #searchbar { flex: 1 1 8rem; min-width: 0; }
+html[data-design="skizze"] body:not(.sk) #changelist .actions { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .7rem; }
+
+/* Verwaltungsoberfläche: Die Feldregeln oben dürfen das Suchfeld im Kopf nicht ein zweites Mal umranden. */
+html[data-design="skizze"] body:not(.sk) .sk-kopf .sk-suche input[type=search],
+html[data-design="skizze"] body:not(.sk) .sk-kopf .sk-suche input[type=search]:focus { border: 0; border-radius: 0; background: transparent; box-shadow: none; outline: 0; padding: .3rem 0; margin: 0; }

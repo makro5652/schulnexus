@@ -841,6 +841,27 @@ SECRET_KEY=x DATABASE_URL=postgres://x:x@localhost/x python tools/spezifikation_
 
 Eine Datenbank ist dafür nicht nötig.
 
+## Oberfläche „Skizzenbuch“ ohne Menüband (ab 0.8.0)
+
+Neben dem Menüband gibt es eine zweite, vollständig eigene Oberfläche im Stil eines handgezeichneten Lernplakats:
+cremefarbenes Punktraster-Papier, Pastellkästen mit dicker Kontur und hartem Schatten, Handschrift für Überschriften.
+Sie wird wie ein Design gewählt (**Design › Skizzenbuch**) und pro Konto gespeichert; über dasselbe Menü geht es
+jederzeit zurück zum Menüband.
+
+- **Bereichsleiste statt Menüband:** Oben steht je Bereich (Termine, Schüler:innen, Unterricht, …) ein Eintrag.
+  Ein Klick öffnet die **Bereichsseite** (`/bereich/<schluessel>/`) mit allen Befehlen des Bereichs als Karten.
+- **Wegleiste:** Auf Unterseiten zeigt ein hellblaues Band die Befehle derselben Gruppe; der aktive ist gelb.
+- **Startseite:** „Was möchten Sie tun?“ mit einer Kachel je Bereich (die bis zu vier wichtigsten Befehle),
+  darunter Schnellzugriff, Kennzahlen als Kreise und die gewohnten Karten.
+- Befehlssuche (Strg+K), Favoriten, Hilfe, Sprache und Rechte arbeiten unverändert; jedes Konto sieht nur seine Befehle.
+- Tabellen, Eingabefelder, Noten und alle Ziffern bleiben in nüchterner Systemschrift; Druckansichten sind unverändert.
+- Die Schriften (Permanent Marker, Caveat, Patrick Hand) liegen in `src/static/schrift/` – es werden keine fremden
+  Server angefragt. Lizenzen: Apache 2.0 bzw. SIL OFL 1.1, die Texte liegen bei.
+
+Anordnung, Farben und Schriftregeln stehen in [docs/skizzenbuch-design.md](docs/skizzenbuch-design.md).
+Die Gestaltung liegt in `src/static/skizze.css`, `skizze_start.css` und `skizze_seiten.css`; alle Regeln gelten nur
+unter `data-design="skizze"`, die übrigen elf Designs bleiben unberührt.
+
 ## Fehlzeiten nach Klasse (ab 0.7.1)
 
 **Schüler:innen › Fehlzeiten** ist jetzt eine eigene Arbeitsseite statt der allgemeinen Liste:
