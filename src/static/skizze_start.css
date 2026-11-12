@@ -1,1 +1,234 @@
-/* Oberfläche „Skizzenbuch“ (ab 0.8.0) – Startseite (Bereichskacheln, Kalenderblatt, Kennzahlen) und Bereichsseite. Vorgabe: docs/skizzenbuch-design.md */
+/* Skizzenbuch – Startseite und Bereichsseite (ab 0.8.0). Wird nach skizze.css geladen.
+   Vorgabe: docs/skizzenbuch-design.md. Alle Regeln unter html[data-design="skizze"]. */
+
+/* ---------- Gemeinsame Hilfen ---------- */
+html[data-design="skizze"] {
+  --sk-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --sk-hart: 4px 5px 0 var(--sk-tinte);
+}
+
+/* ---------- 1. Startkopf: Abreißkalender, Gruß, Sternchen ---------- */
+html[data-design="skizze"] .startkopf { position: relative; gap: 1.4rem; margin-bottom: 1.8rem; padding-right: 9rem; }
+html[data-design="skizze"] .kalenderblatt { width: 5rem; border: 2px solid var(--sk-tinte); border-radius: 12px; background: #fff;
+  box-shadow: var(--sk-hart); transform: rotate(-1deg); }
+html[data-design="skizze"] .kb-tag { background: var(--sk-rosa); color: var(--sk-tinte); border-bottom: 2px solid var(--sk-tinte);
+  font-family: var(--sk-hand); font-size: 1.05rem; font-weight: 400; padding: 0.15rem 0; text-transform: uppercase; letter-spacing: 0.04em; }
+html[data-design="skizze"] .kb-zahl { font-family: var(--sk-marker); font-size: 2.1rem; line-height: 1.1; padding-top: 0.3rem; color: var(--sk-tinte); }
+html[data-design="skizze"] .kb-monat { font-family: var(--sk-hand); font-size: 1.05rem; color: var(--sk-tinte); padding-bottom: 0.4rem; }
+
+html[data-design="skizze"] .startgruss h1 { font-family: var(--sk-marker); font-weight: 400; text-transform: uppercase; letter-spacing: 0.01em;
+  font-size: clamp(1.5rem, 3.6vw, 2.6rem); line-height: 1.15; color: var(--sk-tinte); overflow-wrap: anywhere;
+  width: fit-content; max-width: 100%; padding-bottom: 0.6rem; background: repeat-x left bottom / 48px 12px
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='12' viewBox='0 0 48 12'%3E%3Cpath d='M0 6 Q6 0 12 6 T24 6 T36 6 T48 6' fill='none' stroke='%23F2B100' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E"); }
+html[data-design="skizze"] .startgruss .unterzeile { font-family: var(--sk-schrift); font-weight: 700; font-size: clamp(1.25rem, 2.4vw, 1.6rem);
+  color: var(--sk-blau-tinte); margin: 0.2rem 0 0; }
+
+/* Sternchen: reine Dekoration aus drei Pseudo-Elementen (vierzackige Sterne mit Kontur) */
+html[data-design="skizze"] .startkopf::before, html[data-design="skizze"] .startkopf::after, html[data-design="skizze"] .startgruss::after {
+  content: ""; position: absolute; pointer-events: none; background: no-repeat center / contain; }
+html[data-design="skizze"] .startkopf::before { right: 4.2rem; top: 0; width: 2.6rem; height: 2.6rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath d='M20 2 Q22 18 38 20 Q22 22 20 38 Q18 22 2 20 Q18 18 20 2Z' fill='%23F2B100' stroke='%232B2B33' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+html[data-design="skizze"] .startkopf::after { right: 0.4rem; top: 0.9rem; width: 2.1rem; height: 2.1rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath d='M20 2 Q22 18 38 20 Q22 22 20 38 Q18 22 2 20 Q18 18 20 2Z' fill='%231F6FC4' stroke='%232B2B33' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+html[data-design="skizze"] .startgruss::after { right: 3rem; top: 2.9rem; width: 1.4rem; height: 1.4rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath d='M20 2 Q22 18 38 20 Q22 22 20 38 Q18 22 2 20 Q18 18 20 2Z' fill='%23E0527A' stroke='%232B2B33' stroke-width='2.5' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+
+/* ---------- 2. Bereichskacheln ---------- */
+html[data-design="skizze"] .sk-kacheln { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(230px, 100%), 1fr));
+  gap: 1.3rem 1.4rem; margin: 0 0 2rem; }
+html[data-design="skizze"] .sk-frage { grid-column: 1 / -1; margin: 0; font-family: var(--sk-schrift); font-weight: 700;
+  font-size: clamp(1.7rem, 3vw, 2.3rem); line-height: 1.15; color: var(--sk-tinte); }
+html[data-design="skizze"] .sk-kachel { position: relative; display: flex; flex-direction: column; min-width: 0; padding: 1rem 1.1rem 0.7rem;
+  background: var(--sk-f); color: var(--sk-tinte); border: 2px solid var(--sk-tinte); border-radius: 18px; box-shadow: var(--sk-hart); }
+html[data-design="skizze"] .sk-kachel h3 { margin: 0 0 0.7rem; font-family: var(--sk-marker); font-weight: 400; text-transform: uppercase;
+  font-size: 1.35rem; line-height: 1.2; letter-spacing: 0.01em; hyphens: auto; overflow-wrap: anywhere; }
+html[data-design="skizze"] .sk-kachel h3 a { color: var(--sk-tinte); text-decoration: none; }
+/* Die ganze Kachel ist anklickbar: Überschriftenlink spannt sich über sie, Befehle liegen darüber */
+html[data-design="skizze"] .sk-kachel h3 a::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+html[data-design="skizze"] .sk-kachel:has(h3 a:focus-visible) { outline: 3px solid var(--sk-blau-tinte); outline-offset: 3px; }
+html[data-design="skizze"] .sk-kachel h3 a:focus-visible { outline: none; }
+html[data-design="skizze"] .sk-kachel ul { position: relative; z-index: 1; list-style: none; margin: 0 0 0.5rem; padding: 0; display: grid; gap: 0.2rem; }
+html[data-design="skizze"] .sk-kachel li a { display: flex; align-items: center; gap: 0.55rem; min-height: 2.6rem; padding: 0.3rem 0.6rem;
+  border: 2px solid transparent; border-radius: 12px; color: var(--sk-tinte); text-decoration: none;
+  font-family: var(--sk-hand); font-size: 1.1rem; line-height: 1.2; }
+html[data-design="skizze"] .sk-kachel li a svg { width: 1.3rem; height: 1.3rem; flex: none; }
+html[data-design="skizze"] .sk-kachel li a span { min-width: 0; overflow-wrap: anywhere; }
+html[data-design="skizze"] .sk-kachel li a:hover { background: #fff; border-color: var(--sk-tinte); box-shadow: 2px 2px 0 var(--sk-tinte); }
+html[data-design="skizze"] .sk-kachel li a:focus-visible, html[data-design="skizze"] .sk-kachel-alle:focus-visible {
+  outline: 3px solid var(--sk-blau-tinte); outline-offset: 1px; background: #fff; }
+html[data-design="skizze"] .sk-kachel-alle { position: relative; z-index: 1; margin-top: auto; align-self: flex-end; padding: 0.2rem 0.4rem;
+  font-family: var(--sk-schrift); font-weight: 700; font-size: 1.3rem; line-height: 1.2; color: var(--sk-tinte); text-decoration: none; border-radius: 8px; }
+html[data-design="skizze"] .sk-kachel-alle::after { content: " ›"; }
+html[data-design="skizze"] .sk-kachel-alle:hover { text-decoration: underline; text-decoration-thickness: 2px; }
+
+/* ---------- 3. Schnellzugriff: weiße Notizkarten ---------- */
+html[data-design="skizze"] .schnellzugriff { grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 1.4rem; margin-bottom: 2rem; }
+html[data-design="skizze"] .sz-gruppe { --sz-f: var(--sk-gelb); --sz-k: var(--sk-gelb-kraeftig); min-width: 0; padding: 0.9rem 1.1rem 1.1rem; background: #fff;
+  border: 2px solid var(--sk-tinte); border-radius: 14px; box-shadow: 5px 6px 0 var(--sz-k); }
+html[data-design="skizze"] .sz-gruppe + .sz-gruppe { --sz-f: var(--sk-rosa); --sz-k: var(--sk-rosa-kraeftig); }
+html[data-design="skizze"] .sz-unterricht { grid-column: auto; }
+html[data-design="skizze"] .sz-gruppe h2 { margin: 0 0 0.6rem; font-family: var(--sk-hand); font-weight: 400; font-size: 1.35rem; color: var(--sk-tinte);
+  width: fit-content; padding: 0 0.3rem; margin-left: -0.3rem;
+  background: linear-gradient(transparent 58%, var(--sz-f) 58% 92%, transparent 92%); }
+html[data-design="skizze"] .sz-gruppe ul { gap: 0.55rem; }
+html[data-design="skizze"] .sz-gruppe li a { min-width: 7.5rem; padding: 0.4rem 0.8rem; background: var(--sz-f); color: var(--sk-tinte);
+  border: 2px solid var(--sk-tinte); border-radius: 12px; box-shadow: 2px 3px 0 var(--sk-tinte); }
+html[data-design="skizze"] .sz-gruppe li a strong { font-family: var(--sk-hand); font-weight: 400; font-size: 1.15rem; line-height: 1.2; }
+html[data-design="skizze"] .sz-gruppe li a span { color: var(--sk-tinte); font-size: 0.85rem; }
+html[data-design="skizze"] .sz-gruppe li a:hover { background: #fff; transform: translate(1px, 1px); box-shadow: 1px 2px 0 var(--sk-tinte); }
+html[data-design="skizze"] .sz-gruppe li a:focus-visible { outline: 3px solid var(--sk-blau-tinte); outline-offset: 2px; }
+/* Kurswahl (Startseite und Bereichsseite) */
+html[data-design="skizze"] .kw-start { background: transparent; border: 0; padding: 0; gap: 0.7rem; }
+html[data-design="skizze"] .kw-start .kw-label { font-family: var(--sk-hand); font-size: 1.05rem; color: var(--sk-tinte); }
+html[data-design="skizze"] .kw-start select { width: 100%; max-width: 100%; min-height: 2.6rem; }
+html[data-design="skizze"] .kw-start .kw-knoepfe { gap: 0.6rem; }
+html[data-design="skizze"] .sk-gruppe .kw-start { max-width: 32rem; padding: 0.9rem 1.1rem; background: #fff; border: 2px solid var(--sk-tinte);
+  border-radius: 14px; box-shadow: 5px 6px 0 var(--sk-f-kraeftig, var(--sk-blau-kraeftig)); margin-bottom: 1.2rem; }
+
+/* ---------- 4. Kennzahlen als runde „Basen“ ---------- */
+html[data-design="skizze"] .kennzahlen { grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr)); gap: 1.1rem 0.8rem; margin: 0 0 2rem; }
+html[data-design="skizze"] .kennzahlen > div { --kz: var(--sk-gruen); display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+  padding: 0; background: none; border: 0; border-radius: 0; text-align: center; min-width: 0; }
+html[data-design="skizze"] .kennzahlen > div:nth-child(6n+2) { --kz: var(--sk-rosa); }
+html[data-design="skizze"] .kennzahlen > div:nth-child(6n+3) { --kz: var(--sk-gelb); }
+html[data-design="skizze"] .kennzahlen > div:nth-child(6n+4) { --kz: var(--sk-blau); }
+html[data-design="skizze"] .kennzahlen > div:nth-child(6n+5) { --kz: var(--sk-lila); }
+html[data-design="skizze"] .kennzahlen > div:nth-child(6n+6) { --kz: var(--sk-orange); }
+html[data-design="skizze"] .kennzahlen strong { display: grid; place-items: center; box-sizing: border-box; min-width: 4.4rem; height: 4.4rem; padding: 0 0.6rem;
+  background: var(--kz); color: var(--sk-tinte); border: 2px solid var(--sk-tinte); border-radius: 999px; box-shadow: 3px 3px 0 var(--sk-tinte);
+  font-family: var(--sk-marker); font-weight: 400; font-size: 1.6rem; line-height: 1; font-variant-numeric: lining-nums; }
+html[data-design="skizze"] .kennzahlen a { text-decoration: none; color: inherit; }
+html[data-design="skizze"] .kennzahlen span { color: var(--sk-tinte); font-size: 0.95rem; line-height: 1.25; overflow-wrap: anywhere; }
+html[data-design="skizze"] .kennzahlen .hinweis strong { background: var(--sk-rosa); border: 3px solid var(--sk-rot); box-shadow: 3px 3px 0 var(--sk-rot); color: var(--sk-tinte); }
+html[data-design="skizze"] .kennzahlen .hinweis span { color: var(--sk-rot); font-weight: 700; }
+/* Kleine Kennzahlen innerhalb von Karten (z. B. Neuanmeldungen) */
+html[data-design="skizze"] .kennzahlen.klein { grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr)); margin: 0.4rem 0 0.8rem; }
+html[data-design="skizze"] .kennzahlen.klein strong { min-width: 3.4rem; height: 3.4rem; font-size: 1.3rem; box-shadow: 2px 2px 0 var(--sk-tinte); }
+html[data-design="skizze"] .kennzahlen.klein span { font-size: 0.88rem; }
+
+/* ---------- 5. Karten der Hauptspalte ---------- */
+html[data-design="skizze"] .startraster { gap: 1.8rem; }
+html[data-design="skizze"] .hauptspalte, html[data-design="skizze"] .seitenspalte { gap: 1.8rem; }
+html[data-design="skizze"] .hauptspalte > .karte { --kf: var(--sk-gelb); --kf-k: var(--sk-gelb-kraeftig); padding: 1.1rem 1.3rem 1.2rem; background: #fff; color: var(--sk-tinte);
+  border: 2px solid var(--sk-tinte); border-radius: 14px; box-shadow: 5px 6px 0 var(--kf-k); }
+html[data-design="skizze"] .hauptspalte > .karte:nth-child(7n+2) { --kf: var(--sk-rosa);    --kf-k: var(--sk-rosa-kraeftig); }
+html[data-design="skizze"] .hauptspalte > .karte:nth-child(7n+3) { --kf: var(--sk-gruen);   --kf-k: var(--sk-gruen-kraeftig); }
+html[data-design="skizze"] .hauptspalte > .karte:nth-child(7n+4) { --kf: var(--sk-lila);    --kf-k: var(--sk-lila-kraeftig); }
+html[data-design="skizze"] .hauptspalte > .karte:nth-child(7n+5) { --kf: var(--sk-blau);    --kf-k: var(--sk-blau-kraeftig); }
+html[data-design="skizze"] .hauptspalte > .karte:nth-child(7n+6) { --kf: var(--sk-orange);  --kf-k: var(--sk-orange-kraeftig); }
+html[data-design="skizze"] .hauptspalte > .karte:nth-child(7n+7) { --kf: var(--sk-tuerkis); --kf-k: var(--sk-tuerkis-kraeftig); }
+/* Kartenüberschrift mit Textmarker-Strich */
+html[data-design="skizze"] .hauptspalte > .karte h2 { width: fit-content; max-width: 100%; margin: 0 0 0.2rem -0.3rem; padding: 0 0.3rem;
+  font-family: var(--sk-hand); font-weight: 400; font-size: 1.45rem; line-height: 1.3; color: var(--sk-tinte);
+  background: linear-gradient(transparent 58%, var(--kf) 58% 92%, transparent 92%); }
+html[data-design="skizze"] .hauptspalte > .karte .karte-kopf { margin-bottom: 0.5rem; }
+html[data-design="skizze"] .hauptspalte > .karte h2 .leise { font-family: var(--sk-system); font-size: 0.9rem; color: var(--sk-tinte); }
+html[data-design="skizze"] .hauptspalte > .karte h3 { font-family: var(--sk-hand); font-weight: 400; font-size: 1.2rem; color: var(--sk-tinte); }
+html[data-design="skizze"] .hauptspalte > .karte .rollbar { max-width: 100%; }
+
+/* ---------- 6. Seitenspalte: Merke-Karte, Geburtstage, Haftnotizen ---------- */
+html[data-design="skizze"] .seitenspalte > .karte { background: #fff; color: var(--sk-tinte); border: 2px solid var(--sk-tinte); border-radius: 14px; padding: 1.1rem 1.3rem 1.2rem; }
+html[data-design="skizze"] .geburtstage { box-shadow: 5px 6px 0 var(--sk-orange-kraeftig); }
+html[data-design="skizze"] .geburtstage h2 { font-family: var(--sk-hand); font-weight: 400; font-size: 1.45rem; color: var(--sk-tinte); }
+html[data-design="skizze"] .geburtstage h2 .symbol { color: var(--sk-rosa-kraeftig); }
+html[data-design="skizze"] .geburtstage .karte-kopf .leise { color: var(--sk-leise); font-size: 0.9rem; }
+html[data-design="skizze"] .gb-tag { border-top: 2px dashed #cdbf9d; }
+html[data-design="skizze"] .gb-tag h3 { font-family: var(--sk-hand); font-weight: 400; font-size: 1.1rem; color: var(--sk-leise); }
+html[data-design="skizze"] .gb-tag.heute { background: var(--sk-gelb); border: 2px solid var(--sk-tinte); box-shadow: 3px 3px 0 var(--sk-tinte); margin: 0.5rem 0 0.7rem; }
+html[data-design="skizze"] .gb-tag.heute h3, html[data-design="skizze"] .gb-tag.heute small, html[data-design="skizze"] .gb-tag.heute .leise { color: var(--sk-tinte); }
+html[data-design="skizze"] .gb-gruss { font-family: var(--sk-schrift); font-weight: 700; font-size: 1.3rem; color: var(--sk-blau-tinte); }
+
+/* Mitteilungen als „Merke“-Karte mit Klebestreifen */
+html[data-design="skizze"] .mitteilungen { position: relative; margin-top: 0.8rem; transform: rotate(-0.4deg); box-shadow: 5px 6px 0 var(--sk-gruen-kraeftig); }
+html[data-design="skizze"] .mitteilungen::before { content: ""; position: absolute; top: -0.9rem; left: 50%; width: 6.5rem; height: 1.7rem; margin-left: -3.25rem;
+  background: var(--sk-orange); border: 2px solid rgba(43, 43, 51, .35); border-radius: 2px; opacity: .92; pointer-events: none; }
+html[data-design="skizze"] .mitteilungen h2 { font-family: var(--sk-marker); font-weight: 400; text-transform: uppercase; font-size: 1.35rem; color: var(--sk-rot); margin: 0.2rem 0 0.7rem; }
+html[data-design="skizze"] .mitteilungen h2 .symbol { color: var(--sk-rot); }
+html[data-design="skizze"] .mitteilungen .notiz { color: var(--sk-tinte); font-size: 1rem; max-width: none; border-radius: 10px; margin-top: 0; }
+html[data-design="skizze"] .mitteilungen .notiz + .notiz { margin-top: 0.7rem; }
+
+/* Notizen (privat) als Haftnotizen; Textfarbe immer Tinte */
+html[data-design="skizze"] .notizliste { gap: 1.1rem; padding: 0.3rem 0.3rem 0.5rem 0; }
+html[data-design="skizze"] .notiz { color: var(--sk-tinte); font-size: 1rem; max-width: none; margin-top: 0; }
+html[data-design="skizze"] .notizliste .notiz { border-radius: 3px 3px 3px 16px; padding: 0.8rem 0.9rem 0.6rem; background: var(--sk-gelb);
+  box-shadow: 3px 4px 0 rgba(43, 43, 51, .28); transform: rotate(-0.4deg); }
+html[data-design="skizze"] .notizliste .notiz:nth-child(even) { transform: rotate(0.4deg); }
+html[data-design="skizze"] .notiz.farbe-gelb { background: var(--sk-gelb); } html[data-design="skizze"] .notiz.farbe-gruen { background: var(--sk-gruen); }
+html[data-design="skizze"] .notiz.farbe-blau { background: var(--sk-blau); }  html[data-design="skizze"] .notiz.farbe-rosa { background: var(--sk-rosa); }
+html[data-design="skizze"] .notiz.farbe-grau { background: #ece6d4; }
+html[data-design="skizze"] .notizliste .notiz.angeheftet { box-shadow: inset 5px 0 0 var(--sk-blau-kraeftig), 3px 4px 0 rgba(43, 43, 51, .28); }
+html[data-design="skizze"] .notizliste .notiz.faellig { box-shadow: inset 5px 0 0 var(--sk-rot), 3px 4px 0 rgba(43, 43, 51, .28); }
+html[data-design="skizze"] .notiz .nadel { color: var(--sk-tinte); }
+html[data-design="skizze"] .notiz-meta { color: var(--sk-tinte); font-size: 0.85rem; }
+html[data-design="skizze"] .notiz-meta .auffaellig { color: #9d1b2e; }
+html[data-design="skizze"] .notiz-aktionen { font-size: 0.9rem; gap: 0.2rem 1rem; }
+html[data-design="skizze"] .notiz-aktionen .link, html[data-design="skizze"] .notiz-aktionen summary { color: var(--sk-tinte); font-size: 0.9rem; text-decoration: underline; }
+html[data-design="skizze"] .notiz-aktionen .link.gefahr { color: #9d1b2e; }
+html[data-design="skizze"] .notiz-aktionen .link:hover { color: var(--sk-blau-tinte); }
+html[data-design="skizze"] .notizen .karte-kopf .leise { font-size: 0.9rem; }
+
+/* ---------- 7. Bereichsseite ---------- */
+html[data-design="skizze"] .sk-bereichskopf { margin: 0 0 2rem; padding: 0.9rem 1.5rem; background: var(--sk-f); color: var(--sk-tinte);
+  border: 2px solid var(--sk-tinte); border-radius: 18px; box-shadow: var(--sk-hart); }
+html[data-design="skizze"] .sk-bereichskopf h1 { margin: 0; font-family: var(--sk-marker); font-weight: 400; text-transform: uppercase;
+  font-size: clamp(1.6rem, 4vw, 2.6rem); line-height: 1.2; color: var(--sk-tinte); overflow-wrap: anywhere; hyphens: auto; }
+html[data-design="skizze"] .sk-gruppe { margin: 0 0 2.2rem; }
+/* Die Farbklasse sitzt am Kopf: Gruppen und Befehlskarten erben sie über das Geschwister-Selektor */
+html[data-design="skizze"] .sk-farbe-1.sk-bereichskopf ~ .sk-gruppe { --sk-f: var(--sk-gelb); --sk-f-kraeftig: var(--sk-gelb-kraeftig); }
+html[data-design="skizze"] .sk-farbe-2.sk-bereichskopf ~ .sk-gruppe { --sk-f: var(--sk-rosa); --sk-f-kraeftig: var(--sk-rosa-kraeftig); }
+html[data-design="skizze"] .sk-farbe-3.sk-bereichskopf ~ .sk-gruppe { --sk-f: var(--sk-gruen); --sk-f-kraeftig: var(--sk-gruen-kraeftig); }
+html[data-design="skizze"] .sk-farbe-4.sk-bereichskopf ~ .sk-gruppe { --sk-f: var(--sk-lila); --sk-f-kraeftig: var(--sk-lila-kraeftig); }
+html[data-design="skizze"] .sk-farbe-5.sk-bereichskopf ~ .sk-gruppe { --sk-f: var(--sk-blau); --sk-f-kraeftig: var(--sk-blau-kraeftig); }
+html[data-design="skizze"] .sk-farbe-6.sk-bereichskopf ~ .sk-gruppe { --sk-f: var(--sk-orange); --sk-f-kraeftig: var(--sk-orange-kraeftig); }
+html[data-design="skizze"] .sk-farbe-7.sk-bereichskopf ~ .sk-gruppe { --sk-f: var(--sk-tuerkis); --sk-f-kraeftig: var(--sk-tuerkis-kraeftig); }
+
+/* Klammerlinie: Linie mit Endstrichen in der Bereichsfarbe (ohne Farbklasse: blau) */
+html[data-design="skizze"] .sk-gruppe > h2 { --kl: var(--sk-f-kraeftig, var(--sk-blau-kraeftig)); margin: 0 0 1.1rem; padding: 0 0.2rem 0.55rem;
+  font-family: var(--sk-schrift); font-weight: 700; font-size: clamp(1.6rem, 3vw, 2rem); line-height: 1.15; color: var(--sk-tinte);
+  background: linear-gradient(var(--kl), var(--kl)) left bottom / 100% 4px no-repeat, linear-gradient(var(--kl), var(--kl)) left bottom / 4px 16px no-repeat,
+    linear-gradient(var(--kl), var(--kl)) right bottom / 4px 16px no-repeat; }
+html[data-design="skizze"] .sk-befehlskarten { list-style: none; margin: 0; padding: 0; display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr)); gap: 1.2rem; }
+html[data-design="skizze"] .sk-befehlskarten > li { display: flex; min-width: 0; }
+html[data-design="skizze"] .sk-befehlskarte { flex: 1; display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 0.85rem; align-items: center;
+  padding: 0.8rem 1rem; background: #fff; color: var(--sk-tinte); text-decoration: none; border: 2px solid var(--sk-tinte); border-radius: 14px;
+  box-shadow: 4px 5px 0 var(--sk-f-kraeftig, var(--sk-blau-kraeftig)); }
+html[data-design="skizze"] .sk-befehlskarte svg { grid-row: span 2; box-sizing: border-box; width: 2.8rem; height: 2.8rem; padding: 0.55rem;
+  background: var(--sk-f, var(--sk-blau)); border: 2px solid var(--sk-tinte); border-radius: 50%; color: var(--sk-tinte); }
+html[data-design="skizze"] .sk-befehlskarte strong { font-family: var(--sk-hand); font-weight: 400; font-size: 1.2rem; line-height: 1.2; overflow-wrap: anywhere; }
+html[data-design="skizze"] .sk-befehlskarte span { grid-column: 2; font-family: var(--sk-system); font-size: 0.88rem; line-height: 1.35; color: var(--sk-leise); }
+html[data-design="skizze"] .sk-befehlskarte:hover { transform: translate(2px, 3px); box-shadow: 2px 2px 0 var(--sk-f-kraeftig, var(--sk-blau-kraeftig)); }
+html[data-design="skizze"] .sk-befehlskarte:focus-visible { outline: 3px solid var(--sk-blau-tinte); outline-offset: 3px; }
+html[data-design="skizze"] .sk-befehlskarte.gross { padding: 1.1rem 1.2rem; background: var(--sk-f, var(--sk-gelb)); box-shadow: 5px 6px 0 var(--sk-tinte); }
+html[data-design="skizze"] .sk-befehlskarte.gross svg { width: 3.4rem; height: 3.4rem; padding: 0.7rem; background: #fff; }
+html[data-design="skizze"] .sk-befehlskarte.gross strong { font-size: 1.4rem; }
+html[data-design="skizze"] .sk-befehlskarte.gross span { font-size: 0.95rem; color: var(--sk-tinte); }
+html[data-design="skizze"] .sk-befehlskarte.gross:hover { box-shadow: 2px 3px 0 var(--sk-tinte); }
+
+/* ---------- 8. Bewegung nur als kurze Rückmeldung, Telefon, Druck ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  html[data-design="skizze"] .sk-kachel { transition: transform .12s ease-out, box-shadow .12s ease-out; }
+  html[data-design="skizze"] .sk-kachel:hover { transform: translate(3px, 3px); box-shadow: 1px 2px 0 var(--sk-tinte); }
+  html[data-design="skizze"] .sk-befehlskarte, html[data-design="skizze"] .sz-gruppe li a { transition: transform .12s ease-out, box-shadow .12s ease-out; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-design="skizze"] .sk-kachel:hover { box-shadow: 1px 2px 0 var(--sk-tinte); }
+  html[data-design="skizze"] .sk-befehlskarte:hover, html[data-design="skizze"] .sz-gruppe li a:hover, html[data-design="skizze"] .kalenderblatt { transform: none; }
+}
+@media (max-width: 760px) {
+  html[data-design="skizze"] .startkopf { padding-right: 0; gap: 1rem; }
+  html[data-design="skizze"] .startkopf::before, html[data-design="skizze"] .startkopf::after, html[data-design="skizze"] .startgruss::after { display: none; }
+  html[data-design="skizze"] .kalenderblatt { width: 4.2rem; }
+  html[data-design="skizze"] .kb-zahl { font-size: 1.7rem; }
+  html[data-design="skizze"] .hauptspalte > .karte, html[data-design="skizze"] .seitenspalte > .karte { padding: 1rem; }
+  html[data-design="skizze"] .mitteilungen { transform: none; }
+  html[data-design="skizze"] .notizliste { grid-template-columns: minmax(0, 1fr); }
+  html[data-design="skizze"] .sk-bereichskopf { padding: 0.8rem 1rem; }
+}
+@media print {
+  html[data-design="skizze"] .startkopf::before, html[data-design="skizze"] .startkopf::after, html[data-design="skizze"] .startgruss::after,
+  html[data-design="skizze"] .mitteilungen::before { display: none; }
+  html[data-design="skizze"] .sk-kachel, html[data-design="skizze"] .sz-gruppe, html[data-design="skizze"] .hauptspalte > .karte, html[data-design="skizze"] .seitenspalte > .karte,
+  html[data-design="skizze"] .sk-befehlskarte, html[data-design="skizze"] .sk-bereichskopf, html[data-design="skizze"] .kalenderblatt, html[data-design="skizze"] .kennzahlen strong,
+  html[data-design="skizze"] .notizliste .notiz { box-shadow: none; transform: none; }
+}
