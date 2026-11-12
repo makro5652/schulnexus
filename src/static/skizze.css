@@ -1,0 +1,68 @@
+/* Oberfläche „Skizzenbuch“ (ab 0.8.0) – Grundlagen: Schriften, Farbvariablen, Bereichsfarben.
+   Vorgabe: docs/skizzenbuch-design.md. Alle Regeln gelten nur unter data-design="skizze"; die übrigen Designs und das Menüband
+   bleiben unberührt. Kopf, Bauteile: weiter unten bzw. skizze_start.css (Start, Bereichsseite) und skizze_seiten.css (Fachseiten).
+   Schriften liegen lokal in schrift/ (Lizenztexte dort: OFL 1.1 bzw. Apache 2.0), es werden keine fremden Server angefragt. */
+@font-face { font-family: "Caveat"; font-style: normal; font-weight: 600; font-display: swap;
+  src: url("schrift/caveat-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Caveat"; font-style: normal; font-weight: 600; font-display: swap;
+  src: url("schrift/caveat-latin-ext-600-normal.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: "Caveat"; font-style: normal; font-weight: 700; font-display: swap;
+  src: url("schrift/caveat-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Caveat"; font-style: normal; font-weight: 700; font-display: swap;
+  src: url("schrift/caveat-latin-ext-700-normal.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: "Patrick Hand"; font-style: normal; font-weight: 400; font-display: swap;
+  src: url("schrift/patrick-hand-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Patrick Hand"; font-style: normal; font-weight: 400; font-display: swap;
+  src: url("schrift/patrick-hand-latin-ext-400-normal.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: "Permanent Marker"; font-style: normal; font-weight: 400; font-display: swap;
+  src: url("schrift/permanent-marker-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+:root[data-design="skizze"] {
+  color-scheme: light;
+  /* Farben laut Vorgabe */
+  --sk-papier: #FFF8E7; --sk-raster: #E8DCC0; --sk-tinte: #2B2B33; --sk-leise: #666A78; --sk-blau-tinte: #1A5FA8; --sk-rot: #C2273D;
+  --sk-gelb: #FFE08A;   --sk-gelb-kraeftig: #F2B100;
+  --sk-rosa: #FFB8CB;   --sk-rosa-kraeftig: #E0527A;
+  --sk-gruen: #BDEFC6;  --sk-gruen-kraeftig: #2E9E63;
+  --sk-lila: #DCC8FF;   --sk-lila-kraeftig: #7B4FD6;
+  --sk-blau: #AEDBFF;   --sk-blau-kraeftig: #1F6FC4;
+  --sk-orange: #FFCF96; --sk-orange-kraeftig: #E0801A;
+  --sk-tuerkis: #ACEBE0; --sk-tuerkis-kraeftig: #159A8A;
+  /* Schriften mit Ersatz, falls die Dateien nicht laden */
+  --sk-marker: "Permanent Marker", "Marker Felt", "Comic Sans MS", cursive;
+  --sk-schrift: "Caveat", "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive;
+  --sk-hand: "Patrick Hand", "Segoe Print", "Comic Sans MS", cursive;
+  /* Bestehende Variablen (portal.css) passend belegt, damit alle Fachseiten ohne Einzelanpassung stimmig sind */
+  --grund: var(--sk-papier); --flaeche: #ffffff; --text: var(--sk-tinte); --leise: var(--sk-leise); --linie: #cdbf9d;
+  --akzent: var(--sk-blau-tinte); --akzent-hell: #dff0ff; --warnung: var(--sk-rot); --gefahr-flaeche: #ffe1e8;
+  --info-flaeche: #dff0ff; --info-text: #123f73; --hinweis-flaeche: #fff0c2; --hinweis-text: #6b4a00; --notiz-text: #4a3608;
+  --lila-flaeche: #ece0ff; --lila-text: #4a2a99; --ok: #1f7a4a;
+  --radius: 14px;
+  --papier-gelb: var(--sk-gelb); --papier-gruen: var(--sk-gruen); --papier-blau: var(--sk-blau); --papier-rosa: var(--sk-rosa); --papier-grau: #ece6d4;
+  /* Menüband-Variablen: die Befehlssuche (.bs) und die Hilfe (.hp) lesen sie */
+  --mb-titel: var(--sk-blau); --mb-titel-text: var(--sk-tinte); --mb-flaeche: #ffffff; --mb-text: var(--sk-tinte); --mb-leise: var(--sk-leise);
+  --mb-linie: var(--sk-tinte); --mb-akzent: var(--sk-blau-tinte); --mb-akzent-hell: var(--sk-gelb); --mb-hover: #fff3cc;
+  --mb-schatten: rgba(43, 43, 51, .2);
+  /* Verwaltungsoberfläche (Django-Admin) */
+  --primary: var(--sk-blau); --secondary: var(--sk-blau); --accent: var(--sk-gelb); --primary-fg: var(--sk-tinte);
+  --body-fg: var(--sk-tinte); --body-bg: var(--sk-papier); --body-quiet-color: var(--sk-leise); --body-medium-color: var(--sk-tinte); --body-loud-color: var(--sk-tinte);
+  --header-color: var(--sk-tinte); --header-branding-color: var(--sk-tinte); --header-bg: var(--sk-papier); --header-link-color: var(--sk-blau-tinte);
+  --breadcrumbs-fg: var(--sk-tinte); --breadcrumbs-link-fg: var(--sk-blau-tinte); --breadcrumbs-bg: var(--sk-blau);
+  --link-fg: var(--sk-blau-tinte); --link-hover-color: #0f3d70; --link-selected-fg: var(--sk-blau-tinte);
+  --hairline-color: #cdbf9d; --border-color: var(--sk-tinte);
+  --error-fg: var(--sk-rot); --message-success-bg: var(--sk-gruen); --message-warning-bg: var(--sk-gelb); --message-error-bg: var(--sk-rosa);
+  --darkened-bg: #fff3cc; --selected-bg: var(--sk-gelb); --selected-row: #fff3cc;
+  --button-fg: var(--sk-tinte); --button-bg: var(--sk-gelb); --button-hover-bg: var(--sk-gelb-kraeftig);
+  --default-button-bg: var(--sk-gelb); --default-button-hover-bg: var(--sk-gelb-kraeftig);
+  --close-button-bg: #666A78; --close-button-hover-bg: var(--sk-tinte); --delete-button-bg: var(--sk-rot); --delete-button-hover-bg: #9d1b2e;
+  --object-tools-fg: var(--sk-tinte); --object-tools-bg: var(--sk-blau); --object-tools-hover-bg: var(--sk-gelb);
+}
+
+/* Bereichsfarben, reihum (Nummer kommt aus portal/navigation.py: Start 1, Termine 2, …) */
+html[data-design="skizze"] .sk-farbe-1 { --sk-f: var(--sk-gelb);    --sk-f-kraeftig: var(--sk-gelb-kraeftig); }
+html[data-design="skizze"] .sk-farbe-2 { --sk-f: var(--sk-rosa);    --sk-f-kraeftig: var(--sk-rosa-kraeftig); }
+html[data-design="skizze"] .sk-farbe-3 { --sk-f: var(--sk-gruen);   --sk-f-kraeftig: var(--sk-gruen-kraeftig); }
+html[data-design="skizze"] .sk-farbe-4 { --sk-f: var(--sk-lila);    --sk-f-kraeftig: var(--sk-lila-kraeftig); }
+html[data-design="skizze"] .sk-farbe-5 { --sk-f: var(--sk-blau);    --sk-f-kraeftig: var(--sk-blau-kraeftig); }
+html[data-design="skizze"] .sk-farbe-6 { --sk-f: var(--sk-orange);  --sk-f-kraeftig: var(--sk-orange-kraeftig); }
+html[data-design="skizze"] .sk-farbe-7 { --sk-f: var(--sk-tuerkis); --sk-f-kraeftig: var(--sk-tuerkis-kraeftig); }

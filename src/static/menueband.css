@@ -298,3 +298,5 @@ html[data-design="kontrast"] .mb {
 }
 .design-muster-kontrast i:nth-child(1) { background: #ffffff; } .design-muster-kontrast i:nth-child(2) { background: #000000; } .design-muster-kontrast i:nth-child(3) { background: #0033a0; }
 /* <<< Weitere Designs */
+/* Skizzenbuch (ab 0.8.0): hier nur das Muster im Design-Menü, alles Weitere steht in skizze*.css */
+.design-muster-skizze i:nth-child(1) { background: #FFF8E7; } .design-muster-skizze i:nth-child(2) { background: #FFE08A; } .design-muster-skizze i:nth-child(3) { background: #FFB8CB; }

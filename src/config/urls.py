@@ -10,6 +10,7 @@ urlpatterns = [
     path("anmelden/code/", sicherheit.anmelden_code, name="anmelden_code"),
     path("konto/sicherheit/", sicherheit.sicherheit, name="sicherheit"),
     path("office/", views.office, name="office"),
+    path("bereich/<slug:schluessel>/", views.bereich, name="bereich"),
     path("abmelden/", auth_views.LogoutView.as_view(), name="logout"),
     path("noten/unterricht/<int:pk>/", views.notenuebersicht, name="notenuebersicht"),
     path("noten/", include("noten.urls")),
