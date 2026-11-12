@@ -15918,3 +15918,23 @@ msgid "nur mit Eintrag (%(n)s)"
 msgid_plural "nur mit Einträgen (%(n)s)"
 msgstr[0] "only with entry (%(n)s)"
 msgstr[1] "only with entries (%(n)s)"
+
+#: portal/models.py
+msgid "Skizzenbuch (hell, ohne Menüband)"
+msgstr "Sketchbook (light, no ribbon)"
+
+#: portal/models.py
+msgid "Skizzenbuch"
+msgstr "Sketchbook"
+
+#: templates/portal/_skizze_kopf.html
+msgid "Bereiche"
+msgstr "Areas"
+
+#: templates/portal/_skizze_kopf.html
+msgid "Befehle dieses Bereichs"
+msgstr "Commands in this area"
+
+#: templates/portal/_skizze_bereiche.html
+msgid "Was möchten Sie tun?"
+msgstr "What would you like to do?"

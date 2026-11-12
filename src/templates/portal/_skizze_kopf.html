@@ -1,0 +1,75 @@
+{% load i18n %}
+{% include "portal/_symbole.html" %}
+{# Kopfzeile der Oberfläche „Skizzenbuch“ (ab 0.8.0). Hat id="menueband", weil befehle.js und menueband.js dort ihre Elemente suchen. #}
+<header class="sk-kopf" id="menueband">
+  <div class="sk-kopfzeile">
+    <a class="sk-marke" href="{% url 'start' %}" aria-label="Schulnexus">
+      <span class="sk-wort" aria-hidden="true"><span class="sk-m1">Schul</span><span class="sk-m2">ne</span><span class="sk-m3">xus</span></span>
+      <small class="sk-marke-unter">{{ SCHULNAME }}{% if AKTUELLES_SCHULJAHR %} · {{ AKTUELLES_SCHULJAHR }}{% endif %}</small>
+    </a>
+    {% if MENUEBAND %}
+    <form class="sk-suche" method="get" action="{% url 'suche' %}" role="search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-lupe"/></svg>
+      <label for="mb-suche-q" class="mb-unsichtbar">{% translate "Person suchen" %}</label>
+      <input id="mb-suche-q" type="search" name="q" placeholder="{% translate 'Schüler:in, Kolleg:in oder Eltern suchen' %}" minlength="2" required autocomplete="off">
+    </form>
+    <button type="button" class="sk-befehlsknopf" id="mb-befehle-oeffnen" aria-haspopup="dialog" title="{% translate 'Befehl suchen: alle Funktionen, die Sie nutzen dürfen' %}">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-liste"/></svg><span>{% translate "Befehle" %}</span> <kbd>{% translate "Strg" %}+K</kbd>
+    </button>
+    {% endif %}
+    <div class="sk-rechts">
+      {% include "portal/_sprachmenue.html" %}
+      {% include "portal/_designmenue.html" %}
+      {% if MENUEBAND %}
+      {% include "portal/_hilfeleiste.html" %}
+      <details class="mb-konto sk-konto">
+        <summary aria-label="{% translate 'Konto' %}">
+          <span class="mb-initialen" aria-hidden="true">{% if user.person %}{{ user.person.vorname|slice:":1" }}{{ user.person.nachname|slice:":1" }}{% else %}{{ user.get_username|slice:":2"|upper }}{% endif %}</span>
+          <span class="mb-name">{{ user.person.anzeigename|default:user.get_username }}</span>
+        </summary>
+        <div class="mb-konto-menue">
+          <p class="mb-konto-kopf"><strong>{{ user.person.anzeigename|default:user.get_username }}</strong>
+            <small>{{ MENUEBAND.rollen|join:", "|default:_("Konto") }}</small></p>
+          {% if user.is_staff and user.has_usable_password %}<a href="{% url 'admin:password_change' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-schluessel"/></svg>{% translate "Passwort ändern" %}</a>{% endif %}
+          <a href="{% url 'sicherheit' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-schild"/></svg>{% translate "Sicherheit" %}</a>
+          <a href="{% url 'office' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-brief"/></svg>{% translate "Office" %}</a>
+          <form method="post" action="{% url 'logout' %}">{% csrf_token %}
+            <button type="submit"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-tuer"/></svg>{% translate "Abmelden" %}</button>
+          </form>
+        </div>
+      </details>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if MENUEBAND %}
+  <nav class="sk-bereiche" aria-label="{% translate 'Bereiche' %}">
+    {% for k in MENUEBAND.karten %}
+    <a class="sk-bereich sk-farbe-{{ k.farbe }}{% if k.schluessel == MENUEBAND.aktiv %} aktiv{% endif %}" href="{{ k.url }}"{% if k.schluessel == MENUEBAND.aktiv %} aria-current="true"{% endif %}>{{ k.titel }}</a>
+    {% endfor %}
+  </nav>
+  {% with w=MENUEBAND.weg %}{% if w %}
+  <nav class="sk-weg sk-farbe-{{ w.karte.farbe }}" aria-label="{% translate 'Befehle dieses Bereichs' %}">
+    <a class="sk-weg-bereich" href="{{ w.karte.url }}">{{ w.karte.titel }}</a>
+    {% if w.gruppe %}{% for b in w.gruppe.befehle %}<a class="sk-weg-befehl{% if b.aktiv %} aktiv{% endif %}" href="{{ b.url }}" title="{{ b.hinweis }}"{% if b.aktiv %} aria-current="page"{% endif %}>{{ b.titel }}</a>{% endfor %}{% endif %}
+  </nav>
+  {% endif %}{% endwith %}
+  <nav class="sk-favoriten" id="mb-schnell" aria-label="{% translate 'Favoriten' %}" hidden><span class="sk-favoriten-titel">{% translate "Favoriten" %}</span></nav>
+
+  {# Unsichtbares Befehlsverzeichnis: befehle.js liest daraus die Befehle für Strg+K und die Favoriten #}
+  <div class="sk-verzeichnis" hidden>
+    {% for k in MENUEBAND.karten %}
+    <span id="mb-reiter-{{ k.schluessel }}">{{ k.titel }}</span>
+    <div class="mb-band" aria-labelledby="mb-reiter-{{ k.schluessel }}">
+      {% for g in k.gruppen %}{% if g.befehle %}
+      <section class="mb-gruppe">
+        {% for b in g.befehle %}<a href="{{ b.url }}" title="{{ b.hinweis }}"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#s-{{ b.symbol }}"/></svg><span>{{ b.titel }}</span></a>{% endfor %}
+        <h3 class="mb-gruppentitel">{{ g.titel }}</h3>
+      </section>
+      {% endif %}{% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+  {% include "portal/_befehlssuche.html" %}
+  {% endif %}
+</header>

@@ -14,6 +14,8 @@
   </div>
 </header>
 
+{% if SKIZZE and MENUEBAND %}{% include "portal/_skizze_bereiche.html" %}{% endif %}
+
 {% with sz=schnellzugriff %}
 {% if sz.klassen or sz.kurse %}
 <nav class="schnellzugriff" aria-label="{% translate 'Schnellzugriff' %}">

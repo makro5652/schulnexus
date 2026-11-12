@@ -6,13 +6,16 @@
   <title>{% block title %}Schulnexus{% endblock %} · {{ SCHULNAME }}</title>
   <link rel="stylesheet" href="{% static 'portal.css' %}">
   <link rel="stylesheet" href="{% static 'menueband.css' %}">
+  {% if SKIZZE %}<link rel="stylesheet" href="{% static 'skizze.css' %}">
+  <link rel="stylesheet" href="{% static 'skizze_start.css' %}">
+  <link rel="stylesheet" href="{% static 'skizze_seiten.css' %}">{% endif %}
   <script src="{% static 'menueband.js' %}" defer></script>
   <script src="{% static 'befehle.js' %}" defer></script>
   <script src="{% static 'hilfe.js' %}" defer></script>
   {% block kopf %}{% endblock %}
 </head>
-<body>
-  {% include "portal/_menueband.html" %}
+<body{% if SKIZZE %} class="sk"{% endif %}>
+  {% if SKIZZE %}{% include "portal/_skizze_kopf.html" %}{% else %}{% include "portal/_menueband.html" %}{% endif %}
   <main class="inhalt {% block inhaltsklasse %}{% endblock %}">
     {% if messages %}<ul class="meldungen">{% for m in messages %}<li class="{{ m.tags }}">{{ m }}</li>{% endfor %}</ul>{% endif %}
     {% block inhalt %}{% endblock %}
