@@ -4,30 +4,44 @@ art: anleitung
 kurz: Fehltag, Fehlstunden oder Verspätung eintragen, Entschuldigungen abarbeiten, Eltern automatisch benachrichtigen
 stichworte: Fehlzeit, Fehltag, Fehlstunde, Verspätung, krank, Entschuldigung, entschuldigt, unentschuldigt, Benachrichtigung, Schwelle
 reihenfolge: 9
-pfade: /verwaltung/fehlzeiten/, /elternkontakt/regeln/
+pfade: /fehlzeiten/, /verwaltung/fehlzeiten/, /elternkontakt/regeln/
 ---
-Fehlzeiten erfassen Klassenleitungen, Lehrkräfte und das Sekretariat. Die Liste steht unter **Schüler:innen › Fehlzeiten**.
+Fehlzeiten erfassen Klassenleitungen, Lehrkräfte und das Sekretariat auf der Seite **Schüler:innen › Fehlzeiten**. Die Klassenliste hat dafür auch den Knopf **Fehlzeiten**.
 
-## Fehlzeit eintragen
+**Welche Klassen sehe ich?** Sekretariat, Verwaltungsleitung, Schulleitung und IT: alle Klassen. Stufenkoordination: die Klassen ihrer Jahrgänge. Lehrkräfte: die Klassen, die sie leiten oder als ganze Klasse unterrichten.
 
-1. **Schüler:innen › Fehlzeiten › Fehlzeit erfassen.**
-2. **Schüler:in** wählen: im Suchfeld den Namen tippen – oder den Klassennamen (`9a`), um die Klasse zu sehen.
-3. **Art** wählen:
-   - **Ganztägig** – Datum von und bis (bis leer = ein Tag).
-   - **Einzelne Stunden** – Datum und Stunde von/bis (nach dem Zeitraster, zum Beispiel 3.–4. Std.).
-   - **Verspätung** – Datum und Minuten.
-4. **Status:** offen (Entschuldigung steht aus), entschuldigt oder unentschuldigt.
-5. **Grund** und **gemeldet durch** (Lehrkraft, Eltern, Sekretariat …).
-6. Speichern. Erfasst von und am werden automatisch vermerkt.
+## 1. Klasse und Tag wählen
 
-## Entschuldigungen abarbeiten
+1. **Schüler:innen › Fehlzeiten** öffnen.
+2. Oben das **Datum** prüfen (Standard: heute).
+3. Die **Klasse** antippen. Die Kacheln sind nach Jahrgang geordnet und zeigen die Klassenleitung und die Zahl der offenen Entschuldigungen.
 
-1. **Schüler:innen › Fehlzeiten › Offene Entschuldigungen.**
-2. Rechts nach **Klasse** filtern, um eine Klasse abzuarbeiten.
-3. Die Einträge ankreuzen, für die eine Entschuldigung vorliegt.
-4. Oben die Aktion **Als entschuldigt markieren** wählen und **Ausführen**. Entsprechend gibt es **Als unentschuldigt markieren**.
+In der Klasse wechseln Sie oben rechts direkt zu einer anderen Klasse. Mit **‹** und **›** springen Sie zum vorigen bzw. nächsten Schultag (Wochenenden werden übersprungen), **Heute** führt zurück.
 
-Die Klassenliste zeigt je Schüler:in die Fehlstunden, davon unentschuldigt, Verspätungen und offene Entschuldigungen.
+## 2. Eintragen
+
+Alle Schüler:innen stehen **alphabetisch** untereinander. In der Spalte „Am Tag eingetragen“ sehen Sie, was für diesen Tag schon erfasst ist.
+
+1. In der Zeile die **Art** antippen:
+   - **ganztägig** – optional „bis“ für mehrere Tage (zum Beispiel Krankmeldung bis Freitag).
+   - **Stunden** – erste und letzte versäumte Stunde nach dem Zeitraster („bis“ wird beim Wählen der ersten Stunde vorbelegt).
+   - **Verspätung** – Minuten. Wer Minuten eintippt, wählt die Verspätung automatisch.
+2. **Status**: offen (Entschuldigung steht aus), entschuldigt oder unentschuldigt.
+3. Optional einen **Grund**, zum Beispiel „krank“ oder „Arzttermin“.
+4. Unten **Gemeldet durch** wählen (Lehrkraft, Sekretariat, Eltern, schulische Veranstaltung) und **Speichern**. Alle ausgefüllten Zeilen werden zusammen gespeichert; die Zahl der ausgefüllten Zeilen steht neben dem Knopf.
+
+Hilfen: **Name suchen** filtert die Liste ([[Enter]] springt in die erste Zeile, [[Esc]] leert), **nur mit Eintrag** zeigt nur, wer an dem Tag schon eine Fehlzeit hat. Ist eine Angabe unvollständig (zum Beispiel „Stunden“ ohne Stunde), wird nichts gespeichert und die Meldung nennt die Schülerin oder den Schüler.
+
+## 3. Entschuldigungen abarbeiten
+
+- **In der Klasse:** Abschnitt **Offene Entschuldigungen** – alle offenen Einträge der Klasse, nach Name und Datum. Ankreuzen (das Feld im Kopf wählt alle) und **Als entschuldigt markieren** bzw. **Als unentschuldigt markieren**.
+- **Für alle Klassen:** **Schüler:innen › Fehlzeiten › Offene Entschuldigungen** – dieselbe Liste über alle Klassen, die Sie sehen dürfen, nach Klasse und Name geordnet.
+
+## 4. Übersicht und Korrekturen
+
+- **Übersicht des Halbjahres:** je Schüler:in Fehltage, Fehlstunden, davon unentschuldigt, Verspätungen, Minuten und offene Einträge. Ein Klick auf einen Spaltenkopf sortiert, zum Beispiel nach den meisten Fehlstunden.
+- **Alle Einträge im Halbjahr:** aufklappbar, neueste zuerst, mit **Bearbeiten** und – mit Recht – **Löschen**.
+- Die vollständige Liste aller Fehlzeiten mit Suche und Filtern bleibt unter **Alle Fehlzeiten (Liste)** erreichbar.
 
 ## Eltern automatisch benachrichtigen
 
@@ -37,6 +51,6 @@ Unter **Schüler:innen › Eltern › Benachrichtigungsregeln** legen Schulleitu
 - alle, nicht entschuldigte oder nur unentschuldigte Einträge,
 - je Halbjahr oder Schuljahr, auf Wunsch erneut bei jedem Vielfachen.
 
-Geprüft wird nach jedem Speichern einer Fehlzeit; schulische Veranstaltungen zählen nicht. **Vorschau** zeigt vor dem Speichern, wer betroffen wäre. Beim Anlegen werden bereits erreichte Schwellen still vorgemerkt – oder, wenn angehakt, sofort benachrichtigt.
+Geprüft wird nach jedem Speichern einer Fehlzeit – auch beim Eintragen über die Klassenseite; schulische Veranstaltungen zählen nicht. **Vorschau** zeigt vor dem Speichern einer Regel, wer betroffen wäre.
 
 > Fehltage stehen nur dann auf dem Zeugnis, wenn die Schule das eingeschaltet hat (im KMK-Muster nicht vorgesehen).

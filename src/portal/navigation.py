@@ -139,10 +139,14 @@ def menueband(request):
         .add(_("Klassen und Gruppen"), _url("zuordnung"), "person_plus", gross=True, bedingung=darf_zuordnen(user),
              hinweis=_("Klassen anlegen, Schüler:innen zuordnen und abmelden, Fächer und Lehrkräfte festlegen")),
         Gruppe(_("Fehlzeiten"))
-        .add(_("Fehlzeiten"), _url("admin:fehlzeiten_fehlzeit_changelist"), "uhr", gross=True, bedingung=p("fehlzeiten.view_fehlzeit"))
-        .add(_("Offene Entschuldigungen"), _url("admin:fehlzeiten_fehlzeit_changelist", query="?status__exact=offen"), "warnung",
-             bedingung=p("fehlzeiten.view_fehlzeit"))
-        .add(_("Fehlzeit erfassen"), _url("admin:fehlzeiten_fehlzeit_add"), "plus", bedingung=p("fehlzeiten.add_fehlzeit")),
+        .add(_("Fehlzeiten"), _url("fehlzeiten"), "uhr", gross=True, bedingung=p("fehlzeiten.view_fehlzeit"),
+             hinweis=_("Klasse wählen, Fehlzeiten eintragen, Entschuldigungen abarbeiten, Übersicht des Halbjahres"))
+        .add(_("Offene Entschuldigungen"), _url("fehlzeiten", query="?offen=1"), "warnung",
+             bedingung=p("fehlzeiten.view_fehlzeit"), hinweis=_("Alle offenen Entschuldigungen nach Klasse und Name"))
+        .add(_("Fehlzeit erfassen"), _url("admin:fehlzeiten_fehlzeit_add"), "plus", bedingung=admin and p("fehlzeiten.add_fehlzeit"),
+             hinweis=_("Einzelnes Formular für eine Fehlzeit"))
+        .add(_("Alle Fehlzeiten (Liste)"), _url("admin:fehlzeiten_fehlzeit_changelist"), "liste",
+             bedingung=admin and p("fehlzeiten.view_fehlzeit"), hinweis=_("Liste aller Fehlzeiten mit Suche, Filtern und Sammelaktionen")),
         Gruppe(_("Eltern"))
         .add(_("Elternnachrichten"), _url("elternkontakt"), "brief", gross=True, bedingung=p("elternkontakt.view_gespraech"),
              hinweis=_("Nachrichten an Eltern, Antworten und Bestätigungen"))
@@ -347,7 +351,7 @@ def menueband(request):
 
 PFAD_REGELN = [("/hilfe/", "start"), ("/termine/", "termine"), ("/laufbahn/archiv/", "schulleitung"), ("/laufbahn/archiv/", "verwaltung"), ("/laufbahn/schueler/", "schueler"),
                ("/klassen/", "schueler"), ("/schueler/", "schueler"), ("/stufe/", "schueler"), ("/zuordnung/", "schueler"),
-               ("/aufnahme/", "schueler"), ("/elternkontakt/", "schueler"),
+               ("/aufnahme/", "schueler"), ("/elternkontakt/", "schueler"), ("/fehlzeiten/", "schueler"),
                ("/noten/", "unterricht"), ("/zeugnisse/", "unterricht"),
                ("/laufbahn/", "schulleitung"), ("/rollen/", "system"), ("/system/", "system"),
                ("/foerderung/", "foerderung"), ("/verwaltung/", "verwaltung"), ("/verwaltung/", "system")]

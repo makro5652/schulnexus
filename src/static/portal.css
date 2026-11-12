@@ -1341,3 +1341,74 @@ kbd { font: inherit; font-size: 0.82em; border: 1px solid var(--linie); border-b
 :root[data-design="kontrast"] a { text-decoration-thickness: 2px; }
 :root[data-design="kontrast"] :focus-visible { outline: 3px solid #0033a0; outline-offset: 2px; }
 /* <<< Weitere Designs */
+
+/* Fehlzeiten nach Klasse (ab 0.7.1) */
+.fz-kopf { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 0.6rem 1.2rem; margin-bottom: 0.8rem; }
+.fz-kopf h1 { margin: 0; }
+.fz-reiter { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.fz-reiter a { padding: 0.35rem 0.85rem; border: 1px solid var(--linie); border-radius: 999px; text-decoration: none; color: var(--text); background: var(--flaeche); font-size: 0.9rem; }
+.fz-reiter a.aktiv { background: var(--akzent); border-color: var(--akzent); color: var(--flaeche); font-weight: 600; }
+.fz-zahl { display: inline-block; min-width: 1.4rem; padding: 0 0.4rem; border-radius: 999px; background: var(--hinweis-flaeche); color: var(--hinweis-text); font-size: 0.8rem; font-weight: 700; text-align: center; }
+.fz-datumwahl { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1rem; margin: 0 0 1rem; }
+.fz-datumwahl input, .fz-tagwahl input, .fz-wechsel select { font: inherit; padding: 0.35rem 0.5rem; border: 1px solid var(--linie); border-radius: 7px; background: var(--grund); color: var(--text); }
+.fz-wechsel label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; }
+.fz-jahrgang h2 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: .05em; color: var(--leise); margin: 1rem 0 0.5rem; }
+.fz-kacheln { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: 0.6rem; }
+.fz-kachel { display: flex; flex-direction: column; gap: 0.15rem; padding: 0.75rem 0.9rem; border: 1px solid var(--linie); border-radius: 10px; background: var(--flaeche); text-decoration: none; color: var(--text); height: 100%; }
+.fz-kachel:hover, .fz-kachel:focus-visible { border-color: var(--akzent); box-shadow: 0 0 0 1px var(--akzent); }
+.fz-kachel strong { font-size: 1.25rem; }
+.fz-kachel small { color: var(--leise); font-size: 0.8rem; }
+.fz-offen { align-self: flex-start; margin-top: 0.25rem; padding: 0 0.45rem; border-radius: 999px; background: var(--hinweis-flaeche); color: var(--hinweis-text); font-size: 0.75rem; font-weight: 700; }
+th .fz-offen { margin: 0 0 0 0.4rem; vertical-align: 0.1em; }
+.fz-tagwahl { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin: 0 0 1rem; }
+.fz-tagwahl form { margin: 0; }
+.fz-tag { margin-left: 0.4rem; }
+.fz-erfassen, .fz-alle-eintraege, #offen { margin-bottom: 1rem; }
+.fz-werkzeug { display: flex; flex-wrap: wrap; gap: 0.5rem 0.9rem; align-items: center; }
+.fz-filter { font: inherit; padding: 0.35rem 0.6rem; border: 1px solid var(--linie); border-radius: 6px; background: var(--grund); color: var(--text); width: min(14rem, 100%); }
+.fz-eingabe { width: 100%; border-collapse: collapse; }
+.fz-eingabe th, .fz-eingabe td { padding: 0.35rem 0.45rem; border-bottom: 1px solid var(--linie); text-align: left; vertical-align: middle; }
+.fz-eingabe thead th { font-size: 0.78rem; color: var(--leise); font-weight: 600; }
+.fz-eingabe tbody th { font-weight: 500; white-space: nowrap; }
+.fz-eingabe tr[hidden] { display: none; }
+.fz-eingabe tr[data-art=ganztaegig], .fz-eingabe tr[data-art=stunden], .fz-eingabe tr[data-art=verspaetung] { background: var(--akzent-hell); }
+.fz-nr { color: var(--leise); font-size: 0.8rem; width: 2rem; }
+.fz-art { white-space: nowrap; }
+.fz-art label { display: inline-block; margin: 0.1rem 0; }
+.fz-art input { position: absolute; opacity: 0; pointer-events: none; }
+.fz-art span { display: inline-block; padding: 0.25rem 0.55rem; border: 1px solid var(--linie); border-radius: 6px; font-size: 0.82rem; cursor: pointer; background: var(--flaeche); }
+.fz-art input:checked + span { background: var(--akzent); border-color: var(--akzent); color: var(--flaeche); font-weight: 600; }
+.fz-art input:focus-visible + span { outline: 2px solid var(--akzent); outline-offset: 1px; }
+.fz-angaben { white-space: nowrap; font-size: 0.85rem; }
+.fz-angaben > span { display: inline-flex; gap: 0.35rem; align-items: center; margin-right: 0.4rem; }
+.fz-angaben input, .fz-angaben select, .fz-eingabe td > select, .fz-grund { font: inherit; font-size: 0.85rem; padding: 0.25rem 0.35rem; border: 1px solid var(--linie); border-radius: 6px; background: var(--grund); color: var(--text); }
+.fz-min { width: 4.2rem; }
+.fz-grund { width: 100%; min-width: 7rem; }
+.fz-js .fz-nur-ganztaegig, .fz-js .fz-nur-stunden, .fz-js .fz-nur-verspaetung { display: none; }
+.fz-js[data-art=ganztaegig] .fz-nur-ganztaegig, .fz-js[data-art=stunden] .fz-nur-stunden, .fz-js[data-art=verspaetung] .fz-nur-verspaetung { display: inline-flex; }
+.fz-marke { display: inline-block; margin: 0.1rem 0.25rem 0.1rem 0; padding: 0.05rem 0.45rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; background: var(--linie); }
+.fz-st-offen { background: var(--hinweis-flaeche); color: var(--hinweis-text); }
+.fz-st-entschuldigt { background: var(--papier-gruen); color: var(--ok); }
+.fz-st-unentschuldigt { background: var(--gefahr-flaeche); color: var(--warnung); }
+.fz-knoepfe { position: sticky; bottom: 0; background: var(--flaeche); padding: 0.6rem 0; border-top: 1px solid var(--linie); z-index: 3; align-items: center; }
+.fz-knoepfe label { display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; }
+.fz-knoepfe select { font: inherit; padding: 0.35rem 0.5rem; border: 1px solid var(--linie); border-radius: 7px; background: var(--grund); color: var(--text); }
+.fz-sammel { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin: 0 0 0.6rem; }
+.fz-kreuz { width: 2rem; text-align: center; }
+.fz-wt { color: var(--leise); }
+.fz-sortierbar th[data-sort] { cursor: pointer; user-select: none; }
+.fz-sortierbar th[aria-sort=ascending]::after { content: " ▲"; font-size: 0.7em; }
+.fz-sortierbar th[aria-sort=descending]::after { content: " ▼"; font-size: 0.7em; }
+.fz-alle-eintraege summary { cursor: pointer; list-style: revert; }
+.fz-alle-eintraege summary h2 { display: inline; }
+.fz-inline { display: inline; margin-left: 0.5rem; }
+@media (max-width: 760px) {
+  .fz-eingabe thead { display: none; }
+  .fz-eingabe tr { display: grid; grid-template-columns: 1.6rem minmax(0, 1fr); gap: 0.25rem 0.4rem; padding: 0.5rem 0; border-bottom: 1px solid var(--linie); }
+  .fz-eingabe th, .fz-eingabe td { border: 0; padding: 0; }
+  .fz-eingabe td:not(.fz-nr) { grid-column: 2; }
+  .fz-angaben { white-space: normal; }
+  .fz-erfassen > .hinweistext { display: none; }
+  .fz-knoepfe { gap: 0.4rem; padding: 0.4rem 0; }
+}
+@media print { .fz-tagwahl, .fz-werkzeug, .fz-knoepfe, .fz-sammel, .fz-reiter { display: none; } }

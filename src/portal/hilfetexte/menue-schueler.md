@@ -28,9 +28,10 @@ Für Mittel- und Oberstufenkoordination: je Stufe eine **Stufenübersicht** mit 
 
 ## Gruppe „Fehlzeiten“
 
-- **Fehlzeiten** – Liste aller erfassten Fehlzeiten mit Schüler:in, Art (ganztägig, einzelne Stunden, Verspätung), Zeitraum, Status und Fehlstunden. Filter rechts: **Klasse**, **Jahrgang**, Status, Art, gemeldet durch, Datum. Aktionen: „Als entschuldigt markieren“, „Als unentschuldigt markieren“.
-- **Offene Entschuldigungen** – dieselbe Liste, vorgefiltert auf den Status „offen“. Hier arbeiten Sie eingegangene Entschuldigungen ab.
-- **Fehlzeit erfassen** – neuen Eintrag anlegen. Anleitung: [Fehlzeiten erfassen und entschuldigen](hilfe:fehlzeiten).
+- **Fehlzeiten** – die Arbeitsseite für Fehlzeiten: **Klasse antippen** (Kacheln nach Jahrgang, mit der Zahl offener Entschuldigungen), dann steht die Klasse **alphabetisch** bereit. Je Schüler:in tippen Sie „ganztägig“, „Stunden“ oder „Verspätung“ an und ergänzen Stunden, Minuten, Status und Grund; alle Zeilen werden zusammen gespeichert. Darunter: offene Entschuldigungen der Klasse zum Abhaken und eine sortierbare Übersicht des Halbjahres (Fehltage, Fehlstunden, davon unentschuldigt, Verspätungen). Anleitung: [Fehlzeiten erfassen und entschuldigen](hilfe:fehlzeiten).
+- **Offene Entschuldigungen** – alle offenen Entschuldigungen, die Sie sehen dürfen, nach Klasse und Name geordnet. Ankreuzen und „Als entschuldigt markieren“ bzw. „Als unentschuldigt markieren“.
+- **Fehlzeit erfassen** – das einzelne Formular der Verwaltungsoberfläche für eine Fehlzeit.
+- **Alle Fehlzeiten (Liste)** – die vollständige Liste der Verwaltungsoberfläche mit Suche, Filtern (Klasse, Jahrgang, Status, Art, gemeldet durch, Datum) und Sammelaktionen. Hier bearbeiten oder löschen Sie auch ältere Einträge.
 
 ## Gruppe „Eltern“
 

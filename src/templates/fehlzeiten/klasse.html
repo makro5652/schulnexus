@@ -1,0 +1,146 @@
+{% extends "portal/base.html" %}
+{% load i18n static formate %}
+{% block title %}{% translate "Fehlzeiten" %} · {{ gruppe.name }}{% endblock %}
+{% block inhaltsklasse %}breit{% endblock %}
+{% block inhalt %}
+<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › <a href="{% url 'fehlzeiten' %}?datum={{ datum|date:'Y-m-d' }}">{% translate "Fehlzeiten" %}</a> › {{ gruppe.name }}</p>
+<div class="fz-kopf">
+  <h1>{% blocktranslate with k=gruppe.name %}Fehlzeiten {{ k }}{% endblocktranslate %}</h1>
+  <form method="get" class="fz-wechsel">
+    <input type="hidden" name="datum" value="{{ datum|date:'Y-m-d' }}">
+    <label>{% translate "Klasse" %}
+      <select name="gruppe" onchange="this.form.submit()">{% for k in klassen %}<option value="{{ k.pk }}"{% if k.pk == gruppe.pk %} selected{% endif %}>{{ k.name }}</option>{% endfor %}</select></label>
+    <noscript><button class="knopf klein">{% translate "Anzeigen" %}</button></noscript>
+  </form>
+</div>
+
+<nav class="fz-tagwahl" aria-label="{% translate 'Datum' %}">
+  <a class="knopf klein zweitrangig" href="?gruppe={{ gruppe.pk }}&amp;datum={{ vortag|date:'Y-m-d' }}" title="{% translate 'voriger Schultag' %}">‹</a>
+  <form method="get"><input type="hidden" name="gruppe" value="{{ gruppe.pk }}">
+    <input type="date" name="datum" value="{{ datum|date:'Y-m-d' }}" onchange="this.form.submit()" aria-label="{% translate 'Datum' %}"></form>
+  <a class="knopf klein zweitrangig" href="?gruppe={{ gruppe.pk }}&amp;datum={{ folgetag|date:'Y-m-d' }}" title="{% translate 'nächster Schultag' %}">›</a>
+  {% if datum != heute %}<a class="knopf klein zweitrangig" href="?gruppe={{ gruppe.pk }}&amp;datum={{ heute|date:'Y-m-d' }}">{% translate "Heute" %}</a>{% endif %}
+  <strong class="fz-tag">{{ datum|date:"l" }}, {{ datum|date:"SHORT_DATE_FORMAT" }}</strong>
+  {% if wochenende %}<span class="etikett warnend">{% translate "Wochenende" %}</span>{% endif %}
+  {% if not datum_im_schuljahr %}<span class="etikett warnend">{% translate "außerhalb des aktuellen Schuljahres" %}</span>{% endif %}
+</nav>
+
+{# ------------------------------------------------ Erfassen #}
+<section class="karte fz-erfassen">
+  <div class="karte-kopf">
+    <h2>{% translate "Eintragen" %} <span class="leise">· {% blocktranslate count n=zeilen|length %}{{ n }} Schüler:in{% plural %}{{ n }} Schüler:innen{% endblocktranslate %}</span></h2>
+    <div class="fz-werkzeug">
+      <input type="search" class="fz-filter" id="fz-filter" placeholder="{% translate 'Name suchen …' %}" aria-label="{% translate 'Schüler:innen nach Namen filtern' %}" autocomplete="off">
+      {% if anzahl_am_tag %}<label class="haken"><input type="checkbox" id="fz-nur-heute"> {% blocktranslate count n=anzahl_am_tag %}nur mit Eintrag ({{ n }}){% plural %}nur mit Einträgen ({{ n }}){% endblocktranslate %}</label>{% endif %}
+    </div>
+  </div>
+  {% if darf_erfassen %}
+  <p class="hinweistext">{% translate "In der Zeile die Art antippen: ganztägig, Stunden oder Verspätung. Dann bei Bedarf Stunden, Minuten, Status und Grund ergänzen. Alle Zeilen werden zusammen gespeichert; leere Zeilen bleiben unverändert." %}</p>
+  {% endif %}
+  <form method="post" id="fz-form">{% csrf_token %}
+    <input type="hidden" name="aktion" value="erfassen"><input type="hidden" name="gruppe" value="{{ gruppe.pk }}"><input type="hidden" name="datum" value="{{ datum|date:'Y-m-d' }}">
+    <div class="tabellenrahmen">
+    <table class="fz-eingabe">
+      <thead><tr><th class="fz-nr">#</th><th>{% translate "Schüler:in" %}</th><th>{% translate "Am Tag eingetragen" %}</th>
+        {% if darf_erfassen %}<th>{% translate "Art" %}</th><th>{% translate "Angaben" %}</th><th>{% translate "Status" %}</th><th>{% translate "Grund" %}</th>{% endif %}</tr></thead>
+      <tbody>
+      {% for z in zeilen %}
+        <tr class="fz-zeile{% if z.heute %} fz-hat-eintrag{% endif %}" data-name="{{ z.s.person.nachname }} {{ z.s.person.vorname }} {{ z.s.person.rufname }}">
+          <td class="fz-nr">{{ forloop.counter }}</td>
+          <th scope="row">{% if perms.stammdaten.view_schuelerprofil %}<a href="{% url 'schuelerakte' z.s.pk %}">{{ z.s.person }}</a>{% else %}{{ z.s.person }}{% endif %}
+            {% if z.summe.offen %}<span class="fz-offen klein" title="{% translate 'offene Entschuldigungen' %}">{{ z.summe.offen }} {% translate "offen" %}</span>{% endif %}</th>
+          <td class="fz-heute">{% for f in z.heute %}<span class="fz-marke fz-st-{{ f.status }}">{{ f.get_art_display }}{% if f.art == "stunden" %} {{ f.stunde_von }}.{% if f.stunde_bis != f.stunde_von %}–{{ f.stunde_bis }}.{% endif %}{% elif f.art == "verspaetung" %} {{ f.minuten }}′{% elif f.datum_bis and f.datum_bis != f.datum_von %} {% translate "bis" %} {{ f.datum_bis|date:"d.m." }}{% endif %} · {{ f.get_status_display }}</span>{% empty %}<span class="leise">–</span>{% endfor %}</td>
+          {% if darf_erfassen %}
+          <td class="fz-art" role="radiogroup" aria-label="{% translate 'Art' %} {{ z.s.person }}">
+            <label><input type="radio" name="art_{{ z.s.pk }}" value="" checked><span>–</span></label>
+            <label title="{% translate 'Ganztägig' %}"><input type="radio" name="art_{{ z.s.pk }}" value="ganztaegig"><span>{% translate "ganztägig" %}</span></label>
+            <label title="{% translate 'Einzelne Stunden' %}"><input type="radio" name="art_{{ z.s.pk }}" value="stunden"><span>{% translate "Stunden" %}</span></label>
+            <label title="{% translate 'Verspätung' %}"><input type="radio" name="art_{{ z.s.pk }}" value="verspaetung"><span>{% translate "Verspätung" %}</span></label>
+          </td>
+          <td class="fz-angaben">
+            <span class="fz-nur-ganztaegig"><label>{% translate "bis" %} <input type="date" name="bis_{{ z.s.pk }}" min="{{ datum|date:'Y-m-d' }}" aria-label="{% translate 'bis Datum' %}"></label></span>
+            <span class="fz-nur-stunden"><label>{% translate "Std." %}
+              <select name="von_{{ z.s.pk }}" aria-label="{% translate 'ab Stunde' %}"><option value="">–</option>{% for st in stunden %}<option value="{{ st.nummer }}">{{ st.nummer }}.</option>{% endfor %}</select></label>
+              <label>{% translate "bis" %} <select name="bisstd_{{ z.s.pk }}" aria-label="{% translate 'bis Stunde' %}"><option value="">–</option>{% for st in stunden %}<option value="{{ st.nummer }}">{{ st.nummer }}.</option>{% endfor %}</select></label></span>
+            <span class="fz-nur-verspaetung"><label><input type="number" name="min_{{ z.s.pk }}" min="1" max="600" inputmode="numeric" class="fz-min" aria-label="{% translate 'Minuten' %}"> {% translate "Min." %}</label></span>
+          </td>
+          <td><select name="status_{{ z.s.pk }}" aria-label="{% translate 'Status' %}">{% for k, n in status_werte %}<option value="{{ k }}">{{ n }}</option>{% endfor %}</select></td>
+          <td><input type="text" name="grund_{{ z.s.pk }}" maxlength="200" class="fz-grund" aria-label="{% translate 'Grund' %}" placeholder="{% translate 'z. B. krank' %}"></td>
+          {% endif %}
+        </tr>
+      {% empty %}<tr><td colspan="7" class="leer">{% translate "An diesem Tag gehört niemand zu dieser Klasse." %}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    </div>
+    {% if darf_erfassen and zeilen %}
+    <div class="knopfreihe fz-knoepfe">
+      <label>{% translate "Gemeldet durch" %}
+        <select name="quelle">{% for k, n in quellen %}<option value="{{ k }}"{% if k == quelle_vorwahl %} selected{% endif %}>{{ n }}</option>{% endfor %}</select></label>
+      <button type="submit" class="knopf">{% translate "Speichern" %}</button>
+      <span class="hinweistext" id="fz-zaehler" data-text="{% translate '{n} Zeilen ausgefüllt' %}" aria-live="polite"></span>
+    </div>
+    {% endif %}
+  </form>
+</section>
+
+{# ------------------------------------------------ Offene Entschuldigungen #}
+<section class="karte" id="offen">
+  <h2>{% translate "Offene Entschuldigungen" %} {% if offene %}<span class="fz-zahl">{{ offene|length }}</span>{% endif %}</h2>
+  {% if offene %}
+  <form method="post">{% csrf_token %}<input type="hidden" name="gruppe" value="{{ gruppe.pk }}"><input type="hidden" name="datum" value="{{ datum|date:'Y-m-d' }}">
+    {% include "fehlzeiten/_offen_knoepfe.html" %}
+    <div class="tabellenrahmen">
+    <table class="liste fz-tabelle">
+      <thead><tr><th class="fz-kreuz">{% if darf_aendern %}<input type="checkbox" class="fz-alle" aria-label="{% translate 'alle auswählen' %}">{% endif %}</th>
+        <th>{% translate "Schüler:in" %}</th><th>{% translate "Datum" %}</th><th>{% translate "Art" %}</th><th>{% translate "Grund" %}</th></tr></thead>
+      <tbody>{% for f in offene %}
+        <tr><td class="fz-kreuz">{% if darf_aendern %}<input type="checkbox" name="fehlzeit" value="{{ f.pk }}" aria-label="{{ f.schueler.person }}">{% endif %}</td>
+          <td>{{ f.schueler.person }}</td><td class="nowrap">{% include "fehlzeiten/_zeitraum.html" %}</td><td>{{ f.get_art_display }}</td><td>{{ f.grund|default:"–" }}</td></tr>
+      {% endfor %}</tbody>
+    </table>
+    </div>
+  </form>
+  {% else %}<p class="leer">{% translate "Keine offenen Entschuldigungen in dieser Klasse." %}</p>{% endif %}
+</section>
+
+{# ------------------------------------------------ Übersicht Halbjahr #}
+<section class="karte">
+  <h2>{% if abschnitt %}{% blocktranslate with h=abschnitt.lokal_name sj=abschnitt.schuljahr %}Übersicht {{ h }} {{ sj }}{% endblocktranslate %}{% else %}{% translate "Übersicht" %}{% endif %}</h2>
+  <p class="hinweistext">{% translate "Spaltenköpfe antippen, um zu sortieren." %}</p>
+  <div class="tabellenrahmen">
+  <table class="liste fz-tabelle fz-sortierbar">
+    <thead><tr><th data-sort="text">{% translate "Schüler:in" %}</th><th data-sort="zahl" class="zahl">{% translate "Fehltage" %}</th>
+      <th data-sort="zahl" class="zahl">{% translate "Fehlstunden" %}</th><th data-sort="zahl" class="zahl">{% translate "davon unentsch." %}</th>
+      <th data-sort="zahl" class="zahl">{% translate "Verspätungen" %}</th><th data-sort="zahl" class="zahl">{% translate "Minuten" %}</th>
+      <th data-sort="zahl" class="zahl">{% translate "offen" %}</th></tr></thead>
+    <tbody>{% for z in zeilen %}
+      <tr><td>{{ z.s.person }}</td><td class="zahl">{{ z.summe.fehltage }}</td><td class="zahl">{{ z.summe.stunden }}</td>
+        <td class="zahl{% if z.summe.unentsch %} auffaellig{% endif %}">{{ z.summe.unentsch }}</td><td class="zahl">{{ z.summe.verspaetung }}</td>
+        <td class="zahl">{{ z.summe.minuten }}</td><td class="zahl{% if z.summe.offen %} auffaellig{% endif %}">{{ z.summe.offen }}</td></tr>
+    {% endfor %}</tbody>
+  </table>
+  </div>
+</section>
+
+{# ------------------------------------------------ Alle Einträge des Halbjahres #}
+<details class="karte fz-alle-eintraege">
+  <summary><h2>{% blocktranslate count n=eintraege|length %}Alle Einträge im Halbjahr ({{ n }}){% plural %}Alle Einträge im Halbjahr ({{ n }}){% endblocktranslate %}</h2></summary>
+  {% if eintraege %}
+  <div class="tabellenrahmen">
+  <table class="liste fz-tabelle">
+    <thead><tr><th>{% translate "Datum" %}</th><th>{% translate "Schüler:in" %}</th><th>{% translate "Art" %}</th><th>{% translate "Status" %}</th><th>{% translate "Grund" %}</th><th></th></tr></thead>
+    <tbody>{% for f in eintraege %}
+      <tr><td class="nowrap">{% include "fehlzeiten/_zeitraum.html" %}</td><td>{{ f.schueler.person }}</td><td>{{ f.get_art_display }}</td>
+        <td><span class="fz-marke fz-st-{{ f.status }}">{{ f.get_status_display }}</span></td><td>{{ f.grund|default:"–" }}</td>
+        <td class="nowrap">{% if perms.fehlzeiten.change_fehlzeit and user.is_staff %}<a href="{% url 'admin:fehlzeiten_fehlzeit_change' f.pk %}">{% translate "Bearbeiten" %}</a>{% endif %}
+          {% if darf_loeschen %}<form method="post" class="fz-inline" onsubmit="return confirm('{% translate "Diesen Eintrag löschen?" as frage %}{{ frage|escapejs }}')">{% csrf_token %}
+            <input type="hidden" name="aktion" value="loeschen"><input type="hidden" name="fehlzeit" value="{{ f.pk }}"><input type="hidden" name="gruppe" value="{{ gruppe.pk }}"><input type="hidden" name="datum" value="{{ datum|date:'Y-m-d' }}">
+            <button type="submit" class="link gefahr">{% translate "Löschen" %}</button></form>{% endif %}</td></tr>
+    {% endfor %}</tbody>
+  </table>
+  </div>
+  {% else %}<p class="leer">{% translate "Keine Einträge in diesem Halbjahr." %}</p>{% endif %}
+</details>
+<script src="{% static 'fehlzeiten.js' %}" defer></script>
+{% endblock %}

@@ -26,6 +26,7 @@ urlpatterns = [
     path("eltern/sprechtage/", include("termine.urls_eltern")),
     path("eltern/", include("elternkontakt.urls_eltern")),
     path("termine/", include("termine.urls")),
+    path("fehlzeiten/", include("fehlzeiten.urls")),
     path("system/", include("sicherung.urls")),
     path("laufbahn/", include("laufbahn.urls")),
     path("suche/", startseite.suche, name="suche"),

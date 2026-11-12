@@ -5,6 +5,7 @@
 <p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › {% blocktranslate with name=gruppe.name %}Klasse {{ name }}{% endblocktranslate %}</p>
 <div class="akte-kopf"><h1>{% blocktranslate with name=gruppe.name %}Klasse {{ name }}{% endblocktranslate %}</h1>
 <div class="knopfreihe">{% if zeugnis_abschnitt %}<a class="knopf zweitrangig" href="{% url 'zeugnis_klasse' gruppe.pk zeugnis_abschnitt.pk %}">{% translate "Zeugnisse" %}</a>{% endif %}
+{% if gruppe.typ == "stammklasse" and perms.fehlzeiten.view_fehlzeit and gruppe.schuljahr.aktiv %}<a class="knopf zweitrangig" href="{% url 'fehlzeiten' %}?gruppe={{ gruppe.pk }}">{% translate "Fehlzeiten" %}</a>{% endif %}
 {% if darf_eltern %}<a class="knopf zweitrangig" href="{% url 'elternnachricht_neu' %}?gruppe={{ gruppe.pk }}">{% translate "Eltern der Klasse schreiben" %}</a>{% endif %}
 {% if darf_zuordnen %}<a class="knopf zweitrangig" href="{% url 'zuordnung' %}?sj={{ gruppe.schuljahr_id }}&amp;gruppe={{ gruppe.pk }}">{% translate "Mitglieder zuordnen" %}</a>{% endif %}</div></div>
 <p class="unterzeile">{{ gruppe.schuljahr }} · {% blocktranslate with leitung=gruppe.leitung.person.anzeigename|default:"—" %}Klassenleitung {{ leitung }}{% endblocktranslate %} · {% blocktranslate count n=zeilen|length %}{{ n }} Schüler:in{% plural %}{{ n }} Schüler:innen{% endblocktranslate %}</p>

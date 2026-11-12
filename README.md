@@ -841,6 +841,27 @@ SECRET_KEY=x DATABASE_URL=postgres://x:x@localhost/x python tools/spezifikation_
 
 Eine Datenbank ist dafür nicht nötig.
 
+## Fehlzeiten nach Klasse (ab 0.7.1)
+
+**Schüler:innen › Fehlzeiten** ist jetzt eine eigene Arbeitsseite statt der allgemeinen Liste:
+
+1. **Klasse antippen** – Kacheln nach Jahrgang, mit Klassenleitung und Zahl der offenen Entschuldigungen; oben das Datum
+   (Standard heute). Sekretariat, Verwaltungsleitung, Schulleitung und IT sehen alle Klassen, die Stufenkoordination die
+   Klassen ihrer Jahrgänge, Lehrkräfte die Klassen, die sie leiten oder als ganze Klasse unterrichten.
+2. **Eintragen:** alle Schüler:innen alphabetisch; je Zeile „ganztägig“ (optional bis Datum), „Stunden“ (von/bis nach
+   Zeitraster) oder „Verspätung“ (Minuten) antippen, Status und Grund ergänzen, „Gemeldet durch“ wählen und alle Zeilen
+   zusammen speichern. Was am Tag schon eingetragen ist, steht in der Zeile. Namensfilter, „nur mit Eintrag“, ‹ › für
+   den vorigen bzw. nächsten Schultag, Klassenwechsel oben rechts. Unvollständige Zeilen verhindern das Speichern.
+3. **Offene Entschuldigungen** der Klasse ankreuzen und als entschuldigt bzw. unentschuldigt markieren; über alle
+   Klassen unter „Offene Entschuldigungen“ (nach Klasse und Name geordnet).
+4. **Übersicht des Halbjahres** je Schüler:in (Fehltage, Fehlstunden, davon unentschuldigt, Verspätungen, Minuten,
+   offen), per Klick auf den Spaltenkopf sortierbar; aufklappbar alle Einträge des Halbjahres mit Bearbeiten und Löschen.
+
+Die Klassenliste hat einen Knopf „Fehlzeiten“. Die bisherige Liste der Verwaltungsoberfläche und das Einzelformular
+bleiben als „Alle Fehlzeiten (Liste)“ und „Fehlzeit erfassen“ erreichbar. Die automatische Elternbenachrichtigung greift
+auch beim Eintragen über die Klassenseite. Code: `fehlzeiten/ansichten.py`, `templates/fehlzeiten/`,
+`static/fehlzeiten.js`; Tests in `fehlzeiten/tests.py`.
+
 ## Hilfe und Dokumentation in der Anwendung (ab 0.7.0)
 
 - **Hilfe-Knopf auf jeder Seite:** Am rechten Rand steht überall der Knopf **Hilfe** (Portal und Verwaltungsoberfläche).

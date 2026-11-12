@@ -50,3 +50,12 @@ def benutzername(benutzer, ersatz="–"):
     except Exception:
         name = ""
     return name or benutzer.get_full_name() or benutzer.get_username()
+
+
+@register.filter
+def get_item(verzeichnis, schluessel):
+    """Wert aus einem dict im Template: {{ d|get_item:k }} (ab 0.7.1)."""
+    try:
+        return verzeichnis.get(schluessel)
+    except AttributeError:
+        return None

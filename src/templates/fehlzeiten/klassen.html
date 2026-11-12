@@ -1,0 +1,65 @@
+{% extends "portal/base.html" %}
+{% load i18n static formate %}
+{% block title %}{% translate "Fehlzeiten" %}{% endblock %}
+{% block inhaltsklasse %}breit{% endblock %}
+{% block inhalt %}
+<p class="brotkrumen"><a href="{% url 'start' %}">{% translate "Start" %}</a> › {% translate "Fehlzeiten" %}</p>
+<div class="fz-kopf">
+  <h1>{% translate "Fehlzeiten" %}</h1>
+  <div class="fz-reiter" role="tablist">
+    <a href="{% url 'fehlzeiten' %}" {% if not nur_offen %}class="aktiv" aria-current="page"{% endif %}>{% translate "Klasse wählen" %}</a>
+    <a href="{% url 'fehlzeiten' %}?offen=1" {% if nur_offen %}class="aktiv" aria-current="page"{% endif %}>{% translate "Offene Entschuldigungen" %}{% if offen_gesamt %} <span class="fz-zahl">{{ offen_gesamt }}</span>{% endif %}</a>
+    {% if perms.fehlzeiten.view_fehlzeit and user.is_staff %}<a href="{% url 'admin:fehlzeiten_fehlzeit_changelist' %}">{% translate "Alle Fehlzeiten (Liste)" %}</a>{% endif %}
+  </div>
+</div>
+
+{% if not nur_offen %}
+<form method="get" class="fz-datumwahl">
+  <label>{% translate "Datum" %} <input type="date" name="datum" value="{{ datum|date:'Y-m-d' }}"></label>
+  <span class="hinweistext">{% translate "Klasse antippen – danach stehen alle Schüler:innen alphabetisch zum Eintragen bereit." %}</span>
+</form>
+{% for jg in jahrgaenge %}
+<section class="fz-jahrgang">
+  <h2>{% blocktranslate with jg=jg %}Jahrgang {{ jg }}{% endblocktranslate %}</h2>
+  <ul class="fz-kacheln">
+    {% for k in klassen %}{% if k.jahrgang == jg %}
+    <li><a href="?gruppe={{ k.pk }}&amp;datum={{ datum|date:'Y-m-d' }}" class="fz-kachel">
+      <strong>{{ k.name }}</strong>
+      <small>{{ k.leitung.person.anzeigename|default:"–" }}</small>
+      {% with n=offen_je_klasse|get_item:k.pk %}{% if n %}<span class="fz-offen" title="{% translate 'offene Entschuldigungen' %}">{{ n }} {% translate "offen" %}</span>{% endif %}{% endwith %}
+    </a></li>
+    {% endif %}{% endfor %}
+  </ul>
+</section>
+{% endfor %}
+{% for k in klassen %}{% if k.jahrgang is None %}{% if forloop.first %}<section class="fz-jahrgang"><h2>{% translate "Ohne Jahrgang" %}</h2><ul class="fz-kacheln">{% endif %}
+  <li><a href="?gruppe={{ k.pk }}&amp;datum={{ datum|date:'Y-m-d' }}" class="fz-kachel"><strong>{{ k.name }}</strong></a></li>
+{% endif %}{% endfor %}
+{% if klassen and not jahrgaenge %}{% endif %}
+{% if not klassen %}<p class="leer karte">{% translate "Keine Klassen gefunden. Fehlzeiten tragen Klassenleitungen und Lehrkräfte für ihre Klassen ein, das Sekretariat für alle Klassen." %}</p>{% endif %}
+
+{% else %}
+<section class="karte">
+  {% if offene %}
+  <form method="post">{% csrf_token %}<input type="hidden" name="offen" value="1">
+    {% include "fehlzeiten/_offen_knoepfe.html" %}
+    <div class="tabellenrahmen">
+    <table class="liste fz-tabelle">
+      <thead><tr><th class="fz-kreuz"><input type="checkbox" class="fz-alle" aria-label="{% translate 'alle auswählen' %}"></th>
+        <th>{% translate "Klasse" %}</th><th>{% translate "Schüler:in" %}</th><th>{% translate "Datum" %}</th><th>{% translate "Art" %}</th><th>{% translate "Grund" %}</th></tr></thead>
+      <tbody>
+      {% for f in offene %}
+        <tr><td class="fz-kreuz"><input type="checkbox" name="fehlzeit" value="{{ f.pk }}" aria-label="{{ f.schueler.person }}"></td>
+          <td>{{ klasse_von|get_item:f.schueler_id }}</td>
+          <td>{% if perms.stammdaten.view_schuelerprofil %}<a href="{% url 'schuelerakte' f.schueler_id %}">{{ f.schueler.person }}</a>{% else %}{{ f.schueler.person }}{% endif %}</td>
+          <td class="nowrap">{% include "fehlzeiten/_zeitraum.html" %}</td><td>{{ f.get_art_display }}</td><td>{{ f.grund|default:"–" }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    </div>
+  </form>
+  {% else %}<p class="leer">{% translate "Keine offenen Entschuldigungen. 🎉" %}</p>{% endif %}
+</section>
+{% endif %}
+<script src="{% static 'fehlzeiten.js' %}" defer></script>
+{% endblock %}

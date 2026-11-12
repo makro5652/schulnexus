@@ -1,0 +1,5 @@
+{% load i18n %}{% if darf_aendern %}<div class="fz-sammel">
+  <span class="hinweistext">{% translate "Ankreuzen und markieren:" %}</span>
+  <button type="submit" name="aktion" value="entschuldigt" class="knopf klein">{% translate "Als entschuldigt markieren" %}</button>
+  <button type="submit" name="aktion" value="unentschuldigt" class="knopf klein zweitrangig">{% translate "Als unentschuldigt markieren" %}</button>
+</div>{% endif %}

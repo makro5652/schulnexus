@@ -15766,3 +15766,155 @@ msgstr "The help texts are currently available in German only."
 msgctxt "Versionsdatum"
 msgid "Stand"
 msgstr "as of"
+
+msgid "Alle Fehlzeiten (Liste)"
+msgstr "All absences (list)"
+
+msgid "Alle offenen Entschuldigungen nach Klasse und Name"
+msgstr "All open excuses by class and name"
+
+msgid "Am Tag eingetragen"
+msgstr "Recorded that day"
+
+msgid "An diesem Tag gehört niemand zu dieser Klasse."
+msgstr "Nobody belongs to this class on that day."
+
+msgid "Angaben"
+msgstr "Details"
+
+msgid "Ankreuzen und markieren:"
+msgstr "Tick and mark:"
+
+msgid "Fehlzeiten %(k)s"
+msgstr "Absences %(k)s"
+
+msgid "Übersicht %(h)s %(sj)s"
+msgstr "Overview %(h)s %(sj)s"
+
+msgid "Bitte zuerst Einträge ankreuzen."
+msgstr "Please tick entries first."
+
+msgid "Diesen Eintrag löschen?"
+msgstr "Delete this entry?"
+
+msgid "Einzelnes Formular für eine Fehlzeit"
+msgstr "Single form for one absence"
+
+msgid "Es war nichts eingetragen."
+msgstr "Nothing was entered."
+
+msgid "Es wurde nichts gespeichert. Bitte die markierten Angaben prüfen."
+msgstr "Nothing was saved. Please check the marked entries."
+
+msgid "Fehlzeit gelöscht."
+msgstr "Absence deleted."
+
+msgid ""
+"In der Zeile die Art antippen: ganztägig, Stunden oder Verspätung. Dann bei "
+"Bedarf Stunden, Minuten, Status und Grund ergänzen. Alle Zeilen werden "
+"zusammen gespeichert; leere Zeilen bleiben unverändert."
+msgstr ""
+"Tap the type in the row: full day, lessons or late. Then add lessons, "
+"minutes, status and reason if needed. All rows are saved together; empty "
+"rows stay unchanged."
+
+msgid "Keine Einträge in diesem Halbjahr."
+msgstr "No entries in this term."
+
+msgid ""
+"Keine Klassen gefunden. Fehlzeiten tragen Klassenleitungen und Lehrkräfte "
+"für ihre Klassen ein, das Sekretariat für alle Klassen."
+msgstr ""
+"No classes found. Form tutors and teachers record absences for their "
+"classes, the office for all classes."
+
+msgid "Keine offenen Entschuldigungen in dieser Klasse."
+msgstr "No open excuses in this class."
+
+msgid "Keine offenen Entschuldigungen. 🎉"
+msgstr "No open excuses. 🎉"
+
+msgid ""
+"Klasse antippen – danach stehen alle Schüler:innen alphabetisch zum "
+"Eintragen bereit."
+msgstr ""
+"Tap a class – all students are then listed alphabetically, ready for entry."
+
+msgid "Klasse wählen"
+msgstr "Choose class"
+
+msgid ""
+"Klasse wählen, Fehlzeiten eintragen, Entschuldigungen abarbeiten, Übersicht "
+"des Halbjahres"
+msgstr "Choose a class, record absences, process excuses, term overview"
+
+msgid "Liste aller Fehlzeiten mit Suche, Filtern und Sammelaktionen"
+msgstr "List of all absences with search, filters and bulk actions"
+
+msgid "Min."
+msgstr "min"
+
+msgid "Minuten"
+msgstr "Minutes"
+
+msgid "Ohne Jahrgang"
+msgstr "Without year group"
+
+msgid "Spaltenköpfe antippen, um zu sortieren."
+msgstr "Tap column headers to sort."
+
+msgid "Stunden"
+msgstr "Lessons"
+
+msgid "Wochenende"
+msgstr "Weekend"
+
+msgid "ab Stunde"
+msgstr "from lesson"
+
+msgid "alle auswählen"
+msgstr "select all"
+
+msgid "außerhalb des aktuellen Schuljahres"
+msgstr "outside the current school year"
+
+msgid "bis Datum"
+msgstr "until date"
+
+msgid "bis Stunde"
+msgstr "until lesson"
+
+msgid "ganztägig"
+msgstr "full day"
+
+msgid "nächster Schultag"
+msgstr "next school day"
+
+msgid "voriger Schultag"
+msgstr "previous school day"
+
+msgid "z. B. krank"
+msgstr "e.g. ill"
+
+msgid "{n} Zeilen ausgefüllt"
+msgstr "{n} rows filled in"
+
+msgid "%(n)d Fehlzeit gespeichert."
+msgid_plural "%(n)d Fehlzeiten gespeichert."
+msgstr[0] "%(n)d absence saved."
+msgstr[1] "%(n)d absences saved."
+
+msgid "%(n)d Fehlzeit geändert."
+msgid_plural "%(n)d Fehlzeiten geändert."
+msgstr[0] "%(n)d absence changed."
+msgstr[1] "%(n)d absences changed."
+
+msgid "Alle Einträge im Halbjahr (%(n)s)"
+msgid_plural "Alle Einträge im Halbjahr (%(n)s)"
+msgstr[0] "All entries in this term (%(n)s)"
+msgstr[1] "All entries in this term (%(n)s)"
+
+msgid "nur mit Eintrag (%(n)s)"
+msgid_plural "nur mit Einträgen (%(n)s)"
+msgstr[0] "only with entry (%(n)s)"
+msgstr[1] "only with entries (%(n)s)"
