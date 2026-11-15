@@ -1,7 +1,7 @@
 {
  "format": "schulnexus-spezifikation",
  "formatversion": 1,
- "schulnexus_version": "0.8.1",
+ "schulnexus_version": "0.8.2",
  "hinweis": "Automatisch erzeugt mit tools/spezifikation_erzeugen.py. Enthält nur die Programmstruktur, keine Daten.",
  "projekt": {
   "zweck": "Schulnexus ist eine Open-Source-Schulverwaltung für eine Schule (Jahrgänge 1–12, Sek I nach der Richtlinie für Deutsche Schulen im Ausland, Sek II mit Punkten 0–15). Sie deckt Stammdaten, Klassen und Kurse, Noten, Zeugnisse und Konferenzen, Fehlzeiten, Förderung, Neuanmeldungen, Elternkommunikation, Termine, Personal, Schuljahreswechsel, Archiv, Sicherung und Rechte ab.",
@@ -12381,6 +12381,10 @@
          "Schulnexus Hell"
         ],
         [
+         "abendrot",
+         "Abendrot (hell, glänzende Knöpfe)"
+        ],
+        [
          "ozean",
          "Ozean (hell, blau)"
         ],
@@ -14972,7 +14976,8 @@
         "test_konto_hat_vorrang_vor_cookie",
         "test_erste_anmeldung_uebernimmt_gewaehltes_design",
         "test_druckansichten_tragen_design",
-        "test_css_enthaelt_alle_designs"
+        "test_css_enthaelt_alle_designs",
+        "test_abendrot_laedt_eigene_datei_nur_bei_wahl"
        ]
       }
      ]
@@ -31938,7 +31943,7 @@
   },
   {
    "datei": "src/templates/portal/base.html",
-   "zeilen": 26,
+   "zeilen": 27,
    "erbt_von": null,
    "einbindungen": [
     "portal/_menueband.html",
@@ -32328,13 +32333,18 @@
    "beschreibung": "Fächer und Lehrkräfte: Fachsuche, nur belegte Fächer, 1. → 2. Halbjahr übernehmen, geänderte Felder markieren."
   },
   {
+   "datei": "src/static/abendrot.css",
+   "zeilen": 212,
+   "beschreibung": "Design „Abendrot“ (ab 0.8.2): Farben eines gemalten Sonnenuntergangs (Dunst, Koralle, Pfirsich, Wasserblau, Tusche) und glänzende Pillen-Knöpfe mit dunkler Kontur und Serifenschrift. Die Grundfarben (Variablen) stehen wie bei den übrigen Designs in den von tools/designs_erzeugen.py erzeugten Abschnitten; hier stehen Schrift, Hintergrund, Glasflächen und Knöpfe. Wird nur geladen, wenn das Design ge"
+  },
+  {
    "datei": "src/static/menueband.css",
-   "zeilen": 303,
+   "zeilen": 308,
    "beschreibung": "Menüband (Ribbon) – gemeinsam für Portal und Verwaltungsoberfläche. Alle Regeln sind auf .mb begrenzt."
   },
   {
    "datei": "src/static/portal.css",
-   "zeilen": 1415,
+   "zeilen": 1423,
    "beschreibung": "Kennzeichnungen (Status, Hinweise)"
   },
   {
@@ -32344,8 +32354,8 @@
   },
   {
    "datei": "src/static/skizze_klar.css",
-   "zeilen": 34,
-   "beschreibung": "Design „Skizzenbuch klar (modern)“ (ab 0.8.1): dieselbe Anordnung wie das Skizzenbuch (skizze.css, skizze_start.css, skizze_seiten.css), aber schlichte, moderne Farben. Die Regeln der Anordnung gelten für beide Designs; hier werden nur die Farbvariablen überschrieben. Diese Datei wird nach den drei Skizzen-Dateien geladen. Schriften bleiben wie im Skizzenbuch."
+   "zeilen": 39,
+   "beschreibung": "Design „Skizzenbuch klar (modern)“ (ab 0.8.1): dieselbe Anordnung wie das Skizzenbuch (skizze.css, skizze_start.css, skizze_seiten.css), aber mit höchstens vier Farben: Tinte, Akzent, Fläche und Karte. Alle Bereichs- und Warnfarben sind Töne davon. Die Regeln der Anordnung gelten für beide Designs; hier stehen nur die Farbvariablen. Schriften bleiben wie im Skizzenbuch."
   },
   {
    "datei": "src/static/skizze_seiten.css",
@@ -32364,12 +32374,12 @@
   },
   {
    "datei": "src/static/verwaltung.css",
-   "zeilen": 186,
+   "zeilen": 200,
    "beschreibung": "Sprachmenü in der Verwaltungsoberfläche"
   },
   {
    "datei": "src/static/zeugnis.css",
-   "zeilen": 127,
+   "zeilen": 130,
    "beschreibung": "Druckansicht der Zeugnisse nach dem Muster der Sek I-PO (Anlage 11), Format DIN A4"
   }
  ],

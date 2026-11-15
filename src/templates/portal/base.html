@@ -6,6 +6,7 @@
   <title>{% block title %}Schulnexus{% endblock %} · {{ SCHULNAME }}</title>
   <link rel="stylesheet" href="{% static 'portal.css' %}">
   <link rel="stylesheet" href="{% static 'menueband.css' %}">
+  {% if DESIGN == "abendrot" %}<link rel="stylesheet" href="{% static 'abendrot.css' %}">{% endif %}
   {% if SKIZZE %}<link rel="stylesheet" href="{% static 'skizze.css' %}">
   <link rel="stylesheet" href="{% static 'skizze_start.css' %}">
   <link rel="stylesheet" href="{% static 'skizze_seiten.css' %}">{% if DESIGN == "klar" %}<link rel="stylesheet" href="{% static 'skizze_klar.css' %}">{% endif %}{% endif %}

@@ -32,7 +32,7 @@ class DesignwahlTest(TestCase):
         self.assertTrue(all(len(c) <= 12 for c in codes))            # Länge des Datenbankfeldes
         gruppiert = [c for _t, liste in DESIGN_GRUPPEN for c in liste]
         self.assertEqual(sorted(gruppiert), sorted(codes))           # jedes Design steht genau einmal im Menü
-        self.assertEqual([len(l) for _t, l in design_gruppen()], [1, 2, 5, 5])
+        self.assertEqual([len(l) for _t, l in design_gruppen()], [1, 2, 6, 5])
 
     def test_menue_zeigt_alle_designs_in_gruppen(self):
         r = self.client.get(reverse("login"))
@@ -133,3 +133,18 @@ class DesignwahlTest(TestCase):
         # Catppuccin-Grundfarben: Latte base/text/mauve, Mocha base/text/mauve
         for farbe in ("#eff1f5", "#4c4f69", "#8839ef", "#1e1e2e", "#cdd6f4", "#cba6f7"):
             self.assertIn(farbe, portal)
+
+    def test_abendrot_laedt_eigene_datei_nur_bei_wahl(self):
+        """Ab 0.8.2: „Abendrot“ bringt Knöpfe und Hintergrund in abendrot.css mit; andere Designs laden sie nicht."""
+        css = (STATIC / "abendrot.css").read_text()
+        self.assertIn('html[data-design="abendrot"] .knopf', css)
+        self.assertIn('url("schrift/eb-garamond-latin-400-normal.woff2")', css)
+        self.assertNotIn("fonts.googleapis", css)                    # keine fremden Server
+        for datei in ("eb-garamond-latin-400-normal.woff2", "eb-garamond-latin-500-normal.woff2",
+                      "eb-garamond-latin-600-normal.woff2", "eb-garamond-latin-400-italic.woff2", "LIZENZ-EBGaramond.txt"):
+            self.assertTrue((STATIC / "schrift" / datei).exists(), datei)
+        self.assertNotContains(self.client.get(reverse("login")), "abendrot.css")
+        self.client.cookies["design"] = "abendrot"
+        r = self.client.get(reverse("login"))
+        self.assertContains(r, 'data-design="abendrot"')
+        self.assertContains(r, "abendrot.css")

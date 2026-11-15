@@ -1340,6 +1340,14 @@ kbd { font: inherit; font-size: 0.82em; border: 1px solid var(--linie); border-b
 }
 :root[data-design="kontrast"] a { text-decoration-thickness: 2px; }
 :root[data-design="kontrast"] :focus-visible { outline: 3px solid #0033a0; outline-offset: 2px; }
+:root[data-design="abendrot"] {
+  color-scheme: light;
+  --grund: #f4eeea; --flaeche: #fffdfb; --text: #23202b; --leise: #5e5566; --linie: #eaddd8;
+  --akzent: #a3344e; --akzent-hell: #fbe3e1; --warnung: #a8361c; --gefahr-flaeche: #fbe6dd;
+  --info-flaeche: #e1ecf0; --info-text: #2b5562; --hinweis-flaeche: #fcebd3; --hinweis-text: #7d4c18; --notiz-text: #4a3608;
+  --lila-flaeche: #f1e4ee; --lila-text: #683866; --ok: #2b6a51;
+  --papier-gelb: #fcefd9; --papier-gruen: #e3f0ea; --papier-blau: #e1ecf1; --papier-rosa: #fbe3e3; --papier-grau: #efeae8;
+}
 /* <<< Weitere Designs */
 
 /* Fehlzeiten nach Klasse (ab 0.7.1) */

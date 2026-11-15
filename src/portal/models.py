@@ -10,6 +10,7 @@ DESIGN_COOKIE = "design"
 DESIGNS = [
     ("standard", _("Standard (hell/dunkel nach System)")),
     ("hell", _("Schulnexus Hell")),
+    ("abendrot", _("Abendrot (hell, glänzende Knöpfe)")),
     ("ozean", _("Ozean (hell, blau)")),
     ("sepia", _("Sepia (hell, warm)")),
     ("latte", _("Catppuccin Latte (hell)")),
@@ -26,7 +27,7 @@ DESIGNS = [
 DESIGN_GRUPPEN = [
     (_("Automatisch"), ["standard"]),
     (_("Skizzenbuch"), ["skizze", "klar"]),
-    (_("Hell"), ["hell", "ozean", "sepia", "latte", "kontrast"]),
+    (_("Hell"), ["abendrot", "hell", "ozean", "sepia", "latte", "kontrast"]),
     (_("Dunkel"), ["dunkel", "nord", "frappe", "macchiato", "mocha"]),
 ]
 

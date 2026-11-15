@@ -68,6 +68,12 @@ PALETTEN = {
         hover="#eaf0ff", warnung="#a30000", gefahr="#ffe3e0", info="#dfe8ff", info_text="#002a80",
         hinweis="#fff1b8", hinweis_text="#5c3d00", notiz="#2b1d00", lila="#ecdcff", lila_text="#3d0a80", ok="#005a1c", ok_fl="#d9f2df",
         grau="#2b2b2b", papier=("#fff1b8", "#d9f2df", "#dfe8ff", "#ffe3e0", "#ededed"), muster=("#ffffff", "#000000", "#0033a0")),
+    "abendrot": dict(
+        dunkel=False, grund="#f4eeea", flaeche="#fffdfb", text="#23202b", leise="#5e5566", linie="#eaddd8", linie2="#d8c6c1",
+        akzent="#a3344e", akzent2="#842840", akzent_hell="#fbe3e1", auf_akzent="#ffffff", titel="#3a2f45", titel_text="#ffffff",
+        hover="#f8ece8", warnung="#a8361c", gefahr="#fbe6dd", info="#e1ecf0", info_text="#2b5562",
+        hinweis="#fcebd3", hinweis_text="#7d4c18", notiz="#4a3608", lila="#f1e4ee", lila_text="#683866", ok="#2b6a51", ok_fl="#e2f0ea",
+        grau="#5e5566", papier=("#fcefd9", "#e3f0ea", "#e1ecf1", "#fbe3e3", "#efeae8"), muster=("#f7d9cf", "#ee6f7c", "#9cc6cf")),
 }
 
 # Farbpaare (Schrift, Grund), die mindestens 4,5 : 1 erreichen müssen

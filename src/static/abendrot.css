@@ -1,0 +1,211 @@
+/* Design „Abendrot“ (ab 0.8.2): Farben eines gemalten Sonnenuntergangs (Dunst, Koralle, Pfirsich, Wasserblau, Tusche)
+   und glänzende Pillen-Knöpfe mit dunkler Kontur und Serifenschrift. Die Grundfarben (Variablen) stehen wie bei den
+   übrigen Designs in den von tools/designs_erzeugen.py erzeugten Abschnitten; hier stehen Schrift, Hintergrund,
+   Glasflächen und Knöpfe. Wird nur geladen, wenn das Design gewählt ist.
+   Schrift: EB Garamond (SIL Open Font License, siehe schrift/LIZENZ-EBGaramond.txt), lokal ausgeliefert. */
+@font-face { font-family: "EB Garamond"; font-style: normal; font-weight: 400; font-display: swap;
+  src: url("schrift/eb-garamond-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "EB Garamond"; font-style: normal; font-weight: 500; font-display: swap;
+  src: url("schrift/eb-garamond-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "EB Garamond"; font-style: normal; font-weight: 600; font-display: swap;
+  src: url("schrift/eb-garamond-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "EB Garamond"; font-style: italic; font-weight: 400; font-display: swap;
+  src: url("schrift/eb-garamond-latin-400-italic.woff2") format("woff2"); }
+
+:root[data-design="abendrot"] {
+  --ar-tinte: #23202b; --ar-tinte-weich: #3b2433; --ar-koralle: #ee6f7c; --ar-rose: #e8607a; --ar-pfirsich: #f8c29a;
+  --ar-dunst: #f4eeea; --ar-wasser: #a9ccd4; --ar-wasser-hell: #dcebef;
+  --ar-glas: rgba(255, 253, 251, .76); --ar-glas-rand: rgba(255, 255, 255, .75);
+  --ar-schatten: 0 1px 0 rgba(255, 255, 255, .8) inset, 0 12px 32px -14px rgba(120, 56, 72, .28), 0 2px 6px -2px rgba(60, 30, 45, .08);
+  --ar-serif: "EB Garamond", "Cormorant Garamond", Garamond, "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --radius: 18px;
+}
+
+/* Hintergrund: Himmel, Glut um die Sonne, Pfirsich und Wasserblau unten, darüber ein feines Papierkorn */
+html[data-design="abendrot"] body {
+  background-color: var(--ar-dunst);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='k'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .2 0 0 0 0 .25 0 0 0 .06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23k)'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse 34% 22% at 66% 30%, rgba(240, 112, 120, .38), rgba(246, 170, 160, .16) 55%, transparent 75%),
+    radial-gradient(ellipse 60% 30% at 80% 78%, rgba(248, 194, 154, .45), transparent 70%),
+    radial-gradient(ellipse 45% 30% at 95% 55%, rgba(156, 198, 207, .45), transparent 70%),
+    radial-gradient(ellipse 50% 25% at 30% 95%, rgba(246, 201, 204, .5), transparent 70%),
+    linear-gradient(180deg, #f3f1ef 0%, #f6e7e2 22%, #f5d8d3 33%, #efe2df 45%, #e6eced 62%, #f6e6d9 85%, #f4dde0 100%);
+  background-attachment: fixed;
+}
+html[data-design="abendrot"] :focus-visible { outline: 2px solid var(--ar-tinte); outline-offset: 3px; }
+
+/* Überschriften in Serifenschrift */
+html[data-design="abendrot"] :is(h1, h2, h3, .hp-artikel h2) { font-family: var(--ar-serif); font-weight: 500; letter-spacing: -0.005em; color: var(--ar-tinte); }
+html[data-design="abendrot"] h1 { font-size: 2.15rem; line-height: 1.15; }
+html[data-design="abendrot"] h2 { font-size: 1.4rem; }
+html[data-design="abendrot"] .karte h3 { font-size: 1.15rem; }
+html[data-design="abendrot"] .kennzahlen strong { font-family: var(--ar-serif); font-weight: 500; font-size: 2rem; line-height: 1.1; }
+html[data-design="abendrot"] .fuss { font-family: var(--ar-serif); font-size: 0.95rem; }
+
+/* Glasflächen */
+html[data-design="abendrot"] :is(.karte, .kennzahlen div, .tabellenrahmen, .meldungen li, .kacheln a) {
+  background: var(--ar-glas); border: 1px solid var(--ar-glas-rand); box-shadow: var(--ar-schatten);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15); backdrop-filter: blur(14px) saturate(1.15);
+}
+html[data-design="abendrot"] :is(.karte, .kennzahlen div, .tabellenrahmen) { border-radius: var(--radius); }
+html[data-design="abendrot"] .kacheln a { border-radius: 14px; }
+html[data-design="abendrot"] .kacheln a:hover { border-color: var(--ar-koralle); }
+html[data-design="abendrot"] .kennzahlen .hinweis { border-color: var(--ar-koralle); box-shadow: var(--ar-schatten), 0 0 0 1px var(--ar-koralle) inset; }
+html[data-design="abendrot"] .meldungen li { border-radius: 999px; padding-inline: 1.3rem; }
+html[data-design="abendrot"] thead th { background: transparent; }
+
+/* Eingabefelder: weich gerundet, leicht durchscheinend */
+html[data-design="abendrot"] :is(select, .formular input, .formular textarea, .anmeldung input, .filterzeile input) {
+  border: 1px solid #e3d3cf; border-radius: 12px; background: rgba(255, 255, 255, .78);
+  box-shadow: inset 0 1px 2px rgba(60, 30, 45, .06);
+}
+html[data-design="abendrot"] :is(select, input, textarea):focus { border-color: var(--ar-koralle); outline: none; box-shadow: 0 0 0 3px rgba(238, 111, 124, .25); }
+
+/* ---- Knöpfe: Pillen mit Glanzkappe ---------------------------------------------------------------------------------- */
+html[data-design="abendrot"] .knopf {
+  position: relative; isolation: isolate; overflow: hidden;
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem;
+  padding: 0.55rem 1.65rem; border-radius: 999px;
+  font-family: var(--ar-serif); font-size: 1.2rem; font-weight: 500; line-height: 1.25; letter-spacing: 0.01em;
+  color: #3a1426; text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
+  border: 1.5px solid var(--ar-tinte-weich);
+  background: linear-gradient(180deg, #e8607a 0%, #ef8384 38%, #f5ab98 70%, #fbd9c2 100%);
+  box-shadow: inset 0 -3px 7px rgba(255, 236, 220, .75), inset 0 1px 0 rgba(255, 255, 255, .6),
+    0 1px 2px rgba(60, 20, 38, .25), 0 8px 18px -10px rgba(232, 96, 122, .7);
+  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+}
+/* Glanzkappe in der oberen Hälfte, wie bei Aqua-Knöpfen */
+html[data-design="abendrot"] .knopf::before {
+  content: ""; position: absolute; z-index: -1; left: 7%; right: 7%; top: 2px; height: 46%;
+  border-radius: 999px 999px 60% 60% / 999px 999px 100% 100%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .85), rgba(255, 255, 255, .18));
+  pointer-events: none;
+}
+html[data-design="abendrot"] .knopf:hover { filter: brightness(1.04) saturate(1.05); transform: translateY(-1px);
+  box-shadow: inset 0 -3px 7px rgba(255, 236, 220, .75), inset 0 1px 0 rgba(255, 255, 255, .6),
+    0 2px 3px rgba(60, 20, 38, .25), 0 12px 22px -10px rgba(232, 96, 122, .8); }
+html[data-design="abendrot"] .knopf:active { transform: translateY(0); filter: brightness(.97);
+  box-shadow: inset 0 2px 6px rgba(80, 20, 40, .3), 0 1px 1px rgba(60, 20, 38, .2); }
+html[data-design="abendrot"] .knopf:focus-visible { outline: 2px solid var(--ar-tinte); outline-offset: 3px; }
+html[data-design="abendrot"] .knopf.klein { padding: 0.3rem 1.1rem; font-size: 1.05rem; }
+html[data-design="abendrot"] .knopf:disabled { opacity: 0.5; filter: grayscale(.35); transform: none; }
+
+/* Zweitrangig: Milchglas in Wasserblau, ohne dunkle Kontur */
+html[data-design="abendrot"] .knopf.zweitrangig {
+  color: var(--ar-tinte); text-shadow: 0 1px 0 rgba(255, 255, 255, .7);
+  border: 1px solid rgba(86, 120, 132, .28);
+  background: linear-gradient(180deg, #eef5f7 0%, #dcebef 55%, #cfe3e9 100%);
+  box-shadow: inset 0 -2px 6px rgba(255, 255, 255, .8), inset 0 1px 0 rgba(255, 255, 255, .9), 0 6px 14px -8px rgba(70, 110, 125, .5);
+}
+html[data-design="abendrot"] .knopf.zweitrangig:hover { box-shadow: inset 0 -2px 6px rgba(255, 255, 255, .8), inset 0 1px 0 rgba(255, 255, 255, .9), 0 10px 18px -8px rgba(70, 110, 125, .55); }
+
+/* Gefahr: hellgrau glänzend mit dunkler Kontur und roter Schrift */
+html[data-design="abendrot"] .knopf.gefahr {
+  color: #9a2c1a; text-shadow: 0 1px 0 rgba(255, 255, 255, .7);
+  border: 1.5px solid #6f6670;
+  background: linear-gradient(180deg, #f7f5f5 0%, #e9e5e5 50%, #dcd6d7 100%);
+  box-shadow: inset 0 -2px 6px rgba(255, 255, 255, .7), inset 0 1px 0 #fff, 0 6px 14px -8px rgba(60, 40, 50, .45);
+}
+
+/* ---- Menüband ------------------------------------------------------------------------------------------------------- */
+html[data-design="abendrot"] .mb {
+  --mb-titel-text: var(--ar-tinte); --mb-flaeche: rgba(255, 252, 250, .8); --mb-hover: rgba(251, 227, 225, .7);
+  --mb-schatten: rgba(120, 56, 72, .14);
+  background: var(--mb-flaeche); -webkit-backdrop-filter: blur(16px) saturate(1.2); backdrop-filter: blur(16px) saturate(1.2);
+}
+/* Titelleiste als Horizont: Dunst, Glut, Wasserblau */
+html[data-design="abendrot"] .mb-titel {
+  color: var(--ar-tinte);
+  background: linear-gradient(90deg, rgba(246, 236, 232, .9) 0%, rgba(247, 214, 210, .9) 48%, rgba(248, 206, 190, .85) 62%, rgba(214, 232, 237, .9) 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, .7);
+}
+html[data-design="abendrot"] .mb-titel :focus-visible { outline-color: var(--ar-tinte); }
+html[data-design="abendrot"] .mb-marke strong { font-family: var(--ar-serif); font-size: 1.2rem; font-weight: 600; letter-spacing: 0.01em; }
+html[data-design="abendrot"] .mb-zeichen {
+  border-radius: 50%; color: #3a1426; font-family: var(--ar-serif); font-weight: 600; border: 1.5px solid var(--ar-tinte-weich);
+  background: radial-gradient(circle at 50% 30%, #fff6ea 0%, #fbd3b4 35%, #ee6f7c 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .8), 0 2px 6px -2px rgba(232, 96, 122, .7);
+}
+html[data-design="abendrot"] .mb-suche { background: rgba(255, 255, 255, .62); color: var(--ar-tinte); border: 1px solid rgba(255, 255, 255, .85);
+  border-radius: 999px; padding: 0.38rem 0.95rem; box-shadow: inset 0 1px 2px rgba(60, 30, 45, .08); }
+html[data-design="abendrot"] .mb-suche input::placeholder { color: #6a5f6c; }
+html[data-design="abendrot"] .mb-suche:focus-within { background: #fff; box-shadow: 0 0 0 3px rgba(238, 111, 124, .28); }
+/* Kleine Pillen der Titelleiste (Befehle, Sprache, Design) im Milchglas-Stil */
+html[data-design="abendrot"] :is(.mb .mb-befehlsknopf, .mb .sprachmenue summary) {
+  color: var(--ar-tinte); border: 1px solid rgba(86, 120, 132, .3);
+  background: linear-gradient(180deg, rgba(255, 255, 255, .95) 0%, rgba(232, 242, 245, .9) 52%, rgba(207, 227, 233, .9) 100%);
+  box-shadow: inset 0 1px 0 #fff, 0 4px 10px -6px rgba(70, 110, 125, .5);
+}
+html[data-design="abendrot"] :is(.mb .mb-befehlsknopf, .mb .sprachmenue summary):hover { background: linear-gradient(180deg, #fff 0%, #eef6f8 52%, #d8e9ee 100%); }
+html[data-design="abendrot"] .mb-befehlsknopf kbd { border-color: rgba(35, 32, 43, .3); }
+html[data-design="abendrot"] .mb-konto summary:hover { background: rgba(255, 255, 255, .45); }
+html[data-design="abendrot"] .mb-initialen { color: var(--ar-tinte); border: 1px solid rgba(86, 120, 132, .35);
+  background: radial-gradient(circle at 50% 30%, #ffffff 0%, #dcebef 60%, #a9ccd4 100%); }
+/* Registerkarten in Serifenschrift, aktive Karte mit Glut-Linie */
+html[data-design="abendrot"] .mb-reiter [role="tab"] { font-family: var(--ar-serif); font-size: 1.08rem; color: #5e5566; }
+html[data-design="abendrot"] .mb-reiter [role="tab"]:hover { color: var(--ar-tinte); }
+html[data-design="abendrot"] .mb-reiter [role="tab"][aria-selected="true"] { color: var(--ar-tinte); font-weight: 600;
+  border-bottom-color: transparent; border-image: linear-gradient(90deg, var(--ar-pfirsich), var(--ar-koralle), var(--ar-wasser)) 1; }
+html[data-design="abendrot"] .mb-gross, html[data-design="abendrot"] .mb-klein a { border-radius: 12px; }
+html[data-design="abendrot"] .mb-gross.aktiv, html[data-design="abendrot"] .mb-klein a.aktiv {
+  color: #842840; background: linear-gradient(180deg, rgba(255, 255, 255, .7), rgba(251, 222, 218, .85)); box-shadow: inset 0 0 0 1px rgba(238, 111, 124, .35); }
+html[data-design="abendrot"] .mb-schnell a { border-radius: 999px; background: rgba(255, 255, 255, .55); }
+html[data-design="abendrot"] :is(.mb .sprachmenue form, .mb-konto-menue) { background: rgba(255, 252, 250, .94); border-radius: 16px;
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+
+/* ---- Verwaltungsoberfläche (Django-Admin) ---------------------------------------------------------------------------- */
+html[data-design="abendrot"] :is(input[type="submit"], input[type="button"], .button, a.button, .submit-row a.deletelink) {
+  border-radius: 999px; font-family: var(--ar-serif); font-size: 1rem; font-weight: 500; padding: 0.45rem 1.2rem; height: auto;
+  color: var(--ar-tinte); border: 1px solid rgba(86, 120, 132, .3);
+  background: linear-gradient(180deg, #eef5f7 0%, #dcebef 55%, #cfe3e9 100%);
+  box-shadow: inset 0 1px 0 #fff, 0 6px 14px -8px rgba(70, 110, 125, .5);
+}
+html[data-design="abendrot"] :is(input[type="submit"].default, .button.default) {
+  color: #3a1426; border: 1.5px solid var(--ar-tinte-weich);
+  background: linear-gradient(180deg, #f6a6b0 0%, #ef8384 40%, #f5ab98 70%, #fbd9c2 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .7), 0 8px 18px -10px rgba(232, 96, 122, .7);
+}
+html[data-design="abendrot"] .submit-row a.deletelink { color: #9a2c1a; background: linear-gradient(180deg, #f7f5f5, #dcd6d7); border-color: #6f6670; }
+
+/* ---- Pillen-Umschalter der Fachseiten (Reiter, Chips, Wege): inaktiv Milchglas, aktiv glänzende Glut ------------------ */
+html[data-design="abendrot"] :is(.fz-reiter a, .sy-wege a, .nk-chip, .zo-chip, .fz-art span) {
+  border-radius: 999px; color: var(--ar-tinte); border: 1px solid rgba(86, 120, 132, .28);
+  background: linear-gradient(180deg, rgba(255, 255, 255, .95) 0%, rgba(236, 244, 246, .92) 55%, rgba(214, 231, 236, .92) 100%);
+  box-shadow: inset 0 1px 0 #fff, 0 4px 10px -7px rgba(70, 110, 125, .55);
+}
+html[data-design="abendrot"] :is(.fz-reiter a.aktiv, .sy-wege a.aktiv, .nk-chip.aktiv, .zo-chip[aria-pressed=true], .fz-art input:checked + span, .zo-gruppen li a.aktiv) {
+  color: #3a1426; border: 1.5px solid var(--ar-tinte-weich); text-shadow: 0 1px 0 rgba(255, 255, 255, .45);
+  background: linear-gradient(180deg, rgba(255, 255, 255, .55) 0%, rgba(255, 255, 255, .12) 48%, rgba(255, 255, 255, 0) 52%),
+    linear-gradient(180deg, #e8607a 0%, #ef8384 40%, #f5ab98 72%, #fbd9c2 100%);
+  box-shadow: inset 0 -2px 5px rgba(255, 236, 220, .7), 0 6px 14px -8px rgba(232, 96, 122, .7);
+}
+/* Auswahlkacheln als Glas */
+html[data-design="abendrot"] :is(.fz-kachel, .nk-kachel:not(.aktiv)) {
+  background: var(--ar-glas); border: 1px solid var(--ar-glas-rand); box-shadow: var(--ar-schatten); border-radius: 16px;
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+}
+html[data-design="abendrot"] .fz-kachel:hover { border-color: var(--ar-koralle); }
+html[data-design="abendrot"] .fz-kachel strong { font-family: var(--ar-serif); font-size: 1.55rem; font-weight: 500; }
+html[data-design="abendrot"] .fz-jahrgang h2 { font-size: 1.05rem; letter-spacing: 0.08em; color: #5e5566; }
+html[data-design="abendrot"] input[type="date"], html[data-design="abendrot"] input[type="search"] { border-radius: 12px; }
+
+/* Verwaltung: Werkzeugknöpfe und Filterleiste */
+html[data-design="abendrot"] .object-tools a {
+  border-radius: 999px; font-family: var(--ar-serif); font-size: 1rem; text-transform: none; letter-spacing: 0.01em; color: #3a1426;
+  border: 1.5px solid var(--ar-tinte-weich); padding: 0.35rem 1.1rem;
+  background: linear-gradient(180deg, #f6a6b0 0%, #ef8384 40%, #f5ab98 70%, #fbd9c2 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .7), 0 8px 18px -10px rgba(232, 96, 122, .7);
+}
+html[data-design="abendrot"] .object-tools a:hover { filter: brightness(1.04); }
+html[data-design="abendrot"] #changelist-filter { background: var(--ar-glas); border-radius: 16px; overflow: hidden; }
+html[data-design="abendrot"] #changelist-filter h2 { background: transparent; color: var(--ar-tinte); font-family: var(--ar-serif); font-size: 1.15rem; text-transform: none; letter-spacing: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-design="abendrot"] .knopf { transition: none; }
+  html[data-design="abendrot"] .knopf:hover { transform: none; }
+}
+@media print {
+  html[data-design="abendrot"] body { background: #fff; }
+  html[data-design="abendrot"] :is(.karte, .kennzahlen div, .tabellenrahmen) { box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; background: #fff; }
+}

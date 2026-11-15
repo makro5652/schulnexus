@@ -297,6 +297,11 @@ html[data-design="kontrast"] .mb {
   --mb-akzent: #0033a0; --mb-akzent-hell: #dfe8ff; --mb-hover: #eaf0ff; --mb-schatten: rgba(16, 24, 32, .1);
 }
 .design-muster-kontrast i:nth-child(1) { background: #ffffff; } .design-muster-kontrast i:nth-child(2) { background: #000000; } .design-muster-kontrast i:nth-child(3) { background: #0033a0; }
+html[data-design="abendrot"] .mb {
+  --mb-titel: #3a2f45; --mb-titel-text: #ffffff; --mb-flaeche: #fffdfb; --mb-text: #23202b; --mb-leise: #5e5566; --mb-linie: #eaddd8;
+  --mb-akzent: #a3344e; --mb-akzent-hell: #fbe3e1; --mb-hover: #f8ece8; --mb-schatten: rgba(16, 24, 32, .1);
+}
+.design-muster-abendrot i:nth-child(1) { background: #f7d9cf; } .design-muster-abendrot i:nth-child(2) { background: #ee6f7c; } .design-muster-abendrot i:nth-child(3) { background: #9cc6cf; }
 /* <<< Weitere Designs */
 /* Skizzenbuch (ab 0.8.0): hier nur das Muster im Design-Menü, alles Weitere steht in skizze*.css */
 .design-muster-skizze i:nth-child(1) { background: #FFF8E7; } .design-muster-skizze i:nth-child(2) { background: #FFE08A; } .design-muster-skizze i:nth-child(3) { background: #FFB8CB; }

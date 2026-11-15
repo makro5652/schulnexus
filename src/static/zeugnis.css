@@ -122,5 +122,8 @@ table { border-collapse: collapse; width: 100%; }
   html[data-design="kontrast"] body { background: #ffffff; }
   html[data-design="kontrast"] .werkzeug { background: #000000; color: #ffffff; }
   html[data-design="kontrast"] .werkzeug button { color: #000000; }
+  html[data-design="abendrot"] body { background: #f4eeea; }
+  html[data-design="abendrot"] .werkzeug { background: #3a2f45; color: #ffffff; }
+  html[data-design="abendrot"] .werkzeug button { color: #3a2f45; }
 }
 /* <<< Weitere Designs */

@@ -841,6 +841,18 @@ SECRET_KEY=x DATABASE_URL=postgres://x:x@localhost/x python tools/spezifikation_
 
 Eine Datenbank ist dafür nicht nötig.
 
+## Design „Abendrot“ (ab 0.8.2)
+
+Farben eines gemalten Sonnenuntergangs – Dunstweiß, Koralle, Pfirsich, Wasserblau, dazu Tusche als Schrift – mit
+**glänzenden Pillen-Knöpfen**: Hauptknöpfe in Abendglut mit dunkler Kontur und Glanzkappe, Nebenknöpfe als
+blaues Milchglas, Löschknöpfe hellgrau mit roter Schrift. Karten und Menüband sind leicht durchscheinend,
+Überschriften, Registerkarten und Knöpfe stehen in der Serifenschrift EB Garamond; Fließtext, Tabellen und Ziffern
+bleiben in der Systemschrift. Wahl unter **Design › Hell › Abendrot**.
+
+Grundfarben: `tools/designs_erzeugen.py` (Palette `abendrot`, kontrastgeprüft); Hintergrund, Glas und Knöpfe:
+`src/static/abendrot.css` (wird nur bei diesem Design geladen). Die Schrift liegt in `src/static/schrift/`
+(SIL OFL 1.1, Lizenztext liegt bei) – es werden keine fremden Server angefragt.
+
 ## Design „Skizzenbuch klar (modern)“ (ab 0.8.1)
 
 Dieselbe Anordnung wie das Skizzenbuch, aber mit schlichten, modernen Farben: helles Grau-Weiß, Schiefer als Schrift,
@@ -866,7 +878,7 @@ jederzeit zurück zum Menüband.
 
 Anordnung, Farben und Schriftregeln stehen in [docs/skizzenbuch-design.md](docs/skizzenbuch-design.md).
 Die Gestaltung liegt in `src/static/skizze.css`, `skizze_start.css` und `skizze_seiten.css`; alle Regeln gelten nur
-unter `data-design="skizze"`, die übrigen elf Designs bleiben unberührt.
+unter `data-design="skizze"`, die übrigen Designs bleiben unberührt.
 
 ## Fehlzeiten nach Klasse (ab 0.7.1)
 

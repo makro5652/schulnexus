@@ -15941,3 +15941,7 @@ msgstr "What would you like to do?"
 
 msgid "Skizzenbuch klar (modern)"
 msgstr "Sketchbook clear (modern)"
+
+#: portal/models.py:13
+msgid "Abendrot (hell, glänzende Knöpfe)"
+msgstr "Sunset glow (light, glossy buttons)"

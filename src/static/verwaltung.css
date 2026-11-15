@@ -182,4 +182,18 @@ html[data-design="kontrast"]:root {
   --close-button-bg: #2b2b2b; --close-button-hover-bg: #2b2b2b; --delete-button-bg: #a30000; --delete-button-hover-bg: #a30000;
   --object-tools-fg: #ffffff; --object-tools-bg: #2b2b2b; --object-tools-hover-bg: #0033a0;
 }
+html[data-design="abendrot"]:root {
+  color-scheme: light;
+  --primary: #a3344e; --secondary: #a3344e; --accent: #fbe3e1; --primary-fg: #ffffff;
+  --body-fg: #23202b; --body-bg: #fffdfb; --body-quiet-color: #5e5566; --body-medium-color: #23202b; --body-loud-color: #23202b;
+  --header-color: #ffffff; --header-branding-color: #ffffff; --header-bg: #3a2f45; --header-link-color: #ffffff;
+  --breadcrumbs-fg: #5e5566; --breadcrumbs-link-fg: #a3344e; --breadcrumbs-bg: #f4eeea;
+  --link-fg: #a3344e; --link-hover-color: #842840; --link-selected-fg: #a3344e;
+  --hairline-color: #eaddd8; --border-color: #d8c6c1;
+  --error-fg: #a8361c; --message-success-bg: #e2f0ea; --message-warning-bg: #fcebd3; --message-error-bg: #fbe6dd;
+  --darkened-bg: #f4eeea; --selected-bg: #eaddd8; --selected-row: #fbe3e1;
+  --button-fg: #ffffff; --button-bg: #a3344e; --button-hover-bg: #842840; --default-button-bg: #842840; --default-button-hover-bg: #a3344e;
+  --close-button-bg: #5e5566; --close-button-hover-bg: #5e5566; --delete-button-bg: #a8361c; --delete-button-hover-bg: #a8361c;
+  --object-tools-fg: #ffffff; --object-tools-bg: #5e5566; --object-tools-hover-bg: #a3344e;
+}
 /* <<< Weitere Designs */

@@ -38,7 +38,7 @@ Das Suchfeld in der Titelleiste findet Schüler:innen, Kolleg:innen und – für
 ## Sprache und Design
 
 - **Sprache** (Weltkugel, „DE“): Deutsch oder Englisch. Die Wahl wird in Ihrem Konto gespeichert und gilt auf jedem Gerät. Freie Eingaben wie Namen oder Bemerkungen werden nicht übersetzt.
-- **Design** (Farbpalette): elf Farbschemata, gegliedert in „Automatisch“ (hell oder dunkel nach Ihrem Betriebssystem), „Hell“ und „Dunkel“. Für schwierige Lichtverhältnisse eignet sich „Hoher Kontrast“, für langes Lesen „Sepia“. Auch das Design wird im Konto gespeichert. Druckansichten bleiben immer weiß.
+- **Design** (Farbpalette): mehrere Farbschemata, gegliedert in „Automatisch“ (hell oder dunkel nach Ihrem Betriebssystem), „Skizzenbuch“, „Hell“ und „Dunkel“. Für schwierige Lichtverhältnisse eignet sich „Hoher Kontrast“, für langes Lesen „Sepia“. „Abendrot“ zeigt sanfte Sonnenuntergangsfarben und glänzende, runde Knöpfe. Auch das Design wird im Konto gespeichert. Druckansichten bleiben immer weiß.
 
 ## Ihr Konto
 
